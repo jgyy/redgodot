@@ -59,6 +59,11 @@ func _setup_scene(scene: String, args: Dictionary) -> void:
 			pass  # goto_title() already ran in _ready()
 		"intro":
 			SceneRouter.goto_intro()
+		"px_test":
+			var layer := CanvasLayer.new()
+			layer.layer = 50
+			add_child(layer)
+			layer.add_child(load("res://scripts/ui/px/PxTestCard.gd").new())
 		"battle":
 			GameState.new_game(args.get("player", "SQUIRTLE"))
 			if args.has("player_level"):
