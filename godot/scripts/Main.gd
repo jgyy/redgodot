@@ -18,6 +18,15 @@ func _ready() -> void:
 	if OS.get_cmdline_user_args().has("--run-tests"):
 		_run_tests()
 		return
+	if OS.get_cmdline_user_args().has("--scene=ow_playtest"):   # overworld new-game autopilot
+		var pt: Node = load("res://scripts/overworld/PlayTest.gd").new()
+		add_child(pt)
+		var starter := "CHARMANDER"
+		for a in OS.get_cmdline_user_args():
+			if a.begins_with("--starter="):
+				starter = a.substr(10)
+		pt.run(starter)
+		return
 	_maybe_capture_screenshot()
 
 func _run_tests() -> void:

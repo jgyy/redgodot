@@ -417,7 +417,8 @@ func _on_player_step(_a: OwActor) -> void:
 		return
 	var m := _map_loader
 	var wi := m.warp_index_at(player.cell)
-	if wi >= 0 and (m.is_warp_tile(player.cell) or m.is_door_tile(player.cell)):
+	# scripted walks onto a door leave the warp to the script (it warps itself right after)
+	if wi >= 0 and not player.scripted and (m.is_warp_tile(player.cell) or m.is_door_tile(player.cell)):
 		_do_warp(wi)
 		return
 	if player.scripted:
