@@ -15,7 +15,7 @@ Code in this repository is MIT licensed (see `LICENSE`); no original game
 assets from Nintendo's Pokémon Red are included or redistributed.
 
 **Tooling:** [Godot 4.7.2](https://godotengine.org/download) (headless,
-`--headless --rendering-driver opengl3`) and **Blender 5.0.1** (headless, via
+`--headless --rendering-driver opengl3`) and **Blender 5.2.2** (headless, via
 the official [`bpy` PyPI package](https://pypi.org/project/bpy/) — no GUI
 ever). Both are the newest versions actually reachable from the sandbox this
 was built in, which blocks `blender.org` at the network-policy level; see
@@ -43,7 +43,7 @@ placeholder pretending to be final art.
 
 ## Screenshots
 
-*(Captured headlessly via `xvfb-run godot4 --rendering-driver opengl3`, the same
+*(Captured headlessly via `xvfb-run godot --rendering-driver opengl3`, the same
 command the CI workflow runs — these are real, in-engine screenshots of the
 actual Blender-generated models, not mockups.)*
 
@@ -141,8 +141,8 @@ Requires the [Godot 4.7+ engine](https://godotengine.org/download) (this repo
 targets Godot 4.7.2).
 
 ```sh
-godot4 --path godot --import   # first run only: import assets
-godot4 --path godot            # play
+godot --path godot --import   # first run only: import assets
+godot --path godot            # play
 ```
 
 Controls: arrow keys / WASD to move, Space/Enter to confirm, Escape/X to
@@ -151,8 +151,8 @@ cancel, Enter to open the party menu.
 ### Running tests
 
 ```sh
-godot4 --headless --path godot --import
-godot4 --headless --path godot -- --run-tests
+godot --headless --path godot --import
+godot --headless --path godot -- --run-tests
 ```
 
 26 assertions cover the ported damage formula (including a same-seed crit vs.
@@ -163,7 +163,7 @@ map tile classification, and the wild-encounter slot table — see
 ### Taking your own screenshots
 
 ```sh
-xvfb-run godot4 --path godot --rendering-driver opengl3 \
+xvfb-run godot --path godot --rendering-driver opengl3 \
   -- --screenshot=/tmp/out.png --scene=overworld --wait=1.5
 # --scene is one of: title, overworld, battle
 ```
