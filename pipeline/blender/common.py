@@ -76,8 +76,11 @@ def make_material(name, hex_color='#888888', roughness=0.55, specular=0.35, meta
         ins['Emission Strength'].default_value = emission_strength
     if alpha < 1.0:
         ins['Alpha'].default_value = alpha
-        m.blend_method = 'BLEND'
-        m.shadow_method = 'HASHED'
+        if hasattr(m, 'blend_method'):
+            m.blend_method = 'BLEND'
+        if hasattr(m, 'shadow_method'):
+            # Removed in Blender 4.2+ (EEVEE Next handles transparent shadows itself).
+            m.shadow_method = 'HASHED'
     m.diffuse_color = (col[0], col[1], col[2], alpha)
     return m
 
@@ -407,9 +410,16 @@ class ActionWriter:
         self.keys.setdefault(bone, {})[frame] = (lv, q, ls)
 
     def write(self, all_bones):
+        # Blender 4.4+ replaced the old single-layer Action (Action.fcurves /
+        # Action.id_root) with slotted/layered actions. fcurve_ensure_for_datablock
+        # requires the action to already be the datablock's *active* action, so we
+        # assign it temporarily and detach afterwards (stash_actions() puts the
+        # finished action into its own NLA strip, it doesn't need to stay active).
         act = bpy.data.actions.new(self.name)
         act.use_fake_user = True
-        act.id_root = 'OBJECT'
+        ad = self.arm.animation_data or self.arm.animation_data_create()
+        prev_action = ad.action
+        ad.action = act
         for bone in all_bones:
             fr = self.keys.get(bone, {})
             if 0 not in fr:
@@ -422,7 +432,7 @@ class ActionWriter:
                                         ('rotation_quaternion', 4, lambda k: k[1]),
                                         ('scale', 3, lambda k: k[2])):
                 for i in range(idx_n):
-                    fc = act.fcurves.new(base + prop, index=i, action_group=bone)
+                    fc = act.fcurve_ensure_for_datablock(self.arm, base + prop, index=i, group_name=bone)
                     fc.keyframe_points.add(len(frames))
                     co = []
                     for f in frames:
@@ -431,6 +441,7 @@ class ActionWriter:
                     for kp in fc.keyframe_points:
                         kp.interpolation = 'LINEAR'
                     fc.update()
+        ad.action = prev_action
         return act
 
 

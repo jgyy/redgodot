@@ -162,7 +162,7 @@
    "tris": 4876,
    "materials": 9,
    "file": "BULBASAUR.glb",
-   "bytes": 214340,
+   "bytes": 191928,
    "status": "generated"
   },
   "IVYSAUR": {
@@ -171,7 +171,7 @@
    "tris": 13388,
    "materials": 12,
    "file": "IVYSAUR.glb",
-   "bytes": 561576,
+   "bytes": 524712,
    "status": "generated"
   },
   "VENUSAUR": {
@@ -180,7 +180,7 @@
    "tris": 19102,
    "materials": 16,
    "file": "VENUSAUR.glb",
-   "bytes": 777400,
+   "bytes": 721432,
    "status": "generated"
   },
   "CHARMANDER": {
@@ -189,7 +189,7 @@
    "tris": 4848,
    "materials": 7,
    "file": "CHARMANDER.glb",
-   "bytes": 216056,
+   "bytes": 191628,
    "status": "generated"
   },
   "CHARMELEON": {
@@ -198,7 +198,7 @@
    "tris": 4460,
    "materials": 8,
    "file": "CHARMELEON.glb",
-   "bytes": 213160,
+   "bytes": 185760,
    "status": "generated"
   },
   "CHARIZARD": {
@@ -207,7 +207,7 @@
    "tris": 7634,
    "materials": 8,
    "file": "CHARIZARD.glb",
-   "bytes": 347200,
+   "bytes": 314012,
    "status": "generated"
   },
   "SQUIRTLE": {
@@ -216,7 +216,7 @@
    "tris": 5718,
    "materials": 9,
    "file": "SQUIRTLE.glb",
-   "bytes": 240880,
+   "bytes": 216304,
    "status": "generated"
   },
   "WARTORTLE": {
@@ -225,7 +225,7 @@
    "tris": 8354,
    "materials": 12,
    "file": "WARTORTLE.glb",
-   "bytes": 358188,
+   "bytes": 333100,
    "status": "generated"
   },
   "BLASTOISE": {
@@ -234,7 +234,7 @@
    "tris": 6704,
    "materials": 11,
    "file": "BLASTOISE.glb",
-   "bytes": 286500,
+   "bytes": 252536,
    "status": "generated"
   },
   "CATERPIE": {
@@ -243,7 +243,7 @@
    "tris": 1718,
    "materials": 6,
    "file": "CATERPIE.glb",
-   "bytes": 121652,
+   "bytes": 96468,
    "status": "generated"
   },
   "METAPOD": {
@@ -252,7 +252,7 @@
    "tris": 3118,
    "materials": 6,
    "file": "METAPOD.glb",
-   "bytes": 124404,
+   "bytes": 119776,
    "status": "generated"
   },
   "BUTTERFREE": {
@@ -261,7 +261,7 @@
    "tris": 4850,
    "materials": 8,
    "file": "BUTTERFREE.glb",
-   "bytes": 267388,
+   "bytes": 229544,
    "status": "generated"
   },
   "WEEDLE": {
@@ -270,7 +270,7 @@
    "tris": 1718,
    "materials": 5,
    "file": "WEEDLE.glb",
-   "bytes": 133660,
+   "bytes": 97840,
    "status": "generated"
   },
   "KAKUNA": {
@@ -279,7 +279,7 @@
    "tris": 2944,
    "materials": 3,
    "file": "KAKUNA.glb",
-   "bytes": 166472,
+   "bytes": 139984,
    "status": "generated"
   },
   "BEEDRILL": {
@@ -288,7 +288,7 @@
    "tris": 9300,
    "materials": 9,
    "file": "BEEDRILL.glb",
-   "bytes": 443692,
+   "bytes": 394488,
    "status": "generated"
   },
   "PIDGEY": {
@@ -297,7 +297,7 @@
    "tris": 11512,
    "materials": 9,
    "file": "PIDGEY.glb",
-   "bytes": 480284,
+   "bytes": 453844,
    "status": "generated"
   },
   "PIDGEOTTO": {
@@ -306,7 +306,7 @@
    "tris": 17208,
    "materials": 11,
    "file": "PIDGEOTTO.glb",
-   "bytes": 687588,
+   "bytes": 654004,
    "status": "generated"
   },
   "PIDGEOT": {
@@ -315,7 +315,7 @@
    "tris": 15864,
    "materials": 13,
    "file": "PIDGEOT.glb",
-   "bytes": 655788,
+   "bytes": 619452,
    "status": "generated"
   },
   "RATTATA": {
@@ -324,7 +324,7 @@
    "tris": 3716,
    "materials": 9,
    "file": "RATTATA.glb",
-   "bytes": 210468,
+   "bytes": 170228,
    "status": "generated"
   },
   "RATICATE": {
@@ -333,7 +333,7 @@
    "tris": 6912,
    "materials": 10,
    "file": "RATICATE.glb",
-   "bytes": 346008,
+   "bytes": 293656,
    "status": "generated"
   },
   "SPEAROW": {
@@ -342,7 +342,7 @@
    "tris": 9800,
    "materials": 10,
    "file": "SPEAROW.glb",
-   "bytes": 424924,
+   "bytes": 396496,
    "status": "generated"
   },
   "FEAROW": {
@@ -351,7 +351,7 @@
    "tris": 13200,
    "materials": 13,
    "file": "FEAROW.glb",
-   "bytes": 569896,
+   "bytes": 537304,
    "status": "generated"
   },
   "EKANS": {
@@ -360,7 +360,7 @@
    "tris": 4322,
    "materials": 9,
    "file": "EKANS.glb",
-   "bytes": 177884,
+   "bytes": 161852,
    "status": "generated"
   },
   "ARBOK": {
@@ -369,7 +369,7 @@
    "tris": 6276,
    "materials": 9,
    "file": "ARBOK.glb",
-   "bytes": 243124,
+   "bytes": 228500,
    "status": "generated"
   },
   "PIKACHU": {
@@ -378,7 +378,7 @@
    "tris": 4456,
    "materials": 5,
    "file": "PIKACHU.glb",
-   "bytes": 215636,
+   "bytes": 192920,
    "status": "generated"
   },
   "RAICHU": {
@@ -387,7 +387,7 @@
    "tris": 9924,
    "materials": 10,
    "file": "RAICHU.glb",
-   "bytes": 421816,
+   "bytes": 397200,
    "status": "generated"
   },
   "SANDSHREW": {
@@ -396,7 +396,7 @@
    "tris": 3112,
    "materials": 6,
    "file": "SANDSHREW.glb",
-   "bytes": 175648,
+   "bytes": 148396,
    "status": "generated"
   },
   "SANDSLASH": {
@@ -405,7 +405,7 @@
    "tris": 16542,
    "materials": 8,
    "file": "SANDSLASH.glb",
-   "bytes": 734080,
+   "bytes": 676740,
    "status": "generated"
   },
   "NIDORAN_F": {
@@ -414,7 +414,7 @@
    "tris": 5254,
    "materials": 7,
    "file": "NIDORAN_F.glb",
-   "bytes": 296448,
+   "bytes": 255512,
    "status": "generated"
   },
   "NIDORINA": {
@@ -423,7 +423,7 @@
    "tris": 6370,
    "materials": 8,
    "file": "NIDORINA.glb",
-   "bytes": 336024,
+   "bytes": 299232,
    "status": "generated"
   },
   "NIDOQUEEN": {
@@ -432,7 +432,7 @@
    "tris": 5780,
    "materials": 8,
    "file": "NIDOQUEEN.glb",
-   "bytes": 279128,
+   "bytes": 247016,
    "status": "generated"
   },
   "NIDORAN_M": {
@@ -441,7 +441,7 @@
    "tris": 4780,
    "materials": 7,
    "file": "NIDORAN_M.glb",
-   "bytes": 243804,
+   "bytes": 210784,
    "status": "generated"
   },
   "NIDORINO": {
@@ -450,7 +450,7 @@
    "tris": 5828,
    "materials": 7,
    "file": "NIDORINO.glb",
-   "bytes": 278992,
+   "bytes": 249600,
    "status": "generated"
   },
   "NIDOKING": {
@@ -459,7 +459,7 @@
    "tris": 6410,
    "materials": 11,
    "file": "NIDOKING.glb",
-   "bytes": 316068,
+   "bytes": 276996,
    "status": "generated"
   },
   "CLEFAIRY": {
@@ -468,7 +468,7 @@
    "tris": 4214,
    "materials": 7,
    "file": "CLEFAIRY.glb",
-   "bytes": 213864,
+   "bytes": 187620,
    "status": "generated"
   },
   "CLEFABLE": {
@@ -477,7 +477,7 @@
    "tris": 5094,
    "materials": 5,
    "file": "CLEFABLE.glb",
-   "bytes": 232540,
+   "bytes": 205648,
    "status": "generated"
   },
   "VULPIX": {
@@ -486,7 +486,7 @@
    "tris": 4928,
    "materials": 8,
    "file": "VULPIX.glb",
-   "bytes": 267928,
+   "bytes": 214200,
    "status": "generated"
   },
   "NINETALES": {
@@ -495,7 +495,7 @@
    "tris": 7942,
    "materials": 8,
    "file": "NINETALES.glb",
-   "bytes": 403276,
+   "bytes": 328188,
    "status": "generated"
   },
   "JIGGLYPUFF": {
@@ -504,7 +504,7 @@
    "tris": 3028,
    "materials": 6,
    "file": "JIGGLYPUFF.glb",
-   "bytes": 158320,
+   "bytes": 133972,
    "status": "generated"
   },
   "WIGGLYTUFF": {
@@ -513,7 +513,7 @@
    "tris": 3840,
    "materials": 7,
    "file": "WIGGLYTUFF.glb",
-   "bytes": 199148,
+   "bytes": 171132,
    "status": "generated"
   },
   "ZUBAT": {
@@ -522,7 +522,7 @@
    "tris": 5816,
    "materials": 6,
    "file": "ZUBAT.glb",
-   "bytes": 258412,
+   "bytes": 242828,
    "status": "generated"
   },
   "GOLBAT": {
@@ -531,7 +531,7 @@
    "tris": 8026,
    "materials": 8,
    "file": "GOLBAT.glb",
-   "bytes": 342180,
+   "bytes": 316736,
    "status": "generated"
   },
   "ODDISH": {
@@ -540,7 +540,7 @@
    "tris": 4308,
    "materials": 6,
    "file": "ODDISH.glb",
-   "bytes": 218764,
+   "bytes": 192292,
    "status": "generated"
   },
   "GLOOM": {
@@ -549,7 +549,7 @@
    "tris": 6694,
    "materials": 12,
    "file": "GLOOM.glb",
-   "bytes": 305124,
+   "bytes": 267308,
    "status": "generated"
   },
   "VILEPLUME": {
@@ -558,7 +558,7 @@
    "tris": 8178,
    "materials": 9,
    "file": "VILEPLUME.glb",
-   "bytes": 327608,
+   "bytes": 295040,
    "status": "generated"
   },
   "PARAS": {
@@ -567,7 +567,7 @@
    "tris": 4506,
    "materials": 8,
    "file": "PARAS.glb",
-   "bytes": 251224,
+   "bytes": 199688,
    "status": "generated"
   },
   "PARASECT": {
@@ -576,7 +576,7 @@
    "tris": 4388,
    "materials": 6,
    "file": "PARASECT.glb",
-   "bytes": 224948,
+   "bytes": 188360,
    "status": "generated"
   },
   "VENONAT": {
@@ -585,7 +585,7 @@
    "tris": 2190,
    "materials": 6,
    "file": "VENONAT.glb",
-   "bytes": 139768,
+   "bytes": 117256,
    "status": "generated"
   },
   "VENOMOTH": {
@@ -594,7 +594,7 @@
    "tris": 4582,
    "materials": 8,
    "file": "VENOMOTH.glb",
-   "bytes": 273268,
+   "bytes": 226656,
    "status": "generated"
   },
   "DIGLETT": {
@@ -603,7 +603,7 @@
    "tris": 2918,
    "materials": 5,
    "file": "DIGLETT.glb",
-   "bytes": 127164,
+   "bytes": 113404,
    "status": "generated"
   },
   "DUGTRIO": {
@@ -612,7 +612,7 @@
    "tris": 6580,
    "materials": 5,
    "file": "DUGTRIO.glb",
-   "bytes": 255316,
+   "bytes": 225244,
    "status": "generated"
   },
   "MEOWTH": {
@@ -621,7 +621,7 @@
    "tris": 4318,
    "materials": 9,
    "file": "MEOWTH.glb",
-   "bytes": 230520,
+   "bytes": 194356,
    "status": "generated"
   },
   "PERSIAN": {
@@ -630,7 +630,7 @@
    "tris": 5252,
    "materials": 9,
    "file": "PERSIAN.glb",
-   "bytes": 263040,
+   "bytes": 222076,
    "status": "generated"
   },
   "PSYDUCK": {
@@ -639,7 +639,7 @@
    "tris": 3288,
    "materials": 5,
    "file": "PSYDUCK.glb",
-   "bytes": 182168,
+   "bytes": 151356,
    "status": "generated"
   },
   "GOLDUCK": {
@@ -648,7 +648,7 @@
    "tris": 6668,
    "materials": 8,
    "file": "GOLDUCK.glb",
-   "bytes": 317192,
+   "bytes": 276576,
    "status": "generated"
   },
   "MANKEY": {
@@ -657,7 +657,7 @@
    "tris": 3784,
    "materials": 7,
    "file": "MANKEY.glb",
-   "bytes": 206640,
+   "bytes": 177948,
    "status": "generated"
   },
   "PRIMEAPE": {
@@ -666,7 +666,7 @@
    "tris": 4720,
    "materials": 9,
    "file": "PRIMEAPE.glb",
-   "bytes": 233152,
+   "bytes": 205816,
    "status": "generated"
   },
   "GROWLITHE": {
@@ -675,7 +675,7 @@
    "tris": 4602,
    "materials": 6,
    "file": "GROWLITHE.glb",
-   "bytes": 237540,
+   "bytes": 201012,
    "status": "generated"
   },
   "ARCANINE": {
@@ -684,7 +684,7 @@
    "tris": 8628,
    "materials": 6,
    "file": "ARCANINE.glb",
-   "bytes": 401976,
+   "bytes": 349224,
    "status": "generated"
   },
   "POLIWAG": {
@@ -693,7 +693,7 @@
    "tris": 2536,
    "materials": 8,
    "file": "POLIWAG.glb",
-   "bytes": 134552,
+   "bytes": 117944,
    "status": "generated"
   },
   "POLIWHIRL": {
@@ -702,7 +702,7 @@
    "tris": 3328,
    "materials": 5,
    "file": "POLIWHIRL.glb",
-   "bytes": 154852,
+   "bytes": 136500,
    "status": "generated"
   },
   "POLIWRATH": {
@@ -711,7 +711,7 @@
    "tris": 4628,
    "materials": 5,
    "file": "POLIWRATH.glb",
-   "bytes": 192464,
+   "bytes": 174112,
    "status": "generated"
   },
   "ABRA": {
@@ -720,7 +720,7 @@
    "tris": 3712,
    "materials": 3,
    "file": "ABRA.glb",
-   "bytes": 183636,
+   "bytes": 156552,
    "status": "generated"
   },
   "KADABRA": {
@@ -729,7 +729,7 @@
    "tris": 6684,
    "materials": 7,
    "file": "KADABRA.glb",
-   "bytes": 313440,
+   "bytes": 270716,
    "status": "generated"
   },
   "ALAKAZAM": {
@@ -738,7 +738,7 @@
    "tris": 5904,
    "materials": 6,
    "file": "ALAKAZAM.glb",
-   "bytes": 275188,
+   "bytes": 230796,
    "status": "generated"
   },
   "MACHOP": {
@@ -747,7 +747,7 @@
    "tris": 4466,
    "materials": 7,
    "file": "MACHOP.glb",
-   "bytes": 221080,
+   "bytes": 190168,
    "status": "generated"
   },
   "MACHOKE": {
@@ -756,7 +756,7 @@
    "tris": 7346,
    "materials": 9,
    "file": "MACHOKE.glb",
-   "bytes": 326588,
+   "bytes": 282044,
    "status": "generated"
   },
   "MACHAMP": {
@@ -765,7 +765,7 @@
    "tris": 7844,
    "materials": 9,
    "file": "MACHAMP.glb",
-   "bytes": 355328,
+   "bytes": 296544,
    "status": "generated"
   },
   "BELLSPROUT": {
@@ -774,7 +774,7 @@
    "tris": 2168,
    "materials": 7,
    "file": "BELLSPROUT.glb",
-   "bytes": 134456,
+   "bytes": 109876,
    "status": "generated"
   },
   "WEEPINBELL": {
@@ -783,7 +783,7 @@
    "tris": 4184,
    "materials": 7,
    "file": "WEEPINBELL.glb",
-   "bytes": 181976,
+   "bytes": 166000,
    "status": "generated"
   },
   "VICTREEBEL": {
@@ -792,7 +792,7 @@
    "tris": 5546,
    "materials": 10,
    "file": "VICTREEBEL.glb",
-   "bytes": 249128,
+   "bytes": 220820,
    "status": "generated"
   },
   "TENTACOOL": {
@@ -801,7 +801,7 @@
    "tris": 2840,
    "materials": 5,
    "file": "TENTACOOL.glb",
-   "bytes": 137372,
+   "bytes": 116496,
    "status": "generated"
   },
   "TENTACRUEL": {
@@ -810,7 +810,7 @@
    "tris": 4702,
    "materials": 8,
    "file": "TENTACRUEL.glb",
-   "bytes": 220768,
+   "bytes": 184048,
    "status": "generated"
   },
   "GEODUDE": {
@@ -819,7 +819,7 @@
    "tris": 4658,
    "materials": 5,
    "file": "GEODUDE.glb",
-   "bytes": 202828,
+   "bytes": 181988,
    "status": "generated"
   },
   "GRAVELER": {
@@ -828,7 +828,7 @@
    "tris": 5246,
    "materials": 5,
    "file": "GRAVELER.glb",
-   "bytes": 244784,
+   "bytes": 208608,
    "status": "generated"
   },
   "GOLEM": {
@@ -837,7 +837,7 @@
    "tris": 7780,
    "materials": 9,
    "file": "GOLEM.glb",
-   "bytes": 292288,
+   "bytes": 273936,
    "status": "generated"
   },
   "PONYTA": {
@@ -846,7 +846,7 @@
    "tris": 5720,
    "materials": 8,
    "file": "PONYTA.glb",
-   "bytes": 311900,
+   "bytes": 264452,
    "status": "generated"
   },
   "RAPIDASH": {
@@ -855,7 +855,7 @@
    "tris": 8824,
    "materials": 9,
    "file": "RAPIDASH.glb",
-   "bytes": 452116,
+   "bytes": 382376,
    "status": "generated"
   },
   "SLOWPOKE": {
@@ -864,7 +864,7 @@
    "tris": 4000,
    "materials": 7,
    "file": "SLOWPOKE.glb",
-   "bytes": 182512,
+   "bytes": 161456,
    "status": "generated"
   },
   "SLOWBRO": {
@@ -873,7 +873,7 @@
    "tris": 5384,
    "materials": 9,
    "file": "SLOWBRO.glb",
-   "bytes": 264884,
+   "bytes": 226772,
    "status": "generated"
   },
   "MAGNEMITE": {
@@ -882,7 +882,7 @@
    "tris": 2336,
    "materials": 6,
    "file": "MAGNEMITE.glb",
-   "bytes": 142224,
+   "bytes": 108560,
    "status": "generated"
   },
   "MAGNETON": {
@@ -891,7 +891,7 @@
    "tris": 4740,
    "materials": 6,
    "file": "MAGNETON.glb",
-   "bytes": 273100,
+   "bytes": 205240,
    "status": "generated"
   },
   "FARFETCHD": {
@@ -900,7 +900,7 @@
    "tris": 4128,
    "materials": 10,
    "file": "FARFETCHD.glb",
-   "bytes": 207072,
+   "bytes": 186316,
    "status": "generated"
   },
   "DODUO": {
@@ -909,7 +909,7 @@
    "tris": 2826,
    "materials": 5,
    "file": "DODUO.glb",
-   "bytes": 155156,
+   "bytes": 127428,
    "status": "generated"
   },
   "DODRIO": {
@@ -918,7 +918,7 @@
    "tris": 4992,
    "materials": 8,
    "file": "DODRIO.glb",
-   "bytes": 276064,
+   "bytes": 225204,
    "status": "generated"
   },
   "SEEL": {
@@ -927,7 +927,7 @@
    "tris": 4116,
    "materials": 5,
    "file": "SEEL.glb",
-   "bytes": 186816,
+   "bytes": 168076,
    "status": "generated"
   },
   "DEWGONG": {
@@ -936,7 +936,7 @@
    "tris": 3860,
    "materials": 4,
    "file": "DEWGONG.glb",
-   "bytes": 170344,
+   "bytes": 156596,
    "status": "generated"
   },
   "GRIMER": {
@@ -945,7 +945,7 @@
    "tris": 3810,
    "materials": 5,
    "file": "GRIMER.glb",
-   "bytes": 152592,
+   "bytes": 141288,
    "status": "generated"
   },
   "MUK": {
@@ -954,7 +954,7 @@
    "tris": 5162,
    "materials": 5,
    "file": "MUK.glb",
-   "bytes": 190700,
+   "bytes": 179732,
    "status": "generated"
   },
   "SHELLDER": {
@@ -963,7 +963,7 @@
    "tris": 3248,
    "materials": 6,
    "file": "SHELLDER.glb",
-   "bytes": 138560,
+   "bytes": 126176,
    "status": "generated"
   },
   "CLOYSTER": {
@@ -972,7 +972,7 @@
    "tris": 5822,
    "materials": 11,
    "file": "CLOYSTER.glb",
-   "bytes": 277532,
+   "bytes": 244892,
    "status": "generated"
   },
   "GASTLY": {
@@ -981,7 +981,7 @@
    "tris": 9738,
    "materials": 7,
    "file": "GASTLY.glb",
-   "bytes": 367264,
+   "bytes": 339212,
    "status": "generated"
   },
   "HAUNTER": {
@@ -990,7 +990,7 @@
    "tris": 5664,
    "materials": 5,
    "file": "HAUNTER.glb",
-   "bytes": 282088,
+   "bytes": 251252,
    "status": "generated"
   },
   "GENGAR": {
@@ -999,7 +999,7 @@
    "tris": 5232,
    "materials": 4,
    "file": "GENGAR.glb",
-   "bytes": 269100,
+   "bytes": 233452,
    "status": "generated"
   },
   "ONIX": {
@@ -1008,7 +1008,7 @@
    "tris": 5076,
    "materials": 6,
    "file": "ONIX.glb",
-   "bytes": 250612,
+   "bytes": 207560,
    "status": "generated"
   },
   "DROWZEE": {
@@ -1017,7 +1017,7 @@
    "tris": 4564,
    "materials": 5,
    "file": "DROWZEE.glb",
-   "bytes": 199776,
+   "bytes": 179268,
    "status": "generated"
   },
   "HYPNO": {
@@ -1026,7 +1026,7 @@
    "tris": 5778,
    "materials": 6,
    "file": "HYPNO.glb",
-   "bytes": 252704,
+   "bytes": 222588,
    "status": "generated"
   },
   "KRABBY": {
@@ -1035,7 +1035,7 @@
    "tris": 3516,
    "materials": 3,
    "file": "KRABBY.glb",
-   "bytes": 194720,
+   "bytes": 161428,
    "status": "generated"
   },
   "KINGLER": {
@@ -1044,7 +1044,7 @@
    "tris": 5810,
    "materials": 4,
    "file": "KINGLER.glb",
-   "bytes": 276512,
+   "bytes": 243988,
    "status": "generated"
   },
   "VOLTORB": {
@@ -1053,7 +1053,7 @@
    "tris": 1456,
    "materials": 5,
    "file": "VOLTORB.glb",
-   "bytes": 94504,
+   "bytes": 78652,
    "status": "generated"
   },
   "ELECTRODE": {
@@ -1062,7 +1062,7 @@
    "tris": 2416,
    "materials": 6,
    "file": "ELECTRODE.glb",
-   "bytes": 136452,
+   "bytes": 119436,
    "status": "generated"
   },
   "EXEGGCUTE": {
@@ -1071,7 +1071,7 @@
    "tris": 6124,
    "materials": 5,
    "file": "EXEGGCUTE.glb",
-   "bytes": 230648,
+   "bytes": 213340,
    "status": "generated"
   },
   "EXEGGUTOR": {
@@ -1080,7 +1080,7 @@
    "tris": 7720,
    "materials": 10,
    "file": "EXEGGUTOR.glb",
-   "bytes": 332404,
+   "bytes": 293572,
    "status": "generated"
   },
   "CUBONE": {
@@ -1089,7 +1089,7 @@
    "tris": 4108,
    "materials": 5,
    "file": "CUBONE.glb",
-   "bytes": 193752,
+   "bytes": 171648,
    "status": "generated"
   },
   "MAROWAK": {
@@ -1098,7 +1098,7 @@
    "tris": 4996,
    "materials": 5,
    "file": "MAROWAK.glb",
-   "bytes": 219028,
+   "bytes": 199716,
    "status": "generated"
   },
   "HITMONLEE": {
@@ -1107,7 +1107,7 @@
    "tris": 3170,
    "materials": 6,
    "file": "HITMONLEE.glb",
-   "bytes": 209616,
+   "bytes": 160308,
    "status": "generated"
   },
   "HITMONCHAN": {
@@ -1116,7 +1116,7 @@
    "tris": 4670,
    "materials": 5,
    "file": "HITMONCHAN.glb",
-   "bytes": 242128,
+   "bytes": 202888,
    "status": "generated"
   },
   "LICKITUNG": {
@@ -1125,7 +1125,7 @@
    "tris": 3952,
    "materials": 7,
    "file": "LICKITUNG.glb",
-   "bytes": 191884,
+   "bytes": 169056,
    "status": "generated"
   },
   "KOFFING": {
@@ -1134,7 +1134,7 @@
    "tris": 3196,
    "materials": 7,
    "file": "KOFFING.glb",
-   "bytes": 172348,
+   "bytes": 139252,
    "status": "generated"
   },
   "WEEZING": {
@@ -1143,7 +1143,7 @@
    "tris": 5842,
    "materials": 7,
    "file": "WEEZING.glb",
-   "bytes": 272604,
+   "bytes": 227304,
    "status": "generated"
   },
   "RHYHORN": {
@@ -1152,7 +1152,7 @@
    "tris": 3720,
    "materials": 5,
    "file": "RHYHORN.glb",
-   "bytes": 200664,
+   "bytes": 174148,
    "status": "generated"
   },
   "RHYDON": {
@@ -1161,7 +1161,7 @@
    "tris": 4598,
    "materials": 7,
    "file": "RHYDON.glb",
-   "bytes": 264600,
+   "bytes": 221048,
    "status": "generated"
   },
   "CHANSEY": {
@@ -1170,7 +1170,7 @@
    "tris": 5776,
    "materials": 4,
    "file": "CHANSEY.glb",
-   "bytes": 248536,
+   "bytes": 220044,
    "status": "generated"
   },
   "TANGELA": {
@@ -1179,7 +1179,7 @@
    "tris": 4458,
    "materials": 7,
    "file": "TANGELA.glb",
-   "bytes": 226876,
+   "bytes": 196640,
    "status": "generated"
   },
   "KANGASKHAN": {
@@ -1188,7 +1188,7 @@
    "tris": 6220,
    "materials": 8,
    "file": "KANGASKHAN.glb",
-   "bytes": 324760,
+   "bytes": 268920,
    "status": "generated"
   },
   "HORSEA": {
@@ -1197,7 +1197,7 @@
    "tris": 2194,
    "materials": 7,
    "file": "HORSEA.glb",
-   "bytes": 118024,
+   "bytes": 106596,
    "status": "generated"
   },
   "SEADRA": {
@@ -1206,7 +1206,7 @@
    "tris": 3716,
    "materials": 7,
    "file": "SEADRA.glb",
-   "bytes": 178268,
+   "bytes": 164656,
    "status": "generated"
   },
   "GOLDEEN": {
@@ -1215,7 +1215,7 @@
    "tris": 2596,
    "materials": 8,
    "file": "GOLDEEN.glb",
-   "bytes": 156760,
+   "bytes": 136496,
    "status": "generated"
   },
   "SEAKING": {
@@ -1224,7 +1224,7 @@
    "tris": 3036,
    "materials": 9,
    "file": "SEAKING.glb",
-   "bytes": 174660,
+   "bytes": 155800,
    "status": "generated"
   },
   "STARYU": {
@@ -1233,7 +1233,7 @@
    "tris": 1668,
    "materials": 4,
    "file": "STARYU.glb",
-   "bytes": 92424,
+   "bytes": 81616,
    "status": "generated"
   },
   "STARMIE": {
@@ -1242,7 +1242,7 @@
    "tris": 5586,
    "materials": 4,
    "file": "STARMIE.glb",
-   "bytes": 231992,
+   "bytes": 216168,
    "status": "generated"
   },
   "MR_MIME": {
@@ -1251,7 +1251,7 @@
    "tris": 4754,
    "materials": 7,
    "file": "MR_MIME.glb",
-   "bytes": 256540,
+   "bytes": 207384,
    "status": "generated"
   },
   "SCYTHER": {
@@ -1260,7 +1260,7 @@
    "tris": 8460,
    "materials": 10,
    "file": "SCYTHER.glb",
-   "bytes": 377140,
+   "bytes": 342116,
    "status": "generated"
   },
   "JYNX": {
@@ -1269,7 +1269,7 @@
    "tris": 8438,
    "materials": 10,
    "file": "JYNX.glb",
-   "bytes": 363804,
+   "bytes": 344976,
    "status": "generated"
   },
   "ELECTABUZZ": {
@@ -1278,7 +1278,7 @@
    "tris": 5576,
    "materials": 4,
    "file": "ELECTABUZZ.glb",
-   "bytes": 254748,
+   "bytes": 224048,
    "status": "generated"
   },
   "MAGMAR": {
@@ -1287,7 +1287,7 @@
    "tris": 5876,
    "materials": 9,
    "file": "MAGMAR.glb",
-   "bytes": 289788,
+   "bytes": 254084,
    "status": "generated"
   },
   "PINSIR": {
@@ -1296,7 +1296,7 @@
    "tris": 5168,
    "materials": 8,
    "file": "PINSIR.glb",
-   "bytes": 254944,
+   "bytes": 228240,
    "status": "generated"
   },
   "TAUROS": {
@@ -1305,7 +1305,7 @@
    "tris": 6580,
    "materials": 9,
    "file": "TAUROS.glb",
-   "bytes": 300964,
+   "bytes": 257204,
    "status": "generated"
   },
   "MAGIKARP": {
@@ -1314,7 +1314,7 @@
    "tris": 3748,
    "materials": 11,
    "file": "MAGIKARP.glb",
-   "bytes": 206716,
+   "bytes": 179144,
    "status": "generated"
   },
   "GYARADOS": {
@@ -1323,7 +1323,7 @@
    "tris": 6232,
    "materials": 12,
    "file": "GYARADOS.glb",
-   "bytes": 340788,
+   "bytes": 288204,
    "status": "generated"
   },
   "LAPRAS": {
@@ -1332,7 +1332,7 @@
    "tris": 4926,
    "materials": 7,
    "file": "LAPRAS.glb",
-   "bytes": 259892,
+   "bytes": 208236,
    "status": "generated"
   },
   "DITTO": {
@@ -1341,7 +1341,7 @@
    "tris": 2328,
    "materials": 2,
    "file": "DITTO.glb",
-   "bytes": 82124,
+   "bytes": 80548,
    "status": "generated"
   },
   "EEVEE": {
@@ -1350,7 +1350,7 @@
    "tris": 6972,
    "materials": 6,
    "file": "EEVEE.glb",
-   "bytes": 292816,
+   "bytes": 266328,
    "status": "generated"
   },
   "VAPOREON": {
@@ -1359,7 +1359,7 @@
    "tris": 6832,
    "materials": 7,
    "file": "VAPOREON.glb",
-   "bytes": 327744,
+   "bytes": 290404,
    "status": "generated"
   },
   "JOLTEON": {
@@ -1368,7 +1368,7 @@
    "tris": 6128,
    "materials": 5,
    "file": "JOLTEON.glb",
-   "bytes": 269132,
+   "bytes": 244508,
    "status": "generated"
   },
   "FLAREON": {
@@ -1377,7 +1377,7 @@
    "tris": 9804,
    "materials": 7,
    "file": "FLAREON.glb",
-   "bytes": 411416,
+   "bytes": 378396,
    "status": "generated"
   },
   "PORYGON": {
@@ -1386,7 +1386,7 @@
    "tris": 3984,
    "materials": 7,
    "file": "PORYGON.glb",
-   "bytes": 223904,
+   "bytes": 197924,
    "status": "generated"
   },
   "OMANYTE": {
@@ -1395,7 +1395,7 @@
    "tris": 2760,
    "materials": 6,
    "file": "OMANYTE.glb",
-   "bytes": 137444,
+   "bytes": 120060,
    "status": "generated"
   },
   "OMASTAR": {
@@ -1404,7 +1404,7 @@
    "tris": 4200,
    "materials": 8,
    "file": "OMASTAR.glb",
-   "bytes": 210152,
+   "bytes": 182016,
    "status": "generated"
   },
   "KABUTO": {
@@ -1413,7 +1413,7 @@
    "tris": 3112,
    "materials": 5,
    "file": "KABUTO.glb",
-   "bytes": 159528,
+   "bytes": 130140,
    "status": "generated"
   },
   "KABUTOPS": {
@@ -1422,7 +1422,7 @@
    "tris": 6824,
    "materials": 8,
    "file": "KABUTOPS.glb",
-   "bytes": 360084,
+   "bytes": 313084,
    "status": "generated"
   },
   "AERODACTYL": {
@@ -1431,7 +1431,7 @@
    "tris": 4838,
    "materials": 7,
    "file": "AERODACTYL.glb",
-   "bytes": 263256,
+   "bytes": 232976,
    "status": "generated"
   },
   "SNORLAX": {
@@ -1440,7 +1440,7 @@
    "tris": 5400,
    "materials": 5,
    "file": "SNORLAX.glb",
-   "bytes": 236004,
+   "bytes": 210180,
    "status": "generated"
   },
   "ARTICUNO": {
@@ -1449,7 +1449,7 @@
    "tris": 6480,
    "materials": 9,
    "file": "ARTICUNO.glb",
-   "bytes": 303680,
+   "bytes": 279664,
    "status": "generated"
   },
   "ZAPDOS": {
@@ -1458,7 +1458,7 @@
    "tris": 8980,
    "materials": 9,
    "file": "ZAPDOS.glb",
-   "bytes": 405324,
+   "bytes": 381760,
    "status": "generated"
   },
   "MOLTRES": {
@@ -1467,7 +1467,7 @@
    "tris": 11816,
    "materials": 8,
    "file": "MOLTRES.glb",
-   "bytes": 477008,
+   "bytes": 453504,
    "status": "generated"
   },
   "DRATINI": {
@@ -1476,7 +1476,7 @@
    "tris": 2356,
    "materials": 5,
    "file": "DRATINI.glb",
-   "bytes": 110600,
+   "bytes": 99636,
    "status": "generated"
   },
   "DRAGONAIR": {
@@ -1485,7 +1485,7 @@
    "tris": 3138,
    "materials": 6,
    "file": "DRAGONAIR.glb",
-   "bytes": 173384,
+   "bytes": 150336,
    "status": "generated"
   },
   "DRAGONITE": {
@@ -1494,7 +1494,7 @@
    "tris": 6318,
    "materials": 8,
    "file": "DRAGONITE.glb",
-   "bytes": 280096,
+   "bytes": 252692,
    "status": "generated"
   },
   "MEWTWO": {
@@ -1503,7 +1503,7 @@
    "tris": 6160,
    "materials": 5,
    "file": "MEWTWO.glb",
-   "bytes": 254612,
+   "bytes": 227416,
    "status": "generated"
   },
   "MEW": {
@@ -1512,7 +1512,7 @@
    "tris": 3032,
    "materials": 4,
    "file": "MEW.glb",
-   "bytes": 138920,
+   "bytes": 124796,
    "status": "generated"
   }
  },
@@ -1536,5 +1536,5 @@
   "origin": "bottom centre; hovering species keep their hover gap",
   "rig": "one bone per 2D art group, all under 'root'; face features parented to 'head' when present"
  },
- "elapsed_seconds": 97.2
+ "elapsed_seconds": 86.4
 }

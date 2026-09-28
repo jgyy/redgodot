@@ -48,14 +48,40 @@ eyes/mouths/spot patterns). `gen_pokemon.py` reads that same definition and
 builds genuine 3D geometry from it (spheres/capsules/extruded polygons), rigs a
 generic armature from the part groups, bakes `Idle`/`Walk`/`Attack` animations,
 rescales the result to the species' real Pokedex height, and exports glTF —
-run once per species, for all 151, unattended:
+run once per species, for all 151, unattended.
+
+**Blender version:** generated with **Blender 5.0.1**, via the official
+[`bpy` PyPI package](https://pypi.org/project/bpy/) (Blender Foundation's
+headless-only Python module — no GUI ever, so it's a fully legitimate
+"headless Blender", just distributed as a wheel instead of the standalone
+executable). This sandbox's network policy blocks `blender.org` and its
+mirrors outright (`pypi.org` is unrestricted), so the standalone installer —
+where a newer point release such as 5.2 might live — isn't reachable from
+here; 5.0.1 is the newest Blender actually obtainable in this environment. If
+your environment can reach `blender.org`, the exact same scripts run
+identically via the standalone binary:
 
 ```sh
+# via the standalone executable (any environment that can reach blender.org)
 blender --background --python pipeline/blender/gen_pokemon.py -- --all
 blender --background --python pipeline/blender/gen_characters.py
 blender --background --python pipeline/blender/gen_tiles.py
 blender --background --python pipeline/blender/gen_vfx.py
+
+# via pip-installed bpy (what generated the assets in this repo; no `blender`
+# binary needed at all — `import bpy` inside plain python3 IS headless Blender)
+pip install bpy   # ~375MB, official Blender Foundation package
+python3 pipeline/blender/gen_pokemon.py -- --all
+python3 pipeline/blender/gen_characters.py
+python3 pipeline/blender/gen_tiles.py
+python3 pipeline/blender/gen_vfx.py
 ```
+
+Porting `common.py` from Blender 4.0 to 5.0's Python API required two real
+fixes (Blender 4.4+ replaced the old single-layer `Action.fcurves`/`id_root`
+API with slotted/layered actions, and 4.2+'s EEVEE Next dropped
+`Material.shadow_method`) — see the git history for `pipeline/blender/common.py`
+if you're porting further forward yourself.
 
 Outputs land in `godot/assets/models/{pokemon,characters,tiles,vfx}/`, each with
 a `manifest.json` describing what was generated. Godot's runtime code
@@ -64,14 +90,17 @@ gracefully falls back to a simple colored primitive for anything the pipeline
 hasn't generated yet, so the game is always playable even for parts of the
 pipeline still in progress.
 
-**Current run:** all 151 species generated from their own real per-species art
-data with **zero fallbacks** (1.5k–19k triangles each, 0.20m–8.79m tall —
-scaled from the real Pokedex height), one humanoid character base (5.5k tris),
-a 14-piece tile kit, and 9 VFX meshes. Total generation time: ~1m50s for the
-whole pipeline (151-species Blender batch: ~97s in a single headless
-invocation). Every `.glb` was verified (`pipeline/blender/verify_glb.py`):
-valid glTF header, at least one mesh + material, and the expected animation
-names (`Idle`/`Walk`/`Attack` for Pokemon and characters).
+**Current run (Blender 5.0.1):** all 151 species generated from their own real
+per-species art data with **zero fallbacks** (1.4k–19k triangles each,
+0.20m–8.79m tall — scaled from the real Pokedex height), one humanoid
+character base (5.5k tris), a 14-piece tile kit, and 9 VFX meshes. Total
+generation time: ~95s for the whole pipeline (151-species batch: ~86s in a
+single headless invocation). Every `.glb` was verified
+(`pipeline/blender/verify_glb.py`): valid glTF header, at least one mesh +
+material, and the expected animation names (`Idle`/`Walk`/`Attack` for
+Pokemon and characters) — two of the smallest tile/VFX meshes (`roof.glb`,
+`spark.glb`, both legitimately tiny 8-triangle shapes) trip the verifier's
+2KB minimum-size heuristic; that's a verifier threshold quirk, not a bad file.
 
 Known rough edges in this pass (cosmetic, not structural):
 - A handful of species have a small decorative part (spot/eye/accessory)

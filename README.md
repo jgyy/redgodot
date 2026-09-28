@@ -14,6 +14,14 @@ Inc., built for educational purposes on top of the openly-published
 Code in this repository is MIT licensed (see `LICENSE`); no original game
 assets from Nintendo's Pokémon Red are included or redistributed.
 
+**Tooling:** [Godot 4.7.2](https://godotengine.org/download) (headless,
+`--headless --rendering-driver opengl3`) and **Blender 5.0.1** (headless, via
+the official [`bpy` PyPI package](https://pypi.org/project/bpy/) — no GUI
+ever). Both are the newest versions actually reachable from the sandbox this
+was built in, which blocks `blender.org` at the network-policy level; see
+`pipeline/README.md` for the exact story and how to run the same scripts
+against a newer standalone Blender if yours can reach it.
+
 ## What this actually is (read this before the screenshots)
 
 Converting a ~27k-line, 151-species, 223-map game to bespoke, hand-authored 3D
@@ -23,7 +31,7 @@ art is a multi-month project. This is a **real, working vertical slice** with a
 | Layer | Status |
 |---|---|
 | Game data (species, moves, type chart, maps, cast) | **Complete** — 151/151 species, 165/165 moves, 223/223 maps, ported verbatim from the source's real data tables |
-| 3D models (headless Blender pipeline) | **151/151 Pokemon species generated, 0 fallbacks** (real per-species geometry, materials, and Idle/Walk/Attack animations built from each species' actual vector-art data + Pokedex height) + a rigged/tintable humanoid character base + a 12-piece overworld tile kit + 8 battle VFX meshes — see `godot/assets/models/*/manifest.json` for exact per-asset detail |
+| 3D models (headless Blender 5.0.1 pipeline) | **151/151 Pokemon species generated, 0 fallbacks** (real per-species geometry, materials, and Idle/Walk/Attack animations built from each species' actual vector-art data + Pokedex height) + a rigged/tintable humanoid character base + a 14-piece overworld tile kit + 9 battle VFX meshes — see `godot/assets/models/*/manifest.json` for exact per-asset detail |
 | Overworld (3D, tile-accurate movement/collision/warps/encounters) | **Working** for all 223 maps via a generic tile classifier (pass/grass/door/counter lists from the real tileset data) |
 | Battle system | **Working** for wild encounters (FIGHT/RUN), using the original Gen-1 damage formula ported line-for-line into `BattleMath.gd` |
 | Trainer battles, catching, full menu suite (bag/PC/save), overworld dialogue/story scripts | **Not implemented** — data is present and wired for it (trainer parties, items, dialogue text all extracted), but the interaction layer is future work |
