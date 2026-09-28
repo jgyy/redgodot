@@ -1,75 +1,63 @@
 class_name OptionsMenu
-extends Control
-## Options screen (Start Menu's OPTION entry): TEXT SPEED and SOUND, backed by
-## real GameState fields (GameState.text_speed feeds DialogueBox's future
-## typewriter pacing; sound_on is read wherever SFX are triggered).
+extends PxScreen
+## Port of menus.js optionsMenu(): a 190-wide menu at (120, 30) over whatever
+## is behind it; A toggles the highlighted option in place, CANCEL/B leaves.
+## Writes GameState.options (text_speed 1-3, battle_anim, battle_style,
+## sound, day_night, follower).
 
-signal closed
+var sel := 0
 
-const TEXT_SPEEDS := ["SLOW", "NORMAL", "FAST"]
+func items() -> Array:
+	var o := GameState.options
+	var ts := int(o.get("text_speed", 2))
+	return [
+		"TEXT SPEED: " + ["SLOW", "MID", "FAST"][clampi(ts - 1, 0, 2)],
+		"BATTLE ANIM: " + ("ON" if o.get("battle_anim", true) else "OFF"),
+		"BATTLE STYLE: " + ("SHIFT" if o.get("battle_style", "shift") == "shift" else "SET"),
+		"SOUND: " + ("ON" if o.get("sound", true) else "OFF"),
+		"DAY/NIGHT: " + ("ON" if o.get("day_night", true) else "OFF"),
+		"FOLLOWER: " + ("ON" if o.get("follower", true) else "OFF"),
+		"CANCEL",
+	]
 
-var _rows: Array = []
-var _index := 0
+func _on_open() -> void:
+	sel = 0
 
-func _ready() -> void:
-	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	visible = false
+## Toggles option row r (0-5), exactly as upstream's loop body.
+static func toggle(r: int) -> void:
+	var o := GameState.options
+	match r:
+		0: o["text_speed"] = int(o.get("text_speed", 2)) % 3 + 1
+		1: o["battle_anim"] = not o.get("battle_anim", true)
+		2: o["battle_style"] = "set" if o.get("battle_style", "shift") == "shift" else "shift"
+		3:
+			o["sound"] = not o.get("sound", true)
+			GameState.sound_on = o["sound"]
+			var au := UI.audio()
+			if au and au.has_method("set_muted"):
+				au.set_muted(not o["sound"])
+		4: o["day_night"] = not o.get("day_night", true)
+		5: o["follower"] = not o.get("follower", true)
+	GameState.text_speed = ["SLOW", "NORMAL", "FAST"][int(o["text_speed"]) - 1]
 
-	var panel := PanelContainer.new()
-	panel.set_anchors_preset(Control.PRESET_CENTER)
-	panel.custom_minimum_size = Vector2(320, 200)
-	panel.position = Vector2(-160, -100)
-	add_child(panel)
-
-	var root := VBoxContainer.new()
-	panel.add_child(root)
-	var title := Label.new()
-	title.text = "OPTIONS"
-	title.add_theme_font_size_override("font_size", 20)
-	root.add_child(title)
-
-	for _i in range(2):
-		var l := Label.new()
-		root.add_child(l)
-		_rows.append(l)
-
-	var hint := Label.new()
-	hint.text = "(left/right: change, cancel: back)"
-	hint.add_theme_font_size_override("font_size", 13)
-	root.add_child(hint)
-
-func open() -> void:
-	visible = true
-	mouse_filter = Control.MOUSE_FILTER_STOP
-	_refresh()
-
-func close() -> void:
-	visible = false
-	mouse_filter = Control.MOUSE_FILTER_IGNORE
-
-func _refresh() -> void:
-	var p0 := "▶ " if _index == 0 else "   "
-	var p1 := "▶ " if _index == 1 else "   "
-	_rows[0].text = "%sTEXT SPEED   %s" % [p0, TEXT_SPEEDS[TEXT_SPEEDS.find(GameState.text_speed)]]
-	_rows[1].text = "%sSOUND        %s" % [p1, "ON" if GameState.sound_on else "OFF"]
-
-func _unhandled_input(event: InputEvent) -> void:
-	if not visible:
-		return
-	if event.is_action_pressed("move_up") or event.is_action_pressed("move_down"):
-		_index = 1 - _index
-		_refresh()
-	elif event.is_action_pressed("move_left") or event.is_action_pressed("move_right") or event.is_action_pressed("confirm"):
-		if _index == 0:
-			var i := TEXT_SPEEDS.find(GameState.text_speed)
-			GameState.text_speed = TEXT_SPEEDS[(i + 1) % TEXT_SPEEDS.size()]
+func _input_event(e: InputEvent) -> bool:
+	if pressed(e, "move_up", true):
+		sel = (sel + 6) % 7
+		UI.sfx("cursor")
+	elif pressed(e, "move_down", true):
+		sel = (sel + 1) % 7
+		UI.sfx("cursor")
+	elif pressed(e, "confirm"):
+		UI.sfx("select")
+		if sel == 6:
+			exit()
 		else:
-			GameState.sound_on = not GameState.sound_on
-		_refresh()
-	elif event.is_action_pressed("cancel"):
-		close()
-		closed.emit()
+			toggle(sel)
+	elif pressed(e, "cancel"):
+		exit()
 	else:
-		return
-	get_viewport().set_input_as_handled()
+		return false
+	return true
+
+func _draw() -> void:
+	Px.menu(self, items(), sel, 120, 30, 190, -1, 0, Px.frame_count())

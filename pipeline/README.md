@@ -119,3 +119,19 @@ re-run the extraction scripts, re-run the Blender scripts, and the Godot
 project picks up the new `.glb` files on its next asset import
 (`godot4 --headless --path godot --import`). No original assets are stored in
 this repository — only the generation pipeline and the generated output.
+
+## UI suite: text tables and 2D UI art (title / intro / menus)
+
+Both scripts load the upstream game headlessly (`UPSTREAM=/path/to/pokemon-claude-red`)
+and are deterministic; outputs are committed.
+
+- `node pipeline/scripts/extract_text.js` → `godot/data/text.json`: every upstream text
+  table (general.js, maps_a.js, maps_b.js, dex.js, aliases.js) keyed exactly like upstream
+  (`text` = G.TEXT labels, `dex` = G.DEX_TEXT, `aliases`, `files` = labels per source file).
+  Read it via `GameText` / `UI.text()`.
+- `node pipeline/scripts/bake_ui.js` → `godot/assets/ui/`: `title_logo_big/red.png`
+  (logo.js), `levy_mark/word.png` (intro card), `townmap.png` + `townmap.json`
+  (townmap.js build(): Kanto minimap from every outdoor map's terrain + map centres/names).
+
+Reference captures for 001/002/092–100 use `--save=showcase`, `--title_t=100` and
+`--scene=intro --intro_frame=505 --intro_hold=1` (see `capture_screenshots.sh`).

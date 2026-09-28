@@ -722,9 +722,7 @@ func new_mon(sp: String, lv: int) -> Object:
 	return GameState.PartyMon.new(sp, lv)
 
 func _box() -> Array:
-	while GameState.boxes.size() <= GameState.box:
-		GameState.boxes.append([])
-	return GameState.boxes[GameState.box]
+	return GameState.box()
 
 ## G.receiveMon: nickname prompt, then party or PC box.
 func receive_mon(m: Object) -> String:
@@ -741,7 +739,7 @@ func receive_mon(m: Object) -> String:
 	if box.size() >= 20:
 		await say("The POKéMON BOX is full! It can't accept any more POKéMON!")
 		return "full"
-	box.append(m.call("to_dict"))
+	box.append(m)
 	await say(mon_name(m) + " was transferred to " + ("BILL's PC" if flag("EVENT_MET_BILL") else "someone's PC") + "!")
 	return "box"
 

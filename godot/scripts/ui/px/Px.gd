@@ -240,3 +240,158 @@ static func menu(ci: CanvasItem, items: Array, sel: int, x: int, y: int, w: int 
 	if top + rows < items.size():
 		text(ci, "▼", x + w - 14, y + h - 13 - blink, RED, Color(0, 0, 0, 0))
 	return Rect2i(x, y, w, h)
+
+# ================================================================ UI-suite additions (append-only)
+const WHITE := Color("#ffffff")
+
+## gfx.mix(): linear blend a->b, keeping a's alpha.
+static func mix(a: Color, b: Color, t: float) -> Color:
+	if t <= 0.0:
+		return a
+	if t >= 1.0:
+		return Color(b.r, b.g, b.b, a.a)
+	return Color(lerpf(a.r, b.r, t), lerpf(a.g, b.g, t), lerpf(a.b, b.b, t), a.a)
+
+static func _hsl(h: float, s: float, l: float) -> Color:
+	h = fposmod(h, 360.0) / 360.0
+	if s == 0.0:
+		return Color(l, l, l)
+	var q := l * (1.0 + s) if l < 0.5 else l + s - l * s
+	var p := 2.0 * l - q
+	return Color(_hue(p, q, h + 1.0 / 3.0), _hue(p, q, h), _hue(p, q, h - 1.0 / 3.0))
+
+static func _hue(p: float, q: float, t: float) -> float:
+	if t < 0.0:
+		t += 1.0
+	if t > 1.0:
+		t -= 1.0
+	if t < 1.0 / 6.0:
+		return p + (q - p) * 6.0 * t
+	if t < 0.5:
+		return q
+	if t < 2.0 / 3.0:
+		return p + (q - p) * (2.0 / 3.0 - t) * 6.0
+	return p
+
+## gfx.shade(): hue-shifted shading (darker drifts blue/purple, lighter warm yellow).
+static func shade(c: Color, amt: float) -> Color:
+	var mx := maxf(c.r, maxf(c.g, c.b))
+	var mn := minf(c.r, minf(c.g, c.b))
+	var h := 0.0
+	var s := 0.0
+	var l := (mx + mn) / 2.0
+	if mx != mn:
+		var d := mx - mn
+		s = d / (2.0 - mx - mn) if l > 0.5 else d / (mx + mn)
+		if mx == c.r:
+			h = (c.g - c.b) / d + (6.0 if c.g < c.b else 0.0)
+		elif mx == c.g:
+			h = (c.b - c.r) / d + 2.0
+		else:
+			h = (c.r - c.g) / d + 4.0
+		h *= 60.0
+	if amt < 0.0:
+		var dh := fposmod(250.0 - h + 540.0, 360.0) - 180.0
+		return _hsl(h + dh * minf(1.0, -amt) * 0.35, minf(1.0, s * (1.0 - amt * 0.15)), maxf(0.0, l + amt * 0.5))
+	var dh2 := fposmod(55.0 - h + 540.0, 360.0) - 180.0
+	return _hsl(h + dh2 * minf(1.0, amt) * 0.3, maxf(0.0, s * (1.0 - amt * 0.1)), minf(1.0, l + amt * 0.5))
+
+static var _bg_cache := {}
+
+## party.js menuBg(): full-screen 8px diagonal stripes scrolling with t.
+## Baked once per colour pair into a (320+16)x180 texture, drawn shifted.
+static func menu_bg(ci: CanvasItem, c1: Color, c2: Color, t: int = 0) -> void:
+	var key := c1.to_html() + c2.to_html()
+	var tex: ImageTexture = _bg_cache.get(key)
+	if tex == null:
+		var img := Image.create(W + 16, H, false, Image.FORMAT_RGBA8)
+		for y in H:
+			for x in W + 16:
+				img.set_pixel(x, y, c1 if ((x + y) >> 3) % 2 == 1 else c2)
+		tex = ImageTexture.create_from_image(img)
+		_bg_cache[key] = tex
+	var o := (t / 4) % 16
+	ci.draw_texture(tex, Vector2(-o, 0))
+
+## party.js hpBar().
+static func hp_bar(ci: CanvasItem, x: float, y: float, w: float, frac: float) -> void:
+	frac = clampf(frac, 0.0, 1.0)
+	rect(ci, x - 1, y - 1, w + 2, 5, OUTLINE)
+	rect(ci, x, y, w, 3, Color("#50506a"))
+	var c := Color("#58d080") if frac > 0.5 else (Color("#f8c838") if frac > 0.2 else Color("#f05848"))
+	rect(ci, x, y, roundf(w * frac), 3, c)
+	rect(ci, x, y, roundf(w * frac), 1, mix(c, WHITE, 0.5))
+
+const STATUS_COLORS := {"PSN": "#a040a0", "BRN": "#e05030", "FRZ": "#58b8e8", "PAR": "#d8b020", "SLP": "#8a8aa0", "FNT": "#d04040"}
+
+## party.js statusTag().
+static func status_tag(ci: CanvasItem, x: float, y: float, st: String) -> void:
+	rect(ci, x, y, 19, 7, OUTLINE)
+	rect(ci, x + 1, y + 1, 17, 5, Color(STATUS_COLORS.get(st, "#888888")))
+	small(ci, st, x + 2, y + 1, WHITE)
+
+static func type_name(t: String) -> String:
+	return "PSYCHIC" if t == "PSYCHIC_TYPE" else t
+
+static func type_color(t: String) -> Color:
+	return TYPE_COLORS.get(type_name(t), Color("#888888"))
+
+## Summary.typeTag(): coloured type badge with small-font caps.
+static func type_tag(ci: CanvasItem, x: float, y: float, t: String, is_small: bool = false) -> void:
+	var c := type_color(t)
+	var w := 36 if is_small else 42
+	rect(ci, x, y, w, 11, OUTLINE)
+	rect(ci, x + 1, y + 1, w - 2, 9, c)
+	var n := type_name(t)
+	small(ci, n, x + w / 2.0 - measure_small(n) / 2.0, y + 3, WHITE)
+
+## battlescene.js drawBall(): 11x11 ball icon centred on (x, y).
+static func draw_ball(ci: CanvasItem, x: float, y: float, item: String = "POKE_BALL", frame_i: int = 0) -> void:
+	x = roundf(x)
+	y = roundf(y)
+	var tops := {"POKE_BALL": "#e04848", "GREAT_BALL": "#4878e0", "ULTRA_BALL": "#383838", "MASTER_BALL": "#8048c0", "SAFARI_BALL": "#6a9a3a"}
+	var tc := Color(tops.get(item, "#e04848"))
+	var tl := shade(tc, 0.35)
+	var td := shade(tc, -0.3)
+	var ang := frame_i * 0.6
+	for j in range(-5, 6):
+		for i in range(-5, 6):
+			var d := i * i + j * j
+			if d > 26:
+				continue
+			var rx := i * cos(ang) + j * sin(ang)
+			var ry := -i * sin(ang) + j * cos(ang)
+			var c := (tl if (rx < -1 and ry < -2) else tc) if ry < -0.5 else WHITE
+			if ry >= 0 and rx > 1.5:
+				c = Color("#d0d0dc")
+			if ry < -0.5 and rx > 1.5:
+				c = td
+			if absf(ry) < 0.8 or d > 20:
+				c = OUTLINE
+			if rx * rx + ry * ry < 3.2:
+				c = WHITE if rx * rx + ry * ry < 1.2 else OUTLINE
+			if item == "ULTRA_BALL" and ry < -2 and absf(rx) < 1.2:
+				c = Color("#f0d040")
+			pset(ci, x + i, y + j, c)
+
+## Draws a texture (e.g. a PxView3D's ViewportTexture rendered at k x resolution)
+## into a logical rect; with the canvas scaled k x this is pixel-exact.
+static func blit(ci: CanvasItem, tex: Texture2D, x: float, y: float, w: float = -1, h: float = -1, modulate: Color = Color.WHITE) -> void:
+	if tex == null:
+		return
+	if w < 0:
+		w = tex.get_width()
+		h = tex.get_height()
+	ci.draw_texture_rect(tex, Rect2(floorf(x), floorf(y), w, h), false, modulate)
+
+## battleflow.js G.fmt(): {PLAYER}/{RIVAL} substitution + spacing clean-up.
+static func fmt(s: String, player: String = "RED", rival: String = "BLUE") -> String:
+	s = s.replace("{PLAYER}", player).replace("{RIVAL}", rival).replace("{PROMPT}", "")
+	var re := RegEx.new()
+	re.compile(" +\f")
+	s = re.sub(s, "\f", true)
+	re.compile("\f +")
+	s = re.sub(s, "\f", true)
+	re.compile(" {2,}")
+	s = re.sub(s, " ", true)
+	return s
