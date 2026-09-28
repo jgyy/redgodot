@@ -1,64 +1,102 @@
 {
- "vfx": {
-  "spark": {
-   "file": "spark.glb",
-   "tris": 8,
-   "bytes": 1996,
-   "notes": "emissive yellow octahedral shard (electric)"
-  },
-  "flame_blob": {
-   "file": "flame_blob.glb",
-   "tris": 192,
-   "bytes": 4916,
-   "notes": "emissive orange teardrop, point up (+Y in Godot)"
-  },
-  "water_droplet": {
-   "file": "water_droplet.glb",
-   "tris": 192,
-   "bytes": 4840,
-   "notes": "translucent blue teardrop"
-  },
-  "leaf_bit": {
-   "file": "leaf_bit.glb",
-   "tris": 44,
-   "bytes": 3224,
-   "notes": "thin leaf plate in the XY plane (Godot)"
-  },
-  "rock_chunk": {
-   "file": "rock_chunk.glb",
-   "tris": 20,
-   "bytes": 2792,
-   "notes": "faceted brown chunk"
-  },
-  "ice_shard": {
-   "file": "ice_shard.glb",
-   "tris": 12,
-   "bytes": 2312,
-   "notes": "translucent hexagonal bipyramid crystal"
-  },
-  "poison_bubble": {
-   "file": "poison_bubble.glb",
-   "tris": 224,
-   "bytes": 5488,
-   "notes": "translucent purple sphere (alpha blend)"
-  },
-  "status_ring": {
-   "file": "status_ring.glb",
-   "tris": 384,
-   "bytes": 8196,
-   "notes": "flat emissive torus in the ground plane, r=0.15 m; tint via material override"
-  },
-  "impact_star": {
-   "file": "impact_star.glb",
-   "tris": 36,
-   "bytes": 3044,
-   "notes": "flat 5-point emissive star facing the camera (Godot +Z)"
-  }
- },
  "conventions": {
   "origin": "centred",
-  "scale": "~0.1-0.3 m; scale via particle params",
-  "front": "Blender -Y == glTF/Godot +Z",
-  "animation": "none"
+  "size": "~1 m nominal",
+  "front": "Godot +Z",
+  "colour": "applied per particle in Godot (BattleVfx.gd), except poke_ball"
+ },
+ "vfx": {
+  "dot": {
+   "file": "dot.glb",
+   "tris": 80
+  },
+  "flame": {
+   "file": "flame.glb",
+   "tris": 252
+  },
+  "spark": {
+   "file": "spark.glb",
+   "tris": 48
+  },
+  "star": {
+   "file": "star.glb",
+   "tris": 36
+  },
+  "ring": {
+   "file": "ring.glb",
+   "tris": 480
+  },
+  "bubble": {
+   "file": "bubble.glb",
+   "tris": 320
+  },
+  "leaf": {
+   "file": "leaf.glb",
+   "tris": 76
+  },
+  "snow": {
+   "file": "snow.glb",
+   "tris": 44
+  },
+  "rock": {
+   "file": "rock.glb",
+   "tris": 20
+  },
+  "note": {
+   "file": "note.glb",
+   "tris": 112
+  },
+  "z": {
+   "file": "z.glb",
+   "tris": 36
+  },
+  "coin": {
+   "file": "coin.glb",
+   "tris": 76
+  },
+  "seed": {
+   "file": "seed.glb",
+   "tris": 80
+  },
+  "needle": {
+   "file": "needle.glb",
+   "tris": 20
+  },
+  "bone": {
+   "file": "bone.glb",
+   "tris": 108
+  },
+  "egg": {
+   "file": "egg.glb",
+   "tris": 252
+  },
+  "shard": {
+   "file": "shard.glb",
+   "tris": 12
+  },
+  "heart": {
+   "file": "heart.glb",
+   "tris": 92
+  },
+  "impact": {
+   "file": "impact.glb",
+   "tris": 60
+  },
+  "claw": {
+   "file": "claw.glb",
+   "tris": 112
+  },
+  "fist": {
+   "file": "fist.glb",
+   "tris": 180
+  },
+  "drop": {
+   "file": "drop.glb",
+   "tris": 192
+  },
+  "poke_ball": {
+   "file": "poke_ball.glb",
+   "tris": 1072
+  }
  }
 }

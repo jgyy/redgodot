@@ -18,3 +18,6 @@ data_*/
 mono_crash.*.json
 __pycache__/
 *.pyc
+
+# textures Godot extracts from the battle-stage glbs on import (regenerated)
+godot/assets/models/battle/*_tex.png
