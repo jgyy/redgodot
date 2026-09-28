@@ -35,6 +35,7 @@ func run_all(tree: SceneTree) -> void:
 	_test_save_load()
 	_test_new_game_defaults()
 	AudioTests.run(self)
+	_test_models_3d(tree)
 
 func _test_type_chart() -> void:
 	check(GameData.type_multiplier("WATER", ["FIRE"]) == 2.0, "WATER is super effective vs FIRE")
@@ -247,3 +248,32 @@ func _test_new_game_defaults() -> void:
 	check(GameState.bag.has("TOWN_MAP"), "new_game() starts with a TOWN MAP")
 	check(GameState.seen_species.has("SQUIRTLE"), "picking a starter marks it seen")
 	check(GameState.caught_species.has("SQUIRTLE"), "picking a starter marks it caught")
+
+## Generated Pokemon / character models: every species has a glb with all clips, the cel
+## shader applies, sprite-frame sizing works, and characters resolve to their own model.
+func _test_models_3d(_tree: SceneTree) -> void:
+	var missing: Array = []
+	for sid in GameData.species.keys():
+		if not ResourceLoader.exists("res://assets/models/pokemon/%s.glb" % sid):
+			missing.append(sid)
+	check(missing.is_empty(), "every species has a glb (missing %s)" % [missing])
+	var actor := PokemonActor.new()  # not added to the tree (root is busy during boot)
+	actor.setup("PIKACHU")
+	for clip in ["Idle", "Walk", "Attack", "Hurt", "Faint", "Special"]:
+		check(actor.has_anim(clip), "PIKACHU has clip %s" % clip)
+	var mi: MeshInstance3D = Toon._mesh_instances(actor)[0]
+	var mat := mi.get_surface_override_material(0) as ShaderMaterial
+	check(mat != null and mat.shader == Toon.TOON_SHADER and mat.next_pass != null, "PIKACHU uses toon + outline")
+	check(float(PokemonActor.species_info("PIKACHU").get("px_height", 0.0)) > 20.0, "manifest has px_height")
+	var s := actor.use_sprite_scale(1.6)
+	check(s > 0.5 and s < 10.0, "sprite-frame scale sane (%f)" % s)
+	actor.free()
+	check(ResourceLoader.exists("res://assets/models/pokemon/MISSINGNO.glb"), "MISSINGNO model present")
+	check(CharacterSkin.resolve_key("red") == "red", "red has its own character model")
+	var red := CharacterSkin.instantiate("red")
+	var ap := AnimUtil.find_player(red)
+	check(ap != null and ap.has_animation("Walk"), "red model has Walk")
+	red.free()
+	var fallback := CharacterSkin.instantiate("no_such_sprite")
+	check(fallback != null, "unknown sprite falls back to humanoid")
+	fallback.free()

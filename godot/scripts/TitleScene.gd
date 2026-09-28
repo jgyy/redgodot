@@ -145,7 +145,7 @@ func _build_world() -> void:
 	_cz.add_child(cza)
 	cza.setup("CHARIZARD")
 	add_child(_cz)
-	Diorama.stand(_cam, _cz, Vector2(256, 176), 102.0, -48.0)
+	Diorama.stand(_cam, _cz, Vector2(256, 176), 102.0, -20.0)
 	_cz_home = _cz.position
 	_add_shadow(_cz.position, 1.2 * _cz.scale.x)
 	_px_world = Diorama.K * Diorama.depth_of(_cam, _cz_home) / f

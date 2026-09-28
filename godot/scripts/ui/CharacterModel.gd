@@ -8,6 +8,10 @@ extends RefCounted
 const DIR := "res://assets/models/characters/"
 
 static func build(cast_key: String) -> Node3D:
+	# the character pipeline's cel-shaded model (with humanoid fallback)
+	var best := CharacterSkin.instantiate(cast_key)
+	if best:
+		return best
 	var entry: Dictionary = GameData.cast.get(cast_key, {})
 	for path in [DIR + cast_key + ".glb", DIR + "humanoid.glb"]:
 		if ResourceLoader.exists(path):
