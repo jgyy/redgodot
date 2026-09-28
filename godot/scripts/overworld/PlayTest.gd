@@ -44,16 +44,22 @@ func run(starter: String) -> void:
 	await _press_action("confirm", 4)
 	await _advance_until(func() -> bool: return not _story_busy() and not GameState.party.is_empty(), 3600)
 	_note("party", str(GameState.party.map(func(m: GameState.PartyMon) -> String: return m.species_id)))
-	# 5. head for the exit: the rival challenges you
+	# 5. head for the exit: the rival challenges you on the way out
+	await _advance_until(func() -> bool: return not _story_busy(), 1800)
 	await _walk_to(Vector2i(5, 6))
-	await _press_dir("down", 60)
 	await _advance_until(func() -> bool: return milestones.has("battle"), 1800)
-	var ok := milestones.has("lab") and not GameState.party.is_empty() and milestones.has("battle")
+	# 6. fight it out (A picks FIGHT and the first move), then the rival leaves: back in the lab
+	await _advance_until(func() -> bool: return milestones.has("battle") and not SceneRouter.in_battle() and not _story_busy(), 7200)
+	if _ow.current_map() == "OaksLab" and _ow.visible:
+		_note("after_battle", "%s %s party=%s" % [_ow.current_map(), str(_ow.actor_cell("PLAYER")), str(GameState.party.map(func(m: GameState.PartyMon) -> String: return "%s L%d %d/%d" % [m.species_id, m.level, m.hp, m.max_hp]))])
+	var ok := milestones.has("lab") and not GameState.party.is_empty() and milestones.has("battle") and milestones.has("after_battle")
 	_done("OK" if ok else "INCOMPLETE")
 
 func _story_busy() -> bool:
 	var st := get_node_or_null("/root/Story")
 	var ui := get_node_or_null("/root/UI")
+	if not _ow.visible:
+		return true
 	return (st != null and bool(st.is_running())) or (ui != null and bool(ui.is_busy())) or bool(_ow.is_input_locked()) or bool(_ow.is_warping())
 
 func _note(k: String, v: String) -> void:
@@ -98,7 +104,7 @@ func _advance_until(cond: Callable, max_frames: int) -> void:
 			var st := get_node_or_null("/root/Story")
 			print("[playtest]   .. %s %s dir=%s story=%s ui=%s locked=%s" % [_ow.current_map(), str(_ow.actor_cell("PLAYER")), _ow.actor_dir("PLAYER"),
 				str(st.is_running()) if st else "-", str(get_node("/root/UI").is_busy()), str(_ow.is_input_locked())])
-		if _story_busy():
+		if _story_busy() or SceneRouter.in_battle():
 			await _press_action("confirm", 2)
 			n += 5
 		else:
