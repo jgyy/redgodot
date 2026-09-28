@@ -17,6 +17,7 @@ const TYPE_COLORS := {
 }
 
 var species_id: String = ""
+var model: Node3D
 var _anim: AnimationPlayer
 
 func setup(sid: String) -> void:
@@ -25,8 +26,8 @@ func setup(sid: String) -> void:
 		c.queue_free()
 	_anim = null
 
+	model = null
 	var path := "res://assets/models/pokemon/%s.glb" % sid
-	var model: Node3D
 	if ResourceLoader.exists(path):
 		var scene: PackedScene = load(path)
 		if scene:
@@ -34,13 +35,48 @@ func setup(sid: String) -> void:
 	if model == null:
 		model = _fallback_model(sid)
 	add_child(model)
+	Toon.apply(model)
 	_anim = _find_anim_player(model)
 	AnimUtil.fix_looping(_anim)
 	play("Idle")
 
+## Plays a baked clip: Idle / Walk (looping), Attack / Hurt / Faint / Special (one-shot).
 func play(anim_name: String) -> void:
 	if _anim and _anim.has_animation(anim_name):
 		_anim.play(anim_name)
+
+## One-shot clip that returns to Idle when done (Faint stays on its last frame).
+func play_once(anim_name: String) -> void:
+	if _anim == null or not _anim.has_animation(anim_name):
+		return
+	_anim.play(anim_name)
+	if anim_name != "Faint":
+		_anim.queue("Idle")
+
+func has_anim(anim_name: String) -> bool:
+	return _anim != null and _anim.has_animation(anim_name)
+
+## Cel-shader uniform on the whole model (tint, flash, fade, gloss... see toon.gdshader).
+func set_shader_param(param: String, value: Variant) -> void:
+	if model:
+		Toon.set_param(model, param, value)
+
+## Model height in metres (Pokedex height; the glb is authored at real scale).
+func model_height() -> float:
+	return GameData.species_height_m(species_id)
+
+## Local-space AABB of all meshes (rest pose), e.g. for battle framing.
+func model_aabb() -> AABB:
+	var box := AABB()
+	var first := true
+	for mi in Toon._mesh_instances(self):
+		var inst: MeshInstance3D = mi
+		if inst.mesh == null:
+			continue
+		var b: AABB = global_transform.affine_inverse() * inst.global_transform * inst.mesh.get_aabb()
+		box = b if first else box.merge(b)
+		first = false
+	return box
 
 func _find_anim_player(node: Node) -> AnimationPlayer:
 	if node is AnimationPlayer:

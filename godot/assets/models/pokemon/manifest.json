@@ -150,7 +150,8 @@
   "DRAGONAIR",
   "DRAGONITE",
   "MEWTWO",
-  "MEW"
+  "MEW",
+  "MISSINGNO"
  ],
  "fallback": [],
  "errors": {},
@@ -159,1360 +160,1517 @@
   "BULBASAUR": {
    "height_m": 0.711,
    "groups": 7,
-   "tris": 4876,
-   "materials": 9,
+   "tris": 6608,
+   "materials": 1,
    "file": "BULBASAUR.glb",
-   "bytes": 191928,
-   "status": "generated"
-  },
-  "IVYSAUR": {
-   "height_m": 0.991,
-   "groups": 12,
-   "tris": 13388,
-   "materials": 12,
-   "file": "IVYSAUR.glb",
-   "bytes": 524712,
-   "status": "generated"
-  },
-  "VENUSAUR": {
-   "height_m": 2.007,
-   "groups": 17,
-   "tris": 19102,
-   "materials": 16,
-   "file": "VENUSAUR.glb",
-   "bytes": 721432,
-   "status": "generated"
-  },
-  "CHARMANDER": {
-   "height_m": 0.61,
-   "groups": 9,
-   "tris": 4848,
-   "materials": 7,
-   "file": "CHARMANDER.glb",
-   "bytes": 191628,
-   "status": "generated"
+   "bytes": 269472,
+   "status": "generated",
+   "texture": "1024x256"
   },
   "CHARMELEON": {
    "height_m": 1.092,
    "groups": 10,
-   "tris": 4460,
-   "materials": 8,
+   "tris": 6158,
+   "materials": 1,
    "file": "CHARMELEON.glb",
-   "bytes": 185760,
-   "status": "generated"
-  },
-  "CHARIZARD": {
-   "height_m": 1.702,
-   "groups": 13,
-   "tris": 7634,
-   "materials": 8,
-   "file": "CHARIZARD.glb",
-   "bytes": 314012,
-   "status": "generated"
-  },
-  "SQUIRTLE": {
-   "height_m": 0.508,
-   "groups": 9,
-   "tris": 5718,
-   "materials": 9,
-   "file": "SQUIRTLE.glb",
-   "bytes": 216304,
-   "status": "generated"
-  },
-  "WARTORTLE": {
-   "height_m": 0.991,
-   "groups": 11,
-   "tris": 8354,
-   "materials": 12,
-   "file": "WARTORTLE.glb",
-   "bytes": 333100,
-   "status": "generated"
+   "bytes": 273460,
+   "status": "generated",
+   "texture": "1024x192"
   },
   "BLASTOISE": {
    "height_m": 1.6,
    "groups": 11,
-   "tris": 6704,
-   "materials": 11,
+   "tris": 6872,
+   "materials": 1,
    "file": "BLASTOISE.glb",
-   "bytes": 252536,
-   "status": "generated"
-  },
-  "CATERPIE": {
-   "height_m": 0.305,
-   "groups": 8,
-   "tris": 1718,
-   "materials": 6,
-   "file": "CATERPIE.glb",
-   "bytes": 96468,
-   "status": "generated"
-  },
-  "METAPOD": {
-   "height_m": 0.711,
-   "groups": 2,
-   "tris": 3118,
-   "materials": 6,
-   "file": "METAPOD.glb",
-   "bytes": 119776,
-   "status": "generated"
-  },
-  "BUTTERFREE": {
-   "height_m": 1.092,
-   "groups": 12,
-   "tris": 4850,
-   "materials": 8,
-   "file": "BUTTERFREE.glb",
-   "bytes": 229544,
-   "status": "generated"
+   "bytes": 298204,
+   "status": "generated",
+   "texture": "1024x384"
   },
   "WEEDLE": {
    "height_m": 0.305,
    "groups": 11,
-   "tris": 1718,
-   "materials": 5,
+   "tris": 6128,
+   "materials": 1,
    "file": "WEEDLE.glb",
-   "bytes": 97840,
-   "status": "generated"
-  },
-  "KAKUNA": {
-   "height_m": 0.61,
-   "groups": 9,
-   "tris": 2944,
-   "materials": 3,
-   "file": "KAKUNA.glb",
-   "bytes": 139984,
-   "status": "generated"
-  },
-  "BEEDRILL": {
-   "height_m": 0.991,
-   "groups": 16,
-   "tris": 9300,
-   "materials": 9,
-   "file": "BEEDRILL.glb",
-   "bytes": 394488,
-   "status": "generated"
-  },
-  "PIDGEY": {
-   "height_m": 0.305,
-   "groups": 10,
-   "tris": 11512,
-   "materials": 9,
-   "file": "PIDGEY.glb",
-   "bytes": 453844,
-   "status": "generated"
+   "bytes": 260824,
+   "status": "generated",
+   "texture": "1024x128"
   },
   "PIDGEOTTO": {
    "height_m": 1.092,
    "groups": 12,
-   "tris": 17208,
-   "materials": 11,
+   "tris": 6026,
+   "materials": 1,
    "file": "PIDGEOTTO.glb",
-   "bytes": 654004,
-   "status": "generated"
-  },
-  "PIDGEOT": {
-   "height_m": 1.499,
-   "groups": 13,
-   "tris": 15864,
-   "materials": 13,
-   "file": "PIDGEOT.glb",
-   "bytes": 619452,
-   "status": "generated"
-  },
-  "RATTATA": {
-   "height_m": 0.305,
-   "groups": 13,
-   "tris": 3716,
-   "materials": 9,
-   "file": "RATTATA.glb",
-   "bytes": 170228,
-   "status": "generated"
-  },
-  "RATICATE": {
-   "height_m": 0.711,
-   "groups": 17,
-   "tris": 6912,
-   "materials": 10,
-   "file": "RATICATE.glb",
-   "bytes": 293656,
-   "status": "generated"
+   "bytes": 283176,
+   "status": "generated",
+   "texture": "1024x192"
   },
   "SPEAROW": {
    "height_m": 0.305,
    "groups": 11,
-   "tris": 9800,
-   "materials": 10,
+   "tris": 6036,
+   "materials": 1,
    "file": "SPEAROW.glb",
-   "bytes": 396496,
-   "status": "generated"
-  },
-  "FEAROW": {
-   "height_m": 1.194,
-   "groups": 13,
-   "tris": 13200,
-   "materials": 13,
-   "file": "FEAROW.glb",
-   "bytes": 537304,
-   "status": "generated"
-  },
-  "EKANS": {
-   "height_m": 2.007,
-   "groups": 6,
-   "tris": 4322,
-   "materials": 9,
-   "file": "EKANS.glb",
-   "bytes": 161852,
-   "status": "generated"
-  },
-  "ARBOK": {
-   "height_m": 3.505,
-   "groups": 6,
-   "tris": 6276,
-   "materials": 9,
-   "file": "ARBOK.glb",
-   "bytes": 228500,
-   "status": "generated"
+   "bytes": 283452,
+   "status": "generated",
+   "texture": "1024x128"
   },
   "PIKACHU": {
    "height_m": 0.406,
    "groups": 9,
-   "tris": 4456,
-   "materials": 5,
+   "tris": 5992,
+   "materials": 1,
    "file": "PIKACHU.glb",
-   "bytes": 192920,
-   "status": "generated"
-  },
-  "RAICHU": {
-   "height_m": 0.787,
-   "groups": 10,
-   "tris": 9924,
-   "materials": 10,
-   "file": "RAICHU.glb",
-   "bytes": 397200,
-   "status": "generated"
-  },
-  "SANDSHREW": {
-   "height_m": 0.61,
-   "groups": 10,
-   "tris": 3112,
-   "materials": 6,
-   "file": "SANDSHREW.glb",
-   "bytes": 148396,
-   "status": "generated"
-  },
-  "SANDSLASH": {
-   "height_m": 0.991,
-   "groups": 20,
-   "tris": 16542,
-   "materials": 8,
-   "file": "SANDSLASH.glb",
-   "bytes": 676740,
-   "status": "generated"
+   "bytes": 268960,
+   "status": "generated",
+   "texture": "1024x192"
   },
   "NIDORAN_F": {
    "height_m": 0.406,
    "groups": 14,
-   "tris": 5254,
-   "materials": 7,
+   "tris": 6236,
+   "materials": 1,
    "file": "NIDORAN_F.glb",
-   "bytes": 255512,
-   "status": "generated"
-  },
-  "NIDORINA": {
-   "height_m": 0.787,
-   "groups": 14,
-   "tris": 6370,
-   "materials": 8,
-   "file": "NIDORINA.glb",
-   "bytes": 299232,
-   "status": "generated"
-  },
-  "NIDOQUEEN": {
-   "height_m": 1.295,
-   "groups": 12,
-   "tris": 5780,
-   "materials": 8,
-   "file": "NIDOQUEEN.glb",
-   "bytes": 247016,
-   "status": "generated"
-  },
-  "NIDORAN_M": {
-   "height_m": 0.508,
-   "groups": 11,
-   "tris": 4780,
-   "materials": 7,
-   "file": "NIDORAN_M.glb",
-   "bytes": 210784,
-   "status": "generated"
+   "bytes": 287072,
+   "status": "generated",
+   "texture": "1024x192"
   },
   "NIDORINO": {
    "height_m": 0.889,
    "groups": 11,
-   "tris": 5828,
-   "materials": 7,
+   "tris": 6301,
+   "materials": 1,
    "file": "NIDORINO.glb",
-   "bytes": 249600,
-   "status": "generated"
-  },
-  "NIDOKING": {
-   "height_m": 1.397,
-   "groups": 14,
-   "tris": 6410,
-   "materials": 11,
-   "file": "NIDOKING.glb",
-   "bytes": 276996,
-   "status": "generated"
-  },
-  "CLEFAIRY": {
-   "height_m": 0.61,
-   "groups": 10,
-   "tris": 4214,
-   "materials": 7,
-   "file": "CLEFAIRY.glb",
-   "bytes": 187620,
-   "status": "generated"
-  },
-  "CLEFABLE": {
-   "height_m": 1.295,
-   "groups": 11,
-   "tris": 5094,
-   "materials": 5,
-   "file": "CLEFABLE.glb",
-   "bytes": 205648,
-   "status": "generated"
+   "bytes": 280620,
+   "status": "generated",
+   "texture": "1024x256"
   },
   "VULPIX": {
    "height_m": 0.61,
    "groups": 16,
-   "tris": 4928,
-   "materials": 8,
+   "tris": 6056,
+   "materials": 1,
    "file": "VULPIX.glb",
-   "bytes": 214200,
-   "status": "generated"
-  },
-  "NINETALES": {
-   "height_m": 1.092,
-   "groups": 22,
-   "tris": 7942,
-   "materials": 8,
-   "file": "NINETALES.glb",
-   "bytes": 328188,
-   "status": "generated"
-  },
-  "JIGGLYPUFF": {
-   "height_m": 0.508,
-   "groups": 8,
-   "tris": 3028,
-   "materials": 6,
-   "file": "JIGGLYPUFF.glb",
-   "bytes": 133972,
-   "status": "generated"
-  },
-  "WIGGLYTUFF": {
-   "height_m": 0.991,
-   "groups": 10,
-   "tris": 3840,
-   "materials": 7,
-   "file": "WIGGLYTUFF.glb",
-   "bytes": 171132,
-   "status": "generated"
+   "bytes": 292016,
+   "status": "generated",
+   "texture": "1024x256"
   },
   "ZUBAT": {
    "height_m": 0.787,
    "groups": 7,
-   "tris": 5816,
-   "materials": 6,
+   "tris": 5992,
+   "materials": 1,
    "file": "ZUBAT.glb",
-   "bytes": 242828,
-   "status": "generated"
-  },
-  "GOLBAT": {
-   "height_m": 1.6,
-   "groups": 9,
-   "tris": 8026,
-   "materials": 8,
-   "file": "GOLBAT.glb",
-   "bytes": 316736,
-   "status": "generated"
-  },
-  "ODDISH": {
-   "height_m": 0.508,
-   "groups": 8,
-   "tris": 4308,
-   "materials": 6,
-   "file": "ODDISH.glb",
-   "bytes": 192292,
-   "status": "generated"
-  },
-  "GLOOM": {
-   "height_m": 0.787,
-   "groups": 13,
-   "tris": 6694,
-   "materials": 12,
-   "file": "GLOOM.glb",
-   "bytes": 267308,
-   "status": "generated"
+   "bytes": 259548,
+   "status": "generated",
+   "texture": "1024x128"
   },
   "VILEPLUME": {
    "height_m": 1.194,
    "groups": 11,
-   "tris": 8178,
-   "materials": 9,
+   "tris": 5990,
+   "materials": 1,
    "file": "VILEPLUME.glb",
-   "bytes": 295040,
-   "status": "generated"
-  },
-  "PARAS": {
-   "height_m": 0.305,
-   "groups": 15,
-   "tris": 4506,
-   "materials": 8,
-   "file": "PARAS.glb",
-   "bytes": 199688,
-   "status": "generated"
-  },
-  "PARASECT": {
-   "height_m": 0.991,
-   "groups": 12,
-   "tris": 4388,
-   "materials": 6,
-   "file": "PARASECT.glb",
-   "bytes": 188360,
-   "status": "generated"
-  },
-  "VENONAT": {
-   "height_m": 0.991,
-   "groups": 8,
-   "tris": 2190,
-   "materials": 6,
-   "file": "VENONAT.glb",
-   "bytes": 117256,
-   "status": "generated"
+   "bytes": 267268,
+   "status": "generated",
+   "texture": "1024x256"
   },
   "VENOMOTH": {
    "height_m": 1.499,
    "groups": 14,
-   "tris": 4582,
-   "materials": 8,
+   "tris": 6094,
+   "materials": 1,
    "file": "VENOMOTH.glb",
-   "bytes": 226656,
-   "status": "generated"
-  },
-  "DIGLETT": {
-   "height_m": 0.203,
-   "groups": 5,
-   "tris": 2918,
-   "materials": 5,
-   "file": "DIGLETT.glb",
-   "bytes": 113404,
-   "status": "generated"
-  },
-  "DUGTRIO": {
-   "height_m": 0.711,
-   "groups": 9,
-   "tris": 6580,
-   "materials": 5,
-   "file": "DUGTRIO.glb",
-   "bytes": 225244,
-   "status": "generated"
-  },
-  "MEOWTH": {
-   "height_m": 0.406,
-   "groups": 13,
-   "tris": 4318,
-   "materials": 9,
-   "file": "MEOWTH.glb",
-   "bytes": 194356,
-   "status": "generated"
+   "bytes": 278292,
+   "status": "generated",
+   "texture": "1024x192"
   },
   "PERSIAN": {
    "height_m": 0.991,
    "groups": 14,
-   "tris": 5252,
-   "materials": 9,
+   "tris": 6178,
+   "materials": 1,
    "file": "PERSIAN.glb",
-   "bytes": 222076,
-   "status": "generated"
-  },
-  "PSYDUCK": {
-   "height_m": 0.787,
-   "groups": 12,
-   "tris": 3288,
-   "materials": 5,
-   "file": "PSYDUCK.glb",
-   "bytes": 151356,
-   "status": "generated"
-  },
-  "GOLDUCK": {
-   "height_m": 1.702,
-   "groups": 15,
-   "tris": 6668,
-   "materials": 8,
-   "file": "GOLDUCK.glb",
-   "bytes": 276576,
-   "status": "generated"
-  },
-  "MANKEY": {
-   "height_m": 0.508,
-   "groups": 10,
-   "tris": 3784,
-   "materials": 7,
-   "file": "MANKEY.glb",
-   "bytes": 177948,
-   "status": "generated"
+   "bytes": 292768,
+   "status": "generated",
+   "texture": "1024x256"
   },
   "PRIMEAPE": {
    "height_m": 0.991,
    "groups": 10,
-   "tris": 4720,
-   "materials": 9,
+   "tris": 6114,
+   "materials": 1,
    "file": "PRIMEAPE.glb",
-   "bytes": 205816,
-   "status": "generated"
-  },
-  "GROWLITHE": {
-   "height_m": 0.711,
-   "groups": 12,
-   "tris": 4602,
-   "materials": 6,
-   "file": "GROWLITHE.glb",
-   "bytes": 201012,
-   "status": "generated"
-  },
-  "ARCANINE": {
-   "height_m": 1.905,
-   "groups": 17,
-   "tris": 8628,
-   "materials": 6,
-   "file": "ARCANINE.glb",
-   "bytes": 349224,
-   "status": "generated"
-  },
-  "POLIWAG": {
-   "height_m": 0.61,
-   "groups": 6,
-   "tris": 2536,
-   "materials": 8,
-   "file": "POLIWAG.glb",
-   "bytes": 117944,
-   "status": "generated"
+   "bytes": 275396,
+   "status": "generated",
+   "texture": "1024x256"
   },
   "POLIWHIRL": {
    "height_m": 0.991,
    "groups": 7,
-   "tris": 3328,
-   "materials": 5,
+   "tris": 5992,
+   "materials": 1,
    "file": "POLIWHIRL.glb",
-   "bytes": 136500,
-   "status": "generated"
-  },
-  "POLIWRATH": {
-   "height_m": 1.295,
-   "groups": 7,
-   "tris": 4628,
-   "materials": 5,
-   "file": "POLIWRATH.glb",
-   "bytes": 174112,
-   "status": "generated"
-  },
-  "ABRA": {
-   "height_m": 0.889,
-   "groups": 10,
-   "tris": 3712,
-   "materials": 3,
-   "file": "ABRA.glb",
-   "bytes": 156552,
-   "status": "generated"
-  },
-  "KADABRA": {
-   "height_m": 1.295,
-   "groups": 15,
-   "tris": 6684,
-   "materials": 7,
-   "file": "KADABRA.glb",
-   "bytes": 270716,
-   "status": "generated"
+   "bytes": 250664,
+   "status": "generated",
+   "texture": "1024x256"
   },
   "ALAKAZAM": {
    "height_m": 1.499,
    "groups": 14,
-   "tris": 5904,
-   "materials": 6,
+   "tris": 5988,
+   "materials": 1,
    "file": "ALAKAZAM.glb",
-   "bytes": 230796,
-   "status": "generated"
-  },
-  "MACHOP": {
-   "height_m": 0.787,
-   "groups": 12,
-   "tris": 4466,
-   "materials": 7,
-   "file": "MACHOP.glb",
-   "bytes": 190168,
-   "status": "generated"
-  },
-  "MACHOKE": {
-   "height_m": 1.499,
-   "groups": 14,
-   "tris": 7346,
-   "materials": 9,
-   "file": "MACHOKE.glb",
-   "bytes": 282044,
-   "status": "generated"
-  },
-  "MACHAMP": {
-   "height_m": 1.6,
-   "groups": 18,
-   "tris": 7844,
-   "materials": 9,
-   "file": "MACHAMP.glb",
-   "bytes": 296544,
-   "status": "generated"
+   "bytes": 284848,
+   "status": "generated",
+   "texture": "1024x256"
   },
   "BELLSPROUT": {
    "height_m": 0.711,
    "groups": 8,
-   "tris": 2168,
-   "materials": 7,
+   "tris": 5996,
+   "materials": 1,
    "file": "BELLSPROUT.glb",
-   "bytes": 109876,
-   "status": "generated"
-  },
-  "WEEPINBELL": {
-   "height_m": 0.991,
-   "groups": 6,
-   "tris": 4184,
-   "materials": 7,
-   "file": "WEEPINBELL.glb",
-   "bytes": 166000,
-   "status": "generated"
-  },
-  "VICTREEBEL": {
-   "height_m": 1.702,
-   "groups": 9,
-   "tris": 5546,
-   "materials": 10,
-   "file": "VICTREEBEL.glb",
-   "bytes": 220820,
-   "status": "generated"
-  },
-  "TENTACOOL": {
-   "height_m": 0.889,
-   "groups": 7,
-   "tris": 2840,
-   "materials": 5,
-   "file": "TENTACOOL.glb",
-   "bytes": 116496,
-   "status": "generated"
+   "bytes": 256904,
+   "status": "generated",
+   "texture": "1024x128"
   },
   "TENTACRUEL": {
    "height_m": 1.6,
    "groups": 11,
-   "tris": 4702,
-   "materials": 8,
+   "tris": 6060,
+   "materials": 1,
    "file": "TENTACRUEL.glb",
-   "bytes": 184048,
-   "status": "generated"
-  },
-  "GEODUDE": {
-   "height_m": 0.406,
-   "groups": 7,
-   "tris": 4658,
-   "materials": 5,
-   "file": "GEODUDE.glb",
-   "bytes": 181988,
-   "status": "generated"
-  },
-  "GRAVELER": {
-   "height_m": 0.991,
-   "groups": 12,
-   "tris": 5246,
-   "materials": 5,
-   "file": "GRAVELER.glb",
-   "bytes": 208608,
-   "status": "generated"
-  },
-  "GOLEM": {
-   "height_m": 1.397,
-   "groups": 7,
-   "tris": 7780,
-   "materials": 9,
-   "file": "GOLEM.glb",
-   "bytes": 273936,
-   "status": "generated"
+   "bytes": 266424,
+   "status": "generated",
+   "texture": "1024x256"
   },
   "PONYTA": {
    "height_m": 0.991,
    "groups": 17,
-   "tris": 5720,
-   "materials": 8,
+   "tris": 6601,
+   "materials": 1,
    "file": "PONYTA.glb",
-   "bytes": 264452,
-   "status": "generated"
-  },
-  "RAPIDASH": {
-   "height_m": 1.702,
-   "groups": 22,
-   "tris": 8824,
-   "materials": 9,
-   "file": "RAPIDASH.glb",
-   "bytes": 382376,
-   "status": "generated"
-  },
-  "SLOWPOKE": {
-   "height_m": 1.194,
-   "groups": 8,
-   "tris": 4000,
-   "materials": 7,
-   "file": "SLOWPOKE.glb",
-   "bytes": 161456,
-   "status": "generated"
-  },
-  "SLOWBRO": {
-   "height_m": 1.6,
-   "groups": 13,
-   "tris": 5384,
-   "materials": 9,
-   "file": "SLOWBRO.glb",
-   "bytes": 226772,
-   "status": "generated"
+   "bytes": 314932,
+   "status": "generated",
+   "texture": "1024x192"
   },
   "MAGNEMITE": {
    "height_m": 0.305,
    "groups": 10,
-   "tris": 2336,
-   "materials": 6,
+   "tris": 5986,
+   "materials": 1,
    "file": "MAGNEMITE.glb",
-   "bytes": 108560,
-   "status": "generated"
-  },
-  "MAGNETON": {
-   "height_m": 0.991,
-   "groups": 20,
-   "tris": 4740,
-   "materials": 6,
-   "file": "MAGNETON.glb",
-   "bytes": 205240,
-   "status": "generated"
-  },
-  "FARFETCHD": {
-   "height_m": 0.787,
-   "groups": 9,
-   "tris": 4128,
-   "materials": 10,
-   "file": "FARFETCHD.glb",
-   "bytes": 186316,
-   "status": "generated"
-  },
-  "DODUO": {
-   "height_m": 1.397,
-   "groups": 9,
-   "tris": 2826,
-   "materials": 5,
-   "file": "DODUO.glb",
-   "bytes": 127428,
-   "status": "generated"
+   "bytes": 250660,
+   "status": "generated",
+   "texture": "1024x128"
   },
   "DODRIO": {
    "height_m": 1.803,
    "groups": 16,
-   "tris": 4992,
-   "materials": 8,
+   "tris": 6163,
+   "materials": 1,
    "file": "DODRIO.glb",
-   "bytes": 225204,
-   "status": "generated"
-  },
-  "SEEL": {
-   "height_m": 1.092,
-   "groups": 7,
-   "tris": 4116,
-   "materials": 5,
-   "file": "SEEL.glb",
-   "bytes": 168076,
-   "status": "generated"
-  },
-  "DEWGONG": {
-   "height_m": 1.702,
-   "groups": 6,
-   "tris": 3860,
-   "materials": 4,
-   "file": "DEWGONG.glb",
-   "bytes": 156596,
-   "status": "generated"
-  },
-  "GRIMER": {
-   "height_m": 0.889,
-   "groups": 5,
-   "tris": 3810,
-   "materials": 5,
-   "file": "GRIMER.glb",
-   "bytes": 141288,
-   "status": "generated"
+   "bytes": 291192,
+   "status": "generated",
+   "texture": "1024x192"
   },
   "MUK": {
    "height_m": 1.194,
    "groups": 5,
-   "tris": 5162,
-   "materials": 5,
+   "tris": 5994,
+   "materials": 1,
    "file": "MUK.glb",
-   "bytes": 179732,
-   "status": "generated"
-  },
-  "SHELLDER": {
-   "height_m": 0.305,
-   "groups": 4,
-   "tris": 3248,
-   "materials": 6,
-   "file": "SHELLDER.glb",
-   "bytes": 126176,
-   "status": "generated"
-  },
-  "CLOYSTER": {
-   "height_m": 1.499,
-   "groups": 10,
-   "tris": 5822,
-   "materials": 11,
-   "file": "CLOYSTER.glb",
-   "bytes": 244892,
-   "status": "generated"
-  },
-  "GASTLY": {
-   "height_m": 1.295,
-   "groups": 9,
-   "tris": 9738,
-   "materials": 7,
-   "file": "GASTLY.glb",
-   "bytes": 339212,
-   "status": "generated"
+   "bytes": 245616,
+   "status": "generated",
+   "texture": "1024x320"
   },
   "HAUNTER": {
    "height_m": 1.6,
    "groups": 10,
-   "tris": 5664,
-   "materials": 5,
+   "tris": 6904,
+   "materials": 1,
    "file": "HAUNTER.glb",
-   "bytes": 251252,
-   "status": "generated"
-  },
-  "GENGAR": {
-   "height_m": 1.499,
-   "groups": 12,
-   "tris": 5232,
-   "materials": 4,
-   "file": "GENGAR.glb",
-   "bytes": 233452,
-   "status": "generated"
-  },
-  "ONIX": {
-   "height_m": 8.788,
-   "groups": 13,
-   "tris": 5076,
-   "materials": 6,
-   "file": "ONIX.glb",
-   "bytes": 207560,
-   "status": "generated"
-  },
-  "DROWZEE": {
-   "height_m": 0.991,
-   "groups": 8,
-   "tris": 4564,
-   "materials": 5,
-   "file": "DROWZEE.glb",
-   "bytes": 179268,
-   "status": "generated"
+   "bytes": 305104,
+   "status": "generated",
+   "texture": "1024x320"
   },
   "HYPNO": {
    "height_m": 1.6,
    "groups": 10,
-   "tris": 5778,
-   "materials": 6,
+   "tris": 6274,
+   "materials": 1,
    "file": "HYPNO.glb",
-   "bytes": 222588,
-   "status": "generated"
-  },
-  "KRABBY": {
-   "height_m": 0.406,
-   "groups": 11,
-   "tris": 3516,
-   "materials": 3,
-   "file": "KRABBY.glb",
-   "bytes": 161428,
-   "status": "generated"
-  },
-  "KINGLER": {
-   "height_m": 1.295,
-   "groups": 11,
-   "tris": 5810,
-   "materials": 4,
-   "file": "KINGLER.glb",
-   "bytes": 243988,
-   "status": "generated"
-  },
-  "VOLTORB": {
-   "height_m": 0.508,
-   "groups": 5,
-   "tris": 1456,
-   "materials": 5,
-   "file": "VOLTORB.glb",
-   "bytes": 78652,
-   "status": "generated"
+   "bytes": 274472,
+   "status": "generated",
+   "texture": "1024x256"
   },
   "ELECTRODE": {
    "height_m": 1.194,
    "groups": 6,
-   "tris": 2416,
-   "materials": 6,
+   "tris": 6652,
+   "materials": 1,
    "file": "ELECTRODE.glb",
-   "bytes": 119436,
-   "status": "generated"
-  },
-  "EXEGGCUTE": {
-   "height_m": 0.406,
-   "groups": 6,
-   "tris": 6124,
-   "materials": 5,
-   "file": "EXEGGCUTE.glb",
-   "bytes": 213340,
-   "status": "generated"
-  },
-  "EXEGGUTOR": {
-   "height_m": 2.007,
-   "groups": 12,
-   "tris": 7720,
-   "materials": 10,
-   "file": "EXEGGUTOR.glb",
-   "bytes": 293572,
-   "status": "generated"
-  },
-  "CUBONE": {
-   "height_m": 0.406,
-   "groups": 9,
-   "tris": 4108,
-   "materials": 5,
-   "file": "CUBONE.glb",
-   "bytes": 171648,
-   "status": "generated"
+   "bytes": 266376,
+   "status": "generated",
+   "texture": "1024x256"
   },
   "MAROWAK": {
    "height_m": 0.991,
    "groups": 9,
-   "tris": 4996,
-   "materials": 5,
+   "tris": 6168,
+   "materials": 1,
    "file": "MAROWAK.glb",
-   "bytes": 199716,
-   "status": "generated"
-  },
-  "HITMONLEE": {
-   "height_m": 1.499,
-   "groups": 15,
-   "tris": 3170,
-   "materials": 6,
-   "file": "HITMONLEE.glb",
-   "bytes": 160308,
-   "status": "generated"
-  },
-  "HITMONCHAN": {
-   "height_m": 1.397,
-   "groups": 13,
-   "tris": 4670,
-   "materials": 5,
-   "file": "HITMONCHAN.glb",
-   "bytes": 202888,
-   "status": "generated"
-  },
-  "LICKITUNG": {
-   "height_m": 1.194,
-   "groups": 9,
-   "tris": 3952,
-   "materials": 7,
-   "file": "LICKITUNG.glb",
-   "bytes": 169056,
-   "status": "generated"
+   "bytes": 275616,
+   "status": "generated",
+   "texture": "1024x256"
   },
   "KOFFING": {
    "height_m": 0.61,
    "groups": 10,
-   "tris": 3196,
-   "materials": 7,
+   "tris": 5990,
+   "materials": 1,
    "file": "KOFFING.glb",
-   "bytes": 139252,
-   "status": "generated"
-  },
-  "WEEZING": {
-   "height_m": 1.194,
-   "groups": 14,
-   "tris": 5842,
-   "materials": 7,
-   "file": "WEEZING.glb",
-   "bytes": 227304,
-   "status": "generated"
-  },
-  "RHYHORN": {
-   "height_m": 0.991,
-   "groups": 10,
-   "tris": 3720,
-   "materials": 5,
-   "file": "RHYHORN.glb",
-   "bytes": 174148,
-   "status": "generated"
-  },
-  "RHYDON": {
-   "height_m": 1.905,
-   "groups": 15,
-   "tris": 4598,
-   "materials": 7,
-   "file": "RHYDON.glb",
-   "bytes": 221048,
-   "status": "generated"
+   "bytes": 254208,
+   "status": "generated",
+   "texture": "1024x192"
   },
   "CHANSEY": {
    "height_m": 1.092,
    "groups": 10,
-   "tris": 5776,
-   "materials": 4,
+   "tris": 6016,
+   "materials": 1,
    "file": "CHANSEY.glb",
-   "bytes": 220044,
-   "status": "generated"
-  },
-  "TANGELA": {
-   "height_m": 0.991,
-   "groups": 10,
-   "tris": 4458,
-   "materials": 7,
-   "file": "TANGELA.glb",
-   "bytes": 196640,
-   "status": "generated"
-  },
-  "KANGASKHAN": {
-   "height_m": 2.21,
-   "groups": 18,
-   "tris": 6220,
-   "materials": 8,
-   "file": "KANGASKHAN.glb",
-   "bytes": 268920,
-   "status": "generated"
-  },
-  "HORSEA": {
-   "height_m": 0.406,
-   "groups": 5,
-   "tris": 2194,
-   "materials": 7,
-   "file": "HORSEA.glb",
-   "bytes": 106596,
-   "status": "generated"
+   "bytes": 260684,
+   "status": "generated",
+   "texture": "1024x256"
   },
   "SEADRA": {
    "height_m": 1.194,
    "groups": 7,
-   "tris": 3716,
-   "materials": 7,
+   "tris": 6004,
+   "materials": 1,
    "file": "SEADRA.glb",
-   "bytes": 164656,
-   "status": "generated"
-  },
-  "GOLDEEN": {
-   "height_m": 0.61,
-   "groups": 7,
-   "tris": 2596,
-   "materials": 8,
-   "file": "GOLDEEN.glb",
-   "bytes": 136496,
-   "status": "generated"
-  },
-  "SEAKING": {
-   "height_m": 1.295,
-   "groups": 7,
-   "tris": 3036,
-   "materials": 9,
-   "file": "SEAKING.glb",
-   "bytes": 155800,
-   "status": "generated"
-  },
-  "STARYU": {
-   "height_m": 0.787,
-   "groups": 4,
-   "tris": 1668,
-   "materials": 4,
-   "file": "STARYU.glb",
-   "bytes": 81616,
-   "status": "generated"
+   "bytes": 254476,
+   "status": "generated",
+   "texture": "1024x192"
   },
   "STARMIE": {
    "height_m": 1.092,
    "groups": 5,
-   "tris": 5586,
-   "materials": 4,
+   "tris": 5994,
+   "materials": 1,
    "file": "STARMIE.glb",
-   "bytes": 216168,
-   "status": "generated"
-  },
-  "MR_MIME": {
-   "height_m": 1.295,
-   "groups": 16,
-   "tris": 4754,
-   "materials": 7,
-   "file": "MR_MIME.glb",
-   "bytes": 207384,
-   "status": "generated"
-  },
-  "SCYTHER": {
-   "height_m": 1.499,
-   "groups": 12,
-   "tris": 8460,
-   "materials": 10,
-   "file": "SCYTHER.glb",
-   "bytes": 342116,
-   "status": "generated"
-  },
-  "JYNX": {
-   "height_m": 1.397,
-   "groups": 7,
-   "tris": 8438,
-   "materials": 10,
-   "file": "JYNX.glb",
-   "bytes": 344976,
-   "status": "generated"
+   "bytes": 235000,
+   "status": "generated",
+   "texture": "1024x320"
   },
   "ELECTABUZZ": {
    "height_m": 1.092,
    "groups": 11,
-   "tris": 5576,
-   "materials": 4,
+   "tris": 6190,
+   "materials": 1,
    "file": "ELECTABUZZ.glb",
-   "bytes": 224048,
-   "status": "generated"
-  },
-  "MAGMAR": {
-   "height_m": 1.295,
-   "groups": 13,
-   "tris": 5876,
-   "materials": 9,
-   "file": "MAGMAR.glb",
-   "bytes": 254084,
-   "status": "generated"
-  },
-  "PINSIR": {
-   "height_m": 1.499,
-   "groups": 9,
-   "tris": 5168,
-   "materials": 8,
-   "file": "PINSIR.glb",
-   "bytes": 228240,
-   "status": "generated"
-  },
-  "TAUROS": {
-   "height_m": 1.397,
-   "groups": 14,
-   "tris": 6580,
-   "materials": 9,
-   "file": "TAUROS.glb",
-   "bytes": 257204,
-   "status": "generated"
+   "bytes": 281128,
+   "status": "generated",
+   "texture": "1024x256"
   },
   "MAGIKARP": {
    "height_m": 0.889,
    "groups": 9,
-   "tris": 3748,
-   "materials": 11,
+   "tris": 6036,
+   "materials": 1,
    "file": "MAGIKARP.glb",
-   "bytes": 179144,
-   "status": "generated"
-  },
-  "GYARADOS": {
-   "height_m": 6.502,
-   "groups": 17,
-   "tris": 6232,
-   "materials": 12,
-   "file": "GYARADOS.glb",
-   "bytes": 288204,
-   "status": "generated"
-  },
-  "LAPRAS": {
-   "height_m": 2.489,
-   "groups": 16,
-   "tris": 4926,
-   "materials": 7,
-   "file": "LAPRAS.glb",
-   "bytes": 208236,
-   "status": "generated"
-  },
-  "DITTO": {
-   "height_m": 0.305,
-   "groups": 1,
-   "tris": 2328,
-   "materials": 2,
-   "file": "DITTO.glb",
-   "bytes": 80548,
-   "status": "generated"
+   "bytes": 255780,
+   "status": "generated",
+   "texture": "1024x192"
   },
   "EEVEE": {
    "height_m": 0.305,
    "groups": 9,
-   "tris": 6972,
-   "materials": 6,
+   "tris": 5990,
+   "materials": 1,
    "file": "EEVEE.glb",
-   "bytes": 266328,
-   "status": "generated"
-  },
-  "VAPOREON": {
-   "height_m": 0.991,
-   "groups": 13,
-   "tris": 6832,
-   "materials": 7,
-   "file": "VAPOREON.glb",
-   "bytes": 290404,
-   "status": "generated"
-  },
-  "JOLTEON": {
-   "height_m": 0.787,
-   "groups": 9,
-   "tris": 6128,
-   "materials": 5,
-   "file": "JOLTEON.glb",
-   "bytes": 244508,
-   "status": "generated"
-  },
-  "FLAREON": {
-   "height_m": 0.889,
-   "groups": 11,
-   "tris": 9804,
-   "materials": 7,
-   "file": "FLAREON.glb",
-   "bytes": 378396,
-   "status": "generated"
+   "bytes": 262084,
+   "status": "generated",
+   "texture": "1024x192"
   },
   "PORYGON": {
    "height_m": 0.787,
    "groups": 10,
-   "tris": 3984,
-   "materials": 7,
+   "tris": 6007,
+   "materials": 1,
    "file": "PORYGON.glb",
-   "bytes": 197924,
-   "status": "generated"
-  },
-  "OMANYTE": {
-   "height_m": 0.406,
-   "groups": 6,
-   "tris": 2760,
-   "materials": 6,
-   "file": "OMANYTE.glb",
-   "bytes": 120060,
-   "status": "generated"
-  },
-  "OMASTAR": {
-   "height_m": 0.991,
-   "groups": 9,
-   "tris": 4200,
-   "materials": 8,
-   "file": "OMASTAR.glb",
-   "bytes": 182016,
-   "status": "generated"
-  },
-  "KABUTO": {
-   "height_m": 0.508,
-   "groups": 9,
-   "tris": 3112,
-   "materials": 5,
-   "file": "KABUTO.glb",
-   "bytes": 130140,
-   "status": "generated"
+   "bytes": 268088,
+   "status": "generated",
+   "texture": "1024x192"
   },
   "KABUTOPS": {
    "height_m": 1.295,
    "groups": 16,
-   "tris": 6824,
-   "materials": 8,
+   "tris": 6154,
+   "materials": 1,
    "file": "KABUTOPS.glb",
-   "bytes": 313084,
-   "status": "generated"
-  },
-  "AERODACTYL": {
-   "height_m": 1.803,
-   "groups": 12,
-   "tris": 4838,
-   "materials": 7,
-   "file": "AERODACTYL.glb",
-   "bytes": 232976,
-   "status": "generated"
-  },
-  "SNORLAX": {
-   "height_m": 2.108,
-   "groups": 9,
-   "tris": 5400,
-   "materials": 5,
-   "file": "SNORLAX.glb",
-   "bytes": 210180,
-   "status": "generated"
-  },
-  "ARTICUNO": {
-   "height_m": 1.702,
-   "groups": 10,
-   "tris": 6480,
-   "materials": 9,
-   "file": "ARTICUNO.glb",
-   "bytes": 279664,
-   "status": "generated"
+   "bytes": 297296,
+   "status": "generated",
+   "texture": "1024x256"
   },
   "ZAPDOS": {
    "height_m": 1.6,
    "groups": 9,
-   "tris": 8980,
-   "materials": 9,
+   "tris": 5989,
+   "materials": 1,
    "file": "ZAPDOS.glb",
-   "bytes": 381760,
-   "status": "generated"
-  },
-  "MOLTRES": {
-   "height_m": 2.007,
-   "groups": 9,
-   "tris": 11816,
-   "materials": 8,
-   "file": "MOLTRES.glb",
-   "bytes": 453504,
-   "status": "generated"
-  },
-  "DRATINI": {
-   "height_m": 1.803,
-   "groups": 4,
-   "tris": 2356,
-   "materials": 5,
-   "file": "DRATINI.glb",
-   "bytes": 99636,
-   "status": "generated"
-  },
-  "DRAGONAIR": {
-   "height_m": 3.988,
-   "groups": 9,
-   "tris": 3138,
-   "materials": 6,
-   "file": "DRAGONAIR.glb",
-   "bytes": 150336,
-   "status": "generated"
+   "bytes": 273568,
+   "status": "generated",
+   "texture": "1024x256"
   },
   "DRAGONITE": {
    "height_m": 2.21,
    "groups": 11,
-   "tris": 6318,
-   "materials": 8,
+   "tris": 6336,
+   "materials": 1,
    "file": "DRAGONITE.glb",
-   "bytes": 252692,
-   "status": "generated"
+   "bytes": 288672,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "IVYSAUR": {
+   "height_m": 0.991,
+   "groups": 12,
+   "tris": 7300,
+   "materials": 1,
+   "file": "IVYSAUR.glb",
+   "bytes": 322304,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "CHARIZARD": {
+   "height_m": 1.702,
+   "groups": 13,
+   "tris": 6266,
+   "materials": 1,
+   "file": "CHARIZARD.glb",
+   "bytes": 298984,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "CATERPIE": {
+   "height_m": 0.305,
+   "groups": 8,
+   "tris": 5992,
+   "materials": 1,
+   "file": "CATERPIE.glb",
+   "bytes": 249608,
+   "status": "generated",
+   "texture": "1024x128"
+  },
+  "KAKUNA": {
+   "height_m": 0.61,
+   "groups": 9,
+   "tris": 6022,
+   "materials": 1,
+   "file": "KAKUNA.glb",
+   "bytes": 255344,
+   "status": "generated",
+   "texture": "1024x128"
+  },
+  "PIDGEOT": {
+   "height_m": 1.499,
+   "groups": 13,
+   "tris": 6430,
+   "materials": 1,
+   "file": "PIDGEOT.glb",
+   "bytes": 307360,
+   "status": "generated",
+   "texture": "1024x384"
+  },
+  "FEAROW": {
+   "height_m": 1.194,
+   "groups": 13,
+   "tris": 6194,
+   "materials": 1,
+   "file": "FEAROW.glb",
+   "bytes": 300316,
+   "status": "generated",
+   "texture": "1024x320"
+  },
+  "RAICHU": {
+   "height_m": 0.787,
+   "groups": 10,
+   "tris": 5988,
+   "materials": 1,
+   "file": "RAICHU.glb",
+   "bytes": 276424,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "NIDORINA": {
+   "height_m": 0.787,
+   "groups": 14,
+   "tris": 6114,
+   "materials": 1,
+   "file": "NIDORINA.glb",
+   "bytes": 286436,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "NIDOKING": {
+   "height_m": 1.397,
+   "groups": 14,
+   "tris": 6474,
+   "materials": 1,
+   "file": "NIDOKING.glb",
+   "bytes": 307752,
+   "status": "generated",
+   "texture": "1024x384"
+  },
+  "NINETALES": {
+   "height_m": 1.092,
+   "groups": 22,
+   "tris": 6746,
+   "materials": 1,
+   "file": "NINETALES.glb",
+   "bytes": 339580,
+   "status": "generated",
+   "texture": "1024x448"
+  },
+  "GOLBAT": {
+   "height_m": 1.6,
+   "groups": 9,
+   "tris": 6024,
+   "materials": 1,
+   "file": "GOLBAT.glb",
+   "bytes": 269336,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "PARAS": {
+   "height_m": 0.305,
+   "groups": 15,
+   "tris": 6060,
+   "materials": 1,
+   "file": "PARAS.glb",
+   "bytes": 272052,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "DIGLETT": {
+   "height_m": 0.203,
+   "groups": 5,
+   "tris": 6010,
+   "materials": 1,
+   "file": "DIGLETT.glb",
+   "bytes": 231460,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "PSYDUCK": {
+   "height_m": 0.787,
+   "groups": 12,
+   "tris": 5982,
+   "materials": 1,
+   "file": "PSYDUCK.glb",
+   "bytes": 273216,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "GROWLITHE": {
+   "height_m": 0.711,
+   "groups": 12,
+   "tris": 6052,
+   "materials": 1,
+   "file": "GROWLITHE.glb",
+   "bytes": 272524,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "POLIWRATH": {
+   "height_m": 1.295,
+   "groups": 7,
+   "tris": 5992,
+   "materials": 1,
+   "file": "POLIWRATH.glb",
+   "bytes": 251312,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "MACHOP": {
+   "height_m": 0.787,
+   "groups": 12,
+   "tris": 6032,
+   "materials": 1,
+   "file": "MACHOP.glb",
+   "bytes": 278996,
+   "status": "generated",
+   "texture": "1024x128"
+  },
+  "WEEPINBELL": {
+   "height_m": 0.991,
+   "groups": 6,
+   "tris": 5992,
+   "materials": 1,
+   "file": "WEEPINBELL.glb",
+   "bytes": 242952,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "GEODUDE": {
+   "height_m": 0.406,
+   "groups": 7,
+   "tris": 5992,
+   "materials": 1,
+   "file": "GEODUDE.glb",
+   "bytes": 249320,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "RAPIDASH": {
+   "height_m": 1.702,
+   "groups": 22,
+   "tris": 7054,
+   "materials": 1,
+   "file": "RAPIDASH.glb",
+   "bytes": 348612,
+   "status": "generated",
+   "texture": "1024x320"
+  },
+  "MAGNETON": {
+   "height_m": 0.991,
+   "groups": 20,
+   "tris": 6138,
+   "materials": 1,
+   "file": "MAGNETON.glb",
+   "bytes": 292460,
+   "status": "generated",
+   "texture": "1024x128"
+  },
+  "SEEL": {
+   "height_m": 1.092,
+   "groups": 7,
+   "tris": 5994,
+   "materials": 1,
+   "file": "SEEL.glb",
+   "bytes": 249556,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "SHELLDER": {
+   "height_m": 0.305,
+   "groups": 4,
+   "tris": 5996,
+   "materials": 1,
+   "file": "SHELLDER.glb",
+   "bytes": 231000,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "GENGAR": {
+   "height_m": 1.499,
+   "groups": 12,
+   "tris": 7474,
+   "materials": 1,
+   "file": "GENGAR.glb",
+   "bytes": 330932,
+   "status": "generated",
+   "texture": "1024x384"
+  },
+  "KRABBY": {
+   "height_m": 0.406,
+   "groups": 11,
+   "tris": 5990,
+   "materials": 1,
+   "file": "KRABBY.glb",
+   "bytes": 264312,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "EXEGGCUTE": {
+   "height_m": 0.406,
+   "groups": 6,
+   "tris": 5996,
+   "materials": 1,
+   "file": "EXEGGCUTE.glb",
+   "bytes": 240228,
+   "status": "generated",
+   "texture": "1024x128"
+  },
+  "HITMONLEE": {
+   "height_m": 1.499,
+   "groups": 15,
+   "tris": 6218,
+   "materials": 1,
+   "file": "HITMONLEE.glb",
+   "bytes": 283268,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "WEEZING": {
+   "height_m": 1.194,
+   "groups": 14,
+   "tris": 6056,
+   "materials": 1,
+   "file": "WEEZING.glb",
+   "bytes": 271288,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "TANGELA": {
+   "height_m": 0.991,
+   "groups": 10,
+   "tris": 6000,
+   "materials": 1,
+   "file": "TANGELA.glb",
+   "bytes": 258592,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "GOLDEEN": {
+   "height_m": 0.61,
+   "groups": 7,
+   "tris": 5988,
+   "materials": 1,
+   "file": "GOLDEEN.glb",
+   "bytes": 246232,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "MR_MIME": {
+   "height_m": 1.295,
+   "groups": 16,
+   "tris": 5984,
+   "materials": 1,
+   "file": "MR_MIME.glb",
+   "bytes": 290456,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "MAGMAR": {
+   "height_m": 1.295,
+   "groups": 13,
+   "tris": 6258,
+   "materials": 1,
+   "file": "MAGMAR.glb",
+   "bytes": 297444,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "GYARADOS": {
+   "height_m": 6.502,
+   "groups": 17,
+   "tris": 6836,
+   "materials": 1,
+   "file": "GYARADOS.glb",
+   "bytes": 319480,
+   "status": "generated",
+   "texture": "1024x320"
+  },
+  "VAPOREON": {
+   "height_m": 0.991,
+   "groups": 13,
+   "tris": 5988,
+   "materials": 1,
+   "file": "VAPOREON.glb",
+   "bytes": 281436,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "OMANYTE": {
+   "height_m": 0.406,
+   "groups": 6,
+   "tris": 5998,
+   "materials": 1,
+   "file": "OMANYTE.glb",
+   "bytes": 238600,
+   "status": "generated",
+   "texture": "1024x128"
+  },
+  "AERODACTYL": {
+   "height_m": 1.803,
+   "groups": 12,
+   "tris": 6314,
+   "materials": 1,
+   "file": "AERODACTYL.glb",
+   "bytes": 293716,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "MOLTRES": {
+   "height_m": 2.007,
+   "groups": 9,
+   "tris": 8648,
+   "materials": 1,
+   "file": "MOLTRES.glb",
+   "bytes": 365476,
+   "status": "generated",
+   "texture": "1024x256"
   },
   "MEWTWO": {
    "height_m": 2.007,
    "groups": 10,
-   "tris": 6160,
-   "materials": 5,
+   "tris": 5998,
+   "materials": 1,
    "file": "MEWTWO.glb",
-   "bytes": 227416,
-   "status": "generated"
+   "bytes": 271420,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "VENUSAUR": {
+   "height_m": 2.007,
+   "groups": 17,
+   "tris": 7854,
+   "materials": 1,
+   "file": "VENUSAUR.glb",
+   "bytes": 354876,
+   "status": "generated",
+   "texture": "1024x512"
+  },
+  "SQUIRTLE": {
+   "height_m": 0.508,
+   "groups": 9,
+   "tris": 5990,
+   "materials": 1,
+   "file": "SQUIRTLE.glb",
+   "bytes": 260712,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "METAPOD": {
+   "height_m": 0.711,
+   "groups": 2,
+   "tris": 5998,
+   "materials": 1,
+   "file": "METAPOD.glb",
+   "bytes": 228944,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "BEEDRILL": {
+   "height_m": 0.991,
+   "groups": 16,
+   "tris": 6216,
+   "materials": 1,
+   "file": "BEEDRILL.glb",
+   "bytes": 295248,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "RATTATA": {
+   "height_m": 0.305,
+   "groups": 13,
+   "tris": 6134,
+   "materials": 1,
+   "file": "RATTATA.glb",
+   "bytes": 278944,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "EKANS": {
+   "height_m": 2.007,
+   "groups": 6,
+   "tris": 5994,
+   "materials": 1,
+   "file": "EKANS.glb",
+   "bytes": 244884,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "SANDSHREW": {
+   "height_m": 0.61,
+   "groups": 10,
+   "tris": 6168,
+   "materials": 1,
+   "file": "SANDSHREW.glb",
+   "bytes": 269724,
+   "status": "generated",
+   "texture": "1024x128"
+  },
+  "NIDOQUEEN": {
+   "height_m": 1.295,
+   "groups": 12,
+   "tris": 7563,
+   "materials": 1,
+   "file": "NIDOQUEEN.glb",
+   "bytes": 333308,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "CLEFAIRY": {
+   "height_m": 0.61,
+   "groups": 10,
+   "tris": 5990,
+   "materials": 1,
+   "file": "CLEFAIRY.glb",
+   "bytes": 269016,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "JIGGLYPUFF": {
+   "height_m": 0.508,
+   "groups": 8,
+   "tris": 5994,
+   "materials": 1,
+   "file": "JIGGLYPUFF.glb",
+   "bytes": 253980,
+   "status": "generated",
+   "texture": "1024x128"
+  },
+  "ODDISH": {
+   "height_m": 0.508,
+   "groups": 8,
+   "tris": 5986,
+   "materials": 1,
+   "file": "ODDISH.glb",
+   "bytes": 251772,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "PARASECT": {
+   "height_m": 0.991,
+   "groups": 12,
+   "tris": 6332,
+   "materials": 1,
+   "file": "PARASECT.glb",
+   "bytes": 279080,
+   "status": "generated",
+   "texture": "1024x320"
+  },
+  "DUGTRIO": {
+   "height_m": 0.711,
+   "groups": 9,
+   "tris": 6098,
+   "materials": 1,
+   "file": "DUGTRIO.glb",
+   "bytes": 250000,
+   "status": "generated",
+   "texture": "1024x384"
+  },
+  "GOLDUCK": {
+   "height_m": 1.702,
+   "groups": 15,
+   "tris": 6064,
+   "materials": 1,
+   "file": "GOLDUCK.glb",
+   "bytes": 287992,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "ARCANINE": {
+   "height_m": 1.905,
+   "groups": 17,
+   "tris": 6390,
+   "materials": 1,
+   "file": "ARCANINE.glb",
+   "bytes": 304432,
+   "status": "generated",
+   "texture": "1024x320"
+  },
+  "ABRA": {
+   "height_m": 0.889,
+   "groups": 10,
+   "tris": 5988,
+   "materials": 1,
+   "file": "ABRA.glb",
+   "bytes": 266996,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "MACHOKE": {
+   "height_m": 1.499,
+   "groups": 14,
+   "tris": 6136,
+   "materials": 1,
+   "file": "MACHOKE.glb",
+   "bytes": 289340,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "VICTREEBEL": {
+   "height_m": 1.702,
+   "groups": 9,
+   "tris": 6132,
+   "materials": 1,
+   "file": "VICTREEBEL.glb",
+   "bytes": 259904,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "GRAVELER": {
+   "height_m": 0.991,
+   "groups": 12,
+   "tris": 5986,
+   "materials": 1,
+   "file": "GRAVELER.glb",
+   "bytes": 273440,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "SLOWPOKE": {
+   "height_m": 1.194,
+   "groups": 8,
+   "tris": 5990,
+   "materials": 1,
+   "file": "SLOWPOKE.glb",
+   "bytes": 255080,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "FARFETCHD": {
+   "height_m": 0.787,
+   "groups": 9,
+   "tris": 5990,
+   "materials": 1,
+   "file": "FARFETCHD.glb",
+   "bytes": 268360,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "DEWGONG": {
+   "height_m": 1.702,
+   "groups": 6,
+   "tris": 5994,
+   "materials": 1,
+   "file": "DEWGONG.glb",
+   "bytes": 246936,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "CLOYSTER": {
+   "height_m": 1.499,
+   "groups": 10,
+   "tris": 7025,
+   "materials": 1,
+   "file": "CLOYSTER.glb",
+   "bytes": 304280,
+   "status": "generated",
+   "texture": "1024x384"
+  },
+  "ONIX": {
+   "height_m": 8.788,
+   "groups": 13,
+   "tris": 6184,
+   "materials": 1,
+   "file": "ONIX.glb",
+   "bytes": 278276,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "KINGLER": {
+   "height_m": 1.295,
+   "groups": 11,
+   "tris": 6182,
+   "materials": 1,
+   "file": "KINGLER.glb",
+   "bytes": 276936,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "EXEGGUTOR": {
+   "height_m": 2.007,
+   "groups": 12,
+   "tris": 7122,
+   "materials": 1,
+   "file": "EXEGGUTOR.glb",
+   "bytes": 311612,
+   "status": "generated",
+   "texture": "1024x320"
+  },
+  "HITMONCHAN": {
+   "height_m": 1.397,
+   "groups": 13,
+   "tris": 6244,
+   "materials": 1,
+   "file": "HITMONCHAN.glb",
+   "bytes": 281792,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "RHYHORN": {
+   "height_m": 0.991,
+   "groups": 10,
+   "tris": 6152,
+   "materials": 1,
+   "file": "RHYHORN.glb",
+   "bytes": 272896,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "KANGASKHAN": {
+   "height_m": 2.21,
+   "groups": 18,
+   "tris": 6578,
+   "materials": 1,
+   "file": "KANGASKHAN.glb",
+   "bytes": 315720,
+   "status": "generated",
+   "texture": "1024x320"
+  },
+  "SEAKING": {
+   "height_m": 1.295,
+   "groups": 7,
+   "tris": 5994,
+   "materials": 1,
+   "file": "SEAKING.glb",
+   "bytes": 250216,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "SCYTHER": {
+   "height_m": 1.499,
+   "groups": 12,
+   "tris": 6548,
+   "materials": 1,
+   "file": "SCYTHER.glb",
+   "bytes": 301672,
+   "status": "generated",
+   "texture": "1024x320"
+  },
+  "PINSIR": {
+   "height_m": 1.499,
+   "groups": 9,
+   "tris": 6050,
+   "materials": 1,
+   "file": "PINSIR.glb",
+   "bytes": 271680,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "LAPRAS": {
+   "height_m": 2.489,
+   "groups": 16,
+   "tris": 6400,
+   "materials": 1,
+   "file": "LAPRAS.glb",
+   "bytes": 290568,
+   "status": "generated",
+   "texture": "1024x320"
+  },
+  "JOLTEON": {
+   "height_m": 0.787,
+   "groups": 9,
+   "tris": 5990,
+   "materials": 1,
+   "file": "JOLTEON.glb",
+   "bytes": 262688,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "OMASTAR": {
+   "height_m": 0.991,
+   "groups": 9,
+   "tris": 6004,
+   "materials": 1,
+   "file": "OMASTAR.glb",
+   "bytes": 261036,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "SNORLAX": {
+   "height_m": 2.108,
+   "groups": 9,
+   "tris": 7058,
+   "materials": 1,
+   "file": "SNORLAX.glb",
+   "bytes": 298312,
+   "status": "generated",
+   "texture": "1024x320"
+  },
+  "DRATINI": {
+   "height_m": 1.803,
+   "groups": 4,
+   "tris": 5998,
+   "materials": 1,
+   "file": "DRATINI.glb",
+   "bytes": 235208,
+   "status": "generated",
+   "texture": "1024x192"
   },
   "MEW": {
    "height_m": 0.406,
    "groups": 6,
-   "tris": 3032,
-   "materials": 4,
+   "tris": 5992,
+   "materials": 1,
    "file": "MEW.glb",
-   "bytes": 124796,
+   "bytes": 252080,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "CHARMANDER": {
+   "height_m": 0.61,
+   "groups": 9,
+   "tris": 6200,
+   "materials": 1,
+   "file": "CHARMANDER.glb",
+   "bytes": 268204,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "WARTORTLE": {
+   "height_m": 0.991,
+   "groups": 11,
+   "tris": 6082,
+   "materials": 1,
+   "file": "WARTORTLE.glb",
+   "bytes": 279616,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "BUTTERFREE": {
+   "height_m": 1.092,
+   "groups": 12,
+   "tris": 5988,
+   "materials": 1,
+   "file": "BUTTERFREE.glb",
+   "bytes": 273484,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "PIDGEY": {
+   "height_m": 0.305,
+   "groups": 10,
+   "tris": 6024,
+   "materials": 1,
+   "file": "PIDGEY.glb",
+   "bytes": 269864,
+   "status": "generated",
+   "texture": "1024x128"
+  },
+  "RATICATE": {
+   "height_m": 0.711,
+   "groups": 17,
+   "tris": 6136,
+   "materials": 1,
+   "file": "RATICATE.glb",
+   "bytes": 297184,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "ARBOK": {
+   "height_m": 3.505,
+   "groups": 6,
+   "tris": 5992,
+   "materials": 1,
+   "file": "ARBOK.glb",
+   "bytes": 246696,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "SANDSLASH": {
+   "height_m": 0.991,
+   "groups": 20,
+   "tris": 6474,
+   "materials": 1,
+   "file": "SANDSLASH.glb",
+   "bytes": 324200,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "NIDORAN_M": {
+   "height_m": 0.508,
+   "groups": 11,
+   "tris": 6064,
+   "materials": 1,
+   "file": "NIDORAN_M.glb",
+   "bytes": 272276,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "CLEFABLE": {
+   "height_m": 1.295,
+   "groups": 11,
+   "tris": 5986,
+   "materials": 1,
+   "file": "CLEFABLE.glb",
+   "bytes": 275692,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "WIGGLYTUFF": {
+   "height_m": 0.991,
+   "groups": 10,
+   "tris": 6014,
+   "materials": 1,
+   "file": "WIGGLYTUFF.glb",
+   "bytes": 264300,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "GLOOM": {
+   "height_m": 0.787,
+   "groups": 13,
+   "tris": 6070,
+   "materials": 1,
+   "file": "GLOOM.glb",
+   "bytes": 274932,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "VENONAT": {
+   "height_m": 0.991,
+   "groups": 8,
+   "tris": 6024,
+   "materials": 1,
+   "file": "VENONAT.glb",
+   "bytes": 252312,
+   "status": "generated",
+   "texture": "1024x128"
+  },
+  "MEOWTH": {
+   "height_m": 0.406,
+   "groups": 13,
+   "tris": 6068,
+   "materials": 1,
+   "file": "MEOWTH.glb",
+   "bytes": 287768,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "MANKEY": {
+   "height_m": 0.508,
+   "groups": 10,
+   "tris": 6108,
+   "materials": 1,
+   "file": "MANKEY.glb",
+   "bytes": 271752,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "POLIWAG": {
+   "height_m": 0.61,
+   "groups": 5,
+   "tris": 5992,
+   "materials": 1,
+   "file": "POLIWAG.glb",
+   "bytes": 235056,
+   "status": "generated",
+   "texture": "1024x128"
+  },
+  "KADABRA": {
+   "height_m": 1.295,
+   "groups": 15,
+   "tris": 6124,
+   "materials": 1,
+   "file": "KADABRA.glb",
+   "bytes": 299672,
+   "status": "generated",
+   "texture": "1024x320"
+  },
+  "MACHAMP": {
+   "height_m": 1.6,
+   "groups": 18,
+   "tris": 6164,
+   "materials": 1,
+   "file": "MACHAMP.glb",
+   "bytes": 300680,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "TENTACOOL": {
+   "height_m": 0.889,
+   "groups": 7,
+   "tris": 6032,
+   "materials": 1,
+   "file": "TENTACOOL.glb",
+   "bytes": 241596,
+   "status": "generated",
+   "texture": "1024x128"
+  },
+  "GOLEM": {
+   "height_m": 1.397,
+   "groups": 7,
+   "tris": 5994,
+   "materials": 1,
+   "file": "GOLEM.glb",
+   "bytes": 258356,
+   "status": "generated",
+   "texture": "1024x320"
+  },
+  "SLOWBRO": {
+   "height_m": 1.6,
+   "groups": 13,
+   "tris": 6070,
+   "materials": 1,
+   "file": "SLOWBRO.glb",
+   "bytes": 280440,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "DODUO": {
+   "height_m": 1.397,
+   "groups": 9,
+   "tris": 5997,
+   "materials": 1,
+   "file": "DODUO.glb",
+   "bytes": 253440,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "GRIMER": {
+   "height_m": 0.889,
+   "groups": 5,
+   "tris": 5994,
+   "materials": 1,
+   "file": "GRIMER.glb",
+   "bytes": 242700,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "GASTLY": {
+   "height_m": 1.295,
+   "groups": 9,
+   "tris": 7204,
+   "materials": 1,
+   "file": "GASTLY.glb",
+   "bytes": 308696,
+   "status": "generated",
+   "texture": "1024x320"
+  },
+  "DROWZEE": {
+   "height_m": 0.991,
+   "groups": 8,
+   "tris": 5990,
+   "materials": 1,
+   "file": "DROWZEE.glb",
+   "bytes": 260428,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "VOLTORB": {
+   "height_m": 0.508,
+   "groups": 5,
+   "tris": 6070,
+   "materials": 1,
+   "file": "VOLTORB.glb",
+   "bytes": 232036,
+   "status": "generated",
+   "texture": "1024x128"
+  },
+  "CUBONE": {
+   "height_m": 0.406,
+   "groups": 9,
+   "tris": 5992,
+   "materials": 1,
+   "file": "CUBONE.glb",
+   "bytes": 264648,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "LICKITUNG": {
+   "height_m": 1.194,
+   "groups": 9,
+   "tris": 6122,
+   "materials": 1,
+   "file": "LICKITUNG.glb",
+   "bytes": 268676,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "RHYDON": {
+   "height_m": 1.905,
+   "groups": 15,
+   "tris": 6770,
+   "materials": 1,
+   "file": "RHYDON.glb",
+   "bytes": 317640,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "HORSEA": {
+   "height_m": 0.406,
+   "groups": 5,
+   "tris": 5992,
+   "materials": 1,
+   "file": "HORSEA.glb",
+   "bytes": 243416,
+   "status": "generated",
+   "texture": "1024x128"
+  },
+  "STARYU": {
+   "height_m": 0.787,
+   "groups": 4,
+   "tris": 5998,
+   "materials": 1,
+   "file": "STARYU.glb",
+   "bytes": 230060,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "JYNX": {
+   "height_m": 1.397,
+   "groups": 7,
+   "tris": 6022,
+   "materials": 1,
+   "file": "JYNX.glb",
+   "bytes": 255412,
+   "status": "generated",
+   "texture": "1024x384"
+  },
+  "TAUROS": {
+   "height_m": 1.397,
+   "groups": 14,
+   "tris": 6416,
+   "materials": 1,
+   "file": "TAUROS.glb",
+   "bytes": 292564,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "DITTO": {
+   "height_m": 0.305,
+   "groups": 1,
+   "tris": 6000,
+   "materials": 1,
+   "file": "DITTO.glb",
+   "bytes": 216992,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "FLAREON": {
+   "height_m": 0.889,
+   "groups": 11,
+   "tris": 5992,
+   "materials": 1,
+   "file": "FLAREON.glb",
+   "bytes": 269736,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "KABUTO": {
+   "height_m": 0.508,
+   "groups": 9,
+   "tris": 6168,
+   "materials": 1,
+   "file": "KABUTO.glb",
+   "bytes": 254108,
+   "status": "generated",
+   "texture": "1024x192"
+  },
+  "ARTICUNO": {
+   "height_m": 1.702,
+   "groups": 10,
+   "tris": 6038,
+   "materials": 1,
+   "file": "ARTICUNO.glb",
+   "bytes": 278524,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "DRAGONAIR": {
+   "height_m": 3.988,
+   "groups": 9,
+   "tris": 6024,
+   "materials": 1,
+   "file": "DRAGONAIR.glb",
+   "bytes": 263832,
+   "status": "generated",
+   "texture": "1024x256"
+  },
+  "MISSINGNO": {
+   "height_m": 1.6,
+   "file": "MISSINGNO.glb",
+   "bytes": 65156,
    "status": "generated"
   }
  },
@@ -1526,7 +1684,19 @@
    "loop": true
   },
   "Attack": {
+   "seconds": 0.6,
+   "loop": false
+  },
+  "Hurt": {
    "seconds": 0.5,
+   "loop": false
+  },
+  "Faint": {
+   "seconds": 1.0,
+   "loop": false
+  },
+  "Special": {
+   "seconds": 1.0,
    "loop": false
   }
  },
@@ -1534,7 +1704,8 @@
   "units": "metres; model height == Pokedex height (min 0.15 m)",
   "front": "Blender -Y == glTF/Godot +Z (MODEL_FRONT)",
   "origin": "bottom centre; hovering species keep their hover gap",
-  "rig": "one bone per 2D art group, all under 'root'; face features parented to 'head' when present"
+  "rig": "one bone per 2D art group, all under 'root'; face groups parented to 'head' when present",
+  "texture": "one albedo atlas per species (front/back sprite projections per art group); shade with assets/shaders/toon.gdshader"
  },
- "elapsed_seconds": 86.4
+ "elapsed_seconds": 100.1
 }

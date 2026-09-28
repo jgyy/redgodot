@@ -4,7 +4,8 @@ extends Node3D
 ##   godot4 --headless --rendering-driver opengl3 --path godot -- --screenshot=/tmp/out.png --scene=title --wait=1.0
 ##
 ## Recognized --scene= values: title, intro, overworld, battle, start_menu,
-## party, summary, bag, pokedex, trainer_card, town_map, options, dialogue.
+## party, summary, bag, pokedex, trainer_card, town_map, options, dialogue,
+## model_sheet (see scripts/tools/ModelSheet.gd for its flags).
 ## Extra flags (all optional): --player=SPECIES --enemy=SPECIES --level=N
 ## --map=MapName --pc=x,y --time=day|dusk|night --text="custom dialogue line"
 
@@ -64,6 +65,16 @@ func _setup_scene(scene: String, args: Dictionary) -> void:
 			layer.layer = 50
 			add_child(layer)
 			layer.add_child(load("res://scripts/ui/px/PxTestCard.gd").new())
+		"model_sheet":
+			# contact sheet of generated models (scripts/tools/ModelSheet.gd); saves itself and quits
+			var out := "/tmp/model_sheet.png"
+			for a in OS.get_cmdline_user_args():
+				if a.begins_with("--screenshot="):
+					out = a.substr("--screenshot=".length())
+			var sheet: Node = load("res://scripts/tools/ModelSheet.gd").new()
+			add_child(sheet)
+			await sheet.run(args, out)
+			await get_tree().create_timer(3600.0).timeout
 		"battle":
 			GameState.new_game(args.get("player", "SQUIRTLE"))
 			if args.has("player_level"):
