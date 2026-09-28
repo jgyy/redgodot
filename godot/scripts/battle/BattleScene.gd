@@ -135,6 +135,23 @@ func _engine_opts(enc: Dictionary) -> Dictionary:
 		var mon := GameState.PartyMon.new(sp, int(enc.get("level", 3)), {"random": true} if not enc.has("dvs") else enc["dvs"])
 		mon.ot = "WILD"
 		opts = {"kind": "wild", "enemy_party": [mon]}
+		# Pokemon Tower: without the SILPH SCOPE every wild mon is an unidentifiable GHOST
+		# (upstream src/scripts/mid.js); the restless soul is unveiled when you have it
+		var scope: bool = int(GameState.bag.get("SILPH_SCOPE", 0)) > 0
+		var tower := RegEx.create_from_string("^PokemonTower[1-7]F$").search(GameState.current_map) != null
+		var ghost: bool = enc.get("ghost", false)
+		if enc.get("restless_soul", false):
+			ghost = not scope
+			opts["no_catch"] = true
+			opts["unveil"] = scope
+		elif tower and not scope and not enc.has("ghost"):
+			ghost = true
+		if ghost:
+			opts["ghost"] = true
+			opts["no_catch"] = true
+			mon.nickname = "GHOST"
+		if enc.get("safari", false):
+			opts["safari"] = true
 	for k in ["no_run", "no_catch", "no_exp", "no_items", "seed"]:
 		if enc.has(k):
 			opts[k] = enc[k]
@@ -142,6 +159,9 @@ func _engine_opts(enc: Dictionary) -> Dictionary:
 
 func _run() -> void:
 	await get_tree().process_frame
+	if encounter.get("demo", false):
+		await _run_demo()
+		return
 	await transition_in()
 	var r: String = await engine.run(self)
 	if engine.pay_day > 0 and (r == "win" or r == "caught"):
@@ -270,7 +290,10 @@ func _load_actor(k: String, sid: String) -> void:
 	_holders[k].add_child(model_root)
 	_models[k] = model_root
 	var actor: Node3D
-	if sid.begins_with("MISSINGNO") or sid.begins_with("GLITCH"):
+	if k == "e" and engine.o.get("ghost", false) and not subs[k]:
+		actor = GhostModel.new()
+		model_root.add_child(actor)
+	elif sid.begins_with("MISSINGNO") or sid.begins_with("GLITCH"):
 		actor = MissingNoBlock.new()
 		model_root.add_child(actor)
 	else:
@@ -279,24 +302,31 @@ func _load_actor(k: String, sid: String) -> void:
 		pa.setup(sid)
 		actor = pa
 	_actors[k] = actor
-	var aabb := _aabb_of(actor)
-	var hm := GameData.species_height_m(sid) if GameData.species.has(sid) else 1.5
-	var f := clampf(log(hm) / log(2.0), -2.0, 2.0)
-	var target_px := 49.0 + 6.0 * f  # upstream sprites are 64x64; most fill ~50px
-	if k == "p":
-		target_px *= 1.3
 	var anchor: Node3D = stage.enemy_anchor if k == "e" else stage.player_anchor
 	var w := vfx.px_world(anchor.global_position)
-	var size_y := maxf(0.05, aabb.size.y)
-	var size_xz := maxf(aabb.size.x, aabb.size.z)
-	var sc := target_px * w / size_y
-	var max_w_px := 64.0 if k == "e" else 80.0
-	if size_xz * sc > max_w_px * w:
-		sc = max_w_px * w / size_xz
+	# upstream draws every battler in the same 64x64 frame; the player's back
+	# sprite is the same size but nearer the camera here, so it reads a bit larger
+	var frame_px := 64.0 if k == "e" else 64.0 * 1.2
+	var sc := 1.0
+	var sized := false
+	if actor is PokemonActor:
+		var s2: float = (actor as PokemonActor).use_sprite_scale(frame_px * w)
+		sized = s2 != 1.0
+	var aabb := _aabb_of(actor)
+	if not sized:
+		# no sprite metrics: fit the model's height to ~50 of the frame's 64 px
+		var hm := GameData.species_height_m(sid) if GameData.species.has(sid) else 1.5
+		var f := clampf(log(hm) / log(2.0), -2.0, 2.0)
+		var target_px := (49.0 + 6.0 * f) * frame_px / 64.0
+		sc = target_px * w / maxf(0.05, aabb.size.y)
+		var size_xz := maxf(aabb.size.x, aabb.size.z)
+		if size_xz * sc > frame_px * 1.1 * w:
+			sc = frame_px * 1.1 * w / size_xz
 	actor.scale = Vector3.ONE * sc
 	actor.position = Vector3(-(aabb.position.x + aabb.size.x / 2.0) * sc, -aabb.position.y * sc, -(aabb.position.z + aabb.size.z / 2.0) * sc)
+	var size_y := maxf(0.05, aabb.size.y)
 	# enemy faces the player (3/4 view toward the lower-left); the player's mon is seen from behind
-	model_root.rotation_degrees.y = float(encounter.get("rot_" + k, -12.0 if k == "e" else 165.0))
+	model_root.rotation_degrees.y = float(encounter.get("rot_" + k, -10.0 if k == "e" else 180.0))
 	_model_h[k] = size_y * sc
 	var tm := ShaderMaterial.new()
 	tm.shader = TINT_SHADER
@@ -335,6 +365,10 @@ func _apply_overlay(n: Node, m: Material) -> void:
 		(mi as GeometryInstance3D).material_overlay = m
 
 func set_tint(k: String, c: Color, amt: float) -> void:
+	if _actors.has(k) and _actors[k] is PokemonActor and is_instance_valid(_actors[k]):
+		# the toon shader's own hit-flash uniform (mix toward colour by alpha)
+		(_actors[k] as PokemonActor).set_shader_param("flash", Color(c.r, c.g, c.b, clampf(amt, 0.0, 1.0)))
+		return
 	if _tints.has(k):
 		var tm: ShaderMaterial = _tints[k]
 		tm.set_shader_parameter("tint", c)
@@ -362,16 +396,7 @@ func screen_wave(amp: float, frames: int) -> void:
 
 # ------------------------------------------------------------------ trainers & balls
 func _humanoid(cast_key: String) -> Node3D:
-	var path := "res://assets/models/characters/%s.glb" % cast_key
-	var model: Node3D
-	if ResourceLoader.exists(path):
-		model = (load(path) as PackedScene).instantiate()
-	elif ResourceLoader.exists("res://assets/models/characters/humanoid.glb"):
-		model = (load("res://assets/models/characters/humanoid.glb") as PackedScene).instantiate()
-		CharacterSkin.apply(model, GameData.cast.get(cast_key, GameData.cast.get("youngster", {})))
-	else:
-		model = Node3D.new()
-	return model
+	return CharacterSkin.instantiate(cast_key)
 
 func _make_trainer(cls: String) -> void:
 	var holder := Node3D.new()
@@ -405,7 +430,7 @@ func _make_player_trainer() -> void:
 	var ball := _make_ball("POKE_BALL")
 	holder.add_child(ball)
 	var hgt := _aabb_of(model).size.y * model.scale.y
-	if not ResourceLoader.exists("res://assets/models/characters/red.glb"):
+	if CharacterSkin.resolve_key("red") == "":
 		_red_extras(holder, hgt)
 	ball.position = Vector3(0.28 * hgt, hgt * 0.98, 0.0)
 	ball.scale = Vector3.ONE * hgt * 0.1
@@ -564,8 +589,33 @@ func intro(b: BattleEngine) -> void:
 		_cry(_mon("e").species_id)
 		await shiny_bounce("e")
 		hud.boxes["e"] = true
-		GameState.mark_seen(_mon("e").species_id)
-		await msg("Wild " + _mon("e").display_name() + " appeared!")
+		if b.o.get("ghost", false):
+			await msg("Wild GHOST appeared!")
+			await msg("Argh! There's no way to identify the GHOST!")
+		elif b.o.get("unveil", false):
+			# SILPH SCOPE unveils the restless soul (engine/battle/ghost_marowak_anim.asm)
+			var real := _mon("e")
+			var nick := real.nickname
+			real.nickname = "GHOST"
+			await msg("Wild GHOST appeared!")
+			await msg("The SILPH SCOPE revealed who the GHOST really is!")
+			engine.o["ghost"] = true
+			for i in 48:
+				var gshow: bool = (((i >> 2) % 2 == 0) if i < 24 else ((i >> 3) % 2 == 0)) and i < 44
+				if i == 0 or gshow != bool(get_meta("gshow", true)):
+					engine.o["ghost"] = gshow
+					set_meta("gshow", gshow)
+					_load_actor("e", real.species_id)
+				await tick
+			engine.o["ghost"] = false
+			_load_actor("e", real.species_id)
+			real.nickname = nick
+			_cry(real.species_id)
+			GameState.mark_seen(real.species_id)
+			await msg("Wild " + real.display_name() + " appeared!")
+		else:
+			GameState.mark_seen(_mon("e").species_id)
+			await msg("Wild " + _mon("e").display_name() + " appeared!")
 	else:
 		await msg(b.trainer_name() + " wants to fight!")
 		for i in 20:
@@ -631,6 +681,11 @@ func choose_action(b: BattleEngine) -> Dictionary:
 			return {"type": "run"}
 		return {"type": "fight", "slot": int(a.substr(6)) if a.begins_with("fight:") else 0}
 	var items := ["FIGHT", "PKMN", "ITEM", "RUN"]
+	if b.safari:
+		items = ["BALL×%d" % BattleEngine.safari_balls(), "BAIT", "ROCK", "RUN"]
+		var sa: int = await grid_menu(items, int(get_meta("last_action", 0)))
+		set_meta("last_action", maxi(0, sa))
+		return {"type": "safari", "what": ["ball", "bait", "rock", "run"][maxi(0, sa)]}
 	while true:
 		hud.box = {"lines": Px.wrap_text("What will " + m.display_name() + " do?", 150), "chars": 999, "waiting": false}
 		var act: int = await grid_menu(items, int(get_meta("last_action", 0)))
@@ -1299,3 +1354,33 @@ func _pose_vfx(move_id: String, k: String, frac: float) -> void:
 	shake = 0.0
 	stage.camera.h_offset = 0.0
 	freeze()
+
+# ------------------------------------------------------------------ the old man's catching demo
+## Viridian City's old man shows how to catch (upstream src/scripts/pallet.js
+## catchDemo): his back on the player platform, a wild WEEDLE, one POKé BALL.
+## The player's party and bag are untouched; returns "caught".
+func _run_demo() -> void:
+	hud.wild = true
+	hud.enemy = _mon("e")
+	hud.disp["e"] = _mon("e").hp
+	_load_actor("e", _mon("e").species_id)
+	var holder := Node3D.new()
+	stage.add_child(holder)
+	var old_man := _humanoid("old_man")
+	holder.add_child(old_man)
+	_fit_height(old_man, 70.0 * vfx.px_world(stage.player_anchor.global_position))
+	old_man.rotation_degrees.y = 180.0
+	_player_trainer = holder
+	_player_trainer.set_meta("on", true)
+	player_pic_x = 84.0
+	show["e"] = true
+	hud.boxes["e"] = true
+	platform_slide = 1.0
+	await _fade(10, false)
+	await msg("Wild " + _mon("e").display_name() + " appeared!")
+	await msg("OLD MAN used POKé BALL!")
+	await ball_throw("POKE_BALL", 3, true)
+	await msg("All right! " + str(GameData.get_species(_mon("e").species_id).get("name", "")) + " was caught!")
+	await _fade(12, true)
+	result_outcome = {"result": "caught", "money": GameState.money, "demo": true}
+	SceneRouter.end_battle(result_outcome)

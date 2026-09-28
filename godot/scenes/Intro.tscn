@@ -1,28 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://intro_scene"]
+[gd_scene load_steps=2 format=3 uid="uid://intro_scene"]
 
 [ext_resource type="Script" path="res://scripts/IntroScene.gd" id="1"]
 
-[sub_resource type="Environment" id="Environment_in1"]
-background_mode = 1
-background_color = Color(0.06, 0.07, 0.16, 1)
-ambient_light_source = 2
-ambient_light_color = Color(0.7, 0.75, 1, 1)
-ambient_light_energy = 0.8
-
 [node name="Intro" type="Node3D"]
 script = ExtResource("1")
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_in1")
-
-[node name="Sun" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.8, -0.5, 0.33, 0, 0.55, 0.83, -0.6, -0.66, 0.44, 0, 4, 0)
-light_energy = 0.7
-
-[node name="MonSlot" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, 0)
-
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.9848, 0.1736, 0, -0.1736, 0.9848, 0, 1.2, 3.0)
-current = true
-fov = 40.0

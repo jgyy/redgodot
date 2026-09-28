@@ -3,10 +3,12 @@ extends Node3D
 ## Also supports headless screenshot capture for CI / docs, e.g.:
 ##   godot4 --headless --rendering-driver opengl3 --path godot -- --screenshot=/tmp/out.png --scene=title --wait=1.0
 ##
-## Recognized --scene= values: title, intro, overworld, battle, start_menu,
-## party, summary, bag, pokedex, trainer_card, town_map, options, dialogue.
+## Recognized --scene= values: title, intro, oak_speech, naming, overworld, battle, start_menu,
+## party, summary, bag, pokedex, trainer_card, town_map, options, dialogue,
+## model_sheet (see scripts/tools/ModelSheet.gd for its flags).
 ## Extra flags (all optional): --player=SPECIES --enemy=SPECIES --level=N
 ## --map=MapName --pc=x,y --time=day|dusk|night --text="custom dialogue line"
+## --save=showcase (reference-screenshot save: RED, 6-mon party, 126/75 dex...)
 
 const MENU_SCENES := ["start_menu", "party", "summary", "bag", "pokedex", "trainer_card", "town_map", "options"]
 
@@ -60,11 +62,33 @@ func _setup_scene(scene: String, args: Dictionary) -> void:
 			pass  # goto_title() already ran in _ready()
 		"intro":
 			SceneRouter.goto_intro()
+			if args.has("intro_frame"):  # jump the opening to a given 60 fps frame
+				var intro := get_node_or_null("Intro")
+				if intro and intro.has_method("seek"):
+					intro.seek(int(args["intro_frame"]), args.has("intro_hold"))
+		"oak_speech":
+			SceneRouter.goto_oak_speech()
+		"naming":
+			GameState.new_game(args.get("player", "CHARMANDER"))
+			SceneRouter.goto_title()
+			var n := NamingScreen.new()
+			UI.layer.add_child(n)
+			n.open()
 		"px_test":
 			var layer := CanvasLayer.new()
 			layer.layer = 50
 			add_child(layer)
 			layer.add_child(load("res://scripts/ui/px/PxTestCard.gd").new())
+		"model_sheet":
+			# contact sheet of generated models (scripts/tools/ModelSheet.gd); saves itself and quits
+			var out := "/tmp/model_sheet.png"
+			for a in OS.get_cmdline_user_args():
+				if a.begins_with("--screenshot="):
+					out = a.substr("--screenshot=".length())
+			var sheet: Node = load("res://scripts/tools/ModelSheet.gd").new()
+			add_child(sheet)
+			await sheet.run(args, out)
+			await get_tree().create_timer(3600.0).timeout
 		"battle":
 			await _setup_battle(args)
 		"dialogue":
@@ -133,6 +157,9 @@ func _setup_battle(args: Dictionary) -> void:
 		enc = {"kind": "trainer", "trainer_class": tk[0], "party_index": int(tk[1]) if tk.size() > 1 else 1, "seed": 11}
 	if args.has("env"):
 		enc["env"] = args["env"]
+	for fk in ["ghost", "restless_soul", "safari", "demo", "no_catch"]:
+		if args.get(fk, "") == "1":
+			enc[fk] = true
 	for rk in ["rot_e", "rot_p"]:
 		if args.has(rk):
 			enc[rk] = float(args[rk])
@@ -164,6 +191,8 @@ func _setup_battle(args: Dictionary) -> void:
 	await battle.pose(state, o)
 
 func _apply_overrides(args: Dictionary) -> void:
+	if args.get("save", "") == "showcase":
+		GameState.build_showcase()  # the fixed save the reference screenshots use
 	if args.has("map"):
 		GameState.current_map = args["map"]
 	if args.has("pc"):

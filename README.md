@@ -36,8 +36,8 @@ art is a multi-month project. This is a **real, working vertical slice** with a
 | Day/night cycle | **Working** — `GameState` runs an in-game clock (`time_period()` → day/dusk/night) that `LightingRig` applies continuously to the overworld's sun + sky; Title/Battle use fixed presets |
 | Dialogue | **Working** — a reusable `DialogueBox` overlay, driven for NPCs/signs by `DialogueText` (curated per-archetype flavor lines, since the upstream source's actual string table for `mapdata.json`'s `textLabel` keys was never extracted into this repo — see `DialogueText.gd`'s header), plus a Professor-Oak `Intro` scene ahead of Title |
 | Start Menu suite | **Working** — POKéDEX (151-species dex with seen/own tracking + a live 3D preview), POKéMON (party list → Summary's INFO/STATS/MOVES tabs, also with a live 3D preview), ITEM (real bag data, and the TOWN MAP item opens a Town Map laid out by BFS-walking the real map-connection graph), the player's Trainer Card (name/ID/money/badges), Options, and Save (`user://save.json`) |
-| Battle system | **Working** for wild encounters (FIGHT/RUN), using the original Gen-1 damage formula ported line-for-line into `BattleMath.gd`, with name/level/HP nameplates and a type-matched VFX mesh flown from attacker to defender on every move |
-| Trainer battles, catching, the PC | **Not implemented** — data is present and wired for it (trainer parties, items all extracted), the interaction layer is future work |
+| Battle system | **Working** — upstream's Gen-1 engine ported to `BattleEngine.gd` (all 165 moves' effects, status, stat stages, trainer AI and items, switching, catching with the shake math, EXP / level-up / move learning, evolution, prize money, ghost / Safari / old-man-demo battles); 15 Blender-generated 3D environments; pixel-exact HUD; every move animated in 3D (`BattleVfx.gd`) |
+| Trainer battles, catching | **Working** — `await SceneRouter.battle({kind:"trainer", trainer_class, party_index, ...})`; caught Pokémon go to the party or the PC box |
 
 If a Pokémon or map looks simple, it's using the honest fallback path
 (a colored primitive) rather than pretending — every part of the pipeline
@@ -67,20 +67,18 @@ set below, regenerated with `pipeline/capture_screenshots.sh` — see
 |---|---|---|---|
 | ![Trainer card](docs/gallery/15-trainer-card.png) | ![Town map](docs/gallery/16-town-map.png) | ![Options](docs/gallery/17-options.png) | ![Dialogue](docs/gallery/18-dialogue.png) |
 
-### Battle: real matchups, HP/level-accurate nameplates, move VFX
+### Battle (3D parity with upstream refs 068-091)
 
-| Charizard vs. Blastoise | Venusaur vs. Gengar | Zapdos vs. Moltres |
+Every battle reference in `docs/claude-red-screenshots/` has a same-named 3D
+capture in `docs/gallery/` (same matchup, level, HP, move, environment and UI).
+
+| Flamethrower (grass) | Thunderbolt (sea) | Blizzard (ice cave) |
 |---|---|---|
-| ![Charizard vs Blastoise](docs/gallery/30-battle-charizard-vs-blastoise.png) | ![Venusaur vs Gengar](docs/gallery/31-battle-venusaur-vs-gengar.png) | ![Zapdos vs Moltres](docs/gallery/39-battle-zapdos-vs-moltres.png) |
+| ![068](docs/gallery/068-battle-charizard-flamethrower.png) | ![069](docs/gallery/069-battle-pikachu-thunderbolt.png) | ![074](docs/gallery/074-battle-lapras-blizzard.png) |
 
-| Fire VFX in flight | Electric VFX in flight | Wild encounter intro |
-|---|---|---|
-| ![Fire VFX](docs/gallery/50-vfx-fire.png) | ![Electric VFX](docs/gallery/51-vfx-electric.png) | ![Wild intro](docs/gallery/20-wild-intro.png) |
-
-The other 9 trained matchups (Pikachu/Raichu, Alakazam/Machamp, Gyarados/
-Lapras, Snorlax/Dragonite, Mewtwo/Mew, Scyther/Pinsir, Arcanine/Ninetales,
-Starmie/Vaporeon, Nidoking/Nidoqueen) and the grass-type VFX shot are in
-`docs/gallery/` too.
+| Hydro Pump | Solarbeam | Wild intro | Wild MISSINGNO. (beach) |
+|---|---|---|---|
+| ![070](docs/gallery/070-battle-blastoise-hydro_pump.png) | ![071](docs/gallery/071-battle-venusaur-solarbeam.png) | ![088](docs/gallery/088-wild-pidgey-intro.png) | ![091](docs/gallery/091-wild-missingno-menu.png) |
 
 ### Day/night lighting cycle, same location
 

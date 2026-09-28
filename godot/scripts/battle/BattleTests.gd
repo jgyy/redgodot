@@ -26,6 +26,7 @@ static func run(t: TestSuite) -> void:
 	_items(t)
 	_level_up(t)
 	_save_fields(t)
+	_special_battles(t)
 	_env_and_vfx(t)
 	_scene_smoke(t)
 	GameState.party = saved_party
@@ -199,3 +200,29 @@ static func _scene_smoke(t: TestSuite) -> void:
 	for env in BattleStage.ENVS.keys():
 		t.check(ResourceLoader.exists("res://assets/models/battle/bg_%s.glb" % env), "battle stage generated for %s" % env)
 	sc.queue_free()
+
+static func _special_battles(t: TestSuite) -> void:
+	# Pokemon Tower ghost: the player's mon is too scared, the GHOST only moans, RUN always works
+	_party([["CHARIZARD", 40]])
+	var g := GameState.PartyMon.new("GASTLY", 20)
+	g.nickname = "GHOST"
+	var b := BattleEngine.new({"kind": "wild", "enemy_party": [g], "ghost": true, "no_catch": true, "seed": 2})
+	var ui := BattleNullUI.new()
+	ui.actions = [{"type": "fight", "slot": 0}, {"type": "run"}]
+	var r := _run(b, ui)
+	t.check(r == "run", "a GHOST battle ends by running (got %s)" % r)
+	t.check(ui.log.has("CHARIZARD is too frightened to move!"), "ghost: the player's mon is too scared")
+	t.check(ui.log.has("GHOST: Leave... Leave now..."), "ghost: the GHOST's moan")
+	# Safari Zone: BALL/BAIT/ROCK, balls counted down, no FIGHT
+	_party([["PIKACHU", 30]])
+	BattleEngine.set_safari_balls(30)
+	var sb := BattleEngine.new({"kind": "wild", "enemy_party": [GameState.PartyMon.new("RHYHORN", 25)], "safari": true, "seed": 12})
+	var sui := BattleNullUI.new()
+	sui.actions = [{"type": "safari", "what": "bait"}, {"type": "safari", "what": "rock"}]
+	var sr := _run(sb, sui)
+	t.check(sr == "caught" or sr == "fled" or sr == "run", "safari battle ends by catch or flight (got %s)" % sr)
+	t.check(BattleEngine.safari_balls() < 30 or sui.log.any(func(x): return x.contains("ran away")), "safari balls are spent")
+	t.check(sui.log.has(GameState.player_name + " threw some BAIT."), "safari BAIT message")
+	# trainer prize money override (Story's `money` field)
+	var o := BattleEngine.trainer_opts("YOUNGSTER", 1, {"money": 5000})
+	t.check(int(o["trainer"]["money"]) == 5000, "trainer money override")

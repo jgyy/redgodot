@@ -52,6 +52,9 @@ var pay_day := 0
 var result := ""
 var turn := 0
 var trainer_items: Array = []
+var safari := false
+var safari_bait := 0
+var safari_rock := 0
 var ui: Object
 var rng := RandomNumberGenerator.new()
 
@@ -69,6 +72,7 @@ func _init(opts: Dictionary) -> void:
 			p.idx = i
 			break
 	trainer_items = (o.get("trainer_items", []) as Array).duplicate()
+	safari = o.get("safari", false)
 	if o.has("seed"):
 		rng.seed = int(o["seed"])
 	else:
@@ -192,6 +196,10 @@ func run(the_ui: Object) -> String:
 			return _finish("caught")
 		if p_act["type"] == "fled":
 			return _finish("fled")
+		if p_act["type"] == "safari":
+			if result != "":
+				return result
+			continue
 		var e_act := enemy_action()
 		if p_act["type"] == "switch":
 			await switch_in(p, int(p_act["index"]), true)
@@ -321,6 +329,11 @@ func player_action() -> Dictionary:
 				return {"type": "item"}
 			"run":
 				return act
+			"safari":
+				var sr: String = await safari_action(str(act["what"]))
+				if sr != "":
+					return {"type": sr}
+				return {"type": "safari"}
 	return {"type": "run"}
 
 ## Weighted move-picking AI (upstream enemyAction).
@@ -397,6 +410,14 @@ func do_move(side: BattleSide, move_id: String) -> void:
 	var fs := foe(side)
 	var nm := label(side)
 	v["moved"] = true
+	if o.get("ghost", false):
+		if side.is_player:
+			if a.status != "SLP" and a.status != "FRZ":
+				await ui.msg(a.display_name() + " is too frightened to move!")
+				return
+		else:
+			await ui.msg("GHOST: Leave... Leave now...")
+			return
 	if move_id == "_RECHARGE":
 		v["recharge"] = false
 		await ui.msg(nm + " must recharge!")
@@ -1258,6 +1279,9 @@ func learn_move(m: GameState.PartyMon, mv: String) -> bool:
 	return false
 
 func try_run(_after_faint: bool) -> bool:
+	if o.get("ghost", false):
+		await ui.msg("Got away safely!")
+		return true
 	if not wild:
 		await ui.msg("No! There's no running from a trainer battle!")
 		return false
@@ -1434,7 +1458,7 @@ func catch_roll(item: String, em: GameState.PartyMon) -> Dictionary:
 	if item == "MASTER_BALL":
 		caught = true
 	else:
-		var r1max := 256 if item == "POKE_BALL" else (201 if item == "GREAT_BALL" else 151)
+		var r1max := 256 if (item == "POKE_BALL" or item == "SAFARI_BALL") else (201 if item == "GREAT_BALL" else 151)
 		var r1 := rnd(r1max)
 		var st := 0
 		if em.status == "SLP" or em.status == "FRZ":
@@ -1442,6 +1466,8 @@ func catch_roll(item: String, em: GameState.PartyMon) -> Dictionary:
 		elif em.status != "":
 			st = 12
 		var rate: int = int(GameData.get_species(em.species_id).get("catchRate", 45))
+		if safari:
+			rate = clampi(int(rate * (2 if safari_rock > 0 else 1) / (2.0 if safari_bait > 0 else 1.0)), 1, 255)
 		if r1 - st < 0:
 			caught = true
 		elif r1 - st > rate:
@@ -1450,7 +1476,7 @@ func catch_roll(item: String, em: GameState.PartyMon) -> Dictionary:
 			var f: int = mini(255, int(floor(floor(em.max_hp * 255.0 / (8.0 if item == "GREAT_BALL" else 12.0)) / maxi(1, int(floor(em.hp / 4.0))))))
 			caught = f >= rnd(256)
 			if not caught:
-				var x := int(floor(rate * 100.0 / (255.0 if item == "POKE_BALL" else (200.0 if item == "GREAT_BALL" else 150.0))))
+				var x := int(floor(rate * 100.0 / (255.0 if (item == "POKE_BALL" or item == "SAFARI_BALL") else (200.0 if item == "GREAT_BALL" else 150.0))))
 				var z := int(floor(x * f / 255.0)) + (10 if st == 25 else (5 if st > 0 else 0))
 				shakes = 0 if z < 10 else (1 if z < 30 else (2 if z < 70 else 3))
 	if caught:
@@ -1485,7 +1511,11 @@ func receive_mon(m: GameState.PartyMon) -> String:
 		GameState.party.append(m)
 		GameState.party_changed.emit()
 		return "party"
-	GameState.pc_box.append(m)
+	var bx: Array = GameState.box()
+	if bx.size() >= 20:
+		await ui.msg("The POKéMON BOX is full! It can't accept any more POKéMON!")
+		return "full"
+	bx.append(m)
 	await ui.msg(m.display_name() + " was transferred to someone's PC!")
 	return "box"
 
@@ -1586,8 +1616,67 @@ static func trainer_opts(cls: String, n: int, extra: Dictionary = {}) -> Diction
 		party = make_trainer_party(cls, n)
 	return {
 		"kind": "trainer", "enemy_party": party,
-		"trainer": {"cls": cls, "n": n, "display_name": display, "money": int(tc.get("money", 1000)),
+		"trainer": {"cls": cls, "n": n, "display_name": display, "money": int(extra.get("money", tc.get("money", 1000))),
 			"win_text": extra.get("on_win_text", extra.get("win_text", "")), "lose_text": extra.get("lose_text", "")},
 		"trainer_items": (TRAINER_ITEMS.get(cls, []) as Array).duplicate(),
 		"boss": LEADERS.has(cls) or is_rival,
 	}
+
+# ------------------------------------------------------------------ safari zone (upstream safariAction)
+static func safari_balls() -> int:
+	var v: Variant = GameState.get("safari_balls")
+	return int(v) if v != null else int(GameState.get_meta("safari_balls", 30))
+
+static func set_safari_balls(n: int) -> void:
+	if GameState.get("safari_balls") != null:
+		GameState.set("safari_balls", n)
+	else:
+		GameState.set_meta("safari_balls", n)
+
+## BALL / BAIT / ROCK / RUN. Returns "caught" | "fled" | "" (battle goes on).
+func safari_action(what: String) -> String:
+	var em := mon(e)
+	match what:
+		"ball":
+			if safari_balls() <= 0:
+				return "fled"
+			set_safari_balls(safari_balls() - 1)
+			var r: String = await throw_ball("SAFARI_BALL")
+			if r == "caught":
+				return "caught"
+			if safari_balls() <= 0:
+				await ui.msg("PA: Ding-dong!\fYou are out of SAFARI BALLs!")
+				result = "run"
+				return "fled"
+		"bait":
+			await ui.msg(GameState.player_name + " threw some BAIT.")
+			safari_bait = 1 + rnd(5)
+			safari_rock = 0
+			await ui.msg(label(e) + " is eating!")
+		"rock":
+			await ui.msg(GameState.player_name + " threw a ROCK.")
+			safari_rock = 1 + rnd(5)
+			safari_bait = 0
+			await ui.anim("ROCK_THROW_SAFARI", p, 0)
+			await ui.msg(label(e) + " is angry!")
+		"run":
+			await ui.msg("Got away safely!")
+			return "fled"
+	var flee_chance := minf(255.0, em.stat("spd") * 2.0) / 256.0
+	if safari_bait > 0:
+		flee_chance /= 4.0
+		safari_bait -= 1
+	if safari_rock > 0:
+		flee_chance *= 2.0
+		safari_rock -= 1
+	if chance(flee_chance * 0.35):
+		await ui.msg(label(e) + " ran away!")
+		await ui.flee(e)
+		return "fled"
+	if safari_bait > 0:
+		await ui.msg(label(e) + " is eating!")
+	elif safari_rock > 0:
+		await ui.msg(label(e) + " is angry!")
+	else:
+		await ui.msg(label(e) + " is watching carefully!")
+	return ""

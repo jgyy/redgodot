@@ -17,7 +17,10 @@ const TYPE_COLORS := {
 }
 
 var species_id: String = ""
+var model: Node3D
 var _anim: AnimationPlayer
+
+static var _manifest: Dictionary = {}
 
 func setup(sid: String) -> void:
 	species_id = sid
@@ -25,8 +28,8 @@ func setup(sid: String) -> void:
 		c.queue_free()
 	_anim = null
 
+	model = null
 	var path := "res://assets/models/pokemon/%s.glb" % sid
-	var model: Node3D
 	if ResourceLoader.exists(path):
 		var scene: PackedScene = load(path)
 		if scene:
@@ -34,13 +37,76 @@ func setup(sid: String) -> void:
 	if model == null:
 		model = _fallback_model(sid)
 	add_child(model)
+	Toon.apply(model)
 	_anim = _find_anim_player(model)
 	AnimUtil.fix_looping(_anim)
 	play("Idle")
 
+## Plays a baked clip: Idle / Walk (looping), Attack / Hurt / Faint / Special (one-shot).
 func play(anim_name: String) -> void:
 	if _anim and _anim.has_animation(anim_name):
 		_anim.play(anim_name)
+
+## One-shot clip that returns to Idle when done (Faint stays on its last frame).
+func play_once(anim_name: String) -> void:
+	if _anim == null or not _anim.has_animation(anim_name):
+		return
+	_anim.play(anim_name)
+	if anim_name != "Faint":
+		_anim.queue("Idle")
+
+func has_anim(anim_name: String) -> bool:
+	return _anim != null and _anim.has_animation(anim_name)
+
+## Cel-shader uniform on the whole model (tint, flash, fade, gloss... see toon.gdshader).
+func set_shader_param(param: String, value: Variant) -> void:
+	if model:
+		Toon.set_param(model, param, value)
+
+## Sizes the model the way upstream sizes battle sprites: every species is drawn in the
+## same 64x64 frame, so a model's on-screen size is its height in sprite pixels (manifest
+## "px_height") relative to that frame.  Afterwards a full 64 px sprite frame spans
+## `frame_height_m` metres (e.g. ~1.6 for the foe).  Returns the scale applied.
+func use_sprite_scale(frame_height_m: float) -> float:
+	if model == null:
+		return 1.0
+	var info: Dictionary = species_info(species_id)
+	var px: float = float(info.get("px_height", 0.0))
+	var h: float = float(info.get("height_m", 0.0))
+	if px <= 0.0 or h <= 0.0:
+		return 1.0
+	var s := (frame_height_m / 64.0) / (h / px)
+	model.scale = Vector3.ONE * s
+	return s
+
+## manifest.json entry for a species ({height_m, px_height, tris, ...}), or {}.
+static func species_info(sid: String) -> Dictionary:
+	if _manifest.is_empty():
+		var f := FileAccess.open("res://assets/models/pokemon/manifest.json", FileAccess.READ)
+		if f:
+			var data: Variant = JSON.parse_string(f.get_as_text())
+			if data is Dictionary:
+				_manifest = (data as Dictionary).get("species", {})
+		if _manifest.is_empty():
+			_manifest = {"_": {}}
+	return _manifest.get(sid, {})
+
+## Model height in metres (Pokedex height; the glb is authored at real scale).
+func model_height() -> float:
+	return GameData.species_height_m(species_id)
+
+## Local-space AABB of all meshes (rest pose), e.g. for battle framing.
+func model_aabb() -> AABB:
+	var box := AABB()
+	var first := true
+	for mi in Toon._mesh_instances(self):
+		var inst: MeshInstance3D = mi
+		if inst.mesh == null:
+			continue
+		var b: AABB = global_transform.affine_inverse() * inst.global_transform * inst.mesh.get_aabb()
+		box = b if first else box.merge(b)
+		first = false
+	return box
 
 func _find_anim_player(node: Node) -> AnimationPlayer:
 	if node is AnimationPlayer:

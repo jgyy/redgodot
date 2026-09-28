@@ -22,6 +22,8 @@ func msg(text: String, _opts: Dictionary = {}) -> void:
 func choose_action(b: BattleEngine) -> Dictionary:
 	if not actions.is_empty():
 		return actions.pop_front()
+	if b.safari:
+		return {"type": "safari", "what": "ball"}
 	var ml := b.move_list(b.p)
 	for i in ml.size():
 		if int(ml[i]["pp"]) > 0:

@@ -46,11 +46,41 @@ func _swap(scene: PackedScene) -> Node:
 	_root.add_child(_active)
 	return _active
 
+## Upstream boot order: the opening (intro.js) plays first, then the title.
+## Main.gd calls goto_title() at startup; the very first call of a normal run
+## (not tests / screenshot capture) is redirected to the intro, which ends by
+## calling goto_title() itself.
+var _booted := false
+
+func _plain_run() -> bool:
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--screenshot") or a == "--run-tests":
+			return false
+	return true
+
 func goto_intro() -> void:
+	_booted = true
 	_swap(load(INTRO))
 
 func goto_title() -> void:
+	if not _booted and _plain_run():
+		goto_intro()
+		return
+	_booted = true
 	_swap(load(TITLE))
+
+## NEW GAME: Professor Oak's speech (title.js newGameIntro), which names the
+## player and rival and ends in RED's room.
+func goto_oak_speech() -> void:
+	_swap_node(OakSpeech.new())
+
+func _swap_node(node: Node) -> Node:
+	if _active:
+		_active.queue_free()
+		_active = null
+	_active = node
+	_root.add_child(_active)
+	return _active
 
 func goto_overworld() -> void:
 	_swap(load(OVERWORLD))
