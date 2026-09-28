@@ -1,0 +1,64 @@
+{
+ "vfx": {
+  "spark": {
+   "file": "spark.glb",
+   "tris": 8,
+   "bytes": 1996,
+   "notes": "emissive yellow octahedral shard (electric)"
+  },
+  "flame_blob": {
+   "file": "flame_blob.glb",
+   "tris": 192,
+   "bytes": 4916,
+   "notes": "emissive orange teardrop, point up (+Y in Godot)"
+  },
+  "water_droplet": {
+   "file": "water_droplet.glb",
+   "tris": 192,
+   "bytes": 4840,
+   "notes": "translucent blue teardrop"
+  },
+  "leaf_bit": {
+   "file": "leaf_bit.glb",
+   "tris": 44,
+   "bytes": 3224,
+   "notes": "thin leaf plate in the XY plane (Godot)"
+  },
+  "rock_chunk": {
+   "file": "rock_chunk.glb",
+   "tris": 20,
+   "bytes": 2792,
+   "notes": "faceted brown chunk"
+  },
+  "ice_shard": {
+   "file": "ice_shard.glb",
+   "tris": 12,
+   "bytes": 2312,
+   "notes": "translucent hexagonal bipyramid crystal"
+  },
+  "poison_bubble": {
+   "file": "poison_bubble.glb",
+   "tris": 224,
+   "bytes": 5488,
+   "notes": "translucent purple sphere (alpha blend)"
+  },
+  "status_ring": {
+   "file": "status_ring.glb",
+   "tris": 384,
+   "bytes": 8196,
+   "notes": "flat emissive torus in the ground plane, r=0.15 m; tint via material override"
+  },
+  "impact_star": {
+   "file": "impact_star.glb",
+   "tris": 36,
+   "bytes": 3044,
+   "notes": "flat 5-point emissive star facing the camera (Godot +Z)"
+  }
+ },
+ "conventions": {
+  "origin": "centred",
+  "scale": "~0.1-0.3 m; scale via particle params",
+  "front": "Blender -Y == glTF/Godot +Z",
+  "animation": "none"
+ }
+}
