@@ -75,12 +75,14 @@ func build_ground(mat: ShaderMaterial) -> MeshInstance3D:
 	return mi
 
 ## All baked blocks of the map merged into one mesh (one draw call).
-func build_objects(mat: ShaderMaterial) -> MeshInstance3D:
+func build_objects(mat: ShaderMaterial, hide_cells: Array = []) -> MeshInstance3D:
 	_st = SurfaceTool.new()
 	_st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var n := 0
 	for b in bake.get("blocks", []):
 		_cur = b
+		if not hide_cells.is_empty() and _covers_hidden(b, hide_cells):
+			continue
 		match String(b.get("t", "")):
 			"card": _emit_card(b); n += 1
 			"box": _emit_box_sprite(b); n += 1
@@ -101,6 +103,23 @@ func build_objects(mat: ShaderMaterial) -> MeshInstance3D:
 	mi.material_override = mat
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	return mi
+
+## A small object block (card / box / furniture) standing on a cell a script changed: it's gone.
+func _covers_hidden(b: Dictionary, cells: Array) -> bool:
+	var t := String(b.get("t", ""))
+	if t == "house" or t == "walls" or t == "terrace":
+		return false
+	var bx0 := float(b.sx)
+	var bx1 := bx0 + float(b.w)
+	var by1 := float(b.sy) + float(b.h)
+	for c in cells:
+		var cell: Vector2i = c
+		var px := float(cell.x + mx) * 16.0
+		var py := float(cell.y + my) * 16.0
+		# the object's foot (bottom rows) lies in the cell
+		if bx0 < px + 16.0 and bx1 > px and by1 > py and by1 <= py + 17.0:
+			return true
+	return false
 
 # ---------------------------------------------------------------- primitives
 func _uv(px: float, pz: float, hpx: float) -> Vector2:

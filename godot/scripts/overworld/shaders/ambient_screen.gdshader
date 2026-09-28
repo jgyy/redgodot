@@ -11,6 +11,10 @@ uniform float vignette = 0.0;           // strength, 0 = off
 uniform vec3 vignette_col = vec3(0.051, 0.039, 0.071);
 uniform float ice = 0.0;                // mix toward #dceeff
 uniform vec2 cam_px = vec2(0.0);        // map-local px of the screen's top-left (upstream cx, cy)
+uniform bool dark = false;              // fieldmoves.js ambientDark: caves needing FLASH
+
+const float BAYER[16] = float[16](0.03125, 0.53125, 0.15625, 0.65625, 0.78125, 0.28125, 0.90625, 0.40625,
+	0.21875, 0.71875, 0.09375, 0.59375, 0.96875, 0.46875, 0.84375, 0.34375);
 
 void fragment() {
 	vec3 c = texture(screen_tex, SCREEN_UV).rgb;
@@ -36,5 +40,14 @@ void fragment() {
 		}
 	}
 	if (ice > 0.0) c = mix(c, vec3(0.863, 0.933, 1.0), ice);
+	if (dark) {
+		float r = length(vec2(s.x - 160.0, (s.y - 86.0) * 1.1));
+		if (r >= 18.0) {
+			float k = min(1.0, (r - 18.0) / 14.0);
+			vec3 black = vec3(0.051, 0.047, 0.086);
+			int bi = int(mod(s.y, 4.0)) * 4 + int(mod(s.x, 4.0));
+			c = BAYER[bi] < k ? black : mix(c, black, 0.45);
+		}
+	}
 	COLOR = vec4(c, 1.0);
 }

@@ -151,6 +151,10 @@ func _apply_overrides(args: Dictionary) -> void:
 		var parts: PackedStringArray = args["pc"].split(",")
 		if parts.size() == 2:
 			GameState.player_cell = Vector2i(int(parts[0]), int(parts[1]))
+	if args.has("flash"):   # FLASH already used (dark caves lit)
+		var story := get_node_or_null("/root/Story")
+		if story:
+			story.set("flashed", true)
 	if args.has("follower"):
 		GameState.set_meta("no_follower", String(args["follower"]) == "none")
 	if args.has("facing"):

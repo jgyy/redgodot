@@ -167,6 +167,8 @@ func sign_at(cell: Vector2i) -> Dictionary:
 	return _sign_at.get(cell, {})
 
 func label_at(cell: Vector2i) -> String:
+	if label_override.has(cell):
+		return String(label_override[cell])
 	if bake.is_empty():
 		return ""
 	var x := cell.x + int(bake.get("mx", 0))
@@ -232,7 +234,37 @@ func actor_at(cell: Vector2i, except: OwActor = null) -> OwActor:
 	return null
 
 func _obj_shown(o: Dictionary) -> bool:
+	var story := get_node_or_null("/root/Story") if is_inside_tree() else null
+	if story and story.has_method("is_shown"):
+		return bool(story.is_shown(String(o.get("id", "")), map_name))
 	return bool(o.get("shown", true))
+
+var label_override := {}   # Vector2i -> label (scripts)
+
+func set_cell_override(cell: Vector2i, label: String, passable: bool) -> void:
+	pass_override[cell] = passable
+	if label != "":
+		label_override[cell] = label
+		_rebuild_objects()
+
+func clear_cell_override(cell: Vector2i) -> void:
+	pass_override.erase(cell)
+	if label_override.has(cell):
+		label_override.erase(cell)
+		_rebuild_objects()
+
+func _rebuild_objects() -> void:
+	if bake.is_empty() or obj_mat == null or not is_inside_tree():
+		return
+	var old := get_node_or_null("Objects")
+	if old:
+		old.free()
+	var wb := WorldBuilder.new(bake)
+	var hide: Array = []
+	for c in label_override.keys():
+		hide.append(c)
+	var node := wb.build_objects(obj_mat, hide)
+	add_child(node)
 
 func spawn_actor(o: Dictionary) -> OwActor:
 	var a := OwActor.new()

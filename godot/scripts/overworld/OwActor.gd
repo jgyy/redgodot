@@ -76,8 +76,8 @@ func setup(sprite_key: String, px_height: float = CHAR_PX, o: Dictionary = {}) -
 		is_mon = true
 		_model = _load_mon(sprite_key.substr(4), px_height)
 	else:
-		_model = CharacterSkin.instantiate_character(sprite_key)
-		if _model == null:
+		_model = CharacterSkin.instantiate(sprite_key)
+		if _model == null or _meshes(_model).is_empty():
 			_model = _fallback()
 		_fit_height(_model, px_height)
 	# characters lean back toward the camera a little, so the steep game camera sees their faces the way
@@ -133,14 +133,9 @@ func _setup_object(key: String) -> void:
 	face(facing)
 
 func _load_mon(species: String, px_height: float) -> Node3D:
-	var path := "res://assets/models/pokemon/%s.glb" % species
-	var m: Node3D = null
-	if ResourceLoader.exists(path):
-		var ps: PackedScene = load(path)
-		if ps:
-			m = ps.instantiate()
-	if m == null:
-		m = _fallback()
+	# the battle agent's PokemonActor: cel-shaded species model with Idle/Walk clips
+	var m := PokemonActor.new()
+	m.setup(species)
 	_fit_height(m, px_height)
 	return m
 
@@ -231,6 +226,26 @@ func _play(n: String) -> void:
 	if _anim and _anim.has_animation(n) and _anim.current_animation != n:
 		_anim.play(n)
 
+var _mount: Node3D = null
+
+## Ride something under the character (surfing: the lead Pokémon); "" = none.
+func set_mount(key: String) -> void:
+	if _mount:
+		_mount.queue_free()
+		_mount = null
+	if _lean:
+		_lean.position.y = 0.0
+	if key == "" or not key.begins_with("mon:"):
+		return
+	_mount = Node3D.new()
+	_mount.name = "Mount"
+	var m := _load_mon(key.substr(4), 18.0)
+	_mount.add_child(m)
+	m.rotation.y = YAW.get(facing, 0.0)
+	add_child(_mount)
+	if _lean:
+		_lean.position.y = WorldData.px_h(7.0)
+
 func place(c: Vector2i, dir: String = "") -> void:
 	cell = c
 	moving = false
@@ -245,6 +260,8 @@ func face(dir: String) -> void:
 	facing = dir
 	if _model and not is_object:
 		_model.rotation.y = YAW[dir]
+	if _mount and _mount.get_child_count() > 0:
+		(_mount.get_child(0) as Node3D).rotation.y = YAW[dir]
 
 func facing_cell() -> Vector2i:
 	return cell + DIRS.get(facing, Vector2i.ZERO)

@@ -55,8 +55,26 @@ var _follower_species := ""
 var _hidden_ids := {}        # object ids hidden by scripts on this map
 var _shown_ids := {}         # object ids shown by scripts (objs[].shown == false)
 var no_encounters := false   # captures / scripted walks
+var ride := "walk"           # "walk" | "bike" | "surf"
+var flashed := false         # FLASH used (dark caves)
+var _pending_land := false
+var _exit_redirect: Array = []   # [to_map, warp_index] for every exit warp of this map (elevators)
+var _shake := 0.0
+var _flash_rect: ColorRect
+var _heal_count := 0
+
+func _story() -> Node:
+	return get_node_or_null("/root/Story")
+
+func _ui_busy() -> bool:
+	var ui := get_node_or_null("/root/UI")
+	return ui != null and ui.has_method("is_busy") and bool(ui.is_busy())
 
 func _ready() -> void:
+	add_to_group("overworld")
+	var st := _story()
+	if st and st.has_method("set_host"):
+		st.set_host(self)
 	_rng.randomize()
 	_setup_camera()
 	_build_fade()
@@ -156,7 +174,10 @@ func _apply_ambient_env() -> void:
 	_amb_mat.set_shader_parameter("vignette", vig)
 	_amb_mat.set_shader_parameter("vignette_col", vcol)
 	_amb_mat.set_shader_parameter("ice", ice)
-	_amb_rect.visible = fog or vig > 0.0 or ice > 0.0 or tint != Vector3.ONE
+	var st := _story()
+	var dark := st != null and st.has_method("is_dark") and bool(st.is_dark()) and not flashed
+	_amb_mat.set_shader_parameter("dark", dark)
+	_amb_rect.visible = fog or vig > 0.0 or ice > 0.0 or tint != Vector3.ONE or dark
 
 func _build_fade() -> void:
 	_fade_layer = CanvasLayer.new()
@@ -167,6 +188,11 @@ func _build_fade() -> void:
 	_fade_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_fade_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_fade_layer.add_child(_fade_rect)
+	_flash_rect = ColorRect.new()
+	_flash_rect.color = Color(1, 1, 1, 0)
+	_flash_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_flash_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_fade_layer.add_child(_flash_rect)
 
 # ---------------------------------------------------------------- map loading
 func _load_map(map_name: String, cell: Vector2i, facing: String) -> void:
@@ -182,6 +208,9 @@ func _load_map(map_name: String, cell: Vector2i, facing: String) -> void:
 		GameState.set_meta("last_outdoor", map_name)
 	_hidden_ids.clear()
 	_shown_ids.clear()
+	_exit_redirect = []
+	if _map_loader.outdoor:
+		flashed = false   # FLASH lasts until you're back outside (upstream)
 	player.place(cell, facing if facing != "" else player.facing)
 	_place_follower()
 	_light_key = ""
@@ -230,7 +259,7 @@ func _process(dt: float) -> void:
 	if _map_loader == null or not visible:
 		return
 	_update_lighting()
-	var ui_open := _start_menu.is_open() or _dialogue.visible
+	var ui_open := _start_menu.is_open() or _dialogue.visible or _ui_busy()
 	if not ui_open and _locks == 0 and not _busy:
 		_player_control(dt)
 		_npcs_idle(dt)
@@ -244,6 +273,9 @@ func _update_camera() -> void:
 		return
 	var target := player.position + Vector3(0.0, 0.0, 0.5 - OwActor.FOOT_Z)
 	_camera_rig.position = target
+	if _shake > 0.0:
+		_camera_rig.position += Vector3(randf_range(-0.5, 0.5), 0.0, randf_range(-0.5, 0.5)) * _shake / 16.0
+		_shake = _shake * 0.9 if _shake > 0.5 else 0.0
 	if _amb_rect and _amb_rect.visible:
 		_amb_mat.set_shader_parameter("cam_px", Vector2(target.x * 16.0 - 160.0, target.z * 16.0 - 90.0))
 
@@ -262,6 +294,9 @@ func _player_control(dt: float) -> void:
 	if player.moving:
 		return
 	var d := _input_dir()
+	var story := _story()
+	if d == "" and story and story.has_method("forced_direction"):
+		d = String(story.forced_direction())
 	if d == "":
 		_was_moving = false
 		_turn_delay = 0.0
@@ -279,9 +314,13 @@ func _player_control(dt: float) -> void:
 		_turn_delay -= dt
 		if _turn_delay > 0.0:
 			return
+	if story and story.has_method("try_push_boulder") and bool(story.try_push_boulder(d)):
+		player.face(d)
+		_was_moving = false
+		return
 	var r := can_move(player, d)
 	if r.get("ok", false):
-		var speed := 2.0 if Input.is_action_pressed("cancel") else 1.0
+		var speed := 3.0 if ride == "bike" else (2.0 if Input.is_action_pressed("cancel") and ride != "surf" else 1.0)
 		_step_player(d, speed, r)
 	else:
 		player.face(d)
@@ -291,6 +330,7 @@ func _step_player(d: String, speed: float, r: Dictionary) -> void:
 	var from := player.cell
 	var jump: bool = r.get("jump", false)
 	_pending_conn = r.get("conn", {})
+	_pending_land = bool(r.get("land", false))
 	player.start_move(d, 2.0 if jump else speed, jump)
 	_was_moving = true
 	_arrived_dir = ""
@@ -315,7 +355,7 @@ func can_move(who: OwActor, dir: String) -> Dictionary:
 		var tm := MapLoader.new()
 		tm.load_map(String(c.get("map", "")), false)
 		var tc := nxt - Vector2i(int(c.get("ox", 0)), int(c.get("oy", 0)))
-		var ok := tm.passable(tc)
+		var ok := tm.passable(tc) or (ride == "surf" and tm.is_water(tc))
 		tm.free()
 		return {"ok": ok, "conn": c}
 	if _actor_blocking(nxt, who):
@@ -325,6 +365,12 @@ func can_move(who: OwActor, dir: String) -> Dictionary:
 			var land: Vector2i = nxt + OwActor.DIRS[dir]
 			if m.passable(land) and not _actor_blocking(land, who):
 				return {"ok": true, "jump": true}
+			return {"ok": false}
+		if ride == "surf":
+			if m.is_water(nxt):
+				return {"ok": true}
+			if m.passable(nxt):
+				return {"ok": true, "land": true}
 			return {"ok": false}
 		if m.pair_blocked(who.cell, nxt):
 			return {"ok": false}
@@ -376,22 +422,36 @@ func _on_player_step(_a: OwActor) -> void:
 		return
 	if player.scripted:
 		return
+	if _pending_land:
+		_pending_land = false
+		var st0 := _story()
+		if st0 and st0.has_method("set_surfing"):
+			st0.set_surfing(false)
+		else:
+			set_ride("walk")
 	stepped_on.emit(player.cell)
-	var story := get_node_or_null("/root/Story")
+	var story := _story()
 	if story and story.has_method("on_step") and story.on_step(player.cell):
 		return
-	if m.is_tall_grass(player.cell) and not no_encounters:
-		var res := EncounterSystem.roll(m.map_name, false, _rng)
+	if no_encounters or (story and story.has_method("encounters_blocked") and bool(story.encounters_blocked(player.cell))):
+		return
+	var on_water := ride == "surf" and m.is_water(player.cell)
+	if m.is_tall_grass(player.cell) or on_water:
+		var res := EncounterSystem.roll(m.map_name, on_water, _rng)
 		if not res.is_empty():
 			SceneRouter.start_battle({"kind": "wild", "species": res["species"], "level": res["level"]})
 
 func _do_warp(wi: int) -> void:
 	if _busy or wi < 0:
 		return
-	var w: Dictionary = _map_loader.map_data.get("warps", [])[wi]
+	var w: Dictionary = (_map_loader.map_data.get("warps", [])[wi] as Dictionary).duplicate()
+	if not _exit_redirect.is_empty():
+		w["to"] = _exit_redirect[0]
+		w["warp"] = _exit_redirect[1]
 	var to := String(w.get("to", ""))
 	if to == "LAST_MAP":
-		to = String(GameState.get_meta("last_outdoor", "PalletTown"))
+		var lo: Variant = GameState.get("last_outdoor")
+		to = String(lo) if lo != null and String(lo) != "" else String(GameState.get_meta("last_outdoor", "PalletTown"))
 	var dmd := GameData.get_map(to)
 	if dmd.is_empty():
 		push_warning("[Overworld] warp target not found: %s" % to)
@@ -422,7 +482,7 @@ func _do_warp(wi: int) -> void:
 
 # ---------------------------------------------------------------- input: A / START
 func _unhandled_input(event: InputEvent) -> void:
-	if not visible or _dialogue.visible or _start_menu.is_open() or _locks > 0 or _busy:
+	if not visible or _dialogue.visible or _start_menu.is_open() or _locks > 0 or _busy or _ui_busy():
 		return
 	if event.is_action_pressed("menu"):
 		_start_menu.open()
@@ -461,6 +521,8 @@ func _try_interact() -> void:
 		_dialogue.show_lines(DialogueText.for_sign(s, m.map_name))
 		return
 	interacted.emit("cell", {"x": t.x, "y": t.y, "label": m.label_at(t)})
+	if story and story.has_method("on_interact_cell"):
+		story.on_interact_cell(t, player.facing)
 
 # ---------------------------------------------------------------- NPC idle (upstream npcIdle)
 func _npcs_idle(dt: float) -> void:
@@ -741,3 +803,86 @@ func set_player_facing_for_screenshot(dir: String) -> void:
 	player.face(dir)
 	GameState.player_facing = dir
 	_place_follower()
+
+# ---------------------------------------------------------------- Story extras (STORY_HOOKS.md)
+func is_water(cell: Vector2i) -> bool:
+	return _map_loader != null and _map_loader.is_water(cell)
+
+func cell_label(cell: Vector2i) -> String:
+	return _map_loader.label_at(cell) if _map_loader else ""
+
+## Script cell change (S.setCell): passability, and a new look ("" = keep the look). Objects baked on that cell
+## (cut trees, card-key doors, gates...) disappear when the label changes.
+func set_cell_override(cell: Vector2i, label: String, passable: bool) -> void:
+	if _map_loader:
+		_map_loader.set_cell_override(cell, label, passable)
+
+func clear_cell_override(cell: Vector2i) -> void:
+	if _map_loader:
+		_map_loader.clear_cell_override(cell)
+
+## Elevators: every exit warp of this map now leads to (to_map, warp_index).
+func set_exit_warps(to_map: String, warp_index: int) -> void:
+	_exit_redirect = [to_map, warp_index]
+
+## "walk" | "bike" | "surf": surfing rides the lead Pokémon over water, the bike walks at 3x speed.
+func set_ride(mode: String) -> void:
+	ride = mode
+	var sp := _lead_species()
+	player.set_mount(("mon:" + (sp if sp != "" else "LAPRAS")) if mode == "surf" else "")
+	_update_follower_visibility()
+
+func take_warp() -> void:
+	var wi := _map_loader.warp_index_at(player.cell) if _map_loader else -1
+	if wi < 0:
+		return
+	await _do_warp(wi)
+
+func is_warping() -> bool:
+	return _busy
+
+func shake(frames: int = 6) -> void:
+	_shake = maxf(_shake, float(frames) * 0.5)
+
+func set_flash(on: bool) -> void:
+	flashed = on
+	_apply_ambient_env()
+
+func flash_white(frames: int = 8) -> void:
+	_flash_rect.color = Color(1, 1, 1, 1)
+	var tw := create_tween()
+	tw.tween_property(_flash_rect, "color:a", 0.0, frames * FRAME)
+	await tw.finished
+
+func poison_flash() -> void:
+	_flash_rect.color = Color(0.69, 0.28, 0.63, 0.35)
+	var tw := create_tween()
+	tw.tween_property(_flash_rect, "color:a", 0.0, 6.0 * FRAME)
+
+## Pokémon Center healing machine: `count` balls placed, `glow` while it runs.
+func heal_machine(count: int, glow: bool) -> void:
+	_heal_count = count
+	if glow:
+		_flash_rect.color = Color(1.0, 0.95, 0.8, 0.25)
+		var tw := create_tween()
+		tw.tween_property(_flash_rect, "color:a", 0.0, 20.0 * FRAME)
+
+## S.S. Anne leaves Vermilion's dock (Early.gd): the ship sails off into a fade.
+func ship_departs() -> void:
+	shake(20)
+	await get_tree().create_timer(40.0 * FRAME).timeout
+	await fade_out(20)
+	await fade_in(20)
+
+## Small field effects: "cut" (a tree is cut down), "purified_zone" (Pokémon Tower).
+func fx(kind: String, cell: Vector2i) -> void:
+	var l := Label3D.new()
+	l.text = {"cut": "✂", "purified_zone": "✦"}.get(kind, "*")
+	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	l.font_size = 48
+	l.modulate = Color(0.55, 0.85, 0.4) if kind == "cut" else Color(0.85, 0.8, 1.0)
+	l.position = OwActor.cell_pos(cell) + Vector3(0, WorldData.px_h(12.0), 0)
+	_map_root.add_child(l)
+	var tw := create_tween()
+	tw.tween_property(l, "modulate:a", 0.0, 30.0 * FRAME)
+	tw.tween_callback(l.queue_free)
