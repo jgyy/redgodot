@@ -31,6 +31,7 @@ func run_all(tree: SceneTree) -> void:
 	_test_lighting_and_clock()
 	_test_dialogue_text()
 	_test_ui_state()
+	_test_ui_widgets(tree)
 	_test_save_load()
 	_test_new_game_defaults()
 	AudioTests.run(self)
@@ -145,6 +146,72 @@ func _test_ui_state() -> void:
 	check(UI.text("NoSuchLabelAnywhere") == "...", "UI.text() falls back to '...' like G.textFor")
 	GameText.vars["wStringBuffer"] = "POTION"
 	check(GameText.fmt("{PLAYER} got {wStringBuffer} !") == GameState.player_name + " got POTION!", "fmt substitutes textVars and trims space before punctuation")
+
+static func _act(action: String) -> InputEventAction:
+	var e := InputEventAction.new()
+	e.action = action
+	e.pressed = true
+	return e
+
+func _test_ui_widgets(tree: SceneTree) -> void:
+	# Main is still in _ready(): parent test nodes under it (the root is busy)
+	var root: Node = tree.current_scene if tree.current_scene else tree.root
+	var box := DialogueBox.new()
+	root.add_child(box)
+	var fin := [false]
+	box.finished.connect(func(): fin[0] = true)
+	box.show_lines(["Page one.\fPage two {PLAYER}."])
+	check(box.visible and box._pages.size() == 2, "DialogueBox paginates on \\f")
+	box._unhandled_input(_act("confirm"))
+	check(box._page == 0, "DialogueBox waits for the typewriter before paging")
+	box.reveal_all()
+	box._unhandled_input(_act("confirm"))
+	check(box._page == 1 and box._pages[1][0] == "Page two %s." % GameState.player_name, "DialogueBox pages and formats {PLAYER}")
+	box.reveal_all()
+	box._unhandled_input(_act("confirm"))
+	check(fin[0] and not box.visible, "DialogueBox closes and emits finished after the last page")
+	box.queue_free()
+
+	var m := PxMenu.new()
+	m.setup(["YES", "NO"], {"x": 262, "y": 84, "w": 52})
+	root.add_child(m)
+	var res := [-9]
+	m.done.connect(func(r): res[0] = r)
+	check(m.rows == 2 and m.h == 42, "PxMenu sizes rows like ui.js Menu")
+	m._unhandled_input(_act("move_down"))
+	m._unhandled_input(_act("confirm"))
+	check(res[0] == 1, "PxMenu returns the chosen index")
+	m.queue_free()
+	var m2 := PxMenu.new()
+	m2.setup(["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"], {})
+	check(m2.rows == 7 and m2.y == Px.BOX.position.y - m2.h - 2 and m2.x == 320 - m2.w - 6, "PxMenu default placement/scrolling matches ui.js")
+	m2.free()
+
+	var ns := NamingScreen.new()
+	root.add_child(ns)
+	ns.open()
+	var named := [""]
+	ns.named.connect(func(n): named[0] = n)
+	ns._input_event(_act("confirm"))       # 'A'
+	ns._input_event(_act("move_right"))
+	ns._input_event(_act("confirm"))       # 'B'
+	ns._input_event(_act("menu"))          # START = done
+	check(named[0] == "AB", "NamingScreen types from the letter grid (got %s)" % named[0])
+	ns.queue_free()
+
+	GameState.build_showcase()
+	var host := Node.new()
+	root.add_child(host)
+	var sm := StartMenu.new()
+	host.add_child(sm)
+	sm.open()
+	check(sm._items == ["POKéDEX", "POKéMON", "ITEM", "RED", "SHARE", "SAVE", "OPTION", "EXIT"], "START menu rows match upstream")
+	sm._input_event(_act("move_down"))
+	sm._input_event(_act("confirm"))
+	check(sm.party_menu.visible and not sm.visible, "START > POKéMON opens the party screen")
+	sm.party_menu._input_event(_act("cancel"))
+	check(sm.visible and not sm.party_menu.visible, "leaving the party screen returns to the START menu")
+	host.queue_free()
 
 func _test_save_load() -> void:
 	var saved_party := GameState.party

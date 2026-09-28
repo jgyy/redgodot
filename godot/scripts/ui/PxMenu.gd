@@ -77,7 +77,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if opts.has("on_move") and not finished:
 		(opts["on_move"] as Callable).call(sel)
 	if handled:
-		get_viewport().set_input_as_handled()
+		_accept_input()
 
 func _finish(r: int) -> void:
 	finished = true
@@ -101,3 +101,8 @@ func _draw() -> void:
 		Px.text(self, "▲", ax, y + 3 + blink, Px.RED, Color(0, 0, 0, 0))
 	if top + rows < items.size():
 		Px.text(self, "▼", ax, y + h - 13 - blink, Px.RED, Color(0, 0, 0, 0))
+
+func _accept_input() -> void:
+	var vp := get_viewport()
+	if vp:
+		vp.set_input_as_handled()

@@ -108,7 +108,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if not (event.is_action_pressed("confirm") or event.is_action_pressed("cancel")):
 		return
-	get_viewport().set_input_as_handled()
+	_accept_input()
 	if _opts.get("no_wait", false) and _last():
 		return
 	if _chars < _total():
@@ -137,3 +137,8 @@ func _draw() -> void:
 	var tf := _frames
 	var show_prompt: bool = _chars >= _total() and not (_opts.get("no_wait", false) and _last())
 	Px.text_box(self, _pages[_page], int(_chars), show_prompt, tf, _opts.get("theme", ""))
+
+func _accept_input() -> void:
+	var vp := get_viewport()
+	if vp:
+		vp.set_input_as_handled()

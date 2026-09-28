@@ -56,7 +56,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not event.is_pressed():
 		return
 	if _input_event(event):
-		get_viewport().set_input_as_handled()
+		_accept_input()
 
 ## Return true when the event was consumed. Override in screens.
 func _input_event(_event: InputEvent) -> bool:
@@ -85,3 +85,8 @@ func ask(text: String, opts: Dictionary = {}) -> bool:
 	var r: bool = await DialogueBox.ask(_host(), text, opts)
 	busy = false
 	return r
+
+func _accept_input() -> void:
+	var vp := get_viewport()
+	if vp:
+		vp.set_input_as_handled()
