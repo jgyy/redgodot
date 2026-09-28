@@ -12,6 +12,7 @@ const MOVE_TIME := 0.16
 var map_loader: MapLoader
 var cell: Vector2i = Vector2i.ZERO
 var facing: String = "down"
+var input_locked: bool = false  # set by OverworldScene while a menu/dialogue is open
 
 var _moving := false
 var _rng := RandomNumberGenerator.new()
@@ -65,8 +66,13 @@ func place(m: MapLoader, start_cell: Vector2i) -> void:
 	cell = start_cell
 	global_position = map_loader.global_position + map_loader.cell_to_world(cell)
 
+func facing_cell() -> Vector2i:
+	var offset: Vector2i = {"down": Vector2i(0, 1), "up": Vector2i(0, -1),
+		"left": Vector2i(-1, 0), "right": Vector2i(1, 0)}.get(facing, Vector2i.ZERO)
+	return cell + offset
+
 func _unhandled_input(event: InputEvent) -> void:
-	if _moving or map_loader == null:
+	if _moving or map_loader == null or input_locked:
 		return
 	var dir := Vector2i.ZERO
 	var new_facing := facing
