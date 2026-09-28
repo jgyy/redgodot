@@ -9,6 +9,7 @@ signal battle_ended(result: String)
 const OVERWORLD := "res://scenes/Overworld.tscn"
 const BATTLE := "res://scenes/Battle.tscn"
 const TITLE := "res://scenes/Title.tscn"
+const INTRO := "res://scenes/Intro.tscn"
 
 var _root: Node = null
 var _active: Node = null
@@ -21,9 +22,13 @@ func register_root(root: Node) -> void:
 func _swap(scene: PackedScene) -> Node:
 	if _active:
 		_active.queue_free()
+		_active = null
 	_active = scene.instantiate()
 	_root.add_child(_active)
 	return _active
+
+func goto_intro() -> void:
+	_swap(load(INTRO))
 
 func goto_title() -> void:
 	_swap(load(TITLE))

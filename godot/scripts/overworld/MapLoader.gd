@@ -18,6 +18,7 @@ var _grid: GridMap
 var _category_at := {}   # Vector2i -> TileKit.Cat
 var _warp_at := {}       # Vector2i -> warp dict {x,y,to,warp}
 var _sign_at := {}       # Vector2i -> sign dict
+var _npc_at := {}        # Vector2i -> obj dict (NPC/prop from mapdata.json's `objs`)
 
 func load_map(name: String) -> bool:
 	map_name = name
@@ -67,7 +68,54 @@ func load_map(name: String) -> bool:
 	for s in map_data.get("signs", []):
 		_sign_at[Vector2i(int(s.get("x", 0)), int(s.get("y", 0)))] = s
 
+	_spawn_npcs()
 	return true
+
+## Populates NPCs/props from the map's `objs` list (real placements from the
+## source data) as static humanoid-or-prop markers the player can talk to.
+## No movement AI (even "WALK" objs stay put) — future work. Building the
+## visual subtree is skipped when not inside the SceneTree (e.g. TestSuite's
+## off-tree MapLoader.load_map() calls) so `npc_at()` still works for tests
+## without touching the renderer before nodes have entered the tree.
+func _spawn_npcs() -> void:
+	_npc_at.clear()
+	for o in map_data.get("objs", []):
+		var cell := Vector2i(int(o.get("x", 0)), int(o.get("y", 0)))
+		if in_bounds(cell) and not _npc_at.has(cell):
+			_npc_at[cell] = o
+	if not is_inside_tree():
+		return
+	var npcs := Node3D.new()
+	npcs.name = "NPCs"
+	add_child(npcs)
+	for cell in _npc_at.keys():
+		var model := _build_npc_model(_npc_at[cell])
+		model.position = cell_to_world(cell)
+		npcs.add_child(model)
+
+func _build_npc_model(obj: Dictionary) -> Node3D:
+	var sprite: String = obj.get("sprite", "")
+	if DialogueText.is_humanoid_sprite(sprite):
+		var path := "res://assets/models/characters/humanoid.glb"
+		if ResourceLoader.exists(path):
+			var scene: PackedScene = load(path)
+			if scene:
+				var inst: Node3D = scene.instantiate()
+				CharacterSkin.apply(inst, GameData.cast.get(sprite, {}))
+				return inst
+	var body := MeshInstance3D.new()
+	var sphere := SphereMesh.new()
+	sphere.radius = 0.25
+	sphere.height = 0.5
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = Color(GameData.cast.get(sprite, {}).get("shirt", "#c8a0d8"))
+	sphere.material = mat
+	body.mesh = sphere
+	body.position.y = 0.25
+	return body
+
+func npc_at(cell: Vector2i) -> Dictionary:
+	return _npc_at.get(cell, {})
 
 func _classify(v: int, pass_ids: Dictionary, grass_id: int, door_ids: Dictionary, counter_ids: Dictionary) -> int:
 	if v == grass_id:
@@ -92,6 +140,8 @@ func in_bounds(cell: Vector2i) -> bool:
 
 func is_walkable(cell: Vector2i) -> bool:
 	if not in_bounds(cell):
+		return false
+	if _npc_at.has(cell):
 		return false
 	return TileKit.is_walkable(_category_at.get(cell, TileKit.Cat.BLOCKING))
 

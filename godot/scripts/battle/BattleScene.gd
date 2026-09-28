@@ -35,6 +35,7 @@ func setup(encounter: Dictionary) -> void:
 		return
 
 	_enemy_mon = GameState.PartyMon.new(encounter.get("species", "RATTATA"), encounter.get("level", 3))
+	GameState.mark_seen(_enemy_mon.species_id)
 
 	_player_actor = PokemonActor.new()
 	_player_slot.add_child(_player_actor)
