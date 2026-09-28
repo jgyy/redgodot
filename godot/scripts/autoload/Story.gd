@@ -220,6 +220,16 @@ func wait(frames: int = 1) -> void:
 		return
 	await get_tree().create_timer(frames / 60.0).timeout
 
+## Wait for A/B (G.engine.run(box) with an update() closing on a press), at most max_frames.
+func wait_button(max_frames: int = 600) -> void:
+	if fast:
+		return
+	await wait(10)
+	for i in max_frames:
+		if Input.is_action_just_pressed("confirm") or Input.is_action_just_pressed("cancel"):
+			return
+		await get_tree().process_frame
+
 # ================================================================== text
 func _load_own_text() -> void:
 	_own_text_loaded = true
