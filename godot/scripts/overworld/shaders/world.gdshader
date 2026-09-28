@@ -68,7 +68,7 @@ void fragment() {
 		float sh = 1.0;
 		sh -= 0.10 * clamp(n.z, 0.0, 1.0) * (1.0 - clamp(n.y, 0.0, 1.0));
 		sh -= 0.28 * clamp(n.x, 0.0, 1.0);
-		sh -= 0.06 * clamp(-n.x, 0.0, 1.0);
+		sh -= 0.16 * clamp(-n.x, 0.0, 1.0);
 		col *= mix(1.0, sh, face_shading);
 	}
 	col = night_light(col, p2d);

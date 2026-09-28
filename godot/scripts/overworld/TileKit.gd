@@ -9,6 +9,7 @@ extends RefCounted
 const TREE_SHADER := preload("res://scripts/overworld/shaders/tree.gdshader")
 const TREE_OUTLINE_SHADER := preload("res://scripts/overworld/shaders/tree_outline.gdshader")
 const DECOR_SHADER := preload("res://scripts/overworld/shaders/decor.gdshader")
+const FX_SHADER := preload("res://scripts/overworld/shaders/fx.gdshader")
 const CHUNK := 8
 
 static var _palette: Dictionary = {}
@@ -163,7 +164,49 @@ static func build_decor(bake: Dictionary, mx: int, my: int) -> Node3D:
 		mmi2.material_override = fm
 		mmi2.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		root.add_child(mmi2)
+	# ---- animated effects: brazier flames, electric barriers, teleport pads
+	var fires: Array = bake.get("fires", [])
+	if not fires.is_empty():
+		var st := SurfaceTool.new()
+		st.begin(Mesh.PRIMITIVE_TRIANGLES)
+		# card local coords: x in [-6, 6] px, standing 10 px behind the flame's base, from 9 px (bowl rim) up 17 px
+		var k := WorldData.K
+		var pts := [[Vector3(-6.0 / 16.0, 26.0 / 16.0 * k, 0), Vector2(0, 0)], [Vector3(6.0 / 16.0, 26.0 / 16.0 * k, 0), Vector2(1, 0)],
+			[Vector3(6.0 / 16.0, 9.0 / 16.0 * k, 0), Vector2(1, 1)], [Vector3(-6.0 / 16.0, 9.0 / 16.0 * k, 0), Vector2(0, 1)]]
+		for i in [0, 1, 2, 0, 2, 3]:
+			st.set_normal(Vector3.BACK)
+			st.set_uv(pts[i][1])
+			st.add_vertex(pts[i][0])
+		root.add_child(_fx_multimesh("Fires", st.commit(), 0, fires.map(func(f: Array) -> Array:
+			return [Vector3(float(f[0]) / 16.0 - mx, 0.0, (float(f[1]) + 9.0) / 16.0 - my), float(f[2])])))
+	var fx: Array = bake.get("fx", [])
+	for kind in ["barrier", "teleport"]:
+		var cells := fx.filter(func(e: Array) -> bool: return String(e[2]) == kind)
+		if cells.is_empty():
+			continue
+		root.add_child(_fx_multimesh(kind.capitalize(), _flower_mesh(), 1 if kind == "barrier" else 2, cells.map(func(e: Array) -> Array:
+			return [Vector3(int(e[0]) - mx, 0.002, int(e[1]) - my), float(int(e[0]) * 7 + int(e[1]))])))
 	return root
+
+static func _fx_multimesh(node_name: String, mesh: Mesh, mode: int, items: Array) -> MultiMeshInstance3D:
+	var mat := ShaderMaterial.new()
+	mat.shader = FX_SHADER
+	mat.set_shader_parameter("mode", mode)
+	var mm := MultiMesh.new()
+	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.use_custom_data = true
+	mm.mesh = mesh
+	mm.instance_count = items.size()
+	for i in range(items.size()):
+		var it: Array = items[i]
+		mm.set_instance_transform(i, Transform3D(Basis.IDENTITY, it[0]))
+		mm.set_instance_custom_data(i, Color(float(it[1]), 0, 0, 0))
+	var mmi := MultiMeshInstance3D.new()
+	mmi.name = node_name
+	mmi.multimesh = mm
+	mmi.material_override = mat
+	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	return mmi
 
 ## Two cards per tall-grass cell (local coords: the cell spans [0,1] x [0,1]): the back tufts stand behind a
 ## character in the cell (depth 10/16, sprite rows 0..10), the front tufts in front of it (depth 1, rows 6..16).

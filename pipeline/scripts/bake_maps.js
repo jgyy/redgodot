@@ -315,7 +315,7 @@ function bakeInterior(map) {
   }
   G.mapRender.elevationEdges(s, map, ox, oy);
   const iso = new Iso(W, H), atlas = new Atlas();
-  const blocks = [], trees = [], lights = [];
+  const blocks = [], trees = [], lights = [], fx = [];
   const done = new Set();
   const anim = [];
   const PAINT = I.PAINT;
@@ -329,6 +329,7 @@ function bakeInterior(map) {
     const l = L(x, y), px = ox + x * 16, py = oy + y * 16;
     if (done.has(x + ',' + y)) continue;
     if (l === 'tree' || l === 'tree2') { done.add(x + ',' + y); T.drawShadowEllipse(s, px + 9, py + 14, 7, 2.5, 0.8); trees.push([x + MX, y + MY, l === 'tree2' ? 1 : 0, Math.floor(hash2(x, y, 3) * 6)]); continue; }
+    if (l === 'barrier' || l === 'teleport') fx.push([x + MX, y + MY, l]);
     if (FLAT_INT.has(l) || FLOORS.has(l) || !PAINT[l]) { done.add(x + ',' + y); if (PAINT[l] && !FLOORS.has(l)) PAINT[l](s, s, px, py, x, y, L, th, anim, map); continue; }
     if (WALLISH.has(l)) {
       // a wall region: every column's run of wall cells becomes one extruded block (front face at the bottom)
@@ -355,7 +356,8 @@ function bakeInterior(map) {
       }
       const e = objEntry(atlas, r, { t: 'walls', cave, boxes: boxes.map(bx => {
         const run = (bx.b - bx.a + 1) * 16;
-        const hgt = cave ? Math.min(run, 18) : Math.min(run, 24);   // tall walls lean in perspective: keep them low, the rest of the art lies on top
+        // tall walls lean in perspective: keep them low (thin wall runs lower still), the rest of the art lies on top
+        const hgt = Math.min(run, cave ? 18 : 24, run > 32 ? (bx.x1 - bx.x0) * 16 : 99);
         const openBelow = !set.has(bx.x0 + ',' + (bx.b + 1));
         return [ox + bx.x0 * 16, oy + bx.a * 16, ox + bx.x1 * 16, oy + (bx.b + 1) * 16 + (openBelow && cave ? 2 : 0), hgt];
       }) });
@@ -387,7 +389,7 @@ function bakeInterior(map) {
     if (FLOORS.has(L(x + 1, y))) for (let yy = 2; yy < 16; yy++) s.pmul(ox + (x + 1) * 16, oy + y * 16 + yy, SH);
   }
   const Lm = (x, y) => L(x, y);
-  return finish(map, { MX, MY, cw, ch, s, atlas, blocks, trees, grass: [], flowers: [], lights, fires: [], L: Lm, wtex: null, kind: 'interior', wx0: 0, wy0: 0 });
+  return finish(map, { MX, MY, cw, ch, s, atlas, blocks, trees, grass: [], flowers: [], lights, fires: [], fx, L: Lm, wtex: null, kind: 'interior', wx0: 0, wy0: 0 });
 }
 function regionOf(cells, ox, oy, pad) {
   let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
@@ -419,7 +421,7 @@ function finish(map, R) {
     map: name, kind: R.kind, w: map.w, h: map.h, mx: R.MX, my: R.MY, cw: R.cw, ch: R.ch,
     world: map.world ? [map.world.x, map.world.y] : null, wx0: R.wx0, wy0: R.wy0,
     legend: lg.legend, labels: lg.grid,
-    blocks: finishBlocks(blocks), trees: R.trees, grass: R.grass, flowers: R.flowers, lights: R.lights, fires: R.fires,
+    blocks: finishBlocks(blocks), trees: R.trees, grass: R.grass, flowers: R.flowers, lights: R.lights, fires: R.fires, fx: R.fx || [],
     atlas: [R.atlas.W || 4, R.atlas.H || 4], water: !!R.wtex,
   };
   fs.writeFileSync(path.join(OUT, name + '.json'), JSON.stringify(json));

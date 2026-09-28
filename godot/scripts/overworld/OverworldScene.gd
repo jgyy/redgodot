@@ -487,12 +487,12 @@ func _npcs_idle(dt: float) -> void:
 			act.face(["up", "down", "left", "right"][_rng.randi() % 4])
 
 # ---------------------------------------------------------------- walking partner (upstream follower.js)
+## upstream follower.js lead(): the first party Pokémon, while it hasn't fainted (OPTION > FOLLOWER off hides it)
 func _lead_species() -> String:
-	for m in GameState.party:
-		var pm: GameState.PartyMon = m
-		if pm.hp > 0:
-			return pm.species_id
-	return ""
+	if bool(GameState.get_meta("no_follower", false)) or GameState.party.is_empty():
+		return ""
+	var pm: GameState.PartyMon = GameState.party[0]
+	return pm.species_id if pm.hp > 0 else ""
 
 func _place_follower() -> void:
 	var sp := _lead_species()
