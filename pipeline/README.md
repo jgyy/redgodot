@@ -202,3 +202,42 @@ python3 pipeline/blender/gen_vfx.py                 # 22 particle meshes + poke_
 
 Battle reference captures: `pipeline/capture_screenshots.sh` "Battle" section
 (`--scene=battle --state=vfx --move=... --vfx_t=...`, see `Main.gd _setup_battle()`).
+
+## Overworld: maps baked from upstream, rebuilt in 3D (overworld agent)
+
+```sh
+UPSTREAM=/path/to/pokemon-claude-red node pipeline/scripts/bake_maps.js   # all maps (~30 s), or list map names
+python3 pipeline/blender/gen_world.py                                    # 3D trees / Poké Ball / boulder
+godot4 --headless --path godot --import                                  # import the new textures
+godot4 --path godot -- --scene=ow_playtest                               # new-game autopilot (Pallet -> rival battle)
+```
+
+`bake_maps.js` runs upstream's own renderer code (map.js labels + connections + border, maprender.js,
+terrain.js, buildings.js, buildingstyles.js, interior.js) for every map and splits the result:
+
+- `godot/assets/maps/<Map>_ground.png` — the flat layer: `paintGround` (grass/path/sand/pavement/rock/water),
+  ledges, cliffs, bridges, curbs, stairs, ships, interior floors / carpets / mats / ladders, elevation edges and
+  the soft shadows every object casts. Outdoor maps carry a 14 x 10 cell margin (neighbour maps via `labelAt`,
+  then the border pattern) so the 3D camera never sees the void; interiors a 2-cell black void.
+- `godot/assets/maps/<Map>_atlas.png` + `<Map>.json` `blocks` — every object that becomes geometry, painted *in
+  isolation* by the same painter (paint once on the ground for its shadow, once on a transparent layer for its
+  pixels, restore the ground under it): whole buildings (`house`: roof top / wall top / wall bottom / chimney /
+  flat roof), interior wall runs (`walls`), furniture (`box` with the front-face height, `cellboxes`), and thin
+  sprites (`card`: signs, fences, cut trees, statues, plants...).
+- `<Map>.json` also: the margin-inclusive label grid, `trees` (kind + upstream variant), `grass`, `flowers`,
+  `lights` (windows / Center & Mart signs / fires, for the night light pools), `fires`, `fx` (barriers, teleports).
+- `<Map>_water.png` (water mask, shore distance, deep patch) + `noise_water.png` / `noise_big.png`: the world
+  shader re-evaluates upstream's `waterColor()` every 4 frames and its drifting cloud shadows.
+- `decor_atlas.png` (tall grass v0-3 x 2 frames, flowers x 2 frames), `objects_atlas.png`, `palette.json`,
+  and `pipeline/blender/world_defs.json` (tree clump layouts / tuft offsets evaluated with upstream's hash).
+
+Variant hashes use upstream's own surface coordinates (margin 11 x 7), so trees, flowers, grass tufts, roofs
+and statues pick exactly the variants the 2D game shows.
+
+In Godot (`godot/scripts/overworld/`): `WorldBuilder` extrudes each block into boxes / gable or flat roofs /
+cards whose UVs are the *oblique projection* of the 2D art (a point at (x, z) and height h samples the pixel
+(x, z - h)), with heights scaled by K = tan(camera pitch 60°): from the game camera every building reads
+exactly like its 2D sprite, but it is real geometry that occludes characters, catches the night lights and
+shows perspective. `TileKit` draws the Blender trees (chunked MultiMeshes + inverted-hull outline), layered
+tall-grass cards (upstream's sway / rustle timing), animated flowers, brazier flames, barriers and teleport
+pads. All world shaders do their colour maths in sRGB like the 2D game (grade, light pools, cloud shadows).

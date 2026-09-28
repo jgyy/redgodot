@@ -141,8 +141,8 @@ shot "054-SeafoamIslands1F" --scene=overworld --map=SeafoamIslands1F --pc=15,9 -
 shot "055-SeafoamIslandsB4F" --scene=overworld --map=SeafoamIslandsB4F --pc=14,8 --time=day --facing=down --player=DEWGONG --story=off --wait=1.5
 shot "056-CinnabarIsland" --scene=overworld --map=CinnabarIsland --pc=9,10 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
 shot "057-CinnabarIsland-night" --scene=overworld --map=CinnabarIsland --pc=9,10 --time=night --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
-shot "058-PokemonMansion1F" --scene=overworld --map=PokemonMansion1F --pc=15,14 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
-shot "059-CinnabarGym" --scene=overworld --map=CinnabarGym --pc=10,9 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "058-PokemonMansion1F" --scene=overworld --map=PokemonMansion1F --pc=15,14 --time=day --facing=down --player=PIKACHU --follower=none --wait=1.5
+shot "059-CinnabarGym" --scene=overworld --map=CinnabarGym --pc=10,9 --time=day --facing=down --player=PIKACHU --follower=none --wait=1.5
 shot "060-PowerPlant" --scene=overworld --map=PowerPlant --pc=20,19 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
 shot "061-Route23" --scene=overworld --map=Route23 --pc=9,71 --time=day --facing=down --player=KABUTO --story=off --wait=1.5
 shot "062-VictoryRoad1F" --scene=overworld --map=VictoryRoad1F --pc=9,8 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5

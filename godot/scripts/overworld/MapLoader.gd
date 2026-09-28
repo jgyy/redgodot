@@ -246,12 +246,28 @@ func set_cell_override(cell: Vector2i, label: String, passable: bool) -> void:
 	if label != "":
 		label_override[cell] = label
 		_rebuild_objects()
+		_cell_fx(cell, label)
 
 func clear_cell_override(cell: Vector2i) -> void:
 	pass_override.erase(cell)
 	if label_override.has(cell):
 		label_override.erase(cell)
 		_rebuild_objects()
+		_cell_fx(cell, "")
+
+## Animated effects for script-set labels (electric barriers, teleport pads).
+func _cell_fx(cell: Vector2i, label: String) -> void:
+	if not is_inside_tree():
+		return
+	var n := "CellFx_%d_%d" % [cell.x, cell.y]
+	var old := get_node_or_null(n)
+	if old:
+		old.queue_free()
+	if label == "barrier" or label == "teleport":
+		var fx := TileKit._fx_multimesh(n, TileKit._flower_mesh(), 1 if label == "barrier" else 2,
+			[[Vector3(cell.x, 0.002, cell.y), float(cell.x * 7 + cell.y)]])
+		fx.name = n
+		add_child(fx)
 
 func _rebuild_objects() -> void:
 	if bake.is_empty() or obj_mat == null or not is_inside_tree():
