@@ -5,13 +5,15 @@ extends Node
 ##
 ## Flags: --kind=pokemon|characters  --species=A,B,C (default: every model in the manifest)
 ##        --view=front|back|side  --cols=N  --cell=PX  --yaw=DEG (3/4 turn, default -25 = toward the light)
-##        --anim=Idle --anim_t=0.0 (pose to sample)  --labels=1
+##        --anim=Idle --anim_t=0.0 (pose to sample)  --labels=1  --toon=0 --outline=PX
+##        --sprite_frame=M (Pokemon sized like upstream sprites: 64px frame = M metres, fixed camera)
 
 var _vp: SubViewport
 var _cam: Camera3D
 var _stage: Node3D
 var _label: Label
 var _toon := true
+var _frame_m := 0.0  # --sprite_frame=M: size Pokemon like upstream sprites, fixed camera
 
 func run(args: Dictionary, out_path: String) -> void:
 	var kind: String = args.get("kind", "pokemon")
@@ -24,6 +26,7 @@ func run(args: Dictionary, out_path: String) -> void:
 	var anim_t := float(args.get("anim_t", "0.0"))
 	var labels: bool = args.get("labels", "1") != "0"
 	_toon = args.get("toon", "1") != "0"
+	_frame_m = float(args.get("sprite_frame", "0"))
 	var rows := int(ceil(float(ids.size()) / float(cols)))
 	_build(cell)
 	var sheet := Image.create(cols * cell, max(1, rows) * cell, false, Image.FORMAT_RGBA8)
@@ -87,6 +90,8 @@ func _instantiate(kind: String, id: String) -> Node3D:
 		return CharacterSkin.instantiate(id, _toon)
 	var actor := PokemonActor.new()
 	actor.setup(id)
+	if _frame_m > 0.0:
+		actor.use_sprite_scale(_frame_m)
 	return actor
 
 func _build(cell: int) -> void:
@@ -125,8 +130,9 @@ func _frame(holder: Node3D) -> void:
 		var b: AABB = inst.global_transform * inst.mesh.get_aabb()
 		box = b if first else box.merge(b)
 		first = false
-	if first:
-		box = AABB(Vector3(-0.5, 0, -0.5), Vector3(1, 1, 1))
+	if first or _frame_m > 0.0:
+		var fm: float = _frame_m if _frame_m > 0.0 else 1.0
+		box = AABB(Vector3(-fm * 0.5, 0, -fm * 0.5), Vector3(fm, fm, fm))
 	var c := box.get_center()
 	var r: float = max(box.size.y, max(box.size.x, box.size.z)) * 0.5
 	var dist: float = r / tan(deg_to_rad(_cam.fov * 0.5)) * 1.12

@@ -159,6 +159,7 @@
  "species": {
   "BULBASAUR": {
    "height_m": 0.711,
+   "px_height": 43.47,
    "groups": 7,
    "tris": 6608,
    "materials": 1,
@@ -169,6 +170,7 @@
   },
   "CHARMELEON": {
    "height_m": 1.092,
+   "px_height": 52.61,
    "groups": 10,
    "tris": 6158,
    "materials": 1,
@@ -179,6 +181,7 @@
   },
   "BLASTOISE": {
    "height_m": 1.6,
+   "px_height": 52.84,
    "groups": 11,
    "tris": 6872,
    "materials": 1,
@@ -189,6 +192,7 @@
   },
   "WEEDLE": {
    "height_m": 0.305,
+   "px_height": 30.02,
    "groups": 11,
    "tris": 6128,
    "materials": 1,
@@ -199,6 +203,7 @@
   },
   "PIDGEOTTO": {
    "height_m": 1.092,
+   "px_height": 52.54,
    "groups": 12,
    "tris": 6026,
    "materials": 1,
@@ -209,6 +214,7 @@
   },
   "SPEAROW": {
    "height_m": 0.305,
+   "px_height": 36.97,
    "groups": 11,
    "tris": 6036,
    "materials": 1,
@@ -219,6 +225,7 @@
   },
   "PIKACHU": {
    "height_m": 0.406,
+   "px_height": 57.06,
    "groups": 9,
    "tris": 5992,
    "materials": 1,
@@ -229,6 +236,7 @@
   },
   "NIDORAN_F": {
    "height_m": 0.406,
+   "px_height": 38.15,
    "groups": 14,
    "tris": 6236,
    "materials": 1,
@@ -239,6 +247,7 @@
   },
   "NIDORINO": {
    "height_m": 0.889,
+   "px_height": 56.83,
    "groups": 11,
    "tris": 6301,
    "materials": 1,
@@ -249,6 +258,7 @@
   },
   "VULPIX": {
    "height_m": 0.61,
+   "px_height": 40.92,
    "groups": 16,
    "tris": 6056,
    "materials": 1,
@@ -259,6 +269,7 @@
   },
   "ZUBAT": {
    "height_m": 0.787,
+   "px_height": 44.59,
    "groups": 7,
    "tris": 5992,
    "materials": 1,
@@ -269,6 +280,7 @@
   },
   "VILEPLUME": {
    "height_m": 1.194,
+   "px_height": 56.58,
    "groups": 11,
    "tris": 5990,
    "materials": 1,
@@ -279,6 +291,7 @@
   },
   "VENOMOTH": {
    "height_m": 1.499,
+   "px_height": 50.05,
    "groups": 14,
    "tris": 6094,
    "materials": 1,
@@ -289,6 +302,7 @@
   },
   "PERSIAN": {
    "height_m": 0.991,
+   "px_height": 49.99,
    "groups": 14,
    "tris": 6178,
    "materials": 1,
@@ -299,6 +313,7 @@
   },
   "PRIMEAPE": {
    "height_m": 0.991,
+   "px_height": 42.79,
    "groups": 10,
    "tris": 6114,
    "materials": 1,
@@ -309,6 +324,7 @@
   },
   "POLIWHIRL": {
    "height_m": 0.991,
+   "px_height": 39.16,
    "groups": 7,
    "tris": 5992,
    "materials": 1,
@@ -319,6 +335,7 @@
   },
   "ALAKAZAM": {
    "height_m": 1.499,
+   "px_height": 58.09,
    "groups": 14,
    "tris": 5988,
    "materials": 1,
@@ -329,6 +346,7 @@
   },
   "BELLSPROUT": {
    "height_m": 0.711,
+   "px_height": 42.33,
    "groups": 8,
    "tris": 5996,
    "materials": 1,
@@ -339,6 +357,7 @@
   },
   "TENTACRUEL": {
    "height_m": 1.6,
+   "px_height": 50.18,
    "groups": 11,
    "tris": 6060,
    "materials": 1,
@@ -349,6 +368,7 @@
   },
   "PONYTA": {
    "height_m": 0.991,
+   "px_height": 48.5,
    "groups": 17,
    "tris": 6601,
    "materials": 1,
@@ -359,6 +379,7 @@
   },
   "MAGNEMITE": {
    "height_m": 0.305,
+   "px_height": 28.47,
    "groups": 10,
    "tris": 5986,
    "materials": 1,
@@ -369,6 +390,7 @@
   },
   "DODRIO": {
    "height_m": 1.803,
+   "px_height": 57.43,
    "groups": 16,
    "tris": 6163,
    "materials": 1,
@@ -379,6 +401,7 @@
   },
   "MUK": {
    "height_m": 1.194,
+   "px_height": 46.5,
    "groups": 5,
    "tris": 5994,
    "materials": 1,
@@ -389,6 +412,7 @@
   },
   "HAUNTER": {
    "height_m": 1.6,
+   "px_height": 55.63,
    "groups": 10,
    "tris": 6904,
    "materials": 1,
@@ -399,6 +423,7 @@
   },
   "HYPNO": {
    "height_m": 1.6,
+   "px_height": 57.91,
    "groups": 10,
    "tris": 6274,
    "materials": 1,
@@ -409,6 +434,7 @@
   },
   "ELECTRODE": {
    "height_m": 1.194,
+   "px_height": 37.97,
    "groups": 6,
    "tris": 6652,
    "materials": 1,
@@ -419,6 +445,7 @@
   },
   "MAROWAK": {
    "height_m": 0.991,
+   "px_height": 56.91,
    "groups": 9,
    "tris": 6168,
    "materials": 1,
@@ -429,6 +456,7 @@
   },
   "KOFFING": {
    "height_m": 0.61,
+   "px_height": 40.3,
    "groups": 10,
    "tris": 5990,
    "materials": 1,
@@ -439,6 +467,7 @@
   },
   "CHANSEY": {
    "height_m": 1.092,
+   "px_height": 41.03,
    "groups": 10,
    "tris": 6016,
    "materials": 1,
@@ -449,6 +478,7 @@
   },
   "SEADRA": {
    "height_m": 1.194,
+   "px_height": 58.06,
    "groups": 7,
    "tris": 6004,
    "materials": 1,
@@ -459,6 +489,7 @@
   },
   "STARMIE": {
    "height_m": 1.092,
+   "px_height": 47.01,
    "groups": 5,
    "tris": 5994,
    "materials": 1,
@@ -469,6 +500,7 @@
   },
   "ELECTABUZZ": {
    "height_m": 1.092,
+   "px_height": 57.95,
    "groups": 11,
    "tris": 6190,
    "materials": 1,
@@ -479,6 +511,7 @@
   },
   "MAGIKARP": {
    "height_m": 0.889,
+   "px_height": 40.22,
    "groups": 9,
    "tris": 6036,
    "materials": 1,
@@ -489,6 +522,7 @@
   },
   "EEVEE": {
    "height_m": 0.305,
+   "px_height": 53.59,
    "groups": 9,
    "tris": 5990,
    "materials": 1,
@@ -499,6 +533,7 @@
   },
   "PORYGON": {
    "height_m": 0.787,
+   "px_height": 44.93,
    "groups": 10,
    "tris": 6007,
    "materials": 1,
@@ -509,6 +544,7 @@
   },
   "KABUTOPS": {
    "height_m": 1.295,
+   "px_height": 54.71,
    "groups": 16,
    "tris": 6154,
    "materials": 1,
@@ -519,6 +555,7 @@
   },
   "ZAPDOS": {
    "height_m": 1.6,
+   "px_height": 58.56,
    "groups": 9,
    "tris": 5989,
    "materials": 1,
@@ -529,6 +566,7 @@
   },
   "DRAGONITE": {
    "height_m": 2.21,
+   "px_height": 60.59,
    "groups": 11,
    "tris": 6336,
    "materials": 1,
@@ -539,6 +577,7 @@
   },
   "IVYSAUR": {
    "height_m": 0.991,
+   "px_height": 52.04,
    "groups": 12,
    "tris": 7300,
    "materials": 1,
@@ -549,6 +588,7 @@
   },
   "CHARIZARD": {
    "height_m": 1.702,
+   "px_height": 58.13,
    "groups": 13,
    "tris": 6266,
    "materials": 1,
@@ -559,6 +599,7 @@
   },
   "CATERPIE": {
    "height_m": 0.305,
+   "px_height": 32.75,
    "groups": 8,
    "tris": 5992,
    "materials": 1,
@@ -569,6 +610,7 @@
   },
   "KAKUNA": {
    "height_m": 0.61,
+   "px_height": 39.35,
    "groups": 9,
    "tris": 6022,
    "materials": 1,
@@ -579,6 +621,7 @@
   },
   "PIDGEOT": {
    "height_m": 1.499,
+   "px_height": 59.07,
    "groups": 13,
    "tris": 6430,
    "materials": 1,
@@ -589,6 +632,7 @@
   },
   "FEAROW": {
    "height_m": 1.194,
+   "px_height": 59.96,
    "groups": 13,
    "tris": 6194,
    "materials": 1,
@@ -599,6 +643,7 @@
   },
   "RAICHU": {
    "height_m": 0.787,
+   "px_height": 55.95,
    "groups": 10,
    "tris": 5988,
    "materials": 1,
@@ -609,6 +654,7 @@
   },
   "NIDORINA": {
    "height_m": 0.787,
+   "px_height": 47.08,
    "groups": 14,
    "tris": 6114,
    "materials": 1,
@@ -619,6 +665,7 @@
   },
   "NIDOKING": {
    "height_m": 1.397,
+   "px_height": 58.94,
    "groups": 14,
    "tris": 6474,
    "materials": 1,
@@ -629,6 +676,7 @@
   },
   "NINETALES": {
    "height_m": 1.092,
+   "px_height": 50.29,
    "groups": 22,
    "tris": 6746,
    "materials": 1,
@@ -639,6 +687,7 @@
   },
   "GOLBAT": {
    "height_m": 1.6,
+   "px_height": 49.87,
    "groups": 9,
    "tris": 6024,
    "materials": 1,
@@ -649,6 +698,7 @@
   },
   "PARAS": {
    "height_m": 0.305,
+   "px_height": 33.81,
    "groups": 15,
    "tris": 6060,
    "materials": 1,
@@ -659,6 +709,7 @@
   },
   "DIGLETT": {
    "height_m": 0.203,
+   "px_height": 30.45,
    "groups": 5,
    "tris": 6010,
    "materials": 1,
@@ -669,6 +720,7 @@
   },
   "PSYDUCK": {
    "height_m": 0.787,
+   "px_height": 46.34,
    "groups": 12,
    "tris": 5982,
    "materials": 1,
@@ -679,6 +731,7 @@
   },
   "GROWLITHE": {
    "height_m": 0.711,
+   "px_height": 34.66,
    "groups": 12,
    "tris": 6052,
    "materials": 1,
@@ -689,6 +742,7 @@
   },
   "POLIWRATH": {
    "height_m": 1.295,
+   "px_height": 46.46,
    "groups": 7,
    "tris": 5992,
    "materials": 1,
@@ -699,6 +753,7 @@
   },
   "MACHOP": {
    "height_m": 0.787,
+   "px_height": 38.72,
    "groups": 12,
    "tris": 6032,
    "materials": 1,
@@ -709,6 +764,7 @@
   },
   "WEEPINBELL": {
    "height_m": 0.991,
+   "px_height": 41.14,
    "groups": 6,
    "tris": 5992,
    "materials": 1,
@@ -719,6 +775,7 @@
   },
   "GEODUDE": {
    "height_m": 0.406,
+   "px_height": 27.25,
    "groups": 7,
    "tris": 5992,
    "materials": 1,
@@ -729,6 +786,7 @@
   },
   "RAPIDASH": {
    "height_m": 1.702,
+   "px_height": 57.6,
    "groups": 22,
    "tris": 7054,
    "materials": 1,
@@ -739,6 +797,7 @@
   },
   "MAGNETON": {
    "height_m": 0.991,
+   "px_height": 39.27,
    "groups": 20,
    "tris": 6138,
    "materials": 1,
@@ -749,6 +808,7 @@
   },
   "SEEL": {
    "height_m": 1.092,
+   "px_height": 40.81,
    "groups": 7,
    "tris": 5994,
    "materials": 1,
@@ -759,6 +819,7 @@
   },
   "SHELLDER": {
    "height_m": 0.305,
+   "px_height": 29.59,
    "groups": 4,
    "tris": 5996,
    "materials": 1,
@@ -769,6 +830,7 @@
   },
   "GENGAR": {
    "height_m": 1.499,
+   "px_height": 56.97,
    "groups": 12,
    "tris": 7474,
    "materials": 1,
@@ -779,6 +841,7 @@
   },
   "KRABBY": {
    "height_m": 0.406,
+   "px_height": 38.29,
    "groups": 11,
    "tris": 5990,
    "materials": 1,
@@ -789,6 +852,7 @@
   },
   "EXEGGCUTE": {
    "height_m": 0.406,
+   "px_height": 27.94,
    "groups": 6,
    "tris": 5996,
    "materials": 1,
@@ -799,6 +863,7 @@
   },
   "HITMONLEE": {
    "height_m": 1.499,
+   "px_height": 48.76,
    "groups": 15,
    "tris": 6218,
    "materials": 1,
@@ -809,6 +874,7 @@
   },
   "WEEZING": {
    "height_m": 1.194,
+   "px_height": 53.32,
    "groups": 14,
    "tris": 6056,
    "materials": 1,
@@ -819,6 +885,7 @@
   },
   "TANGELA": {
    "height_m": 0.991,
+   "px_height": 47.61,
    "groups": 10,
    "tris": 6000,
    "materials": 1,
@@ -829,6 +896,7 @@
   },
   "GOLDEEN": {
    "height_m": 0.61,
+   "px_height": 35.87,
    "groups": 7,
    "tris": 5988,
    "materials": 1,
@@ -839,6 +907,7 @@
   },
   "MR_MIME": {
    "height_m": 1.295,
+   "px_height": 55.11,
    "groups": 16,
    "tris": 5984,
    "materials": 1,
@@ -849,6 +918,7 @@
   },
   "MAGMAR": {
    "height_m": 1.295,
+   "px_height": 58.56,
    "groups": 13,
    "tris": 6258,
    "materials": 1,
@@ -859,6 +929,7 @@
   },
   "GYARADOS": {
    "height_m": 6.502,
+   "px_height": 60.69,
    "groups": 17,
    "tris": 6836,
    "materials": 1,
@@ -869,6 +940,7 @@
   },
   "VAPOREON": {
    "height_m": 0.991,
+   "px_height": 47.24,
    "groups": 13,
    "tris": 5988,
    "materials": 1,
@@ -879,6 +951,7 @@
   },
   "OMANYTE": {
    "height_m": 0.406,
+   "px_height": 35.52,
    "groups": 6,
    "tris": 5998,
    "materials": 1,
@@ -889,6 +962,7 @@
   },
   "AERODACTYL": {
    "height_m": 1.803,
+   "px_height": 48.71,
    "groups": 12,
    "tris": 6314,
    "materials": 1,
@@ -899,6 +973,7 @@
   },
   "MOLTRES": {
    "height_m": 2.007,
+   "px_height": 59.34,
    "groups": 9,
    "tris": 8648,
    "materials": 1,
@@ -909,6 +984,7 @@
   },
   "MEWTWO": {
    "height_m": 2.007,
+   "px_height": 60.48,
    "groups": 10,
    "tris": 5998,
    "materials": 1,
@@ -919,6 +995,7 @@
   },
   "VENUSAUR": {
    "height_m": 2.007,
+   "px_height": 55.74,
    "groups": 17,
    "tris": 7854,
    "materials": 1,
@@ -929,6 +1006,7 @@
   },
   "SQUIRTLE": {
    "height_m": 0.508,
+   "px_height": 51.47,
    "groups": 9,
    "tris": 5990,
    "materials": 1,
@@ -939,6 +1017,7 @@
   },
   "METAPOD": {
    "height_m": 0.711,
+   "px_height": 38.55,
    "groups": 2,
    "tris": 5998,
    "materials": 1,
@@ -949,6 +1028,7 @@
   },
   "BEEDRILL": {
    "height_m": 0.991,
+   "px_height": 55.22,
    "groups": 16,
    "tris": 6216,
    "materials": 1,
@@ -959,6 +1039,7 @@
   },
   "RATTATA": {
    "height_m": 0.305,
+   "px_height": 32.83,
    "groups": 13,
    "tris": 6134,
    "materials": 1,
@@ -969,6 +1050,7 @@
   },
   "EKANS": {
    "height_m": 2.007,
+   "px_height": 40.51,
    "groups": 6,
    "tris": 5994,
    "materials": 1,
@@ -979,6 +1061,7 @@
   },
   "SANDSHREW": {
    "height_m": 0.61,
+   "px_height": 37.91,
    "groups": 10,
    "tris": 6168,
    "materials": 1,
@@ -989,6 +1072,7 @@
   },
   "NIDOQUEEN": {
    "height_m": 1.295,
+   "px_height": 56.72,
    "groups": 12,
    "tris": 7563,
    "materials": 1,
@@ -999,6 +1083,7 @@
   },
   "CLEFAIRY": {
    "height_m": 0.61,
+   "px_height": 41.84,
    "groups": 10,
    "tris": 5990,
    "materials": 1,
@@ -1009,6 +1094,7 @@
   },
   "JIGGLYPUFF": {
    "height_m": 0.508,
+   "px_height": 36.59,
    "groups": 8,
    "tris": 5994,
    "materials": 1,
@@ -1019,6 +1105,7 @@
   },
   "ODDISH": {
    "height_m": 0.508,
+   "px_height": 47.22,
    "groups": 8,
    "tris": 5986,
    "materials": 1,
@@ -1029,6 +1116,7 @@
   },
   "PARASECT": {
    "height_m": 0.991,
+   "px_height": 48.65,
    "groups": 12,
    "tris": 6332,
    "materials": 1,
@@ -1039,6 +1127,7 @@
   },
   "DUGTRIO": {
    "height_m": 0.711,
+   "px_height": 38.98,
    "groups": 9,
    "tris": 6098,
    "materials": 1,
@@ -1049,6 +1138,7 @@
   },
   "GOLDUCK": {
    "height_m": 1.702,
+   "px_height": 52.66,
    "groups": 15,
    "tris": 6064,
    "materials": 1,
@@ -1059,6 +1149,7 @@
   },
   "ARCANINE": {
    "height_m": 1.905,
+   "px_height": 53.35,
    "groups": 17,
    "tris": 6390,
    "materials": 1,
@@ -1069,6 +1160,7 @@
   },
   "ABRA": {
    "height_m": 0.889,
+   "px_height": 44.75,
    "groups": 10,
    "tris": 5988,
    "materials": 1,
@@ -1079,6 +1171,7 @@
   },
   "MACHOKE": {
    "height_m": 1.499,
+   "px_height": 54.03,
    "groups": 14,
    "tris": 6136,
    "materials": 1,
@@ -1089,6 +1182,7 @@
   },
   "VICTREEBEL": {
    "height_m": 1.702,
+   "px_height": 57.41,
    "groups": 9,
    "tris": 6132,
    "materials": 1,
@@ -1099,6 +1193,7 @@
   },
   "GRAVELER": {
    "height_m": 0.991,
+   "px_height": 51.57,
    "groups": 12,
    "tris": 5986,
    "materials": 1,
@@ -1109,6 +1204,7 @@
   },
   "SLOWPOKE": {
    "height_m": 1.194,
+   "px_height": 31.29,
    "groups": 8,
    "tris": 5990,
    "materials": 1,
@@ -1119,6 +1215,7 @@
   },
   "FARFETCHD": {
    "height_m": 0.787,
+   "px_height": 56.96,
    "groups": 9,
    "tris": 5990,
    "materials": 1,
@@ -1129,6 +1226,7 @@
   },
   "DEWGONG": {
    "height_m": 1.702,
+   "px_height": 56.08,
    "groups": 6,
    "tris": 5994,
    "materials": 1,
@@ -1139,6 +1237,7 @@
   },
   "CLOYSTER": {
    "height_m": 1.499,
+   "px_height": 56.53,
    "groups": 10,
    "tris": 7025,
    "materials": 1,
@@ -1149,6 +1248,7 @@
   },
   "ONIX": {
    "height_m": 8.788,
+   "px_height": 49.88,
    "groups": 13,
    "tris": 6184,
    "materials": 1,
@@ -1159,6 +1259,7 @@
   },
   "KINGLER": {
    "height_m": 1.295,
+   "px_height": 52.03,
    "groups": 11,
    "tris": 6182,
    "materials": 1,
@@ -1169,6 +1270,7 @@
   },
   "EXEGGUTOR": {
    "height_m": 2.007,
+   "px_height": 59.45,
    "groups": 12,
    "tris": 7122,
    "materials": 1,
@@ -1179,6 +1281,7 @@
   },
   "HITMONCHAN": {
    "height_m": 1.397,
+   "px_height": 58.29,
    "groups": 13,
    "tris": 6244,
    "materials": 1,
@@ -1189,6 +1292,7 @@
   },
   "RHYHORN": {
    "height_m": 0.991,
+   "px_height": 38.95,
    "groups": 10,
    "tris": 6152,
    "materials": 1,
@@ -1199,6 +1303,7 @@
   },
   "KANGASKHAN": {
    "height_m": 2.21,
+   "px_height": 58.9,
    "groups": 18,
    "tris": 6578,
    "materials": 1,
@@ -1209,6 +1314,7 @@
   },
   "SEAKING": {
    "height_m": 1.295,
+   "px_height": 47.92,
    "groups": 7,
    "tris": 5994,
    "materials": 1,
@@ -1219,6 +1325,7 @@
   },
   "SCYTHER": {
    "height_m": 1.499,
+   "px_height": 55.93,
    "groups": 12,
    "tris": 6548,
    "materials": 1,
@@ -1229,6 +1336,7 @@
   },
   "PINSIR": {
    "height_m": 1.499,
+   "px_height": 60.74,
    "groups": 9,
    "tris": 6050,
    "materials": 1,
@@ -1239,6 +1347,7 @@
   },
   "LAPRAS": {
    "height_m": 2.489,
+   "px_height": 54.87,
    "groups": 16,
    "tris": 6400,
    "materials": 1,
@@ -1249,6 +1358,7 @@
   },
   "JOLTEON": {
    "height_m": 0.787,
+   "px_height": 53.0,
    "groups": 9,
    "tris": 5990,
    "materials": 1,
@@ -1259,6 +1369,7 @@
   },
   "OMASTAR": {
    "height_m": 0.991,
+   "px_height": 53.31,
    "groups": 9,
    "tris": 6004,
    "materials": 1,
@@ -1269,6 +1380,7 @@
   },
   "SNORLAX": {
    "height_m": 2.108,
+   "px_height": 58.86,
    "groups": 9,
    "tris": 7058,
    "materials": 1,
@@ -1279,6 +1391,7 @@
   },
   "DRATINI": {
    "height_m": 1.803,
+   "px_height": 42.72,
    "groups": 4,
    "tris": 5998,
    "materials": 1,
@@ -1289,6 +1402,7 @@
   },
   "MEW": {
    "height_m": 0.406,
+   "px_height": 43.29,
    "groups": 6,
    "tris": 5992,
    "materials": 1,
@@ -1299,6 +1413,7 @@
   },
   "CHARMANDER": {
    "height_m": 0.61,
+   "px_height": 46.56,
    "groups": 9,
    "tris": 6200,
    "materials": 1,
@@ -1309,6 +1424,7 @@
   },
   "WARTORTLE": {
    "height_m": 0.991,
+   "px_height": 55.38,
    "groups": 11,
    "tris": 6082,
    "materials": 1,
@@ -1319,6 +1435,7 @@
   },
   "BUTTERFREE": {
    "height_m": 1.092,
+   "px_height": 49.45,
    "groups": 12,
    "tris": 5988,
    "materials": 1,
@@ -1329,6 +1446,7 @@
   },
   "PIDGEY": {
    "height_m": 0.305,
+   "px_height": 36.99,
    "groups": 10,
    "tris": 6024,
    "materials": 1,
@@ -1339,6 +1457,7 @@
   },
   "RATICATE": {
    "height_m": 0.711,
+   "px_height": 44.89,
    "groups": 17,
    "tris": 6136,
    "materials": 1,
@@ -1349,6 +1468,7 @@
   },
   "ARBOK": {
    "height_m": 3.505,
+   "px_height": 55.97,
    "groups": 6,
    "tris": 5992,
    "materials": 1,
@@ -1359,6 +1479,7 @@
   },
   "SANDSLASH": {
    "height_m": 0.991,
+   "px_height": 42.09,
    "groups": 20,
    "tris": 6474,
    "materials": 1,
@@ -1369,6 +1490,7 @@
   },
   "NIDORAN_M": {
    "height_m": 0.508,
+   "px_height": 45.2,
    "groups": 11,
    "tris": 6064,
    "materials": 1,
@@ -1379,6 +1501,7 @@
   },
   "CLEFABLE": {
    "height_m": 1.295,
+   "px_height": 57.09,
    "groups": 11,
    "tris": 5986,
    "materials": 1,
@@ -1389,6 +1512,7 @@
   },
   "WIGGLYTUFF": {
    "height_m": 0.991,
+   "px_height": 52.02,
    "groups": 10,
    "tris": 6014,
    "materials": 1,
@@ -1399,6 +1523,7 @@
   },
   "GLOOM": {
    "height_m": 0.787,
+   "px_height": 49.56,
    "groups": 13,
    "tris": 6070,
    "materials": 1,
@@ -1409,6 +1534,7 @@
   },
   "VENONAT": {
    "height_m": 0.991,
+   "px_height": 45.79,
    "groups": 8,
    "tris": 6024,
    "materials": 1,
@@ -1419,6 +1545,7 @@
   },
   "MEOWTH": {
    "height_m": 0.406,
+   "px_height": 45.64,
    "groups": 13,
    "tris": 6068,
    "materials": 1,
@@ -1429,6 +1556,7 @@
   },
   "MANKEY": {
    "height_m": 0.508,
+   "px_height": 33.92,
    "groups": 10,
    "tris": 6108,
    "materials": 1,
@@ -1439,6 +1567,7 @@
   },
   "POLIWAG": {
    "height_m": 0.61,
+   "px_height": 27.64,
    "groups": 5,
    "tris": 5992,
    "materials": 1,
@@ -1449,6 +1578,7 @@
   },
   "KADABRA": {
    "height_m": 1.295,
+   "px_height": 57.84,
    "groups": 15,
    "tris": 6124,
    "materials": 1,
@@ -1459,6 +1589,7 @@
   },
   "MACHAMP": {
    "height_m": 1.6,
+   "px_height": 55.38,
    "groups": 18,
    "tris": 6164,
    "materials": 1,
@@ -1469,6 +1600,7 @@
   },
   "TENTACOOL": {
    "height_m": 0.889,
+   "px_height": 36.33,
    "groups": 7,
    "tris": 6032,
    "materials": 1,
@@ -1479,6 +1611,7 @@
   },
   "GOLEM": {
    "height_m": 1.397,
+   "px_height": 49.33,
    "groups": 7,
    "tris": 5994,
    "materials": 1,
@@ -1489,6 +1622,7 @@
   },
   "SLOWBRO": {
    "height_m": 1.6,
+   "px_height": 48.97,
    "groups": 13,
    "tris": 6070,
    "materials": 1,
@@ -1499,6 +1633,7 @@
   },
   "DODUO": {
    "height_m": 1.397,
+   "px_height": 51.43,
    "groups": 9,
    "tris": 5997,
    "materials": 1,
@@ -1509,6 +1644,7 @@
   },
   "GRIMER": {
    "height_m": 0.889,
+   "px_height": 33.06,
    "groups": 5,
    "tris": 5994,
    "materials": 1,
@@ -1519,6 +1655,7 @@
   },
   "GASTLY": {
    "height_m": 1.295,
+   "px_height": 48.46,
    "groups": 9,
    "tris": 7204,
    "materials": 1,
@@ -1529,6 +1666,7 @@
   },
   "DROWZEE": {
    "height_m": 0.991,
+   "px_height": 50.46,
    "groups": 8,
    "tris": 5990,
    "materials": 1,
@@ -1539,6 +1677,7 @@
   },
   "VOLTORB": {
    "height_m": 0.508,
+   "px_height": 26.98,
    "groups": 5,
    "tris": 6070,
    "materials": 1,
@@ -1549,6 +1688,7 @@
   },
   "CUBONE": {
    "height_m": 0.406,
+   "px_height": 44.5,
    "groups": 9,
    "tris": 5992,
    "materials": 1,
@@ -1559,6 +1699,7 @@
   },
   "LICKITUNG": {
    "height_m": 1.194,
+   "px_height": 46.55,
    "groups": 9,
    "tris": 6122,
    "materials": 1,
@@ -1569,6 +1710,7 @@
   },
   "RHYDON": {
    "height_m": 1.905,
+   "px_height": 58.03,
    "groups": 15,
    "tris": 6770,
    "materials": 1,
@@ -1579,6 +1721,7 @@
   },
   "HORSEA": {
    "height_m": 0.406,
+   "px_height": 44.29,
    "groups": 5,
    "tris": 5992,
    "materials": 1,
@@ -1589,6 +1732,7 @@
   },
   "STARYU": {
    "height_m": 0.787,
+   "px_height": 35.29,
    "groups": 4,
    "tris": 5998,
    "materials": 1,
@@ -1599,6 +1743,7 @@
   },
   "JYNX": {
    "height_m": 1.397,
+   "px_height": 55.38,
    "groups": 7,
    "tris": 6022,
    "materials": 1,
@@ -1609,6 +1754,7 @@
   },
   "TAUROS": {
    "height_m": 1.397,
+   "px_height": 51.42,
    "groups": 14,
    "tris": 6416,
    "materials": 1,
@@ -1619,6 +1765,7 @@
   },
   "DITTO": {
    "height_m": 0.305,
+   "px_height": 21.47,
    "groups": 1,
    "tris": 6000,
    "materials": 1,
@@ -1629,6 +1776,7 @@
   },
   "FLAREON": {
    "height_m": 0.889,
+   "px_height": 53.3,
    "groups": 11,
    "tris": 5992,
    "materials": 1,
@@ -1639,6 +1787,7 @@
   },
   "KABUTO": {
    "height_m": 0.508,
+   "px_height": 24.66,
    "groups": 9,
    "tris": 6168,
    "materials": 1,
@@ -1649,6 +1798,7 @@
   },
   "ARTICUNO": {
    "height_m": 1.702,
+   "px_height": 60.7,
    "groups": 10,
    "tris": 6038,
    "materials": 1,
@@ -1659,6 +1809,7 @@
   },
   "DRAGONAIR": {
    "height_m": 3.988,
+   "px_height": 56.6,
    "groups": 9,
    "tris": 6024,
    "materials": 1,
@@ -1669,9 +1820,14 @@
   },
   "MISSINGNO": {
    "height_m": 1.6,
+   "px_height": 56.0,
+   "groups": 1,
+   "tris": 396,
+   "materials": 1,
    "file": "MISSINGNO.glb",
    "bytes": 65156,
-   "status": "generated"
+   "status": "generated",
+   "texture": "1024x512"
   }
  },
  "animations": {
@@ -1707,5 +1863,5 @@
   "rig": "one bone per 2D art group, all under 'root'; face groups parented to 'head' when present",
   "texture": "one albedo atlas per species (front/back sprite projections per art group); shade with assets/shaders/toon.gdshader"
  },
- "elapsed_seconds": 100.1
+ "elapsed_seconds": 149.0
 }

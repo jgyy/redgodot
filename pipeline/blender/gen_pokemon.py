@@ -762,7 +762,10 @@ def finalize(name, mb, mats, sp, out_path, flier=False):
                       hovering=zshift == 0.0 and lo.z >= 4.0)
     C.export_glb(out_path)
     tris = sum(len(p.vertices) - 2 for p in obj.data.polygons)
-    return {'height_m': round(target, 3), 'groups': len(gb), 'tris': tris, 'materials': len(mats)}
+    # px_height: the model's height in upstream sprite pixels (64 = the whole sprite frame),
+    # so the game can size models exactly like upstream's battle sprites (PokemonActor.use_sprite_scale)
+    return {'height_m': round(target, 3), 'px_height': round(H_px, 2), 'groups': len(gb), 'tris': tris,
+            'materials': len(mats)}
 
 
 # ============================================================================ main

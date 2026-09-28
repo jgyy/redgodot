@@ -43,3 +43,4 @@ func _ready() -> void:
 
 func show_species(species_id: String) -> void:
 	_actor.setup(species_id)
+	_actor.use_sprite_scale(1.5)  # size like upstream's 64px sprite frame, not Pokedex metres

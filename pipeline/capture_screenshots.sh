@@ -83,4 +83,13 @@ for entry in "${LOCATIONS[@]}"; do
   i=$((i+1))
 done
 
+# --- 3D model contact sheets (every Pokemon / character next to upstream's sprite) ----
+# docs/gallery/pokemon-151-3d.png, pokemon-151-3d-back.png, characters-3d.png, characters-3d-back.png
+# (needs node + UPSTREAM=/path/to/pokemon-claude-red for the reference sprites)
+if [ -n "${UPSTREAM:-}" ]; then
+  GODOT_BIN="$GODOT_BIN" "$ROOT_DIR/pipeline/scripts/model_sheets.sh"
+else
+  echo "[capture] skipping model sheets (set UPSTREAM=/path/to/pokemon-claude-red)"
+fi
+
 echo "Done. $(ls "$OUT_DIR" | wc -l) screenshots in $OUT_DIR"

@@ -20,6 +20,8 @@ var species_id: String = ""
 var model: Node3D
 var _anim: AnimationPlayer
 
+static var _manifest: Dictionary = {}
+
 func setup(sid: String) -> void:
 	species_id = sid
 	for c in get_children():
@@ -60,6 +62,34 @@ func has_anim(anim_name: String) -> bool:
 func set_shader_param(param: String, value: Variant) -> void:
 	if model:
 		Toon.set_param(model, param, value)
+
+## Sizes the model the way upstream sizes battle sprites: every species is drawn in the
+## same 64x64 frame, so a model's on-screen size is its height in sprite pixels (manifest
+## "px_height") relative to that frame.  Afterwards a full 64 px sprite frame spans
+## `frame_height_m` metres (e.g. ~1.6 for the foe).  Returns the scale applied.
+func use_sprite_scale(frame_height_m: float) -> float:
+	if model == null:
+		return 1.0
+	var info: Dictionary = species_info(species_id)
+	var px: float = float(info.get("px_height", 0.0))
+	var h: float = float(info.get("height_m", 0.0))
+	if px <= 0.0 or h <= 0.0:
+		return 1.0
+	var s := (frame_height_m / 64.0) / (h / px)
+	model.scale = Vector3.ONE * s
+	return s
+
+## manifest.json entry for a species ({height_m, px_height, tris, ...}), or {}.
+static func species_info(sid: String) -> Dictionary:
+	if _manifest.is_empty():
+		var f := FileAccess.open("res://assets/models/pokemon/manifest.json", FileAccess.READ)
+		if f:
+			var data: Variant = JSON.parse_string(f.get_as_text())
+			if data is Dictionary:
+				_manifest = (data as Dictionary).get("species", {})
+		if _manifest.is_empty():
+			_manifest = {"_": {}}
+	return _manifest.get(sid, {})
 
 ## Model height in metres (Pokedex height; the glb is authored at real scale).
 func model_height() -> float:
