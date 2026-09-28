@@ -36,6 +36,11 @@ shot "099-options"      --scene=options      --save=showcase --wait=1.5
 shot "100-dialogue"     --scene=dialogue     --save=showcase --wait=1.5 \
   --text="Welcome to the world of POKéMON! Every pixel here was drawn by code."
 
+# --- Story autoload: Poké Mart (pc.js G.mart menu coords + quantity picker) ---
+# No upstream reference image; these check Story's PxCanvas overlays/coords.
+shot "story-mart-menu"     --scene=story_mart --step=menu     --wait=2.5
+shot "story-mart-quantity" --scene=story_mart --step=quantity --wait=2.0
+
 # --- Wild encounter states -----------------------------------------------
 shot "20-wild-intro" --scene=battle --player=SQUIRTLE --enemy=PIDGEY  --level=4  --wait=0.4
 shot "21-wild-menu"  --scene=battle --player=PIKACHU  --enemy=RATTATA --level=6  --wait=1.5

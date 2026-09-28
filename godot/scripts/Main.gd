@@ -112,6 +112,22 @@ func _setup_scene(scene: String, args: Dictionary) -> void:
 			if ow_d:
 				var text: String = args.get("text", "Hello there! Welcome to the world of POKéMON!")
 				ow_d.show_dialogue_for_screenshot([text])
+		"story_mart":  # Story autoload: Poké Mart menus (+ --step=quantity / --step=money overlays)
+			GameState.new_game(args.get("player", "CHARMANDER"))
+			args["map"] = args.get("map", "ViridianMart")
+			args["pc"] = args.get("pc", "2,5")
+			_apply_overrides(args)
+			SceneRouter.goto_overworld()
+			await get_tree().process_frame
+			var step: String = args.get("step", "menu")
+			if step == "quantity":
+				Story.money_box()
+				Story.overlay().call("pick_quantity", 12, 200)
+			elif step == "money":
+				Story.money_box()
+				Story.info_box(func() -> Array: return [Story.money_str(), Story.coin_str()])
+			else:
+				Story.spawn(Story.mart, [Story.pokedata.get("marts", {}).get("ViridianMartClerkText", [])], "mart")
 		_:
 			if MENU_SCENES.has(scene):
 				GameState.new_game(args.get("player", "CHARMANDER"))

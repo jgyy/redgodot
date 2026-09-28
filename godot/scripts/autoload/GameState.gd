@@ -103,6 +103,58 @@ var pc_items: Dictionary = {}
 var visited: Dictionary = {"PalletTown": true}
 var last_outdoor: String = "PalletTown"
 
+# ---- story state (Story autoload / scripts/story/*.gd; upstream G.state fields) ----
+var flags: Dictionary = {}          # event flags (G.state.flags)
+var toggles: Dictionary = {}        # "Map:OBJ_ID" -> shown (G.state.toggles)
+var coins: int = 0
+var starter: String = ""
+var last_heal: Dictionary = {}      # {map,x,y} of the last nurse visit
+var last_heal_town: Dictionary = {} # blackout / ESCAPE ROPE destination {map,x,y}
+var daycare: Dictionary = {}        # {mon: PartyMon dict, steps: int} or {}
+var safari_balls: int = -1          # -1 = not in the Safari Zone
+var safari_steps: int = -1
+var steps: int = 0
+var repel: int = 0
+var always_on_bike: bool = false
+var hall_of_fame: Array = []
+var lucky_slot: int = 0
+var vermilion_trash: Dictionary = {}
+
+const STORY_KEYS := ["flags", "toggles", "coins", "starter", "last_heal", "last_heal_town", "daycare", "safari_balls",
+	"safari_steps", "steps", "repel", "always_on_bike", "hall_of_fame", "lucky_slot", "vermilion_trash"]
+
+func story_to_dict() -> Dictionary:
+	var d := {}
+	for k in STORY_KEYS:
+		d[k] = get(k)
+	return d
+
+func story_from_dict(d: Dictionary) -> void:
+	for k in STORY_KEYS:
+		if not d.has(k):
+			continue
+		var v = d[k]
+		var cur = get(k)
+		if cur is int:
+			set(k, int(v))
+		else:
+			set(k, v)
+
+func reset_story_state() -> void:
+	flags = {}
+	toggles = {}
+	coins = 0
+	starter = ""
+	last_heal = {}
+	last_heal_town = {}
+	daycare = {}
+	safari_balls = -1
+	safari_steps = -1
+	steps = 0
+	repel = 0
+	always_on_bike = false
+	hall_of_fame = []
+
 func text_speed_chars() -> int:
 	return clampi(int(options.get("text_speed", 2)), 1, 3)
 
@@ -150,6 +202,7 @@ func start_new_adventure() -> void:
 	current_map = "RedsHouse2F"
 	player_cell = Vector2i(3, 6)
 	player_facing = "up"
+	reset_story_state()
 	party_changed.emit()
 
 ## The fixed save the reference screenshots were taken with (Main.gd
@@ -275,6 +328,7 @@ func save() -> bool:
 		"pc_boxes": pc_boxes.map(func(b): return b.map(func(m): return m.to_dict())),
 		"current_box": current_box, "pc_items": pc_items,
 		"visited": visited, "last_outdoor": last_outdoor,
+		"story": story_to_dict(),
 	}
 	var f := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if f == null:
@@ -327,5 +381,6 @@ func load_save() -> bool:
 		pc_items[k] = int(pc_items[k])
 	visited = d.get("visited", {"PalletTown": true})
 	last_outdoor = d.get("last_outdoor", "PalletTown")
+	story_from_dict(d.get("story", {}))
 	party_changed.emit()
 	return true
