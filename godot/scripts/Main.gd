@@ -3,7 +3,7 @@ extends Node3D
 ## Also supports headless screenshot capture for CI / docs, e.g.:
 ##   godot4 --headless --rendering-driver opengl3 --path godot -- --screenshot=/tmp/out.png --scene=title --wait=1.0
 ##
-## Recognized --scene= values: title, intro, overworld, battle, start_menu,
+## Recognized --scene= values: title, intro, oak_speech, naming, overworld, battle, start_menu,
 ## party, summary, bag, pokedex, trainer_card, town_map, options, dialogue.
 ## Extra flags (all optional): --player=SPECIES --enemy=SPECIES --level=N
 ## --map=MapName --pc=x,y --time=day|dusk|night --text="custom dialogue line"
@@ -60,6 +60,18 @@ func _setup_scene(scene: String, args: Dictionary) -> void:
 			pass  # goto_title() already ran in _ready()
 		"intro":
 			SceneRouter.goto_intro()
+			if args.has("intro_frame"):  # jump the opening to a given 60 fps frame
+				var intro := get_node_or_null("Intro")
+				if intro and intro.has_method("seek"):
+					intro.seek(int(args["intro_frame"]), args.has("intro_hold"))
+		"oak_speech":
+			SceneRouter.goto_oak_speech()
+		"naming":
+			GameState.new_game(args.get("player", "CHARMANDER"))
+			SceneRouter.goto_title()
+			var n := NamingScreen.new()
+			UI.layer.add_child(n)
+			n.open()
 		"px_test":
 			var layer := CanvasLayer.new()
 			layer.layer = 50
