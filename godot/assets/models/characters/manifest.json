@@ -1,60 +1,1198 @@
 {
- "file": "humanoid.glb",
- "base_style": {
-  "head": "short",
-  "body": "normal",
-  "source": "chars.json HEADS/BODY, down frame 0 (front) + up frame 0 (back)"
- },
- "height_m": 1.5,
- "tris": 5472,
- "material_slots": {
-  "mat_skin": {
-   "placeholder": "#e8c4a0",
-   "tint_from_cast_json": "skin"
+ "sprites": {
+  "red": {
+   "file": "red.glb",
+   "tris": 6686,
+   "bytes": 227556,
+   "head": "cap",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_hat",
+    "mat_hatk",
+    "mat_brim",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes",
+    "mat_bag",
+    "mat_bagd"
+   ]
   },
-  "mat_hair": {
-   "placeholder": "#6a5a50",
-   "tint_from_cast_json": "hair"
+  "blue": {
+   "file": "blue.glb",
+   "tris": 5222,
+   "bytes": 180592,
+   "head": "spiky",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
   },
-  "mat_top": {
-   "placeholder": "#b0b0b8",
-   "tint_from_cast_json": "shirt (coat for body=coat)"
+  "oak": {
+   "file": "oak.glb",
+   "tris": 5358,
+   "bytes": 185900,
+   "head": "short",
+   "body": "coat",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_coat",
+    "mat_accent",
+    "mat_top",
+    "mat_pants",
+    "mat_shoes"
+   ]
   },
-  "mat_pants": {
-   "placeholder": "#80808a",
-   "tint_from_cast_json": "pants"
+  "mom": {
+   "file": "mom.glb",
+   "tris": 5324,
+   "bytes": 182520,
+   "head": "long",
+   "body": "dress",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_shoes"
+   ]
   },
-  "mat_shoes": {
-   "placeholder": "#606068",
-   "tint_from_cast_json": "shoes"
+  "daisy": {
+   "file": "daisy.glb",
+   "tris": 5324,
+   "bytes": 182544,
+   "head": "long",
+   "body": "dress",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_shoes"
+   ]
+  },
+  "girl": {
+   "file": "girl.glb",
+   "tris": 5402,
+   "bytes": 184632,
+   "head": "pony",
+   "body": "dress",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_accent",
+    "mat_top",
+    "mat_shoes"
+   ]
+  },
+  "little_girl": {
+   "file": "little_girl.glb",
+   "tris": 5402,
+   "bytes": 184596,
+   "head": "pony",
+   "body": "dress",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_accent",
+    "mat_top",
+    "mat_shoes"
+   ]
+  },
+  "brunette_girl": {
+   "file": "brunette_girl.glb",
+   "tris": 5324,
+   "bytes": 182496,
+   "head": "long",
+   "body": "dress",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_shoes"
+   ]
+  },
+  "beauty": {
+   "file": "beauty.glb",
+   "tris": 5324,
+   "bytes": 182528,
+   "head": "long",
+   "body": "dress",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_shoes"
+   ]
+  },
+  "cooltrainer_f": {
+   "file": "cooltrainer_f.glb",
+   "tris": 5340,
+   "bytes": 184104,
+   "head": "pony",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_accent",
+    "mat_top",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "cooltrainer_m": {
+   "file": "cooltrainer_m.glb",
+   "tris": 5222,
+   "bytes": 180624,
+   "head": "spiky",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "youngster": {
+   "file": "youngster.glb",
+   "tris": 5732,
+   "bytes": 197388,
+   "head": "beanie",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_hat",
+    "mat_hatk",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "little_boy": {
+   "file": "little_boy.glb",
+   "tris": 5172,
+   "bytes": 179392,
+   "head": "short",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "super_nerd": {
+   "file": "super_nerd.glb",
+   "tris": 5402,
+   "bytes": 186204,
+   "head": "short",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_glasses",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "scientist": {
+   "file": "scientist.glb",
+   "tris": 5592,
+   "bytes": 192852,
+   "head": "short",
+   "body": "coat",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_glasses",
+    "mat_hair",
+    "mat_coat",
+    "mat_accent",
+    "mat_top",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "rocket": {
+   "file": "rocket.glb",
+   "tris": 5816,
+   "bytes": 201000,
+   "head": "beanie",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_hat",
+    "mat_hatk",
+    "mat_top",
+    "mat_accent",
+    "mat_emblem",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "hiker": {
+   "file": "hiker.glb",
+   "tris": 7190,
+   "bytes": 241856,
+   "head": "hat",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_beard",
+    "mat_hair",
+    "mat_hat",
+    "mat_brim",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes",
+    "mat_bag",
+    "mat_bagd"
+   ]
+  },
+  "swimmer": {
+   "file": "swimmer.glb",
+   "tris": 5652,
+   "bytes": 192736,
+   "head": "beanie",
+   "body": "swim",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_hat",
+    "mat_hatk",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "gentleman": {
+   "file": "gentleman.glb",
+   "tris": 5236,
+   "bytes": 181944,
+   "head": "short",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_beard",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "biker": {
+   "file": "biker.glb",
+   "tris": 5732,
+   "bytes": 197384,
+   "head": "beanie",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_hat",
+    "mat_hatk",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "gambler": {
+   "file": "gambler.glb",
+   "tris": 5172,
+   "bytes": 179384,
+   "head": "short",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "channeler": {
+   "file": "channeler.glb",
+   "tris": 5324,
+   "bytes": 182560,
+   "head": "long",
+   "body": "dress",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_shoes"
+   ]
+  },
+  "fisher": {
+   "file": "fisher.glb",
+   "tris": 6218,
+   "bytes": 211172,
+   "head": "hat",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_hat",
+    "mat_brim",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "fishing_guru": {
+   "file": "fishing_guru.glb",
+   "tris": 6490,
+   "bytes": 219572,
+   "head": "hat",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_beard",
+    "mat_hair",
+    "mat_hat",
+    "mat_brim",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "clerk": {
+   "file": "clerk.glb",
+   "tris": 5172,
+   "bytes": 179372,
+   "head": "short",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "guard": {
+   "file": "guard.glb",
+   "tris": 5732,
+   "bytes": 197384,
+   "head": "beanie",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_hat",
+    "mat_hatk",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "sailor": {
+   "file": "sailor.glb",
+   "tris": 5732,
+   "bytes": 197308,
+   "head": "beanie",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_hat",
+    "mat_hatk",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "link_receptionist": {
+   "file": "link_receptionist.glb",
+   "tris": 5258,
+   "bytes": 180532,
+   "head": "bun",
+   "body": "dress",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_shoes"
+   ]
+  },
+  "nurse": {
+   "file": "nurse.glb",
+   "tris": 5258,
+   "bytes": 180564,
+   "head": "bun",
+   "body": "dress",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_shoes"
+   ]
+  },
+  "silph_worker_m": {
+   "file": "silph_worker_m.glb",
+   "tris": 5172,
+   "bytes": 179408,
+   "head": "short",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "silph_worker_f": {
+   "file": "silph_worker_f.glb",
+   "tris": 5324,
+   "bytes": 182588,
+   "head": "long",
+   "body": "dress",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_shoes"
+   ]
+  },
+  "rocker": {
+   "file": "rocker.glb",
+   "tris": 5222,
+   "bytes": 180600,
+   "head": "spiky",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "middle_aged_man": {
+   "file": "middle_aged_man.glb",
+   "tris": 5172,
+   "bytes": 179412,
+   "head": "short",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "middle_aged_woman": {
+   "file": "middle_aged_woman.glb",
+   "tris": 5258,
+   "bytes": 180612,
+   "head": "bun",
+   "body": "dress",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_shoes"
+   ]
+  },
+  "gym_guide": {
+   "file": "gym_guide.glb",
+   "tris": 5986,
+   "bytes": 205288,
+   "head": "cap",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_hat",
+    "mat_hatk",
+    "mat_brim",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "gramps": {
+   "file": "gramps.glb",
+   "tris": 5122,
+   "bytes": 179008,
+   "head": "bald",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_beard",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "cook": {
+   "file": "cook.glb",
+   "tris": 5192,
+   "bytes": 179884,
+   "head": "bun",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "safari_zone_worker": {
+   "file": "safari_zone_worker.glb",
+   "tris": 6218,
+   "bytes": 211220,
+   "head": "hat",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_hat",
+    "mat_brim",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "granny": {
+   "file": "granny.glb",
+   "tris": 5258,
+   "bytes": 180564,
+   "head": "bun",
+   "body": "dress",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_shoes"
+   ]
+  },
+  "balding_guy": {
+   "file": "balding_guy.glb",
+   "tris": 5032,
+   "bytes": 175748,
+   "head": "bald",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "gameboy_kid": {
+   "file": "gameboy_kid.glb",
+   "tris": 5732,
+   "bytes": 197400,
+   "head": "beanie",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_hat",
+    "mat_hatk",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "giovanni": {
+   "file": "giovanni.glb",
+   "tris": 5172,
+   "bytes": 179388,
+   "head": "short",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "waiter": {
+   "file": "waiter.glb",
+   "tris": 5172,
+   "bytes": 179388,
+   "head": "short",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "silph_president": {
+   "file": "silph_president.glb",
+   "tris": 5122,
+   "bytes": 179044,
+   "head": "bald",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_beard",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "mr_fuji": {
+   "file": "mr_fuji.glb",
+   "tris": 5322,
+   "bytes": 185940,
+   "head": "bald",
+   "body": "coat",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_beard",
+    "mat_hair",
+    "mat_coat",
+    "mat_accent",
+    "mat_top",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "bike_shop_clerk": {
+   "file": "bike_shop_clerk.glb",
+   "tris": 5732,
+   "bytes": 197416,
+   "head": "beanie",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_hat",
+    "mat_hatk",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "warden": {
+   "file": "warden.glb",
+   "tris": 5122,
+   "bytes": 179008,
+   "head": "bald",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_beard",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "lorelei": {
+   "file": "lorelei.glb",
+   "tris": 5564,
+   "bytes": 189640,
+   "head": "long",
+   "body": "dress",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_glasses",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_shoes"
+   ]
+  },
+  "lance": {
+   "file": "lance.glb",
+   "tris": 5222,
+   "bytes": 180592,
+   "head": "spiky",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "koga": {
+   "file": "koga.glb",
+   "tris": 5732,
+   "bytes": 197376,
+   "head": "beanie",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_hat",
+    "mat_hatk",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "captain": {
+   "file": "captain.glb",
+   "tris": 5998,
+   "bytes": 205596,
+   "head": "beanie",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_beard",
+    "mat_hair",
+    "mat_hat",
+    "mat_hatk",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "bruno": {
+   "file": "bruno.glb",
+   "tris": 4968,
+   "bytes": 171528,
+   "head": "bald",
+   "body": "swim",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "agatha": {
+   "file": "agatha.glb",
+   "tris": 5258,
+   "bytes": 180568,
+   "head": "bun",
+   "body": "dress",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_shoes"
+   ]
+  },
+  "brock": {
+   "file": "brock.glb",
+   "tris": 5222,
+   "bytes": 180596,
+   "head": "spiky",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "misty": {
+   "file": "misty.glb",
+   "tris": 5340,
+   "bytes": 184076,
+   "head": "pony",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_accent",
+    "mat_top",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "surge": {
+   "file": "surge.glb",
+   "tris": 5222,
+   "bytes": 180600,
+   "head": "spiky",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "erika": {
+   "file": "erika.glb",
+   "tris": 5258,
+   "bytes": 180568,
+   "head": "bun",
+   "body": "dress",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_shoes"
+   ]
+  },
+  "blaine": {
+   "file": "blaine.glb",
+   "tris": 5346,
+   "bytes": 185652,
+   "head": "bald",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_glasses",
+    "mat_beard",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
+  },
+  "sabrina": {
+   "file": "sabrina.glb",
+   "tris": 5324,
+   "bytes": 182556,
+   "head": "long",
+   "body": "dress",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_shoes"
+   ]
+  },
+  "bill": {
+   "file": "bill.glb",
+   "tris": 5172,
+   "bytes": 179368,
+   "head": "short",
+   "body": "normal",
+   "materials": [
+    "mat_skin",
+    "mat_eye",
+    "mat_white",
+    "mat_mouth",
+    "mat_hair",
+    "mat_top",
+    "mat_accent",
+    "mat_pants",
+    "mat_shoes"
+   ]
   }
  },
- "fixed_materials": {
-  "mat_eye": "dark eye colour, not tinted"
+ "aliases": {
+  "gambler_asleep": "gambler"
  },
- "optional_materials": {
-  "mat_hat": "present only when the base head style has hat cells (C/c/K/B); tint from cast.json \"hat\""
+ "humanoid": {
+  "file": "humanoid.glb",
+  "base_style": {
+   "head": "short",
+   "body": "normal",
+   "source": "chars.json HEADS/BODY, down frame 0 (front) + up frame 0 (back)"
+  },
+  "height_m": 1.5,
+  "tris": 5472,
+  "material_slots": {
+   "mat_skin": {
+    "placeholder": "#e8c4a0",
+    "tint_from_cast_json": "skin"
+   },
+   "mat_hair": {
+    "placeholder": "#6a5a50",
+    "tint_from_cast_json": "hair"
+   },
+   "mat_top": {
+    "placeholder": "#b0b0b8",
+    "tint_from_cast_json": "shirt (coat for body=coat)"
+   },
+   "mat_pants": {
+    "placeholder": "#80808a",
+    "tint_from_cast_json": "pants"
+   },
+   "mat_shoes": {
+    "placeholder": "#606068",
+    "tint_from_cast_json": "shoes"
+   }
+  },
+  "fixed_materials": {
+   "mat_eye": "dark eye colour, not tinted"
+  },
+  "optional_materials": {
+   "mat_hat": "present only when the base head style has hat cells (C/c/K/B); tint from cast.json \"hat\""
+  },
+  "region_code_roles": {
+   "skin": "S s W M",
+   "eye": "E",
+   "hair": "H h L",
+   "top": "T t U A X x G g",
+   "pants": "P p",
+   "shoes": "F f",
+   "hat": "C c K B",
+   "outline O": "takes neighbouring role"
+  },
+  "bones": [
+   "root",
+   "hips",
+   "spine",
+   "head",
+   "arm_L",
+   "arm_R",
+   "leg_L",
+   "leg_R"
+  ],
+  "animations": {
+   "Idle": {
+    "seconds": 2.0,
+    "loop": true
+   },
+   "Walk": {
+    "seconds": 0.8,
+    "loop": true
+   }
+  },
+  "conventions": {
+   "front": "Blender -Y == glTF/Godot +Z",
+   "origin": "bottom centre (feet at y=0)"
+  },
+  "notes": "v1 approach: ONE base mesh for every humanoid in cast.json, recoloured at runtime by setting the mat_* slots from each cast entry's hex fields (skin/hair/shirt/pants/shoes). Per-style mesh variants (hats/caps, hairstyles, coats, dresses, backpacks, glasses) are a documented future extension and out of scope for this pass; gen_characters.py already takes --head/--body to voxelize any other HEADS/BODY style."
  },
- "region_code_roles": {
-  "skin": "S s W M",
-  "eye": "E",
-  "hair": "H h L",
-  "top": "T t U A X x G g",
-  "pants": "P p",
-  "shoes": "F f",
-  "hat": "C c K B",
-  "outline O": "takes neighbouring role"
- },
- "bones": [
-  "root",
-  "hips",
-  "spine",
-  "head",
-  "arm_L",
-  "arm_R",
-  "leg_L",
-  "leg_R"
- ],
+ "height_m": 1.5,
  "animations": {
   "Idle": {
    "seconds": 2.0,
@@ -63,11 +1201,18 @@
   "Walk": {
    "seconds": 0.8,
    "loop": true
+  },
+  "Run": {
+   "seconds": 0.53,
+   "loop": true
   }
  },
  "conventions": {
   "front": "Blender -Y == glTF/Godot +Z",
-  "origin": "bottom centre (feet at y=0)"
+  "origin": "feet at origin",
+  "materials": "mat_<role>: skin hair hat hatk brim top coat pants shoes accent bag eye white mouth beard glasses emblem (flat colours; cel-shade with Toon.apply)",
+  "bones": "root > hips > spine > head / arm_L / arm_R, hips > leg_L / leg_R"
  },
- "notes": "v1 approach: ONE base mesh for every humanoid in cast.json, recoloured at runtime by setting the mat_* slots from each cast entry's hex fields (skin/hair/shirt/pants/shoes). Per-style mesh variants (hats/caps, hairstyles, coats, dresses, backpacks, glasses) are a documented future extension and out of scope for this pass; gen_characters.py already takes --head/--body to voxelize any other HEADS/BODY style."
+ "source": "upstream src/data/cast.js (pipeline/extracted/cast.json) + src/art/chars.js head/body styles",
+ "elapsed_seconds": 108.3
 }

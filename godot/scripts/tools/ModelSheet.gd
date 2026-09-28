@@ -4,13 +4,14 @@ extends Node
 ## --screenshot path, then quits.  Used to eyeball all 151 Pokemon / all characters.
 ##
 ## Flags: --kind=pokemon|characters  --species=A,B,C (default: every model in the manifest)
-##        --view=front|back|side  --cols=N  --cell=PX  --yaw=DEG (front 3/4 turn, default 28)
+##        --view=front|back|side  --cols=N  --cell=PX  --yaw=DEG (3/4 turn, default -25 = toward the light)
 ##        --anim=Idle --anim_t=0.0 (pose to sample)  --labels=1
 
 var _vp: SubViewport
 var _cam: Camera3D
 var _stage: Node3D
 var _label: Label
+var _toon := true
 
 func run(args: Dictionary, out_path: String) -> void:
 	var kind: String = args.get("kind", "pokemon")
@@ -18,10 +19,11 @@ func run(args: Dictionary, out_path: String) -> void:
 	var cols := int(args.get("cols", "12"))
 	var cell := int(args.get("cell", "160"))
 	var view: String = args.get("view", "front")
-	var yaw := float(args.get("yaw", "28"))
+	var yaw := float(args.get("yaw", "-25"))
 	var anim_name: String = args.get("anim", "Idle")
 	var anim_t := float(args.get("anim_t", "0.0"))
 	var labels: bool = args.get("labels", "1") != "0"
+	_toon = args.get("toon", "1") != "0"
 	var rows := int(ceil(float(ids.size()) / float(cols)))
 	_build(cell)
 	var sheet := Image.create(cols * cell, max(1, rows) * cell, false, Image.FORMAT_RGBA8)
@@ -32,6 +34,8 @@ func run(args: Dictionary, out_path: String) -> void:
 		_stage.add_child(holder)
 		var model: Node3D = _instantiate(kind, id)
 		holder.add_child(model)
+		if args.has("outline"):
+			Toon.set_param(model, "width_px", float(args["outline"]))
 		var ap := _find_anim(model)
 		if ap:
 			AnimUtil.fix_looping(ap)
@@ -80,7 +84,7 @@ func _ids(kind: String, args: Dictionary) -> Array:
 
 func _instantiate(kind: String, id: String) -> Node3D:
 	if kind == "characters":
-		return CharacterSkin.instantiate(id)
+		return CharacterSkin.instantiate(id, _toon)
 	var actor := PokemonActor.new()
 	actor.setup(id)
 	return actor

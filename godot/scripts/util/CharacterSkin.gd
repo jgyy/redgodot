@@ -47,6 +47,10 @@ static func instantiate(sprite_key: String, toon: bool = true) -> Node3D:
 		apply(model, GameData.cast.get(sprite_key, {}))
 	if toon:
 		Toon.apply(model, 1.3, 0.02)
+		# chibi faces are big spheres: keep them out of the darkest bands (upstream's
+		# character sprites are mostly flat skin with a darker lower edge)
+		Toon.set_param(model, "ramp_bias", 0.22)
+		Toon.set_param(model, "ramp_strength", 0.7)
 	AnimUtil.fix_looping(AnimUtil.find_player(model))
 	return model
 

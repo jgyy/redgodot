@@ -20,6 +20,8 @@ uniform vec4 tint : source_color = vec4(1.0);          // multiply (time of day,
 uniform vec4 flash : source_color = vec4(1.0, 1.0, 1.0, 0.0); // mix toward flash.rgb by flash.a (hit flash)
 uniform float fade = 0.0;             // 0..1 dissolve toward transparent-dark (faint)
 uniform float rim = 0.12;             // subtle back-rim so silhouettes pop against dark backgrounds
+uniform float ramp_bias = 0.0;        // added to N.L (e.g. +0.2 keeps faces out of the shadow bands)
+uniform float ramp_strength = 1.0;    // scales the ramp's shade amounts (softer look for characters)
 
 vec3 rgb2hsl(vec3 c) {
 	float mx = max(c.r, max(c.g, c.b));
@@ -86,7 +88,7 @@ void fragment() {
 	}
 	vec3 c = to_srgb(base);  // ramp math in sRGB, like upstream
 	vec3 n = normalize(NORMAL);  // view space
-	float I = dot(n, normalize(light_view));
+	float I = dot(n, normalize(light_view)) + ramp_bias;
 	// upstream thresholds: >0.86 (gloss) +0.42 | >0.62 +0.2 | >0.32 base | >0.08 -0.17 | else -0.38
 	float s = band_soft;
 	float amt = -0.38;
@@ -95,6 +97,7 @@ void fragment() {
 	amt = mix(amt, 0.2, smoothstep(0.62 - s, 0.62 + s, I));
 	float top = gloss ? 0.86 : 0.94;
 	amt = mix(amt, 0.42, smoothstep(top - s, top + s, I));
+	amt *= ramp_strength;
 	vec3 col;
 	if (amt < 0.0) {
 		col = shade(c, amt);
