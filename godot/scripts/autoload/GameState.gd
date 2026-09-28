@@ -87,6 +87,106 @@ var sound_on: bool = true
 var money: int = 3000
 var play_seconds: float = 0.0
 
+## Upstream G.state.options (menus.js optionsMenu): text_speed 1..3 (SLOW/MID/
+## FAST = chars revealed per frame), battle_anim, battle_style "shift"|"set",
+## sound, day_night, follower.
+const DEFAULT_OPTIONS := {"text_speed": 2, "battle_anim": true, "battle_style": "shift",
+	"sound": true, "day_night": true, "follower": true}
+var options: Dictionary = DEFAULT_OPTIONS.duplicate()
+var trainer_id: int = 0
+## Bill's PC: 12 boxes of PartyMon (upstream S.boxes / S.box), and the
+## player's PC item storage (upstream S.pc, item_id -> count).
+var pc_boxes: Array = []
+var current_box: int = 0
+var pc_items: Dictionary = {}
+## Town map: towns visited (lit squares / FLY targets) and the last outdoor map.
+var visited: Dictionary = {"PalletTown": true}
+var last_outdoor: String = "PalletTown"
+
+func text_speed_chars() -> int:
+	return clampi(int(options.get("text_speed", 2)), 1, 3)
+
+## "H:MM" play time as on the trainer card.
+func play_time_text() -> String:
+	var mins := int(play_seconds / 60.0)
+	return "%d:%02d" % [mins / 60, mins % 60]
+
+func box(i: int = -1) -> Array:
+	var idx := current_box if i < 0 else i
+	while pc_boxes.size() <= idx:
+		pc_boxes.append([])
+	return pc_boxes[idx]
+
+## Gen-1 experience needed to reach level n for a growth rate (pokemon.js).
+static func exp_for_level(growth: String, n: int) -> int:
+	var n3 := float(n * n * n)
+	match growth:
+		"FAST":
+			return int(floor(4.0 * n3 / 5.0))
+		"SLOW":
+			return int(floor(5.0 * n3 / 4.0))
+		"MEDIUM_SLOW":
+			return maxi(0, int(floor(1.2 * n3 - 15.0 * n * n + 100.0 * n - 140.0)))
+		_:
+			return int(n3)
+
+## The fixed save the reference screenshots were taken with (Main.gd
+## --save=showcase): RED, ₽48210, dex 126 seen / 75 owned, a Lv42-52 party and
+## a bag of 7 staple items, standing in PALLET TOWN at noon.
+func build_showcase() -> void:
+	new_game("CHARIZARD")
+	party.clear()
+	var roster := [["CHARIZARD", 52, 158], ["PIKACHU", 45, 92], ["LAPRAS", 44, 178],
+		["SNORLAX", 46, 213], ["ALAKAZAM", 43, 102], ["JOLTEON", 42, 112]]
+	for r in roster:
+		var m := PartyMon.new(r[0], r[1])
+		m.max_hp = r[2]
+		m.hp = r[2]
+		m.xp = exp_for_level(GameData.get_species(r[0]).get("growth", "MEDIUM_FAST"), r[1])
+		party.append(m)
+	player_name = "RED"
+	rival_name = "BLUE"
+	money = 48210
+	trainer_id = 0
+	play_seconds = 0.0
+	badges = ["BOULDERBADGE", "CASCADEBADGE", "THUNDERBADGE", "RAINBOWBADGE", "SOULBADGE"]
+	bag = {"POTION": 3, "SUPER_POTION": 3, "POKE_BALL": 3, "GREAT_BALL": 3,
+		"ULTRA_BALL": 3, "REVIVE": 3, "ESCAPE_ROPE": 3}
+	options = DEFAULT_OPTIONS.duplicate()
+	# 75 owned: the even dex numbers, trading 10-18 for the party's odd ones.
+	var own := {}
+	for n in range(2, 152, 2):
+		own[n] = true
+	for n in [10, 12, 14, 16, 18]:
+		own.erase(n)
+	for n in [25, 65, 131, 135, 143]:
+		own[n] = true
+	# 126 seen: everything but #005 and the 24 highest odd numbers not owned.
+	var unseen := {5: true}
+	var n2 := 151
+	while unseen.size() < 25:
+		if not own.has(n2):
+			unseen[n2] = true
+		n2 -= 2
+	seen_species.clear()
+	caught_species.clear()
+	for n in range(1, 152):
+		var sid: String = GameData.dex_order[n] if n < GameData.dex_order.size() else ""
+		if sid == "":
+			continue
+		if not unseen.has(n):
+			seen_species[sid] = true
+		if own.has(n):
+			caught_species[sid] = true
+	visited = {"PalletTown": true}
+	last_outdoor = "PalletTown"
+	current_map = "PalletTown"
+	player_cell = Vector2i(5, 8)
+	player_facing = "down"
+	clock_minutes = 12.0 * 60.0
+	clock_running = false
+	party_changed.emit()
+
 func _process(delta: float) -> void:
 	if clock_running:
 		clock_minutes = fmod(clock_minutes + delta * CLOCK_RATE, 1440.0)
@@ -149,6 +249,10 @@ func save() -> bool:
 		"player_name": player_name, "rival_name": rival_name,
 		"seen_species": seen_species, "caught_species": caught_species,
 		"clock_minutes": clock_minutes,
+		"options": options, "trainer_id": trainer_id, "money": money, "play_seconds": play_seconds,
+		"pc_boxes": pc_boxes.map(func(b): return b.map(func(m): return m.to_dict())),
+		"current_box": current_box, "pc_items": pc_items,
+		"visited": visited, "last_outdoor": last_outdoor,
 	}
 	var f := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if f == null:
@@ -183,5 +287,23 @@ func load_save() -> bool:
 	seen_species = d.get("seen_species", {})
 	caught_species = d.get("caught_species", {})
 	clock_minutes = d.get("clock_minutes", clock_minutes)
+	options = DEFAULT_OPTIONS.duplicate()
+	options.merge(d.get("options", {}), true)
+	options["text_speed"] = int(options["text_speed"])
+	trainer_id = int(d.get("trainer_id", 0))
+	money = int(d.get("money", money))
+	play_seconds = float(d.get("play_seconds", 0.0))
+	pc_boxes = []
+	for b in d.get("pc_boxes", []):
+		var arr: Array = []
+		for pm in b:
+			arr.append(PartyMon.from_dict(pm))
+		pc_boxes.append(arr)
+	current_box = int(d.get("current_box", 0))
+	pc_items = d.get("pc_items", {})
+	for k in pc_items.keys():
+		pc_items[k] = int(pc_items[k])
+	visited = d.get("visited", {"PalletTown": true})
+	last_outdoor = d.get("last_outdoor", "PalletTown")
 	party_changed.emit()
 	return true

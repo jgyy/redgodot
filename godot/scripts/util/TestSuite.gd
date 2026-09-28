@@ -30,6 +30,7 @@ func run_all(tree: SceneTree) -> void:
 	_test_party_mon()
 	_test_lighting_and_clock()
 	_test_dialogue_text()
+	_test_ui_state()
 	_test_save_load()
 	_test_new_game_defaults()
 
@@ -107,11 +108,38 @@ func _test_lighting_and_clock() -> void:
 func _test_dialogue_text() -> void:
 	check(DialogueText.is_humanoid_sprite("oak"), "oak is a talkable NPC sprite")
 	check(not DialogueText.is_humanoid_sprite("poke_ball"), "poke_ball is a non-humanoid prop sprite")
-	check(not DialogueText.for_obj({"sprite": "oak"}).is_empty(), "oak has curated dialogue lines")
+	check(GameText.data()["text"].size() > 2000, "text.json has upstream's text tables (%d labels)" % GameText.data()["text"].size())
+	check(GameText.data()["dex"].size() == 151, "text.json has 151 Pokédex entries")
+	check(GameText.dex("CHARIZARD").begins_with("CHARIZARD breathes flames"), "real Pokédex text for CHARIZARD")
+	var girl := DialogueText.for_obj({"sprite": "girl", "textLabel": "PalletTownGirlText"})
+	check(girl[0] == GameText.get_text("PalletTownGirlText") and girl[0].length() > 10, "NPC text comes from upstream's label table")
 	check(not DialogueText.for_obj({"sprite": "totally_unknown_sprite_xyz"}).is_empty(),
 		"unknown NPC sprites still get a fallback line")
-	var sign_lines := DialogueText.for_sign({"textLabel": "PalletTownOaksLabSignText"}, "PalletTown")
-	check(sign_lines[0].findn("OAKS LAB") >= 0, "sign text humanizes its label (got: %s)" % sign_lines[0])
+	var sign_lines := DialogueText.for_sign({"textLabel": "PalletTownSignText"}, "PalletTown")
+	check(sign_lines[0].findn("PALLET TOWN") >= 0, "sign text is upstream's (got: %s)" % sign_lines[0])
+	check(DialogueText.for_obj({"item": "POTION", "textLabel": "PickUpItemText"})[0] == "{PLAYER} found POTION!", "item balls say what was found")
+	check(DialogueText.for_obj({"sprite": "nurse", "textLabel": "ViridianPokecenterNurseText"})[0].findn("POKéMON CENTER") >= 0, "nurse falls back to the POKéMON CENTER welcome")
+	var pages := Px.paginate(Px.fmt("Hello {PLAYER}!\fBye {RIVAL}.", "RED", "BLUE"))
+	check(pages.size() == 2 and pages[0][0] == "Hello RED!" and pages[1][0] == "Bye BLUE.", "fmt + paginate split pages on \\f")
+
+func _test_ui_state() -> void:
+	var saved := GameState.options.duplicate()
+	GameState.options = GameState.DEFAULT_OPTIONS.duplicate()
+	OptionsMenu.toggle(0)
+	check(GameState.options["text_speed"] == 3 and GameState.text_speed_chars() == 3, "TEXT SPEED cycles MID -> FAST")
+	OptionsMenu.toggle(0)
+	check(GameState.options["text_speed"] == 1, "TEXT SPEED wraps FAST -> SLOW")
+	OptionsMenu.toggle(2)
+	check(GameState.options["battle_style"] == "set", "BATTLE STYLE toggles to SET")
+	GameState.options = saved
+	check(GameState.exp_for_level("MEDIUM_SLOW", 52) == 133229, "medium-slow EXP at Lv52 matches upstream (133229)")
+	GameState.build_showcase()
+	check(GameState.party.size() == 6 and GameState.party[0].species_id == "CHARIZARD" and GameState.party[0].max_hp == 158, "showcase party")
+	check(GameState.seen_species.size() == 126 and GameState.caught_species.size() == 75, "showcase dex 126 seen / 75 own")
+	check(GameState.money == 48210 and GameState.bag.size() == 7, "showcase money and bag")
+	var info := TownMap.info()
+	check(info.get("where", {}).has("PalletTown") and info.get("towns", []).size() == 11, "town map bake has every town")
+	check(BagMenu.item_name("POKE_BALL") == "POKé BALL", "item names come from pokedata")
 
 func _test_save_load() -> void:
 	var saved_party := GameState.party
@@ -119,6 +147,10 @@ func _test_save_load() -> void:
 	GameState.new_game("BULBASAUR")
 	GameState.current_map = "Route1"
 	GameState.player_cell = Vector2i(3, 4)
+	GameState.options["text_speed"] = 3
+	GameState.money = 1234
+	GameState.box(0).append(GameState.PartyMon.new("PIDGEY", 7))
+	GameState.pc_items = {"POTION": 2}
 	var ok := GameState.save()
 	check(ok, "GameState.save() succeeds")
 	GameState.current_map = "PewterCity"
@@ -128,6 +160,12 @@ func _test_save_load() -> void:
 	check(GameState.player_cell == Vector2i(3, 4), "load_save() restores player_cell")
 	check(not GameState.party.is_empty() and GameState.party[0].species_id == "BULBASAUR",
 		"load_save() restores the party")
+	check(GameState.options["text_speed"] == 3 and GameState.money == 1234, "load_save() restores options and money")
+	check(GameState.box(0).size() == 1 and GameState.box(0)[0].species_id == "PIDGEY", "load_save() restores PC boxes")
+	check(GameState.pc_items.get("POTION", 0) == 2, "load_save() restores PC items")
+	GameState.pc_boxes = []
+	GameState.pc_items = {}
+	GameState.options = GameState.DEFAULT_OPTIONS.duplicate()
 	GameState.party = saved_party
 	GameState.current_map = saved_map
 

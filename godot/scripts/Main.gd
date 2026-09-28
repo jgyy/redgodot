@@ -7,6 +7,7 @@ extends Node3D
 ## party, summary, bag, pokedex, trainer_card, town_map, options, dialogue.
 ## Extra flags (all optional): --player=SPECIES --enemy=SPECIES --level=N
 ## --map=MapName --pc=x,y --time=day|dusk|night --text="custom dialogue line"
+## --save=showcase (reference-screenshot save: RED, 6-mon party, 126/75 dex...)
 
 const MENU_SCENES := ["start_menu", "party", "summary", "bag", "pokedex", "trainer_card", "town_map", "options"]
 
@@ -103,6 +104,8 @@ func _setup_scene(scene: String, args: Dictionary) -> void:
 				SceneRouter.goto_overworld()
 
 func _apply_overrides(args: Dictionary) -> void:
+	if args.get("save", "") == "showcase":
+		GameState.build_showcase()  # the fixed save the reference screenshots use
 	if args.has("map"):
 		GameState.current_map = args["map"]
 	if args.has("pc"):

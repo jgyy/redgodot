@@ -1,84 +1,138 @@
 class_name DialogueBox
-extends Control
-## Bottom-of-screen text box for NPC/sign dialogue and story beats. Follows the
-## project's overlay convention (see PartyMenu.gd): built entirely in code,
-## hidden by default, toggled via input rather than a .tscn.
+extends PxCanvas
+## Port of ui.js TextBox: upstream's framed box at (6,128,308,48), typewriter
+## reveal at the TEXT SPEED option (1-3 chars/frame, 4 while A/B is held),
+## two lines per page ('\f' forces a page), red bobbing ▼ when a page is done.
 ##
-## Usage: dialogue_box.show_lines(["Line one.", "Line two."]) then `confirm`
-## advances a line at a time; the box closes and emits `finished` after the
-## last line (or immediately on `cancel`, which fast-forwards/skips).
+## Public API (kept compatible with the old Label-based box):
+##   show_lines(["Line one.", "Line two."])  each entry is one TextBox (may page)
+##   signal finished                          after the last page is dismissed
+##   visible                                  true while on screen
+## Extra: show_lines(lines, {"no_wait": true}) reveals the last page and emits
+## `finished` without waiting (the box stays up until close()), as used by ask().
+## Static helpers: await DialogueBox.say(host, text); await DialogueBox.ask(host, text).
 
 signal finished
 
-var _panel: PanelContainer
-var _label: Label
-var _hint: Label
-var _lines: Array = []
-var _index: int = 0
+var _queue: Array = []
+var _pages: Array = []
+var _page := 0
+var _chars := 0.0
+var _opts: Dictionary = {}
+var _time := 0.0
+var _frames := 0
+var _done := false
 
-func _ready() -> void:
-	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	mouse_filter = Control.MOUSE_FILTER_IGNORE
+static func say(host: Node, text: String, opts: Dictionary = {}) -> void:
+	var box := DialogueBox.new()
+	host.add_child(box)
+	box.show_lines([text], opts)
+	if box.visible and not box._done:
+		await box.finished
+	box.queue_free()
+
+## Question box + YES/NO menu (ui.js ask()); the question stays visible.
+static func ask(host: Node, text: String, opts: Dictionary = {}) -> bool:
+	var box := DialogueBox.new()
+	host.add_child(box)
+	box.show_lines([text], {"no_wait": true})
+	if not box._done:
+		await box.finished
+	var mo := {"x": 320 - 58, "y": Px.BOX.position.y - 44, "w": 52}
+	mo.merge(opts, true)
+	var r: int = await PxMenu.pick(host, ["YES", "NO"], mo)
+	box.queue_free()
+	return r == 0
+
+func _init() -> void:
+	super()
 	visible = false
 
-	_panel = PanelContainer.new()
-	_panel.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	_panel.offset_left = 16
-	_panel.offset_right = -16
-	_panel.offset_top = -128
-	_panel.offset_bottom = -16
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.12, 0.14, 0.32, 0.96)
-	style.border_color = Color(0.85, 0.25, 0.25)
-	style.set_border_width_all(3)
-	style.set_corner_radius_all(6)
-	style.content_margin_left = 16
-	style.content_margin_right = 16
-	style.content_margin_top = 12
-	style.content_margin_bottom = 12
-	_panel.add_theme_stylebox_override("panel", style)
-	add_child(_panel)
-
-	var vbox := VBoxContainer.new()
-	_panel.add_child(vbox)
-	_label = Label.new()
-	_label.autowrap_mode = TextServer.AUTOWRAP_WORD
-	_label.add_theme_font_size_override("font_size", 20)
-	_label.custom_minimum_size = Vector2(0, 64)
-	vbox.add_child(_label)
-	_hint = Label.new()
-	_hint.text = "▼ (confirm to continue)"
-	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	_hint.add_theme_font_size_override("font_size", 14)
-	vbox.add_child(_hint)
-
-func show_lines(lines: Array) -> void:
-	_lines = lines.duplicate()
-	_index = 0
-	if _lines.is_empty():
+func show_lines(lines: Array, opts: Dictionary = {}) -> void:
+	_queue = lines.duplicate()
+	_opts = opts
+	_done = false
+	if _queue.is_empty():
 		return
 	visible = true
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	_label.text = _lines[0]
+	_next_box()
+
+func revealed() -> bool:
+	return _done
+
+func _next_box() -> void:
+	var s: String = str(_queue.pop_front())
+	_pages = Px.paginate(Px.fmt(s, GameState.player_name, GameState.rival_name))
+	if _pages.is_empty():
+		_pages = [[""]]
+	_page = 0
+	_chars = 0.0
+	_frames = 0
+
+func _total() -> int:
+	return "\n".join(PackedStringArray(_pages[_page])).length()
+
+func _speed() -> float:
+	return float(GameState.text_speed_chars())
+
+func _last() -> bool:
+	return _queue.is_empty() and _page == _pages.size() - 1
+
+func _process(dt: float) -> void:
+	if not visible or _pages.is_empty():
+		return
+	_time += dt
+	var target := int(_time * 60.0)
+	while _frames < target:
+		_frames += 1
+		_step_frame()
+	super(dt)
+
+func _step_frame() -> void:
+	var tot := _total()
+	if _chars < tot:
+		var fast := Input.is_action_pressed("confirm") or Input.is_action_pressed("cancel")
+		_chars = minf(tot, _chars + (4.0 if fast else _speed()))
+		if _chars >= tot and _opts.get("no_wait", false) and _last() and not _done:
+			_done = true
+			finished.emit()
+
+## Instantly reveals the current page (screenshots / tests).
+func reveal_all() -> void:
+	if not _pages.is_empty():
+		_chars = _total()
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not visible:
+	if not visible or _pages.is_empty() or not event.is_pressed():
 		return
-	if event.is_action_pressed("confirm"):
-		_advance()
-		get_viewport().set_input_as_handled()
-	elif event.is_action_pressed("cancel"):
-		_close()
-		get_viewport().set_input_as_handled()
-
-func _advance() -> void:
-	_index += 1
-	if _index >= _lines.size():
-		_close()
+	if not (event.is_action_pressed("confirm") or event.is_action_pressed("cancel")):
 		return
-	_label.text = _lines[_index]
+	get_viewport().set_input_as_handled()
+	if _opts.get("no_wait", false) and _last():
+		return
+	if _chars < _total():
+		return
+	if _page < _pages.size() - 1:
+		_page += 1
+		_chars = 0.0
+	elif not _queue.is_empty():
+		_next_box()
+	else:
+		_close()
 
-func _close() -> void:
+func close() -> void:
 	visible = false
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+func _close() -> void:
+	close()
+	_done = true
 	finished.emit()
+
+func _draw() -> void:
+	if _pages.is_empty():
+		return
+	var tf := _frames
+	var show_prompt: bool = _chars >= _total() and not (_opts.get("no_wait", false) and _last())
+	Px.text_box(self, _pages[_page], int(_chars), show_prompt, tf, _opts.get("theme", ""))
