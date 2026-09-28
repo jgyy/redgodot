@@ -87,6 +87,67 @@ var sound_on: bool = true
 var money: int = 3000
 var play_seconds: float = 0.0
 
+# ---- story state (Story autoload / scripts/story/*.gd; upstream G.state fields) ----
+var flags: Dictionary = {}          # event flags (G.state.flags)
+var toggles: Dictionary = {}        # "Map:OBJ_ID" -> shown (G.state.toggles)
+var coins: int = 0
+var starter: String = ""
+var last_outdoor: String = "PalletTown"
+var last_heal: Dictionary = {}      # {map,x,y} of the last nurse visit
+var last_heal_town: Dictionary = {} # blackout / ESCAPE ROPE destination {map,x,y}
+var boxes: Array = [[]]             # PC boxes: Array of Array of PartyMon.to_dict()
+var box: int = 0
+var visited: Dictionary = {}        # fly destinations reached
+var daycare: Dictionary = {}        # {mon: dict, steps: int} or {}
+var safari_balls: int = -1          # -1 = not in the Safari Zone
+var safari_steps: int = -1
+var steps: int = 0
+var repel: int = 0
+var always_on_bike: bool = false
+var hall_of_fame: Array = []
+var lucky_slot: int = 0
+var vermilion_trash: Dictionary = {}
+
+const STORY_KEYS := ["flags", "toggles", "coins", "starter", "last_outdoor", "last_heal", "last_heal_town", "boxes", "box",
+	"visited", "daycare", "safari_balls", "safari_steps", "steps", "repel", "always_on_bike", "hall_of_fame", "lucky_slot",
+	"vermilion_trash", "money"]
+
+func story_to_dict() -> Dictionary:
+	var d := {}
+	for k in STORY_KEYS:
+		d[k] = get(k)
+	return d
+
+func story_from_dict(d: Dictionary) -> void:
+	for k in STORY_KEYS:
+		if not d.has(k):
+			continue
+		var v = d[k]
+		var cur = get(k)
+		if cur is int:
+			set(k, int(v))
+		else:
+			set(k, v)
+
+func reset_story_state() -> void:
+	flags = {}
+	toggles = {}
+	coins = 0
+	starter = ""
+	last_outdoor = "PalletTown"
+	last_heal = {}
+	last_heal_town = {}
+	boxes = [[]]
+	box = 0
+	visited = {}
+	daycare = {}
+	safari_balls = -1
+	safari_steps = -1
+	steps = 0
+	repel = 0
+	always_on_bike = false
+	hall_of_fame = []
+
 func _process(delta: float) -> void:
 	if clock_running:
 		clock_minutes = fmod(clock_minutes + delta * CLOCK_RATE, 1440.0)
@@ -149,6 +210,7 @@ func save() -> bool:
 		"player_name": player_name, "rival_name": rival_name,
 		"seen_species": seen_species, "caught_species": caught_species,
 		"clock_minutes": clock_minutes,
+		"story": story_to_dict(),
 	}
 	var f := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if f == null:
@@ -183,5 +245,6 @@ func load_save() -> bool:
 	seen_species = d.get("seen_species", {})
 	caught_species = d.get("caught_species", {})
 	clock_minutes = d.get("clock_minutes", clock_minutes)
+	story_from_dict(d.get("story", {}))
 	party_changed.emit()
 	return true

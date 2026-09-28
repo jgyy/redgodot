@@ -26,6 +26,7 @@ GameData="*res://scripts/autoload/GameData.gd"
 GameState="*res://scripts/autoload/GameState.gd"
 SceneRouter="*res://scripts/autoload/SceneRouter.gd"
 Audio="*res://scripts/autoload/Audio.gd"
+Story="*res://scripts/autoload/Story.gd"
 
 [display]
 
