@@ -472,6 +472,16 @@ def env_cave():
     make_obj('boulders', verts, faces, rock_m, face_mat=fm)
 
 
+def _snow_dots(s):
+    """upstream ice theme: 60 snow specks (every 3rd with a pale cross) over the whole backdrop."""
+    for k in range(60):
+        x, y = int(U.hash2(k, 5, 15) * 320), int(U.hash2(k, 6, 15) * 132)
+        s.pset(x, y, U.hexc('#ffffff'))
+        if k % 3 == 0:
+            for dx, dy in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+                s.pset(x + dx, y + dy, U.hexc('#c8ecff'))
+
+
 def _ice_wall(s):
     U.vgrad(s, 0, 180, U.hexc('#0e2038'), U.hexc('#2e5e8e'), 6)
     for y in range(80):
@@ -485,11 +495,11 @@ def _ice_wall(s):
 
 
 def env_ice():
-    wall = paint_full(_ice_wall)
+    wall = paint_full(lambda s: _ice_wall(s) or _snow_dots(s))
     hd = WALL_D
     wall_plane(wall, hd, name='ice_wall')
     cones_hanging('icicles', 22, 14, (10, 30), (2.5, 4), ['#a8d8f4', '#5a96c6'], hd - 1.0, edge_col='#f0fbff')
-    g = paint_full(lambda s: U.paint_ground(s, int(wall_row()) - 2, U.hexc('#b4d8ee'), U.hexc('#a4cce6'), U.hexc('#eef9ff'), 5))
+    g = paint_full(lambda s: U.paint_ground(s, int(wall_row()) - 2, U.hexc('#b4d8ee'), U.hexc('#a4cce6'), U.hexc('#eef9ff'), 5) or _snow_dots(s))
     ground_plane(g, far=hd)
 
 

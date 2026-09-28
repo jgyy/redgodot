@@ -311,7 +311,7 @@ func _make_snow() -> void:
 	p.initial_velocity_min = 0.9
 	p.initial_velocity_max = 1.6
 	var q := QuadMesh.new()
-	q.size = Vector2(0.07, 0.07)
+	q.size = Vector2(0.1, 0.1)
 	var m := StandardMaterial3D.new()
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.albedo_color = Color(1, 1, 1)

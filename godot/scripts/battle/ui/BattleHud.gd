@@ -58,7 +58,8 @@ func _draw() -> void:
 		_draw_player_box()
 	if not wild:
 		_draw_party_balls()
-	_draw_text_area()
+	if screen.get("kind", "") != "evo":
+		_draw_text_area()
 	if not stats_box.is_empty():
 		_draw_stats_box()
 	if not menu.is_empty() and (menu["kind"] == "yesno" or menu["kind"] == "choose"):

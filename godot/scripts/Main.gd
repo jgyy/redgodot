@@ -19,6 +19,7 @@ func _ready() -> void:
 	_maybe_capture_screenshot()
 
 func _run_tests() -> void:
+	await get_tree().process_frame  # let the root finish adding Main so tests can add scenes
 	var suite := TestSuite.new()
 	suite.run_all(get_tree())
 	print("\n=== %d passed, %d failed ===" % [suite.passed, suite.failures.size()])
@@ -116,6 +117,8 @@ func _setup_battle(args: Dictionary) -> void:
 			lead._recalc_stats()
 			if lead.max_hp == want:
 				break
+	if args.get("player_nearlevel", "") == "1":
+		lead.xp = lead.exp_to_next() - 1
 	if args.has("player_moves"):
 		lead.moves.clear()
 		lead.pp.clear()
@@ -138,6 +141,12 @@ func _setup_battle(args: Dictionary) -> void:
 	var state: String = args.get("state", "live")
 	enc["screenshot"] = state != "live"
 	enc["autoplay"] = args.get("autoplay", "") == "1"
+	if args.has("auto_actions"):
+		enc["auto_actions"] = Array(str(args["auto_actions"]).split(","))
+	if args.has("bag"):
+		for e in str(args["bag"]).split(","):
+			var kv: PackedStringArray = e.split(":")
+			GameState.bag[kv[0]] = int(kv[1]) if kv.size() > 1 else 1
 	SceneRouter.start_battle(enc)
 	var battle: Node = SceneRouter.current_battle()
 	if battle == null or state == "live":

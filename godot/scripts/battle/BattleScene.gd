@@ -149,7 +149,8 @@ func _run() -> void:
 		await msg(GameState.player_name + " picked up $%d!" % engine.pay_day)
 	await _fade(12, true)
 	await _evolutions()
-	result_outcome = {"result": r, "money": GameState.money}
+	result_outcome = {"result": r, "money": GameState.money, "party_size": GameState.party.size()}
+	print("[Battle] result: ", result_outcome)
 	SceneRouter.end_battle(result_outcome)
 
 # ------------------------------------------------------------------ tick loop
@@ -479,8 +480,12 @@ func _make_ball(item: String) -> Node3D:
 
 ## Ball node placed at an upstream px position (with spin), for throws.
 func _ball_at(item: String, px: Vector2, spin: float, tilt: float = 0.0) -> void:
+	if _ball != null and str(_ball.get_meta("item", "")) != item:
+		_ball.queue_free()
+		_ball = null
 	if _ball == null:
 		_ball = _make_ball(item)
+		_ball.set_meta("item", item)
 		add_child(_ball)
 	_ball.visible = true
 	var pos := vfx.to3d(px, 0.3)
@@ -614,6 +619,17 @@ func ball_open(k: String) -> void:
 # ------------------------------------------------------------------ UI protocol: choices
 func choose_action(b: BattleEngine) -> Dictionary:
 	var m := _mon("p")
+	var queued: Array = encounter.get("auto_actions", [])
+	if autoplay and not queued.is_empty():
+		var a: String = queued.pop_front()
+		await wait(20)
+		if a.begins_with("item:"):
+			return {"type": "item", "item": a.substr(5), "target": 0}
+		if a.begins_with("switch:"):
+			return {"type": "switch", "index": int(a.substr(7))}
+		if a == "run":
+			return {"type": "run"}
+		return {"type": "fight", "slot": int(a.substr(6)) if a.begins_with("fight:") else 0}
 	var items := ["FIGHT", "PKMN", "ITEM", "RUN"]
 	while true:
 		hud.box = {"lines": Px.wrap_text("What will " + m.display_name() + " do?", 150), "chars": 999, "waiting": false}
@@ -1230,6 +1246,26 @@ func pose(state: String, o: Dictionary) -> void:
 		_step()
 	if state == "vfx":
 		await _pose_vfx(str(o.get("move", "TACKLE")), str(o.get("attacker", "p")), float(o.get("vfx_t", 0.55)))
+
+## Runs a move animation to completion synchronously; returns its length in
+## frames, or -1 if it never finishes (used by the tests on every move).
+func vfx_frames(move_id: String, k: String) -> int:
+	var done := [false]
+	var run1 := func() -> void:
+		await vfx.move(move_id, k, 0)
+		done[0] = true
+	run1.call()
+	var total := 0
+	while not done[0] and total < 900:
+		_step()
+		total += 1
+	vfx.clear()
+	for kk in ["e", "p"]:
+		offs[kk] = Vector2.ZERO
+		vis[kk] = 1.0
+		clip[kk] = 1.0
+		scale_k[kk] = 1.0
+	return total if done[0] else -1
 
 func _pose_vfx(move_id: String, k: String, frac: float) -> void:
 	# pass 1: count the animation's frames; pass 2: replay to `frac` and freeze

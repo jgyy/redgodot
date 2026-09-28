@@ -27,6 +27,7 @@ static func run(t: TestSuite) -> void:
 	_level_up(t)
 	_save_fields(t)
 	_env_and_vfx(t)
+	_scene_smoke(t)
 	GameState.party = saved_party
 	GameState.bag = saved_bag
 	GameState.money = saved_money
@@ -174,3 +175,27 @@ static func _env_and_vfx(t: TestSuite) -> void:
 		if not BattleVfx.MOVES.has(id):
 			missing += 1
 	t.check(missing == 0, "every move has a VFX recipe (%d missing)" % missing)
+
+## Builds a real BattleScene (no rendering needed), poses it and runs every
+## move's animation recipe to completion, then checks the framing.
+static func _scene_smoke(t: TestSuite) -> void:
+	var tree := Engine.get_main_loop() as SceneTree
+	_party([["CHARIZARD", 50]])
+	var sc: Node = load("res://scenes/Battle.tscn").instantiate()
+	tree.root.add_child(sc)
+	sc.setup({"kind": "wild", "species": "BLASTOISE", "level": 50, "env": "grass", "screenshot": true, "seed": 3})
+	Callable(sc, "pose").call("idle", {})
+	t.check(sc.hud.boxes["e"] and sc.hud.boxes["p"], "posed battle shows both HP boxes")
+	t.check(sc.center_px("e").x > sc.center_px("p").x and sc.center_px("e").y < sc.center_px("p").y,
+		"enemy is framed upper-right of the player's mon")
+	var bad: Array = []
+	for id in GameData.move_list:
+		if int(sc.vfx_frames(id, "p")) < 0:
+			bad.append(id)
+	for id in ["CHARGE", "DRAIN", "LEECH_SEED_DRAIN", "HEAL_ITEM", "FLY_CHARGE", "DIG_CHARGE", "BIDE_HIT"]:
+		if int(sc.vfx_frames(id, "e")) < 0:
+			bad.append(id)
+	t.check(bad.is_empty(), "every move animation runs to completion (failed: %s)" % str(bad))
+	for env in BattleStage.ENVS.keys():
+		t.check(ResourceLoader.exists("res://assets/models/battle/bg_%s.glb" % env), "battle stage generated for %s" % env)
+	sc.queue_free()
