@@ -61,6 +61,11 @@ func _setup_scene(scene: String, args: Dictionary) -> void:
 			SceneRouter.goto_intro()
 		"battle":
 			GameState.new_game(args.get("player", "SQUIRTLE"))
+			if args.has("player_level"):
+				var p: GameState.PartyMon = GameState.party[0]
+				p.level = int(args["player_level"])
+				p._recalc_stats()
+				p.hp = p.max_hp
 			SceneRouter.start_battle({
 				"kind": "wild", "species": args.get("enemy", "PIDGEY"), "level": int(args.get("level", "4")),
 			})
