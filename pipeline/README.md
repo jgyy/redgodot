@@ -171,3 +171,34 @@ and are deterministic; outputs are committed.
 
 Reference captures for 001/002/092–100 use `--save=showcase`, `--title_t=100` and
 `--scene=intro --intro_frame=505 --intro_hold=1` (see `capture_screenshots.sh`).
+
+## Battle: 3D stages and move effects (battle agent)
+
+```sh
+python3 pipeline/blender/gen_battlebg.py            # 15 environments + 11 platforms + layout.json (~6 s)
+python3 pipeline/blender/gen_battlebg.py -- ice     # one environment
+python3 pipeline/blender/gen_vfx.py                 # 22 particle meshes + poke_ball.glb
+/opt/godot/godot4 --headless --path godot --import  # pick up the new glbs
+```
+
+* `upstream_px.py` ports upstream's pixel primitives exactly (gfx.js `hash2`/`bayer`/`shade`,
+  palette.js `NoiseTex`, and battlebg.js's `vgrad`/`clouds`/`hills`/`treeLine`/`ground`/`platform`);
+  its hash and noise output match the JS bit-for-bit.
+* `gen_battlebg.py` fixes the battle camera (`CAM`, written to
+  `godot/assets/models/battle/layout.json`, which `BattleStage.gd` reads) and places every
+  prop along the camera ray through the pixel where upstream paints it in its 320x132 battle
+  framebuffer: 3D clouds, hill ridges, toon-shaded tree lines, stalactites, icicles, boulders,
+  pipes, pillars, light shafts. Sky / walls / ground / sea are 3D planes whose UVs are the camera
+  projection of upstream's own painting, so they read exactly like the 2D game from the battle
+  camera while still receiving the Pokémon's shadows. Platforms are real elliptical discs with
+  upstream's platform art on top. Environments: grass, forest, cave, ice, water, beach, indoor,
+  gym, tower, mountain, power, mansion, elite (tinted per room), cavewater, cavewater_ice.
+* `gen_vfx.py` builds a mesh for each of upstream `drawShape`'s particle shapes (flame, spark,
+  star, ring, bubble, leaf, snow, rock, note, z, coin, seed, needle, bone, egg, shard, heart) plus
+  impact, claw, fist, drop and the poke ball. `godot/scripts/battle/BattleVfx.gd` runs upstream's
+  vfx.js particle simulation and every per-move recipe in its pixel space and draws the result as
+  these meshes on the 3D plane through both battlers; beams, bolts, shock rings and the SURF wave
+  are real 3D geometry.
+
+Battle reference captures: `pipeline/capture_screenshots.sh` "Battle" section
+(`--scene=battle --state=vfx --move=... --vfx_t=...`, see `Main.gd _setup_battle()`).

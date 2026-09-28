@@ -37,6 +37,7 @@ func run_all(tree: SceneTree) -> void:
 	AudioTests.run(self)
 	_test_models_3d(tree)
 	StoryTests.run(self)
+	BattleTests.run(self)  # battle engine / stage / UI (scripts/battle/BattleTests.gd)
 
 func _test_type_chart() -> void:
 	check(GameData.type_multiplier("WATER", ["FIRE"]) == 2.0, "WATER is super effective vs FIRE")
