@@ -141,6 +141,10 @@ func _test_ui_state() -> void:
 	var info := TownMap.info()
 	check(info.get("where", {}).has("PalletTown") and info.get("towns", []).size() == 11, "town map bake has every town")
 	check(BagMenu.item_name("POKE_BALL") == "POKé BALL", "item names come from pokedata")
+	check(UI.text("PalletTownSignText") == GameText.fmt(GameText.get_text("PalletTownSignText")), "UI.text() resolves upstream labels")
+	check(UI.text("NoSuchLabelAnywhere") == "...", "UI.text() falls back to '...' like G.textFor")
+	GameText.vars["wStringBuffer"] = "POTION"
+	check(GameText.fmt("{PLAYER} got {wStringBuffer} !") == GameState.player_name + " got POTION!", "fmt substitutes textVars and trims space before punctuation")
 
 func _test_save_load() -> void:
 	var saved_party := GameState.party

@@ -45,6 +45,7 @@ func is_open() -> bool:
 	return false
 
 func _on_open() -> void:
+	UI.sfx("menu")
 	_items = []
 	_items.append("POKéDEX")
 	if not GameState.party.is_empty():
@@ -59,9 +60,12 @@ func _input_event(e: InputEvent) -> bool:
 	var n := _items.size()
 	if pressed(e, "move_up", true):
 		sel = (sel + n - 1) % n
+		UI.sfx("cursor")
 	elif pressed(e, "move_down", true):
 		sel = (sel + 1) % n
+		UI.sfx("cursor")
 	elif pressed(e, "confirm"):
+		UI.sfx("select")
 		_activate(_items[sel])
 	elif pressed(e, "cancel") or pressed(e, "menu"):
 		close()
@@ -82,6 +86,7 @@ func _activate(it: String) -> void:
 		"SAVE":
 			if await ask("Would you like to SAVE the game?"):
 				GameState.save()
+				UI.sfx("save")
 				await say(GameState.player_name + " saved the game!")
 		"OPTION":
 			close(); options_menu.open()

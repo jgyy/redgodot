@@ -42,6 +42,29 @@ static func text_for(label: String) -> String:
 		return "..."
 	return get_text(label, "...")
 
+## Extra {NAME} placeholders (upstream G.textVars), e.g. vars["wStringBuffer"].
+static var vars: Dictionary = {}
+
+## Upstream G.fmt(): {PLAYER}/{RIVAL}/{PROMPT} and G.textVars substitution,
+## then the same whitespace clean-up around page breaks and punctuation.
+static func fmt(s: String) -> String:
+	s = s.replace("{PLAYER}", GameState.player_name).replace("{RIVAL}", GameState.rival_name).replace("{PROMPT}", "")
+	var re := RegEx.new()
+	re.compile("\\{(\\w+)\\}")
+	for m in re.search_all(s):
+		var k := m.get_string(1)
+		if vars.has(k):
+			s = s.replace(m.get_string(0), str(vars[k]))
+	re.compile(" +\f")
+	s = re.sub(s, "\f", true)
+	re.compile("\f +")
+	s = re.sub(s, "\f", true)
+	re.compile(" +([!?,]|\\.(?!\\.))")
+	s = re.sub(s, "$1", true)
+	re.compile(" {2,}")
+	s = re.sub(s, " ", true)
+	return s
+
 static func dex(species: String) -> String:
 	return data()["dex"].get(species, "")
 

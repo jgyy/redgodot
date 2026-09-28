@@ -61,9 +61,12 @@ func _unhandled_input(event: InputEvent) -> void:
 	var handled := true
 	if event.is_action_pressed("move_up", true):
 		sel = (sel + n - 1) % n
+		UI.sfx("cursor")
 	elif event.is_action_pressed("move_down", true):
 		sel = (sel + 1) % n
+		UI.sfx("cursor")
 	elif event.is_action_pressed("confirm"):
+		UI.sfx("select")
 		_finish(sel)
 	elif event.is_action_pressed("cancel"):
 		if not opts.get("no_cancel", false):

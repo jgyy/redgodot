@@ -63,7 +63,7 @@ func revealed() -> bool:
 
 func _next_box() -> void:
 	var s: String = str(_queue.pop_front())
-	_pages = Px.paginate(Px.fmt(s, GameState.player_name, GameState.rival_name))
+	_pages = Px.paginate(GameText.fmt(s))
 	if _pages.is_empty():
 		_pages = [[""]]
 	_page = 0
@@ -113,6 +113,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if _chars < _total():
 		return
+	UI.sfx("blip")
 	if _page < _pages.size() - 1:
 		_page += 1
 		_chars = 0.0

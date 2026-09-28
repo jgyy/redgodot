@@ -33,6 +33,9 @@ static func toggle(r: int) -> void:
 		3:
 			o["sound"] = not o.get("sound", true)
 			GameState.sound_on = o["sound"]
+			var au := UI.audio()
+			if au and au.has_method("set_muted"):
+				au.set_muted(not o["sound"])
 		4: o["day_night"] = not o.get("day_night", true)
 		5: o["follower"] = not o.get("follower", true)
 	GameState.text_speed = ["SLOW", "NORMAL", "FAST"][int(o["text_speed"]) - 1]
@@ -40,9 +43,12 @@ static func toggle(r: int) -> void:
 func _input_event(e: InputEvent) -> bool:
 	if pressed(e, "move_up", true):
 		sel = (sel + 6) % 7
+		UI.sfx("cursor")
 	elif pressed(e, "move_down", true):
 		sel = (sel + 1) % 7
+		UI.sfx("cursor")
 	elif pressed(e, "confirm"):
+		UI.sfx("select")
 		if sel == 6:
 			exit()
 		else:
