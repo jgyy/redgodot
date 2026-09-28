@@ -17,6 +17,15 @@ const LAYER := 60
 var layer: CanvasLayer
 var _busy := 0
 var _pc: PCMenu
+## A no_wait text box stays up (ui.js StaticBox) until the next say/ask or
+## until the menu that follows it closes, so "question + menu" flows (marts,
+## menu_with_text) keep their text visible like upstream.
+var _sticky: DialogueBox = null
+
+func _drop_sticky() -> void:
+	if is_instance_valid(_sticky):
+		_sticky.queue_free()
+	_sticky = null
 
 func _ready() -> void:
 	layer = CanvasLayer.new()
@@ -30,11 +39,21 @@ func is_busy() -> bool:
 
 func say(text: String, opts: Dictionary = {}) -> void:
 	_busy += 1
-	await DialogueBox.say(layer, text, opts)
+	_drop_sticky()
+	if opts.get("no_wait", false):
+		var box := DialogueBox.new()
+		layer.add_child(box)
+		box.show_lines([text], opts)
+		if box.visible and not box._done:
+			await box.finished
+		_sticky = box
+	else:
+		await DialogueBox.say(layer, text, opts)
 	_busy -= 1
 
 func ask(text: String, opts: Dictionary = {}) -> bool:
 	_busy += 1
+	_drop_sticky()
 	var r: bool = await DialogueBox.ask(layer, text, opts)
 	_busy -= 1
 	return r
@@ -42,6 +61,7 @@ func ask(text: String, opts: Dictionary = {}) -> bool:
 func choose(items: Array, opts: Dictionary = {}) -> int:
 	_busy += 1
 	var r: int = await PxMenu.pick(layer, items, opts)
+	_drop_sticky()
 	_busy -= 1
 	return r
 
