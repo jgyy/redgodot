@@ -1,0 +1,73 @@
+{
+ "file": "humanoid.glb",
+ "base_style": {
+  "head": "short",
+  "body": "normal",
+  "source": "chars.json HEADS/BODY, down frame 0 (front) + up frame 0 (back)"
+ },
+ "height_m": 1.5,
+ "tris": 5472,
+ "material_slots": {
+  "mat_skin": {
+   "placeholder": "#e8c4a0",
+   "tint_from_cast_json": "skin"
+  },
+  "mat_hair": {
+   "placeholder": "#6a5a50",
+   "tint_from_cast_json": "hair"
+  },
+  "mat_top": {
+   "placeholder": "#b0b0b8",
+   "tint_from_cast_json": "shirt (coat for body=coat)"
+  },
+  "mat_pants": {
+   "placeholder": "#80808a",
+   "tint_from_cast_json": "pants"
+  },
+  "mat_shoes": {
+   "placeholder": "#606068",
+   "tint_from_cast_json": "shoes"
+  }
+ },
+ "fixed_materials": {
+  "mat_eye": "dark eye colour, not tinted"
+ },
+ "optional_materials": {
+  "mat_hat": "present only when the base head style has hat cells (C/c/K/B); tint from cast.json \"hat\""
+ },
+ "region_code_roles": {
+  "skin": "S s W M",
+  "eye": "E",
+  "hair": "H h L",
+  "top": "T t U A X x G g",
+  "pants": "P p",
+  "shoes": "F f",
+  "hat": "C c K B",
+  "outline O": "takes neighbouring role"
+ },
+ "bones": [
+  "root",
+  "hips",
+  "spine",
+  "head",
+  "arm_L",
+  "arm_R",
+  "leg_L",
+  "leg_R"
+ ],
+ "animations": {
+  "Idle": {
+   "seconds": 2.0,
+   "loop": true
+  },
+  "Walk": {
+   "seconds": 0.8,
+   "loop": true
+  }
+ },
+ "conventions": {
+  "front": "Blender -Y == glTF/Godot +Z",
+  "origin": "bottom centre (feet at y=0)"
+ },
+ "notes": "v1 approach: ONE base mesh for every humanoid in cast.json, recoloured at runtime by setting the mat_* slots from each cast entry's hex fields (skin/hair/shirt/pants/shoes). Per-style mesh variants (hats/caps, hairstyles, coats, dresses, backpacks, glasses) are a documented future extension and out of scope for this pass; gen_characters.py already takes --head/--body to voxelize any other HEADS/BODY style."
+}

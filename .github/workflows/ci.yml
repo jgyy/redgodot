@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  GODOT_VERSION: 4.7.2
+
+jobs:
+  test:
+    name: Import, unit tests, screenshots
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache Godot binary
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: /opt/godot/godot4
+          key: godot-${{ env.GODOT_VERSION }}-linux-x86_64
+
+      - name: Download Godot ${{ env.GODOT_VERSION }}
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p /opt/godot
+          curl -sSL -o /tmp/godot.zip \
+            "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q /tmp/godot.zip -d /tmp/godot_extract
+          mv "/tmp/godot_extract/Godot_v${GODOT_VERSION}-stable_linux.x86_64" /opt/godot/godot4
+          chmod +x /opt/godot/godot4
+
+      - name: Install Xvfb + Mesa software renderer
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends xvfb libgl1-mesa-dri
+
+      - name: Import project
+        run: /opt/godot/godot4 --headless --path godot --import
+
+      - name: Run unit tests
+        run: /opt/godot/godot4 --headless --path godot -- --run-tests
+
+      - name: Capture screenshots (title / overworld / battle)
+        run: |
+          mkdir -p artifacts/screenshots
+          for scene in title overworld battle; do
+            xvfb-run -a /opt/godot/godot4 --path godot --rendering-driver opengl3 \
+              -- --screenshot="$PWD/artifacts/screenshots/$scene.png" --scene="$scene" --wait=1.5
+          done
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: artifacts/screenshots/*.png
+          if-no-files-found: error

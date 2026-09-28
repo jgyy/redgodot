@@ -1,0 +1,93 @@
+{
+ "tiles": {
+  "floor_grass": {
+   "file": "floor_grass.glb",
+   "tris": 32,
+   "bytes": 4212,
+   "notes": "walkable ground"
+  },
+  "floor_path": {
+   "file": "floor_path.glb",
+   "tris": 32,
+   "bytes": 4236,
+   "notes": "walkable ground"
+  },
+  "floor_pave": {
+   "file": "floor_pave.glb",
+   "tris": 8,
+   "bytes": 3048,
+   "notes": "walkable ground (town)"
+  },
+  "tallgrass": {
+   "file": "tallgrass.glb",
+   "tris": 232,
+   "bytes": 18916,
+   "notes": "walkable, wild encounters"
+  },
+  "water": {
+   "file": "water.glb",
+   "tris": 32,
+   "bytes": 4716,
+   "notes": "blocking unless surfing; top at -0.05 m"
+  },
+  "tree": {
+   "file": "tree.glb",
+   "tris": 504,
+   "bytes": 13268,
+   "notes": "blocking, ~2.5 m"
+  },
+  "wall": {
+   "file": "wall.glb",
+   "tris": 24,
+   "bytes": 3188,
+   "notes": "blocking 1 m cube"
+  },
+  "building_wall": {
+   "file": "building_wall.glb",
+   "tris": 24,
+   "bytes": 3180,
+   "notes": "blocking 1.2 m"
+  },
+  "roof": {
+   "file": "roof.glb",
+   "tris": 8,
+   "bytes": 1676,
+   "notes": "prism, ridge along X, 0.6 m tall; stack on building_wall"
+  },
+  "door": {
+   "file": "door.glb",
+   "tris": 104,
+   "bytes": 5588,
+   "notes": "warp tile, door panel on the -Y (Godot +Z) face"
+  },
+  "counter": {
+   "file": "counter.glb",
+   "tris": 24,
+   "bytes": 3204,
+   "notes": "blocking, waist height, interact across"
+  },
+  "sign": {
+   "file": "sign.glb",
+   "tris": 84,
+   "bytes": 4184,
+   "notes": "blocking, interactable"
+  },
+  "ledge": {
+   "file": "ledge.glb",
+   "tris": 110,
+   "bytes": 5480,
+   "notes": "one-way jump-down; lip on the -Y (Godot +Z) edge"
+  },
+  "rock": {
+   "file": "rock.glb",
+   "tris": 80,
+   "bytes": 7292,
+   "notes": "blocking boulder"
+  }
+ },
+ "conventions": {
+  "footprint": "1 x 1 m, pivot at bottom centre",
+  "front": "Blender -Y == glTF/Godot +Z",
+  "palette": "colours from src/art/palette.js ramps"
+ }
+}
