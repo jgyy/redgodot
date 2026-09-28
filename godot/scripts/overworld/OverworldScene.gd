@@ -1,7 +1,30 @@
 extends Node3D
-## Root of the 3D overworld: builds the current map, places the player, follows
-## with a fixed-angle 3rd-person camera (in the spirit of the original top-down
-## view, tilted into 3D), and reacts to warps / route connections / wild encounters.
+## The 3D overworld: current map (MapLoader, built from the upstream bake), the player, NPCs, the walking
+## partner Pokémon, the camera and day/night. Movement, collision, ledges, warps, connections and NPC idling
+## follow upstream src/game/overworld.js; the camera frames the same ~20 x 11 cells as upstream's 320x180 view.
+##
+## Public API (used by Main.gd captures, the start menu / dialogue, and the Story autoload, see CONTRACT.md):
+##   signals  interacted(kind, data), stepped_on(cell), entered_map(map_name)
+##   lock_input(on), is_input_locked()
+##   get_actor(id) -> Node3D ("PLAYER", "FOLLOWER" or a map object id), actor_cell(id), actor_dir(id)
+##   await move_actor(id, "UDLR"), await move_together([[id, "U"], ...]), face_actor(id, dir)
+##   show_actor(id, cell), hide_actor(id), is_actor_shown(id), spawn_object(obj) / remove_object(id)
+##   await warp_to(map, cell, facing), await emote(id, "!"), await fade_out(frames), await fade_in(frames)
+##   path_to(from, to) -> "UDLR" string, is_passable(cell), current_map()
+##   open_menu_for_screenshot(key), show_dialogue_for_screenshot(lines)
+
+signal interacted(kind: String, data: Dictionary)
+signal stepped_on(cell: Vector2i)
+signal entered_map(map_name: String)
+
+const FRAME := 1.0 / 60.0
+const CAM_FOV := 20.0
+const CAM_DIST := 31.9      # frames 20 cells across at the player's depth (upstream: 320 px = 20 cells)
+const FACING_WARP_TILES := {"down": [0x01, 0x12, 0x17, 0x3D, 0x04, 0x18, 0x33], "up": [0x01, 0x5C], "left": [0x1A, 0x4B], "right": [0x0F, 0x4E]}
+const FACING_WARP_TILESETS := ["Overworld", "Ship", "ShipPort", "Plateau"]
+const FACING_WARP_MAPS := ["RocketHideoutB1F", "RocketHideoutB2F", "RocketHideoutB4F", "RockTunnel1F"]
+const OPP := {"up": "down", "down": "up", "left": "right", "right": "left"}
+const LETTER := {"U": "up", "D": "down", "L": "left", "R": "right"}
 
 @onready var _map_root: Node3D = $MapRoot
 @onready var _camera_rig: Node3D = $CameraRig
@@ -10,121 +33,620 @@ extends Node3D
 @onready var _world_env: WorldEnvironment = $WorldEnvironment
 
 var _map_loader: MapLoader
-var _player: Player
-
+var player: OwActor
+var follower: OwActor
 var _start_menu: StartMenu
 var _dialogue: DialogueBox
+var _fade_layer: CanvasLayer
+var _fade_rect: ColorRect
 
-var _lighting_period := ""
+var _locks := 0
+var _busy := false           # a warp / connection change is in progress
+var _was_moving := false
+var _turn_delay := 0.0
+var _arrived_dir := ""       # the way we came through a door, until the first step
+var _pending_conn: Dictionary = {}
+var _rng := RandomNumberGenerator.new()
+var _light_key := ""
+var _follower_species := ""
+var _hidden_ids := {}        # object ids hidden by scripts on this map
+var _shown_ids := {}         # object ids shown by scripts (objs[].shown == false)
+var no_encounters := false   # captures / scripted walks
 
 func _ready() -> void:
-	_build_player()
-	_load_current_map()
-	_update_lighting()
+	_rng.randomize()
+	_setup_camera()
+	_build_fade()
+	player = OwActor.new()
+	player.name = "Player"
+	add_child(player)
+	player.setup("red")
+	player.step_finished.connect(_on_player_step)
+	follower = OwActor.new()
+	follower.name = "Follower"
+	add_child(follower)
+	_load_map(GameState.current_map, GameState.player_cell, GameState.player_facing)
 	_dialogue = DialogueBox.new()
 	add_child(_dialogue)
 	_start_menu = StartMenu.new()
 	add_child(_start_menu)
+	visibility_changed.connect(_on_visibility_changed)
 
-func _update_lighting() -> void:
-	var period := GameState.time_period()
-	if period == _lighting_period:
-		return
-	_lighting_period = period
-	LightingRig.apply(_sun, _world_env.environment, period)
+func _on_visibility_changed() -> void:
+	# battles are overlays: when the overworld is shown again, take the camera back and refresh lighting
+	if visible and is_inside_tree():
+		_camera.make_current()
+		_light_key = ""
+		_update_lighting()
 
-func _build_player() -> void:
-	_player = Player.new()
-	_player.name = "Player"
-	add_child(_player)
-	_player.warped.connect(_on_player_warped)
-	_player.encounter_triggered.connect(_on_encounter)
+func _setup_camera() -> void:
+	_camera.fov = CAM_FOV
+	_camera.near = 0.5
+	_camera.far = 200.0
+	var pitch := deg_to_rad(WorldData.CAM_PITCH_DEG)
+	_camera.transform = Transform3D.IDENTITY
+	_camera.position = Vector3(0.0, sin(pitch) * CAM_DIST, cos(pitch) * CAM_DIST)
+	_camera.rotation = Vector3(-pitch, 0.0, 0.0)
+	_camera.current = true
+	_sun.shadow_enabled = false
+	_sun.rotation = Vector3(deg_to_rad(-60.0), deg_to_rad(-35.0), 0.0)
 
-func _load_current_map() -> void:
+func _build_fade() -> void:
+	_fade_layer = CanvasLayer.new()
+	_fade_layer.layer = 40
+	add_child(_fade_layer)
+	_fade_rect = ColorRect.new()
+	_fade_rect.color = Color(0, 0, 0, 0)
+	_fade_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_fade_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_fade_layer.add_child(_fade_rect)
+
+# ---------------------------------------------------------------- map loading
+func _load_map(map_name: String, cell: Vector2i, facing: String) -> void:
 	for c in _map_root.get_children():
 		c.queue_free()
 	_map_loader = MapLoader.new()
+	_map_loader.name = "Map_%s" % map_name
 	_map_root.add_child(_map_loader)
-	_map_loader.load_map(GameState.current_map)
-	_player.place(_map_loader, GameState.player_cell)
-	_update_camera()
-
-func _process(_dt: float) -> void:
-	if _player:
-		_update_camera()
-		_player.input_locked = _start_menu.is_open() or _dialogue.visible
+	_map_loader.load_map(map_name)
+	GameState.current_map = map_name
+	GameState.player_cell = cell
+	if _map_loader.outdoor:
+		GameState.set_meta("last_outdoor", map_name)
+	_hidden_ids.clear()
+	_shown_ids.clear()
+	player.place(cell, facing if facing != "" else player.facing)
+	_place_follower()
+	_light_key = ""
 	_update_lighting()
+	_update_camera()
+	entered_map.emit(map_name)
+	var story := get_node_or_null("/root/Story")
+	if story and story.has_method("on_enter"):
+		story.on_enter(map_name)
 
+func current_map() -> String:
+	return _map_loader.map_name if _map_loader else ""
+
+func map_loader() -> MapLoader:
+	return _map_loader
+
+# ---------------------------------------------------------------- lighting
+func _update_lighting() -> void:
+	if _map_loader == null:
+		return
+	var h := fmod(GameState.clock_minutes / 60.0, 24.0)
+	var td := LightingRig.time_of_day(h)
+	var graded := _map_loader.outdoor or _map_loader.ts_file == "forest"
+	var g := LightingRig.grade(td) if graded else Color(1, 1, 1)
+	var la := LightingRig.light_amount(td) if graded else 0.0
+	var key := "%s|%.3f|%.3f|%.3f|%.2f" % [_map_loader.map_name, g.r, g.g, g.b, la]
+	if key == _light_key:
+		return
+	var rebuild := not _light_key.begins_with(_map_loader.map_name + "|")
+	_light_key = key
+	var lt: Texture2D = null
+	var gt: Texture2D = null
+	if rebuild and la > 0.0:
+		var maps := LightingRig.build_light_maps(_map_loader.bake)
+		lt = maps[0]
+		gt = maps[1]
+	_map_loader.apply_grade(g, la, lt, gt)
+	LightingRig.apply_3d(_sun, _world_env.environment, g, _map_loader.interior)
+
+# ---------------------------------------------------------------- per frame
+func _process(dt: float) -> void:
+	if _map_loader == null or not visible:
+		return
+	_update_lighting()
+	var ui_open := _start_menu.is_open() or _dialogue.visible
+	if not ui_open and _locks == 0 and not _busy:
+		_player_control(dt)
+		_npcs_idle(dt)
+	elif not player.moving:
+		_was_moving = false
+	_update_camera()
+	_update_follower_visibility()
+
+func _update_camera() -> void:
+	if player == null:
+		return
+	var target := player.position + Vector3(0.0, 0.0, 0.5 - OwActor.FOOT_Z)
+	_camera_rig.position = target
+
+func _input_dir() -> String:
+	if Input.is_action_pressed("move_up"):
+		return "up"
+	if Input.is_action_pressed("move_down"):
+		return "down"
+	if Input.is_action_pressed("move_left"):
+		return "left"
+	if Input.is_action_pressed("move_right"):
+		return "right"
+	return ""
+
+func _player_control(dt: float) -> void:
+	if player.moving:
+		return
+	var d := _input_dir()
+	if d == "":
+		_was_moving = false
+		_turn_delay = 0.0
+		return
+	var bounce: bool = _arrived_dir != "" and (d == _arrived_dir or bool(can_move(player, d).get("ok", false)))
+	if not bounce and _push_warp(player.cell, d):
+		player.face(d)
+		_do_warp(_map_loader.warp_index_at(player.cell))
+		return
+	if player.facing != d and not _was_moving:
+		player.face(d)
+		_turn_delay = 6.0 * FRAME
+		return
+	if _turn_delay > 0.0:
+		_turn_delay -= dt
+		if _turn_delay > 0.0:
+			return
+	var r := can_move(player, d)
+	if r.get("ok", false):
+		var speed := 2.0 if Input.is_action_pressed("cancel") else 1.0
+		_step_player(d, speed, r)
+	else:
+		player.face(d)
+		_was_moving = false
+
+func _step_player(d: String, speed: float, r: Dictionary) -> void:
+	var from := player.cell
+	var jump: bool = r.get("jump", false)
+	_pending_conn = r.get("conn", {})
+	player.start_move(d, 2.0 if jump else speed, jump)
+	_was_moving = true
+	_arrived_dir = ""
+	var target: Vector2i = from + OwActor.DIRS[d]
+	if _map_loader.is_tall_grass(target):
+		TileKit.rustle(_map_loader.grass_node, target)
+	_follower_follow(from, speed, jump)
+
+## upstream Overworld.canMove -> {ok, jump, conn}
+func can_move(who: OwActor, dir: String) -> Dictionary:
+	var m := _map_loader
+	var nxt: Vector2i = who.cell + OwActor.DIRS[dir]
+	var is_player := who == player
+	if not m.in_bounds(nxt):
+		if not is_player:
+			return {"ok": false}
+		var side := m.connection_dir(nxt)
+		var conns: Dictionary = m.map_data.get("conns", {})
+		if not conns.has(side):
+			return {"ok": false}
+		var c: Dictionary = conns[side]
+		var tm := MapLoader.new()
+		tm.load_map(String(c.get("map", "")), false)
+		var tc := nxt - Vector2i(int(c.get("ox", 0)), int(c.get("oy", 0)))
+		var ok := tm.passable(tc)
+		tm.free()
+		return {"ok": ok, "conn": c}
+	if _actor_blocking(nxt, who):
+		return {"ok": false}
+	if is_player:
+		if m.is_ledge_jump(who.cell, dir):
+			var land: Vector2i = nxt + OwActor.DIRS[dir]
+			if m.passable(land) and not _actor_blocking(land, who):
+				return {"ok": true, "jump": true}
+			return {"ok": false}
+		if m.pair_blocked(who.cell, nxt):
+			return {"ok": false}
+	else:
+		if absi(nxt.x - who.home.x) > 3 or absi(nxt.y - who.home.y) > 3:
+			return {"ok": false}
+		if m.warp_index_at(nxt) >= 0:
+			return {"ok": false}
+	if not m.passable(nxt):
+		return {"ok": false}
+	return {"ok": true}
+
+func _actor_blocking(cell: Vector2i, except: OwActor) -> bool:
+	for a in _map_loader.actors:
+		var act: OwActor = a
+		if act == except or not act.visible:
+			continue
+		if act.cell == cell:
+			return true
+	if player != except and player.cell == cell:
+		return true
+	return false
+
+## upstream pushWarp: standing on a warp cell and pushing toward its exit
+func _push_warp(cell: Vector2i, d: String) -> bool:
+	var m := _map_loader
+	if m.warp_index_at(cell) < 0:
+		return false
+	var nxt: Vector2i = cell + OwActor.DIRS[d]
+	if not m.in_bounds(nxt):
+		return true
+	if (FACING_WARP_MAPS.has(m.map_name) or FACING_WARP_TILESETS.has(m.tileset_name)) and FACING_WARP_TILES[d].has(m.tile(nxt)):
+		return true
+	return d == "down" and not m.is_warp_tile(cell) and not m.passable(cell + Vector2i(0, 1))
+
+func _on_player_step(_a: OwActor) -> void:
+	GameState.player_cell = player.cell
+	GameState.player_facing = player.facing
+	if not _pending_conn.is_empty():
+		var c := _pending_conn
+		_pending_conn = {}
+		var nc := player.cell - Vector2i(int(c.get("ox", 0)), int(c.get("oy", 0)))
+		_load_map(String(c.get("map", "")), nc, player.facing)
+		return
+	var m := _map_loader
+	var wi := m.warp_index_at(player.cell)
+	if wi >= 0 and (m.is_warp_tile(player.cell) or m.is_door_tile(player.cell)):
+		_do_warp(wi)
+		return
+	if player.scripted:
+		return
+	stepped_on.emit(player.cell)
+	var story := get_node_or_null("/root/Story")
+	if story and story.has_method("on_step") and story.on_step(player.cell):
+		return
+	if m.is_tall_grass(player.cell) and not no_encounters:
+		var res := EncounterSystem.roll(m.map_name, false, _rng)
+		if not res.is_empty():
+			SceneRouter.start_battle({"kind": "wild", "species": res["species"], "level": res["level"]})
+
+func _do_warp(wi: int) -> void:
+	if _busy or wi < 0:
+		return
+	var w: Dictionary = _map_loader.map_data.get("warps", [])[wi]
+	var to := String(w.get("to", ""))
+	if to == "LAST_MAP":
+		to = String(GameState.get_meta("last_outdoor", "PalletTown"))
+	var dmd := GameData.get_map(to)
+	if dmd.is_empty():
+		push_warning("[Overworld] warp target not found: %s" % to)
+		return
+	_busy = true
+	var dws: Array = dmd.get("warps", [])
+	var wv := int(w.get("warp", 0))
+	var dw: Dictionary = dws[wv] if wv >= 0 and wv < dws.size() else (dws[0] if not dws.is_empty() else {"x": 0, "y": 0})
+	var dcell := Vector2i(int(dw.get("x", 0)), int(dw.get("y", 0)))
+	var dir := player.facing
+	var entering_door := _map_loader.is_door_tile(player.cell) and _map_loader.outdoor
+	if entering_door:
+		await get_tree().create_timer(8.0 * FRAME).timeout
+		player.visible = false
+		follower.visible = false
+		await get_tree().create_timer(4.0 * FRAME).timeout
+	await fade_out(10)
+	player.visible = true
+	_load_map(to, dcell, dir)
+	_arrived_dir = dir
+	await fade_in(10)
+	var m := _map_loader
+	if m.is_door_tile(dcell) or (m.outdoor and m.is_warp_tile(dcell) and m.passable(dcell + Vector2i(0, 1))):
+		if can_move(player, "down").get("ok", false):
+			player.start_move("down", 1.0)
+			await player.step_finished
+	_busy = false
+
+# ---------------------------------------------------------------- input: A / START
 func _unhandled_input(event: InputEvent) -> void:
-	if _dialogue.visible or _start_menu.is_open():
+	if not visible or _dialogue.visible or _start_menu.is_open() or _locks > 0 or _busy:
 		return
 	if event.is_action_pressed("menu"):
 		_start_menu.open()
 		get_viewport().set_input_as_handled()
-	elif event.is_action_pressed("confirm"):
+	elif event.is_action_pressed("confirm") and not player.moving:
 		_try_interact()
 		get_viewport().set_input_as_handled()
 
 func _try_interact() -> void:
-	if _player == null or _map_loader == null:
+	var m := _map_loader
+	var t := player.facing_cell()
+	var a := m.actor_at(t)
+	if a == null and m.is_counter(t):
+		a = m.actor_at(t + OwActor.DIRS[player.facing])
+	if a == null and follower.visible and follower.cell == t and not follower.moving:
+		follower.face(OPP[player.facing])
+		interacted.emit("follower", {"species": _follower_species})
+		var mon: GameState.PartyMon = GameState.party[0] if not GameState.party.is_empty() else null
+		if mon:
+			_dialogue.show_lines(["%s is happy to be walking with you!" % mon.nickname])
 		return
-	var target := _player.facing_cell()
-	var npc := _map_loader.npc_at(target)
-	if not npc.is_empty():
-		_dialogue.show_lines(DialogueText.for_obj(npc))
+	var story := get_node_or_null("/root/Story")
+	if a:
+		if not ["UP", "DOWN", "LEFT", "RIGHT"].has(String(a.obj.get("dir", ""))) or a.obj.get("move", "") == "WALK":
+			a.face(OPP[player.facing])
+		interacted.emit("npc", a.obj)
+		if story and story.has_method("on_talk") and story.on_talk(a.obj):
+			return
+		_dialogue.show_lines(DialogueText.for_obj(a.obj))
 		return
-	var sign := _map_loader.sign_at(target)
-	if not sign.is_empty():
-		_dialogue.show_lines(DialogueText.for_sign(sign, _map_loader.map_name))
-
-func _update_camera() -> void:
-	if not _player:
+	var s := m.sign_at(t)
+	if not s.is_empty():
+		interacted.emit("sign", s)
+		if story and story.has_method("on_sign") and story.on_sign(s):
+			return
+		_dialogue.show_lines(DialogueText.for_sign(s, m.map_name))
 		return
-	var target := _player.global_position
-	_camera_rig.global_position = _camera_rig.global_position.lerp(target, 0.2)
+	interacted.emit("cell", {"x": t.x, "y": t.y, "label": m.label_at(t)})
 
-func _on_player_warped(payload: Dictionary) -> void:
-	var to_map: String = payload.get("to", "")
-	var target_map_data := GameData.get_map(to_map)
-	if target_map_data.is_empty():
-		push_warning("[Overworld] warp/connection target map not found: %s" % to_map)
+# ---------------------------------------------------------------- NPC idle (upstream npcIdle)
+func _npcs_idle(dt: float) -> void:
+	for a in _map_loader.actors:
+		var act: OwActor = a
+		if act.moving or act.scripted or not act.visible:
+			continue
+		act.idle_t -= dt
+		if act.idle_t > 0.0:
+			continue
+		act.idle_t = (60.0 + _rng.randf() * 140.0) * FRAME
+		var o := act.obj
+		if String(o.get("move", "")) == "WALK":
+			var dirs := ["up", "down", "left", "right"]
+			if String(o.get("dir", "")) == "UP_DOWN":
+				dirs = ["up", "down"]
+			elif String(o.get("dir", "")) == "LEFT_RIGHT":
+				dirs = ["left", "right"]
+			var d: String = dirs[_rng.randi() % dirs.size()]
+			act.face(d)
+			if can_move(act, d).get("ok", false) and _rng.randf() < 0.7:
+				act.start_move(d, 1.0)
+		elif String(o.get("dir", "")) == "NONE" and not o.has("trainer") and not o.has("item"):
+			act.face(["up", "down", "left", "right"][_rng.randi() % 4])
+
+# ---------------------------------------------------------------- walking partner (upstream follower.js)
+func _lead_species() -> String:
+	for m in GameState.party:
+		var pm: GameState.PartyMon = m
+		if pm.hp > 0:
+			return pm.species_id
+	return ""
+
+func _place_follower() -> void:
+	var sp := _lead_species()
+	if sp == "":
+		follower.visible = false
 		return
+	if sp != _follower_species:
+		_follower_species = sp
+		follower.setup("mon:" + sp, _follower_px(sp))
+	var d: String = player.facing
+	var back: Vector2i = player.cell - OwActor.DIRS.get(d, Vector2i(0, 1))
+	var m := _map_loader
+	var ok := m.in_bounds(back) and m.passable(back) and m.warp_index_at(back) < 0 and not _actor_blocking(back, player) and not m.is_water(back)
+	follower.place(back if ok else player.cell, d)
 
-	var w2: int = target_map_data.get("w", 1)
-	var h2: int = target_map_data.get("h", 1)
-	var arrival := Vector2i(w2 / 2, h2 / 2)
+## upstream follower sizeFor(): sprite size from the Pokédex height
+func _follower_px(sp: String) -> float:
+	var d := GameData.get_species(sp)
+	var ht: Variant = d.get("ht", null)
+	var feet := 0.0
+	if typeof(ht) == TYPE_ARRAY and (ht as Array).size() >= 2:
+		feet = float(ht[0]) + float(ht[1]) / 12.0
+	var size := clampf(roundf(10.0 + 9.0 * sqrt(feet)), 16.0, 42.0) if feet > 0.0 else 28.0
+	return size * 0.8
 
-	if payload.get("kind", "") == "warp":
-		# Bidirectional warp: arrive at destination map's warps[warp index]
-		# (the classic pokered encoding this source data also uses).
-		var dest_warps: Array = target_map_data.get("warps", [])
-		var idx: int = payload.get("warp_index", 0)
-		if idx >= 0 and idx < dest_warps.size():
-			var w = dest_warps[idx]
-			arrival = Vector2i(int(w.get("x", 0)), int(w.get("y", 0)))
+func _follower_follow(from: Vector2i, speed: float, jump: bool) -> void:
+	if _follower_species == "":
+		return
+	var dv := from - follower.cell
+	var far := absi(dv.x) + absi(dv.y)
+	var dir := ("right" if dv.x > 0 else "left") if absi(dv.x) >= absi(dv.y) else ("down" if dv.y > 0 else "up")
+	if far == 0:
+		follower.face(player.facing)
+	elif far == 1:
+		follower.start_move(dir, speed)
+	elif far == 2 and (dv.x == 0 or dv.y == 0):
+		follower.start_move(dir, 2.0, true)
 	else:
-		# Route connection: enter from the edge that borders the map you left,
-		# offset along that edge by the connection's declared alignment offset.
-		var offset: Vector2i = payload.get("offset", Vector2i.ZERO)
-		match payload.get("dir", ""):
-			"north":
-				arrival = Vector2i(clampi(_player.cell.x + offset.x, 0, w2 - 1), h2 - 1)
-			"south":
-				arrival = Vector2i(clampi(_player.cell.x + offset.x, 0, w2 - 1), 0)
-			"west":
-				arrival = Vector2i(w2 - 1, clampi(_player.cell.y + offset.y, 0, h2 - 1))
-			"east":
-				arrival = Vector2i(0, clampi(_player.cell.y + offset.y, 0, h2 - 1))
+		follower.place(from, player.facing)
+	if jump:
+		pass
 
-	GameState.current_map = to_map
-	GameState.player_cell = arrival
-	_load_current_map()
+func _update_follower_visibility() -> void:
+	if _follower_species == "" or _lead_species() == "":
+		follower.visible = false
+		return
+	if not player.visible:
+		follower.visible = false
+		return
+	var tucked := not follower.moving and follower.cell == player.cell
+	follower.visible = not tucked and not (_map_loader.is_water(follower.cell) and not follower.moving)
 
-func _on_encounter(species: String, level: int) -> void:
-	SceneRouter.start_battle({"kind": "wild", "species": species, "level": level})
+# ---------------------------------------------------------------- Story / script API
+func lock_input(on: bool) -> void:
+	_locks = maxi(0, _locks + (1 if on else -1))
 
-## Docs/CI screenshot support (see Main.gd's --scene= menu-key handling):
-## opens a given start-menu-reachable screen directly, bypassing input.
+func is_input_locked() -> bool:
+	return _locks > 0
+
+func get_actor(id: String) -> Node3D:
+	if id == "PLAYER":
+		return player
+	if id == "FOLLOWER":
+		return follower
+	if _map_loader == null:
+		return null
+	for a in _map_loader.actors:
+		var act: OwActor = a
+		if String(act.obj.get("id", "")) == id:
+			return act
+	return null
+
+func actor_cell(id: String) -> Vector2i:
+	var a := get_actor(id) as OwActor
+	return a.cell if a else Vector2i(-1, -1)
+
+func actor_dir(id: String) -> String:
+	var a := get_actor(id) as OwActor
+	return a.facing if a else "down"
+
+func face_actor(id: String, dir: String) -> void:
+	var a := get_actor(id) as OwActor
+	if a:
+		a.face(dir)
+
+## Walk an actor along an upstream "UDLR" path, one cell per letter, awaiting each step. Ignores collision
+## (scripts own the path), like upstream's scripted walks.
+func move_actor(id: String, path: String) -> void:
+	var a := get_actor(id) as OwActor
+	if a == null:
+		return
+	a.scripted = true
+	for ch in path:
+		var d: String = LETTER.get(ch.to_upper(), "")
+		if d == "":
+			continue
+		var from := a.cell
+		a.start_move(d, 1.0)
+		if a == player:
+			_follower_follow(from, 1.0, false)
+		await a.step_finished
+		if a == player:
+			GameState.player_cell = a.cell
+	a.scripted = false
+
+## Several actors stepping in lockstep: pairs = [[id, "U"], [id2, "L"], ...] (one step each, then await all).
+func move_together(pairs: Array) -> void:
+	var movers: Array = []
+	for p in pairs:
+		var a := get_actor(String(p[0])) as OwActor
+		var d: String = LETTER.get(String(p[1]).to_upper(), "")
+		if a == null or d == "":
+			continue
+		a.scripted = true
+		var from := a.cell
+		a.start_move(d, 1.0)
+		if a == player:
+			_follower_follow(from, 1.0, false)
+		movers.append(a)
+	for a in movers:
+		var act: OwActor = a
+		if act.moving:
+			await act.step_finished
+		act.scripted = false
+	GameState.player_cell = player.cell
+
+func show_actor(id: String, cell: Vector2i = Vector2i(-1, -1)) -> void:
+	_hidden_ids.erase(id)
+	_shown_ids[id] = true
+	var a := get_actor(id) as OwActor
+	if a == null and _map_loader:
+		for o in _map_loader.map_data.get("objs", []):
+			if String(o.get("id", "")) == id:
+				a = _map_loader.spawn_actor(o)
+				break
+	if a:
+		a.visible = true
+		if cell.x >= 0:
+			a.place(cell)
+
+func hide_actor(id: String) -> void:
+	_hidden_ids[id] = true
+	var a := get_actor(id) as OwActor
+	if a:
+		a.visible = false
+
+func is_actor_shown(id: String) -> bool:
+	var a := get_actor(id) as OwActor
+	return a != null and a.visible
+
+## Add a new object (NPC / item ball) to the current map at runtime; returns its actor.
+func spawn_object(obj: Dictionary) -> Node3D:
+	return _map_loader.spawn_actor(obj) if _map_loader else null
+
+func remove_object(id: String) -> void:
+	var a := get_actor(id) as OwActor
+	if a and a != player and a != follower:
+		_map_loader.remove_actor(a)
+
+func warp_to(map_name: String, cell: Vector2i, facing: String = "") -> void:
+	_busy = true
+	await fade_out(10)
+	_load_map(map_name, cell, facing)
+	await fade_in(10)
+	_busy = false
+
+func fade_out(frames: int = 10) -> void:
+	var tw := create_tween()
+	tw.tween_property(_fade_rect, "color:a", 1.0, frames * FRAME)
+	await tw.finished
+
+func fade_in(frames: int = 10) -> void:
+	var tw := create_tween()
+	tw.tween_property(_fade_rect, "color:a", 0.0, frames * FRAME)
+	await tw.finished
+
+## Emote bubble ("!", "?", "...", "heart") above an actor for ~1 s.
+func emote(id: String, kind: String = "!") -> void:
+	var a := get_actor(id) as OwActor
+	if a == null:
+		return
+	var l := Label3D.new()
+	l.text = {"heart": "♥", "...": "…"}.get(kind, kind)
+	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	l.no_depth_test = true
+	l.font_size = 64
+	l.outline_size = 12
+	l.modulate = Color(0.1, 0.1, 0.15)
+	l.outline_modulate = Color(1, 1, 1)
+	l.position = Vector3(0, WorldData.px_h(30.0), 0)
+	a.add_child(l)
+	await get_tree().create_timer(60.0 * FRAME).timeout
+	l.queue_free()
+
+## BFS over passable, unoccupied cells; returns an upstream "UDLR" path or "" (also "" when from == to).
+func path_to(from: Vector2i, to: Vector2i) -> String:
+	if from == to or _map_loader == null:
+		return ""
+	var prev := {from: null}
+	var q: Array = [from]
+	var dirs := [["U", Vector2i(0, -1)], ["D", Vector2i(0, 1)], ["L", Vector2i(-1, 0)], ["R", Vector2i(1, 0)]]
+	while not q.is_empty():
+		var c: Vector2i = q.pop_front()
+		if c == to:
+			break
+		for dd in dirs:
+			var n: Vector2i = c + dd[1]
+			if prev.has(n) or not _map_loader.passable(n):
+				continue
+			if n != to and _actor_blocking(n, player):
+				continue
+			prev[n] = [c, dd[0]]
+			q.append(n)
+	if not prev.has(to):
+		return ""
+	var out := ""
+	var cur: Vector2i = to
+	while cur != from:
+		var p: Array = prev[cur]
+		out = String(p[1]) + out
+		cur = p[0]
+	return out
+
+func is_passable(cell: Vector2i) -> bool:
+	return _map_loader != null and _map_loader.passable(cell)
+
+# ---------------------------------------------------------------- captures (Main.gd)
 func open_menu_for_screenshot(key: String) -> void:
 	match key:
 		"start_menu": _start_menu.open()
@@ -140,3 +662,9 @@ func open_menu_for_screenshot(key: String) -> void:
 
 func show_dialogue_for_screenshot(lines: Array) -> void:
 	_dialogue.show_lines(lines)
+
+## Capture helper: face the player and put the follower one step behind.
+func set_player_facing_for_screenshot(dir: String) -> void:
+	player.face(dir)
+	GameState.player_facing = dir
+	_place_follower()

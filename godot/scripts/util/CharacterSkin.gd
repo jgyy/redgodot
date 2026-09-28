@@ -40,3 +40,21 @@ static func _find_mesh_instances(node: Node) -> Array:
 	for c in node.get_children():
 		out.append_array(_find_mesh_instances(c))
 	return out
+
+## The one place that decides which 3D model an overworld character sprite key (cast.json key, e.g. "red",
+## "oak", "youngster") uses: a dedicated res://assets/models/characters/<sprite>.glb when the character
+## pipeline has generated one, else the shared tinted humanoid.glb. Returns null if neither exists.
+static func instantiate_character(sprite: String) -> Node3D:
+	var own := "res://assets/models/characters/%s.glb" % sprite
+	if sprite != "" and ResourceLoader.exists(own):
+		var ps: PackedScene = load(own)
+		if ps:
+			return ps.instantiate()
+	var base := "res://assets/models/characters/humanoid.glb"
+	if ResourceLoader.exists(base):
+		var scene: PackedScene = load(base)
+		if scene:
+			var inst: Node3D = scene.instantiate()
+			apply(inst, GameData.cast.get(sprite, {}))
+			return inst
+	return null

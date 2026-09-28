@@ -109,6 +109,8 @@ func _apply_overrides(args: Dictionary) -> void:
 		var parts: PackedStringArray = args["pc"].split(",")
 		if parts.size() == 2:
 			GameState.player_cell = Vector2i(int(parts[0]), int(parts[1]))
+	if args.has("facing"):
+		GameState.player_facing = String(args["facing"])
 	if args.has("time"):
 		match args["time"]:
 			"day": GameState.clock_minutes = 12.0 * 60.0
