@@ -12,7 +12,7 @@ const FOOT_Z := 0.8          # where in its cell (0..1, north->south) a characte
 const DIRS := {"down": Vector2i(0, 1), "up": Vector2i(0, -1), "left": Vector2i(-1, 0), "right": Vector2i(1, 0)}
 const YAW := {"down": 0.0, "up": PI, "left": -PI / 2.0, "right": PI / 2.0}   # models face +Z (Blender -Y)
 const CHAR_PX := 20.0        # height of a character sprite in the 2D game (px)
-const LEAN_DEG := -22.0   # negative: top away from the camera, so the face turns up toward it
+const LEAN_DEG := -30.0   # negative: top away from the camera, so the face turns up toward it
 
 var cell := Vector2i.ZERO
 var facing := "down"

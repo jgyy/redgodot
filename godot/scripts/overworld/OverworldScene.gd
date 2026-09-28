@@ -219,7 +219,8 @@ func _load_map(map_name: String, cell: Vector2i, facing: String) -> void:
 	_update_camera()
 	entered_map.emit(map_name)
 	var story := get_node_or_null("/root/Story")
-	if story and story.has_method("on_enter"):
+	# captures of a location (--story=off) show the map as it stands, without its enter scripts
+	if story and story.has_method("on_enter") and not OS.get_cmdline_user_args().has("--story=off"):
 		story.on_enter(map_name)
 
 func current_map() -> String:

@@ -81,29 +81,76 @@ shot 200-battle-action-menu --scene=battle --wait=0.3 --player=PIKACHU --player_
 shot 201-battle-move-menu --scene=battle --wait=0.3 --player=CHARIZARD --player_level=50 --enemy=BLASTOISE --level=50 --env=grass --state=moves
 shot 202-battle-trainer-brock --scene=battle --wait=4.0 --player=BLASTOISE --player_level=40 --trainer=BROCK:1 --env=gym --autoplay=1
 
-# --- Locations: day/night lighting cycle across Kanto --------------------
-declare -a LOCATIONS=(
-  "PalletTown:day" "PalletTown:night" "OaksLab:day" "RedsHouse1F:day"
-  "ViridianCity:day" "ViridianPokecenter:day" "ViridianForest:day"
-  "PewterCity:day" "PewterGym:day" "MtMoon1F:day"
-  "CeruleanCity:day" "CeruleanCity:night" "CeruleanGym:day" "Route24:day"
-  "VermilionCity:day" "VermilionGym:day" "SSAnne1F:day" "RockTunnel1F:day"
-  "LavenderTown:night" "PokemonTower3F:day"
-  "CeladonCity:day" "CeladonCity:night" "CeladonGym:day" "RocketHideoutB1F:day"
-  "FuchsiaCity:day" "FuchsiaGym:day" "SafariZoneCenter:day"
-  "SaffronCity:day" "SaffronGym:day" "SeafoamIslands1F:day"
-  "CinnabarIsland:day" "CinnabarIsland:night" "CinnabarGym:day" "PokemonMansion1F:day"
-  "PowerPlant:day" "VictoryRoad1F:day" "IndigoPlateau:dusk" "CeruleanCave1F:day"
-  "Route1:day" "Route11:day"
-)
-i=60
-for entry in "${LOCATIONS[@]}"; do
-  map="${entry%%:*}"; time="${entry##*:}"
-  w=$(python3 -c "import json;d=json.load(open('$ROOT_DIR/godot/data/mapdata.json'));m=d['maps']['$map'];print(m['w']//2)")
-  h=$(python3 -c "import json;d=json.load(open('$ROOT_DIR/godot/data/mapdata.json'));m=d['maps']['$map'];print(m['h']//2)")
-  shot "$(printf '%02d' $i)-${map,,}-${time}" --scene=overworld --map="$map" --pc="$w,$h" --time="$time" --wait=1.5
-  i=$((i+1))
-done
+# --- Overworld locations (refs 003-067, docs/claude-red-screenshots) -----------------
+# Same basename as the reference. The player stands where the reference was taken (it is centred);
+# --player picks the walking partner seen in the shot (--follower=none: none visible), --story=off
+# shows the map without running its story enter scripts, --flash=1 = FLASH already used (Rock Tunnel).
+# Maps must be baked first (pipeline/scripts/bake_maps.js) and imported (godot4 --headless --import).
+shot "003-PalletTown" --scene=overworld --map=PalletTown --pc=9,8 --time=day --facing=down --player=PIKACHU --story=off --wait=1.5
+shot "004-PalletTown-night" --scene=overworld --map=PalletTown --pc=9,8 --time=night --facing=down --player=BULBASAUR --story=off --wait=1.5
+shot "005-RedsHouse2F" --scene=overworld --map=RedsHouse2F --pc=4,4 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "006-OaksLab" --scene=overworld --map=OaksLab --pc=5,6 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "007-Route1" --scene=overworld --map=Route1 --pc=10,18 --time=day --facing=down --player=CHARMANDER --story=off --wait=1.5
+shot "008-ViridianCity" --scene=overworld --map=ViridianCity --pc=20,18 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "009-ViridianPokecenter" --scene=overworld --map=ViridianPokecenter --pc=7,4 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "010-Route22-dusk" --scene=overworld --map=Route22 --pc=20,9 --time=dusk --facing=down --player=CATERPIE --story=off --wait=1.5
+shot "011-ViridianForest" --scene=overworld --map=ViridianForest --pc=12,19 --time=day --facing=down --player=PIDGEY --story=off --wait=1.5
+shot "012-PewterCity" --scene=overworld --map=PewterCity --pc=20,18 --time=day --facing=down --player=GEODUDE --story=off --wait=1.5
+shot "013-PewterGym" --scene=overworld --map=PewterGym --pc=4,6 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "014-Route3" --scene=overworld --map=Route3 --pc=35,9 --time=day --facing=down --player=NIDORAN_M --story=off --wait=1.5
+shot "015-MtMoon1F" --scene=overworld --map=MtMoon1F --pc=20,18 --time=day --facing=down --player=CLEFAIRY --story=off --wait=1.5
+shot "016-Route4-dusk" --scene=overworld --map=Route4 --pc=44,8 --time=dusk --facing=down --player=EKANS --story=off --wait=1.5
+shot "017-CeruleanCity" --scene=overworld --map=CeruleanCity --pc=20,18 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "018-CeruleanCity-night" --scene=overworld --map=CeruleanCity --pc=20,18 --time=night --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "019-CeruleanGym" --scene=overworld --map=CeruleanGym --pc=5,7 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "020-Route24" --scene=overworld --map=Route24 --pc=10,18 --time=day --facing=down --player=SPEAROW --story=off --wait=1.5
+shot "021-Route25-dusk" --scene=overworld --map=Route25 --pc=30,9 --time=dusk --facing=down --player=PIKACHU --story=off --wait=1.5
+shot "022-Route5" --scene=overworld --map=Route5 --pc=9,17 --time=day --facing=down --player=PIDGEY --story=off --wait=1.5
+shot "023-SaffronCity" --scene=overworld --map=SaffronCity --pc=24,14 --time=day --facing=down --player=FEAROW --story=off --wait=1.5
+shot "024-SaffronCity-night" --scene=overworld --map=SaffronCity --pc=24,14 --time=night --facing=down --player=FEAROW --story=off --wait=1.5
+shot "025-VermilionCity" --scene=overworld --map=VermilionCity --pc=20,18 --time=day --facing=down --player=WARTORTLE --story=off --wait=1.5
+shot "026-VermilionCity-night" --scene=overworld --map=VermilionCity --pc=20,18 --time=day --facing=down --player=PIDGEOTTO --story=off --wait=1.5
+shot "027-VermilionDock" --scene=overworld --map=VermilionDock --pc=14,2 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "028-SSAnneBow-dusk" --scene=overworld --map=SSAnneBow --pc=10,7 --time=dusk --facing=down --player=POLIWAG --story=off --wait=1.5
+shot "029-VermilionGym" --scene=overworld --map=VermilionGym --pc=4,8 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "030-Route9" --scene=overworld --map=Route9 --pc=29,8 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "031-RockTunnel1F" --scene=overworld --map=RockTunnel1F --pc=20,18 --time=day --facing=down --player=ONIX --flash=1 --story=off --wait=1.5
+shot "032-LavenderTown" --scene=overworld --map=LavenderTown --pc=10,9 --time=day --facing=down --player=HAUNTER --story=off --wait=1.5
+shot "033-LavenderTown-night" --scene=overworld --map=LavenderTown --pc=10,9 --time=night --facing=down --player=HAUNTER --story=off --wait=1.5
+shot "034-PokemonTower6F" --scene=overworld --map=PokemonTower6F --pc=9,8 --time=day --facing=down --player=GENGAR --story=off --wait=1.5
+shot "035-Route8" --scene=overworld --map=Route8 --pc=30,9 --time=day --facing=down --player=PONYTA --story=off --wait=1.5
+shot "036-CeladonCity" --scene=overworld --map=CeladonCity --pc=24,17 --time=day --facing=down --player=VILEPLUME --story=off --wait=1.5
+shot "037-CeladonCity-night" --scene=overworld --map=CeladonCity --pc=24,17 --time=night --facing=down --player=VILEPLUME --story=off --wait=1.5
+shot "038-CeladonMartRoof-dusk" --scene=overworld --map=CeladonMartRoof --pc=10,4 --time=dusk --facing=down --player=DRAGONAIR --story=off --wait=1.5
+shot "039-CeladonGym" --scene=overworld --map=CeladonGym --pc=5,9 --time=day --facing=down --player=NIDOQUEEN --story=off --wait=1.5
+shot "040-GameCorner" --scene=overworld --map=GameCorner --pc=10,9 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "041-RocketHideoutB1F" --scene=overworld --map=RocketHideoutB1F --pc=14,13 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "042-Route12" --scene=overworld --map=Route12 --pc=9,53 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "043-Route15-dusk" --scene=overworld --map=Route15 --pc=30,9 --time=dusk --facing=down --player=SCYTHER --story=off --wait=1.5
+shot "044-FuchsiaCity" --scene=overworld --map=FuchsiaCity --pc=20,18 --time=day --facing=down --player=VENONAT --story=off --wait=1.5
+shot "045-FuchsiaCity-night" --scene=overworld --map=FuchsiaCity --pc=20,18 --time=night --facing=down --player=KANGASKHAN --story=off --wait=1.5
+shot "046-SafariZoneCenter" --scene=overworld --map=SafariZoneCenter --pc=14,14 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "047-SafariZoneEast" --scene=overworld --map=SafariZoneEast --pc=15,13 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "048-FuchsiaGym" --scene=overworld --map=FuchsiaGym --pc=5,9 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "049-Route18" --scene=overworld --map=Route18 --pc=25,9 --time=day --facing=down --player=DODRIO --story=off --wait=1.5
+shot "050-SilphCo11F" --scene=overworld --map=SilphCo11F --pc=9,9 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "051-SaffronGym" --scene=overworld --map=SaffronGym --pc=10,9 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "052-FightingDojo" --scene=overworld --map=FightingDojo --pc=5,6 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "053-Route19" --scene=overworld --map=Route19 --pc=4,9 --time=day --facing=down --player=LAPRAS --story=off --wait=1.5
+shot "054-SeafoamIslands1F" --scene=overworld --map=SeafoamIslands1F --pc=15,9 --time=day --facing=down --player=DEWGONG --story=off --wait=1.5
+shot "055-SeafoamIslandsB4F" --scene=overworld --map=SeafoamIslandsB4F --pc=14,8 --time=day --facing=down --player=DEWGONG --story=off --wait=1.5
+shot "056-CinnabarIsland" --scene=overworld --map=CinnabarIsland --pc=9,10 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "057-CinnabarIsland-night" --scene=overworld --map=CinnabarIsland --pc=9,10 --time=night --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "058-PokemonMansion1F" --scene=overworld --map=PokemonMansion1F --pc=15,14 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "059-CinnabarGym" --scene=overworld --map=CinnabarGym --pc=10,9 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "060-PowerPlant" --scene=overworld --map=PowerPlant --pc=20,19 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "061-Route23" --scene=overworld --map=Route23 --pc=9,71 --time=day --facing=down --player=KABUTO --story=off --wait=1.5
+shot "062-VictoryRoad1F" --scene=overworld --map=VictoryRoad1F --pc=9,8 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "063-IndigoPlateau-dusk" --scene=overworld --map=IndigoPlateau --pc=10,9 --time=dusk --facing=down --player=CHARIZARD --story=off --wait=1.5
+shot "064-LoreleisRoom" --scene=overworld --map=LoreleisRoom --pc=5,6 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "065-LancesRoom" --scene=overworld --map=LancesRoom --pc=10,10 --time=day --facing=down --player=PIKACHU --follower=none --story=off --wait=1.5
+shot "066-ChampionsRoom" --scene=dialogue --map=ChampionsRoom --pc=5,2 --time=day --facing=up --player=PIKACHU --follower=none --text="BLUE: Hey there!" --story=off --wait=1.5
+shot "067-CeruleanCave1F" --scene=overworld --map=CeruleanCave1F --pc=15,9 --time=day --facing=down --player=MEWTWO --story=off --wait=1.5
 
 # --- 3D model contact sheets (every Pokemon / character next to upstream's sprite) ----
 # docs/gallery/pokemon-151-3d.png, pokemon-151-3d-back.png, characters-3d.png, characters-3d-back.png

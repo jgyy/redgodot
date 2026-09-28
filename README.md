@@ -84,7 +84,7 @@ capture in `docs/gallery/` (same matchup, level, HP, move, environment and UI).
 
 | Pallet Town — day | Pallet Town — night |
 |---|---|
-| ![Pallet Town day](docs/gallery/60-pallettown-day.png) | ![Pallet Town night](docs/gallery/61-pallettown-night.png) |
+| ![Pallet Town day](docs/gallery/003-PalletTown.png) | ![Pallet Town night](docs/gallery/004-PalletTown-night.png) |
 
 `docs/gallery/` also has day/night/dusk pairs for Cerulean City, Celadon
 City, and Cinnabar Island, plus 30+ more locations across Kanto (routes,
