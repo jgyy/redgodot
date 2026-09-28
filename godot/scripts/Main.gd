@@ -114,6 +114,6 @@ func _apply_overrides(args: Dictionary) -> void:
 	if args.has("time"):
 		match args["time"]:
 			"day": GameState.clock_minutes = 12.0 * 60.0
-			"dusk": GameState.clock_minutes = 19.0 * 60.0
+			"dusk": GameState.clock_minutes = 18.0 * 60.0   # upstream timeOfDay: peak dusk, no night yet
 			"night": GameState.clock_minutes = 23.0 * 60.0
 	GameState.clock_running = false

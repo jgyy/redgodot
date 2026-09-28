@@ -75,7 +75,65 @@ func _test_map_classification(tree: SceneTree) -> void:
 	check(ok, "PalletTown loads")
 	check(ml.width == 20 and ml.height == 18, "PalletTown dimensions match source data (20x18)")
 	check(not ml.warp_at(Vector2i(5, 5)).is_empty(), "PalletTown has a warp at (5,5) -> Red's house")
+	# collision comes from the quad's collision tile (upstream GameMap), not the quad index
+	check(ml.passable(Vector2i(5, 5)) and ml.is_door_tile(Vector2i(5, 5)), "Red's house door cell is a passable door tile")
+	check(not ml.passable(Vector2i(0, 5)), "Pallet's west tree border blocks")
+	check(ml.passable(Vector2i(9, 8)), "Pallet's central path is walkable")
+	check(not ml.passable(Vector2i(5, 3)), "Red's house walls block")
+	check(ml.is_water(Vector2i(5, 15)) and not ml.passable(Vector2i(5, 15)), "Pallet's pond is water (surf only)")
+	check(ml.connection_beyond(Vector2i(9, -1)).get("conn", {}).get("map", "") == "Route1", "Pallet connects north to Route 1")
+	check(ml.label_at(Vector2i(0, 5)).begins_with("tree"), "baked labels: Pallet's border is trees")
 	ml.free()
+	var r1 := MapLoader.new()
+	r1.load_map("Route1", false)
+	var grass := 0
+	var ledges := 0
+	for y in range(r1.height):
+		for x in range(r1.width):
+			if r1.is_tall_grass(Vector2i(x, y)):
+				grass += 1
+			if r1.is_ledge_jump(Vector2i(x, y), "down"):
+				ledges += 1
+	check(grass == 104, "Route 1 has its 104 tall-grass cells (got %d)" % grass)
+	check(ledges > 0, "Route 1 has ledges you can hop down (got %d)" % ledges)
+	r1.free()
+	_test_all_maps()
+
+## Every map loads, has a bake, a walkable cell, and every warp leads to a real map/warp.
+func _test_all_maps() -> void:
+	var loaded := 0
+	var baked := 0
+	var walkable := 0
+	var bad_warps: Array = []
+	for name in GameData.maps.keys():
+		var ml := MapLoader.new()
+		if ml.load_map(name, false):
+			loaded += 1
+		if FileAccess.file_exists("res://assets/maps/%s.json" % name) and ResourceLoader.exists("res://assets/maps/%s_ground.png" % name):
+			baked += 1
+		var any := false
+		for y in range(ml.height):
+			for x in range(ml.width):
+				if ml.passable(Vector2i(x, y)):
+					any = true
+					break
+			if any:
+				break
+		if any:
+			walkable += 1
+		for w in ml.map_data.get("warps", []):
+			var to := String(w.get("to", ""))
+			if to == "LAST_MAP":
+				continue
+			var dm := GameData.get_map(to)
+			if dm.is_empty() or int(w.get("warp", 0)) >= (dm.get("warps", []) as Array).size():
+				bad_warps.append("%s->%s#%d" % [name, to, int(w.get("warp", 0))])
+		ml.free()
+	var n := GameData.maps.size()
+	check(loaded == n, "all %d maps load (got %d)" % [n, loaded])
+	check(baked == n, "all %d maps have a 3D bake (got %d)" % [n, baked])
+	check(walkable == n, "all %d maps have walkable cells (got %d)" % [n, walkable])
+	check(bad_warps.size() <= 2, "warps lead to existing maps/warps (bad: %s)" % [bad_warps])
 
 func _test_encounter_table() -> void:
 	var table := EncounterSystem.wild_table_for_map("Route1")

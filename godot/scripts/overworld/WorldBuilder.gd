@@ -52,12 +52,19 @@ func build_ground(mat: ShaderMaterial) -> MeshInstance3D:
 	var ch := float(bake.get("ch", 1))
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var p0 := Vector3(-mx, 0, -my)
-	var p1 := Vector3(cw - mx, 0, -my)
-	var p2 := Vector3(cw - mx, 0, ch - my)
-	var p3 := Vector3(-mx, 0, ch - my)
+	# interiors: the baked void border is clamped outward so the room floats in upstream's black void to the
+	# screen edges
+	var ext := 40.0 if String(bake.get("kind", "")) == "interior" else 0.0
+	var u0 := -ext / cw
+	var v0 := -ext / ch
+	var u1 := 1.0 + ext / cw
+	var v1 := 1.0 + ext / ch
+	var p0 := Vector3(-mx - ext, 0, -my - ext)
+	var p1 := Vector3(cw - mx + ext, 0, -my - ext)
+	var p2 := Vector3(cw - mx + ext, 0, ch - my + ext)
+	var p3 := Vector3(-mx - ext, 0, ch - my + ext)
 	st.set_normal(Vector3.UP)
-	for v in [[p0, Vector2(0, 0)], [p1, Vector2(1, 0)], [p2, Vector2(1, 1)], [p0, Vector2(0, 0)], [p2, Vector2(1, 1)], [p3, Vector2(0, 1)]]:
+	for v in [[p0, Vector2(u0, v0)], [p1, Vector2(u1, v0)], [p2, Vector2(u1, v1)], [p0, Vector2(u0, v0)], [p2, Vector2(u1, v1)], [p3, Vector2(u0, v1)]]:
 		st.set_uv(v[1])
 		st.add_vertex(v[0])
 	var mi := MeshInstance3D.new()

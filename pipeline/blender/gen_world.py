@@ -151,6 +151,81 @@ def build_tree(key, d, pal):
     return ob
 
 
+def finish_mesh(ob, bm):
+    bm.to_mesh(ob.data)
+    bm.free()
+    me = ob.data
+    for a in list(me.color_attributes):
+        if a.name != 'Col':
+            me.color_attributes.remove(a)
+    mat = bpy.data.materials.new(ob.name + '_mat')
+    mat.use_nodes = True
+    me.materials.append(mat)
+    for p in me.polygons:
+        p.use_smooth = False
+
+
+def ellipsoid(bm, center, rx, ry, rz, subdiv=2, jag=0.0, seed=0):
+    sph = bmesh.ops.create_icosphere(bm, subdivisions=subdiv, radius=1.0)
+    sv = sph['verts']
+    for v in sv:
+        n = v.co.normalized()
+        j = 1.0 + (hash2(int(n.x * 50 + 99), int(n.z * 50 + 99), seed) - 0.5) * jag
+        v.co = Vector((center[0] + n.x * rx * j, center[1] + n.y * ry * j, center[2] + n.z * rz * j))
+    return {f for v in sv for f in v.link_faces}
+
+
+def build_pokeball():
+    """Item ball (objsprites.js ART.ball): 10px across, red top with a highlight, black band, white bottom."""
+    P = {'O': '#1b1a2e', 'R': '#e04848', 'r': '#a82838', 'L': '#ff9a8a', 'W': '#f8f8f8', 'w': '#c8c8d8'}
+    c = {k: hex_rgb(v) for k, v in P.items()}
+    ob = new_mesh_obj('pokeball')
+    bm = bmesh.new()
+    col = vcol_layer(bm)
+    r = 5.0 / 16.0
+    cz = 4.5 / 16.0
+    fs = ellipsoid(bm, (0.0, 0.0, cz), r, r * 0.8, r * 0.8, subdiv=3)
+    for f in fs:
+        m = f.calc_center_median()
+        n = Vector(((m.x) / r, (m.y) / (r * 0.8), (m.z - cz) / (r * 0.8))).normalized()
+        front = n.y < -0.86 and abs(n.z) < 0.4 and abs(n.x) < 0.4
+        if front and n.y < -0.95:
+            k = 'W'
+        elif front:
+            k = 'O'
+        elif abs(n.z) < 0.13:
+            k = 'O'
+        elif n.z > 0:
+            lit = -n.x * 0.55 + n.z * 0.7 - n.y * 0.45
+            k = 'L' if lit > 0.85 else ('r' if lit < 0.1 else 'R')
+        else:
+            lit = -n.x * 0.55 - n.y * 0.45
+            k = 'W' if lit > -0.1 else 'w'
+        set_face_color(bm, f, c[k], col)
+    finish_mesh(ob, bm)
+    return ob
+
+
+def build_boulder():
+    """Strength boulder (objsprites.js ART.boulder): a lumpy rock lit from the top-left, A (light) .. E (dark)."""
+    ramp = [hex_rgb(h) for h in ['#56463c', '#786454', '#a08c78', '#c8b8a4', '#e8dccc']]
+    ob = new_mesh_obj('boulder')
+    bm = bmesh.new()
+    col = vcol_layer(bm)
+    r = 7.5 / 16.0
+    cz = 6.5 / 16.0
+    rng = random.Random(7)
+    fs = ellipsoid(bm, (0.0, 0.0, cz), r, r * 0.72, r * 0.72, subdiv=2, jag=0.25, seed=41)
+    for f in fs:
+        m = f.calc_center_median()
+        n = f.normal
+        lit = -n.x * 0.55 + n.z * 0.7 - n.y * 0.45 + (rng.random() - 0.5) * 0.2
+        idx = 4 if lit > 0.75 else 3 if lit > 0.4 else 2 if lit > 0.0 else 1 if lit > -0.4 else 0
+        set_face_color(bm, f, ramp[idx], col)
+    finish_mesh(ob, bm)
+    return ob
+
+
 def export_static(path):
     C.ensure_dir(os.path.dirname(path))
     bpy.ops.export_scene.gltf(filepath=path, export_format='GLB', check_existing=False, use_selection=False,
@@ -170,6 +245,14 @@ def main():
         path = os.path.join(OUT_DIR, 'tree_%s.glb' % key)
         export_static(path)
         manifest['tree_%s' % key] = {'tris': tris, 'kind': d['kind'], 'variant': d['v']}
+        print('[gen_world] %s: %d tris' % (path, tris))
+    for name, fn in (('pokeball', build_pokeball), ('boulder', build_boulder)):
+        C.reset_scene()
+        ob = fn()
+        tris = sum(len(p.vertices) - 2 for p in ob.data.polygons)
+        path = os.path.join(OUT_DIR, '%s.glb' % name)
+        export_static(path)
+        manifest[name] = {'tris': tris}
         print('[gen_world] %s: %d tris' % (path, tris))
     json.dump(manifest, open(os.path.join(OUT_DIR, 'manifest.json'), 'w'), indent=1)
 

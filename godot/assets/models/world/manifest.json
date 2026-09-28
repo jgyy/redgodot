@@ -58,5 +58,11 @@
   "tris": 648,
   "kind": "tree",
   "variant": 5
+ },
+ "pokeball": {
+  "tris": 320
+ },
+ "boulder": {
+  "tris": 80
  }
 }

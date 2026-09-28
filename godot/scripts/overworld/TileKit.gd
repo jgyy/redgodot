@@ -14,6 +14,11 @@ const CHUNK := 8
 static var _palette: Dictionary = {}
 static var _tree_meshes: Dictionary = {}   # "tree0" .. "tree25" -> Mesh
 static var _materials: Array = []          # ShaderMaterials that follow the day/night grade
+static var _tree_mat: ShaderMaterial = null
+
+## Vertex-coloured prop material (trees' shader) of the current map, for Blender props (Poké Balls, boulders).
+static func prop_material() -> ShaderMaterial:
+	return _tree_mat
 
 static func palette() -> Dictionary:
 	if _palette.is_empty():
@@ -77,6 +82,7 @@ static func build_decor(bake: Dictionary, mx: int, my: int) -> Node3D:
 	# ---- trees
 	var tree_mat := _register(ShaderMaterial.new(), bake)
 	tree_mat.shader = TREE_SHADER
+	_tree_mat = tree_mat
 	var outline := _register(ShaderMaterial.new(), bake)
 	outline.shader = TREE_OUTLINE_SHADER
 	outline.set_shader_parameter("outline_col", Color(String(palette().get("leaf", ["#0c2322"])[0])))

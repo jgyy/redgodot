@@ -1,6 +1,6 @@
 // Shared by the world / tree / decor shaders: 2D-screen-space position of a fragment (the oblique projection
 // back onto the map, in baked px), upstream's night grade and dithered light pools, sRGB output.
-uniform sampler2D light_tex : filter_linear, repeat_disable;
+uniform sampler2D light_tex : hint_default_black, filter_linear, repeat_disable;
 uniform vec2 map_px = vec2(512.0);
 uniform vec2 margin = vec2(0.0);
 uniform float k_vert = 1.428;
@@ -26,7 +26,24 @@ vec3 linear_to_srgb(vec3 c) {
 // Forward+/Mobile expect linear
 #define to_output(c) (OUTPUT_IS_SRGB ? (c) : srgb_to_linear(c))
 
+// ambient.js cloud shadows: upstream N.big noise drifting over the map (outdoors, by day)
+uniform bool clouds = false;
+uniform float cloud_t = 0.0;     // frames
+uniform sampler2D big_tex : hint_default_black, filter_nearest, repeat_enable;
+
+vec3 cloud_shadow(vec3 col, vec2 p2d) {
+	if (!clouds) return col;
+	vec2 lp = floor(p2d - margin * 16.0);   // map-local px (upstream camera space)
+	float ct = cloud_t + TIME * 60.0;
+	vec2 o = floor(vec2(ct * 0.18, ct * 0.07));
+	vec2 cell = mod(floor(lp / 4.0) + o, 256.0);
+	float v = texture(big_tex, (cell + 0.5) / 256.0).r;
+	if (v > 0.68 || (v > 0.665 && mod(lp.x + lp.y, 2.0) > 0.5)) col *= vec3(196.0, 204.0, 232.0) / 256.0;
+	return col;
+}
+
 vec3 night_light(vec3 col, vec2 p2d) {
+	col = cloud_shadow(col, p2d);
 	col *= grade;
 	if (light_amt > 0.001) {
 		vec2 pix = floor(p2d);

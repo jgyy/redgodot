@@ -244,7 +244,8 @@ func spawn_actor(o: Dictionary) -> OwActor:
 		add_child(npcs)
 	npcs.add_child(a)
 	a.obj = o
-	a.setup(String(o.get("sprite", "youngster")))
+	var spr := String(GameData.sprite_override.get(String(o.get("id", "")), o.get("sprite", "youngster")))
+	a.setup(spr, OwActor.CHAR_PX, o)
 	var dir := "down"
 	var od := String(o.get("dir", "NONE"))
 	if ["UP", "DOWN", "LEFT", "RIGHT"].has(od):
@@ -294,6 +295,19 @@ func _build_visuals() -> void:
 	grass_node = deco.get_node_or_null("TallGrass")
 	_spawn_npcs()
 
+## ambient.js cloud shadows on/off for every world material of this map.
+func set_clouds(on: bool) -> void:
+	var big: Texture2D = load("res://assets/maps/noise_big.png") if on else null
+	var mats: Array = [world_mat, obj_mat]
+	mats.append_array(TileKit._materials)
+	for m in mats:
+		if m == null:
+			continue
+		var mat: ShaderMaterial = m
+		mat.set_shader_parameter("clouds", on)
+		if big:
+			mat.set_shader_parameter("big_tex", big)
+
 ## Shader-level day/night: upstream's multiplicative grade + light pools (see LightingRig).
 func apply_grade(grade: Color, light_amt: float, light_tex: Texture2D, glow_tex: Texture2D) -> void:
 	for m in [world_mat, obj_mat]:
@@ -306,4 +320,4 @@ func apply_grade(grade: Color, light_amt: float, light_tex: Texture2D, glow_tex:
 			mat.set_shader_parameter("light_tex", light_tex)
 		if glow_tex:
 			mat.set_shader_parameter("glow_tex", glow_tex)
-	TileKit.apply_grade(grade, light_amt)
+	TileKit.apply_grade(grade, light_amt, light_tex, glow_tex)

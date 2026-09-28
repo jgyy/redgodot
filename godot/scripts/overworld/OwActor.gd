@@ -23,6 +23,7 @@ var home := Vector2i.ZERO
 var idle_t := 0.0
 var scripted := false        # a script is driving it: no idle wandering
 var is_mon := false
+var is_object := false
 
 var _model: Node3D
 var _lean: Node3D
@@ -38,12 +39,39 @@ var _bob_phase := 0.0
 static func cell_pos(c: Vector2i) -> Vector3:
 	return Vector3(c.x + 0.5, 0.0, c.y + FOOT_Z)
 
-## sprite: cast key for people, or "mon:SPECIES" for a Pokémon (follower).
-func setup(sprite_key: String, px_height: float = CHAR_PX) -> void:
+const OBJECT_SPRITES := ["poke_ball", "boulder", "pokedex", "clipboard", "paper", "fossil", "old_amber"]
+const CREATURE_DEFAULT := {"bird": "PIDGEY", "fairy": "CLEFAIRY", "seel": "SEEL", "snorlax": "SNORLAX", "monster": "NIDORAN_M"}
+
+## upstream objsprites.js speciesFromLabel: the longest species name found in a text label
+static func species_from_label(label: String) -> String:
+	var up := label.to_upper()
+	var best := ""
+	for sp in GameData.species.keys():
+		var k := String(sp).replace("_", "")
+		if up.contains(k) and k.length() > best.replace("_", "").length():
+			best = sp
+	return best
+
+## sprite: cast key for people, or "mon:SPECIES" for a Pokémon (follower). `o` is the map object (NPCs): its
+## cast entry decides between a person, a Pokémon (creature objects, like upstream's objSprites) or an item
+## (a 3D Poké Ball / boulder, or a small standing sprite).
+func setup(sprite_key: String, px_height: float = CHAR_PX, o: Dictionary = {}) -> void:
 	sprite = sprite_key
 	for c in get_children():
 		c.queue_free()
 	_anim = null
+	var def: Dictionary = GameData.cast.get(sprite_key, {})
+	if def.has("creature"):
+		var sp := String(o.get("species", GameData.species_override.get(String(o.get("id", "")), "")))
+		if sp == "":
+			sp = species_from_label(String(o.get("textLabel", "")))
+		if sp == "":
+			sp = String(CREATURE_DEFAULT.get(String(def.creature), "PIKACHU"))
+		sprite_key = "mon:" + sp
+		px_height = 26.0 if (def.creature == "snorlax" or sp == "SNORLAX") else 18.0
+	if def.has("object"):
+		_setup_object(sprite_key)
+		return
 	if sprite_key.begins_with("mon:"):
 		is_mon = true
 		_model = _load_mon(sprite_key.substr(4), px_height)
@@ -66,6 +94,44 @@ func setup(sprite_key: String, px_height: float = CHAR_PX) -> void:
 	add_child(_shadow)
 	face(facing)
 
+## Items on the map: 3D Poké Ball / boulder (pipeline/blender/gen_world.py), other objects as a standing
+## sprite card of upstream's object art.
+func _setup_object(key: String) -> void:
+	is_object = true
+	var mesh_path: String = {"poke_ball": "res://assets/models/world/pokeball.glb", "boulder": "res://assets/models/world/boulder.glb"}.get(key, "")
+	_model = Node3D.new()
+	_model.name = "Object"
+	add_child(_model)
+	if mesh_path != "" and ResourceLoader.exists(mesh_path):
+		var ps: PackedScene = load(mesh_path)
+		var inst := ps.instantiate()
+		var mi := TileKit._find_mesh(inst)
+		if mi:
+			var m := MeshInstance3D.new()
+			m.mesh = mi.mesh
+			m.material_override = TileKit.prop_material()
+			m.scale = Vector3(1.0, WorldData.K, 1.0)
+			m.position = Vector3(0.0, 0.0, 0.8 - FOOT_Z)
+			_model.add_child(m)
+		inst.free()
+	else:
+		var idx := OBJECT_SPRITES.find(key)
+		var q := QuadMesh.new()
+		q.size = Vector2(1.0, WorldData.K)
+		var mat := StandardMaterial3D.new()
+		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		mat.albedo_texture = load("res://assets/maps/objects_atlas.png")
+		mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
+		mat.uv1_scale = Vector3(1.0 / OBJECT_SPRITES.size(), 1.0, 1.0)
+		mat.uv1_offset = Vector3(float(maxi(idx, 0)) / OBJECT_SPRITES.size(), 0.0, 0.0)
+		q.material = mat
+		var m2 := MeshInstance3D.new()
+		m2.mesh = q
+		m2.position = Vector3(0.0, WorldData.K * 0.5, 1.0 - FOOT_Z)
+		_model.add_child(m2)
+	face(facing)
+
 func _load_mon(species: String, px_height: float) -> Node3D:
 	var path := "res://assets/models/pokemon/%s.glb" % species
 	var m: Node3D = null
@@ -84,7 +150,10 @@ func _fit_height(m: Node3D, px: float) -> void:
 	var h := aabb.size.y
 	if h <= 0.001:
 		return
-	var target := WorldData.px_h(px)
+	# the model leans back by LEAN_DEG, so its projected height grows: size it so that on screen it is `px`
+	# pixels of 2D art tall (a ground cell of 16 px shows as sin(pitch) cells)
+	var pitch := deg_to_rad(WorldData.CAM_PITCH_DEG)
+	var target := px / 16.0 * WorldData.CELL * sin(pitch) / cos(pitch - absf(deg_to_rad(LEAN_DEG)))
 	var s := target / h
 	var holder := m
 	holder.scale = Vector3(s, s, s)
@@ -174,7 +243,7 @@ func face(dir: String) -> void:
 	if not YAW.has(dir):
 		return
 	facing = dir
-	if _model:
+	if _model and not is_object:
 		_model.rotation.y = YAW[dir]
 
 func facing_cell() -> Vector2i:

@@ -9,7 +9,7 @@ render_mode unshaded, cull_disabled, depth_draw_opaque;
 #include "res://scripts/overworld/shaders/_common.gdshaderinc"
 
 uniform sampler2D albedo_tex : filter_nearest, repeat_disable;
-uniform sampler2D glow_tex : filter_nearest, repeat_disable;   // r = lit-window rectangles (night)
+uniform sampler2D glow_tex : hint_default_black, filter_nearest, repeat_disable;   // r = lit-window rectangles (night)
 uniform float face_shading = 1.0;
 uniform bool is_ground = false;
 
@@ -56,7 +56,7 @@ void fragment() {
 	vec2 pix = floor(p2d);
 	if (is_ground && has_water) {
 		vec4 wv = texture(water_tex, (pix + 0.5) / map_px);
-		if (wv.r > 0.5) {
+		if (wv.r > 0.5 && wv.a > 0.5) {
 			float t = floor(TIME * 60.0 / 4.0) * 4.0;
 			col = water_color(pix, floor(wv.g * 255.0 / 25.0 + 0.5), wv.b > 0.5, t);
 		}

@@ -19,7 +19,7 @@ signal entered_map(map_name: String)
 
 const FRAME := 1.0 / 60.0
 const CAM_FOV := 20.0
-const CAM_DIST := 31.9      # frames 20 cells across at the player's depth (upstream: 320 px = 20 cells)
+const CAM_DIST := 31.1      # frames 20 cells across at the player's depth (upstream: 320 px = 20 cells)
 const FACING_WARP_TILES := {"down": [0x01, 0x12, 0x17, 0x3D, 0x04, 0x18, 0x33], "up": [0x01, 0x5C], "left": [0x1A, 0x4B], "right": [0x0F, 0x4E]}
 const FACING_WARP_TILESETS := ["Overworld", "Ship", "ShipPort", "Plateau"]
 const FACING_WARP_MAPS := ["RocketHideoutB1F", "RocketHideoutB2F", "RocketHideoutB4F", "RockTunnel1F"]
@@ -39,6 +39,9 @@ var _start_menu: StartMenu
 var _dialogue: DialogueBox
 var _fade_layer: CanvasLayer
 var _fade_rect: ColorRect
+var _amb_layer: CanvasLayer
+var _amb_rect: ColorRect
+var _amb_mat: ShaderMaterial
 
 var _locks := 0
 var _busy := false           # a warp / connection change is in progress
@@ -57,6 +60,7 @@ func _ready() -> void:
 	_rng.randomize()
 	_setup_camera()
 	_build_fade()
+	_build_ambient()
 	player = OwActor.new()
 	player.name = "Player"
 	add_child(player)
@@ -91,6 +95,69 @@ func _setup_camera() -> void:
 	_sun.shadow_enabled = false
 	_sun.rotation = Vector3(deg_to_rad(-60.0), deg_to_rad(-35.0), 0.0)
 
+## upstream ambient.js env(): which full-screen treatment a map gets
+static func ambient_env(map_name: String, outdoor: bool) -> String:
+	if map_name.begins_with("PokemonTower"):
+		return "tower"
+	if map_name.begins_with("Lavender"):
+		return "lavender"
+	if map_name.contains("Seafoam"):
+		return "ice"
+	if map_name.contains("PowerPlant"):
+		return "power"
+	for k in ["MtMoon", "RockTunnel", "Cave", "VictoryRoad", "Diglett"]:
+		if map_name.contains(k):
+			return "cave"
+	if map_name.contains("ViridianForest"):
+		return "forest"
+	if map_name.contains("SafariZone"):
+		return "safari"
+	if map_name.contains("Mansion"):
+		return "mansion"
+	return "outdoor" if outdoor else "indoor"
+
+func _build_ambient() -> void:
+	_amb_layer = CanvasLayer.new()
+	_amb_layer.layer = -1   # over the 3D view, under the menus / text boxes
+	add_child(_amb_layer)
+	_amb_rect = ColorRect.new()
+	_amb_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_amb_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_amb_mat = ShaderMaterial.new()
+	_amb_mat.shader = preload("res://scripts/overworld/shaders/ambient_screen.gdshader")
+	_amb_mat.set_shader_parameter("big_tex", load("res://assets/maps/noise_big.png"))
+	_amb_rect.material = _amb_mat
+	_amb_rect.visible = false
+	_amb_layer.add_child(_amb_rect)
+
+func _apply_ambient_env() -> void:
+	var e := ambient_env(_map_loader.map_name, _map_loader.outdoor)
+	var tint := Vector3.ONE
+	var fog := false
+	var vig := 0.0
+	var vcol := Vector3(13, 10, 18) / 255.0
+	var ice := 0.0
+	match e:
+		"lavender":
+			tint = Vector3(225, 215, 240) / 256.0
+			fog = true
+		"tower":
+			tint = Vector3(190, 175, 225) / 256.0
+			fog = true
+			vig = 0.75
+		"cave", "mansion":
+			vig = 0.5
+		"ice":
+			vig = 0.5
+			vcol = Vector3(0x20, 0x30, 0x4a) / 255.0
+			ice = 0.08
+	_amb_mat.set_shader_parameter("tint", tint)
+	_amb_mat.set_shader_parameter("fog", fog)
+	_amb_mat.set_shader_parameter("vignette", vig)
+	_amb_mat.set_shader_parameter("vignette_col", vcol)
+	_amb_mat.set_shader_parameter("ice", ice)
+	_amb_rect.visible = fog or vig > 0.0 or ice > 0.0 or tint != Vector3.ONE
+
 func _build_fade() -> void:
 	_fade_layer = CanvasLayer.new()
 	_fade_layer.layer = 40
@@ -119,6 +186,7 @@ func _load_map(map_name: String, cell: Vector2i, facing: String) -> void:
 	_place_follower()
 	_light_key = ""
 	_update_lighting()
+	_apply_ambient_env()
 	_update_camera()
 	entered_map.emit(map_name)
 	var story := get_node_or_null("/root/Story")
@@ -152,6 +220,9 @@ func _update_lighting() -> void:
 		lt = maps[0]
 		gt = maps[1]
 	_map_loader.apply_grade(g, la, lt, gt)
+	var mn := _map_loader.map_name
+	var cloudy_env := (_map_loader.outdoor and not mn.begins_with("PokemonTower")) or mn.begins_with("SafariZone")
+	_map_loader.set_clouds(cloudy_env and float(td.night) < 0.5)
 	LightingRig.apply_3d(_sun, _world_env.environment, g, _map_loader.interior)
 
 # ---------------------------------------------------------------- per frame
@@ -173,6 +244,8 @@ func _update_camera() -> void:
 		return
 	var target := player.position + Vector3(0.0, 0.0, 0.5 - OwActor.FOOT_Z)
 	_camera_rig.position = target
+	if _amb_rect and _amb_rect.visible:
+		_amb_mat.set_shader_parameter("cam_px", Vector2(target.x * 16.0 - 160.0, target.z * 16.0 - 90.0))
 
 func _input_dir() -> String:
 	if Input.is_action_pressed("move_up"):

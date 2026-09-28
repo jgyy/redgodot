@@ -5,7 +5,7 @@ extends RefCounted
 ## ledge table and the tile-pair collision table. Loaded once from res://data/mapdata.json.
 
 const CELL := 1.0                 # world units per map cell
-const CAM_PITCH_DEG := 55.0       # camera pitch; world heights of 2D art are scaled by K = tan(pitch)
+const CAM_PITCH_DEG := 60.0       # camera pitch; world heights of 2D art are scaled by K = tan(pitch)
 static var K: float = tan(deg_to_rad(CAM_PITCH_DEG))
 
 static var quads: Dictionary = {}      # tileset file -> Array[[tl,tr,bl,br]]

@@ -266,7 +266,7 @@ function bakeOutdoor(map) {
   G.mapRender.elevationEdges(s, map, MX * 16, MY * 16);
   // water mask (pixels still showing base water)
   let anyWater = false;
-  const wtex = new Surface(W, H);
+  const wtex = new Surface(W, H); wtex.clear(G.gfx.rgb(0, 0, 0, 255));  // opaque: the importer bleeds colour into transparent px
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
     const i = y * W + x;
     if (ground.mat[i] === MATOF.water && s.data[i] === T.waterColor(wx0 + x, wy0 + y, ground.wdist[i], 0)) {
@@ -355,7 +355,7 @@ function bakeInterior(map) {
       }
       const e = objEntry(atlas, r, { t: 'walls', cave, boxes: boxes.map(bx => {
         const run = (bx.b - bx.a + 1) * 16;
-        const hgt = cave ? Math.min(run, 20) : Math.min(run, 40);
+        const hgt = cave ? Math.min(run, 18) : Math.min(run, 24);   // tall walls lean in perspective: keep them low, the rest of the art lies on top
         const openBelow = !set.has(bx.x0 + ',' + (bx.b + 1));
         return [ox + bx.x0 * 16, oy + bx.a * 16, ox + bx.x1 * 16, oy + (bx.b + 1) * 16 + (openBelow && cave ? 2 : 0), hgt];
       }) });
@@ -371,7 +371,7 @@ function bakeInterior(map) {
     const e = { lbl: l };
     if (hgt === 'card') Object.assign(e, { t: 'card', z: r.y + r.spr.h });
     else {
-      if (hgt === 'full') hgt = Math.max(4, r.spr.h - 3);
+      if (hgt === 'full') hgt = Math.max(4, Math.min(24, r.spr.h - 3));
       const rect = isRect(cells);
       Object.assign(e, rect ? { t: 'box', hgt: Math.min(hgt, r.spr.h - 1) } : { t: 'cellboxes', hgt: Math.min(hgt, 15), cells: cells.map(([cx, cy]) => [ox + cx * 16, oy + cy * 16]) });
     }
@@ -433,6 +433,9 @@ function bakeNoise() {
   const N = G.noise.water, s = new Surface(N.size, N.size);
   for (let y = 0; y < N.size; y++) for (let x = 0; x < N.size; x++) { const v = Math.round(N.data[y * N.size + x] * 255); s.data[y * N.size + x] = G.gfx.rgb(v, v, v, 255); }
   U.savePNG(s, path.join(OUT, 'noise_water.png'));
+  const B = G.noise.big, sb = new Surface(B.size, B.size);
+  for (let i = 0; i < B.size * B.size; i++) { const v = Math.round(B.data[i] * 255); sb.data[i] = G.gfx.rgb(v, v, v, 255); }
+  U.savePNG(sb, path.join(OUT, 'noise_big.png'));   // ambient.js cloud shadows
   // the palettes the Godot shaders quantise to
   const pal = {};
   for (const k of ['grass', 'tallgrass', 'path', 'water', 'leaf', 'leaf2', 'trunk', 'rock', 'stone', 'wood', 'cream', 'mtn', 'pave', 'sand', 'moss']) pal[k] = P[k].map(hexOf);
@@ -469,6 +472,11 @@ function bakeWorldDefs() {
   for (let v = 0; v < 4; v++) for (let f = 0; f < 2; f++) deco.blit(T.tallGrassSprite(v, f), (v * 2 + f) * 16, 0);
   FLOWER_COLORS.forEach((c, i) => { for (let f = 0; f < 2; f++) deco.blit(T.flowerSprite(c, f), (8 + i * 2 + f) * 16, 0); });
   U.savePNG(deco, path.join(OUT, 'decor_atlas.png'));
+  // small object sprites (objsprites.js ART, bottom 16x16 of the 16x24 overworld frame) for 3D cards
+  const OBJ = ['poke_ball', 'boulder', 'pokedex', 'clipboard', 'paper', 'fossil', 'old_amber'];
+  const os = new Surface(16 * OBJ.length, 16);
+  OBJ.forEach((n, i) => { const f = G.objSprites(n, {}).down[0]; os.blit(f, i * 16, 16 - f.h); });
+  U.savePNG(os, path.join(OUT, 'objects_atlas.png'));
   const tuft = ['...6....6...', '..65...654..', '..54..6544.6', '.6544.5443.5', '.5443.4433.4', '65433543323.', '54332433322.', '43322332221.', '3322122211..', '.21111111...'];
   const dir = path.join(__dirname, '..', 'blender');
   fs.writeFileSync(path.join(dir, 'world_defs.json'), JSON.stringify({ trees, grass, tuft, pal: {
