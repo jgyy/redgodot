@@ -464,7 +464,7 @@ def export_glb(path, animations=True):
     if animations:
         kw.update(export_animation_mode='ACTIONS', export_skins=True, export_force_sampling=True,
                   export_reset_pose_bones=True, export_anim_slide_to_zero=True,
-                  export_optimize_animation_size=False)
+                  export_optimize_animation_size=True)
     bpy.ops.export_scene.gltf(**kw)
 
 
@@ -504,10 +504,13 @@ def limb_phase(name, idx_fallback=0):
 
 
 def animate_generic(arm, group_bones, height, has_head=None, root='root', loop_idle=60,
-                    loop_walk=24, attack_len=15):
-    """Bake Idle / Walk / Attack on a group-per-bone rig.
+                    loop_walk=24, attack_len=18, body=None, flier=False, hovering=False):
+    """Bake Idle / Walk / Attack / Hurt / Faint / Special on a group-per-bone rig.
 
-    group_bones: {bone_name: {'pivot': Vector, 'x': float}}  (pivot in metres)"""
+    group_bones: {bone_name: {'pivot': Vector, 'x': float}}  (pivot in metres).
+    Axes: front = -Y, up = +Z; rotations are (world axis, angle) about each bone's head.
+    Wings flap and tails wag in the sprite (XZ) plane so it reads from the front (foe)
+    and from behind (the player's Pokemon)."""
     h = max(height, 0.05)
     names = list(group_bones)
     all_bones = [root] + names
@@ -515,10 +518,13 @@ def animate_generic(arm, group_bones, height, has_head=None, root='root', loop_i
     arms = [n for n in names if is_arm(n)]
     wings = [n for n in names if is_wing(n)]
     tails = [n for n in names if is_tail(n)]
+    ears = [n for n in names if _has(n, 'ear', 'antenna', 'horn', 'crest', 'leaf', 'petal', 'frond')
+            and not is_tail(n)]
     heads = [n for n in names if _has(n, 'head') or n.lower() in ('mouth', 'jaw', 'beak', 'face', 'skull')]
     X, Y, Z = Vector((1, 0, 0)), Vector((0, 1, 0)), Vector((0, 0, 1))
+    floaty = flier or hovering or not legs
+    TAU = 2 * math.pi
 
-    # leg phases: marker parity; if every leg ended up in the same phase, alternate by X order
     phases = {n: limb_phase(n) for n in legs}
     if len(legs) > 1 and len({round(p, 3) for p in phases.values()}) == 1:
         for i, n in enumerate(sorted(legs, key=lambda k: group_bones[k]['x'])):
@@ -528,54 +534,111 @@ def animate_generic(arm, group_bones, height, has_head=None, root='root', loop_i
         for i, n in enumerate(sorted(arms, key=lambda k: group_bones[k]['x'])):
             aph[n] = math.pi * (i % 2)
 
-    # ---------- Idle
+    def side(n):
+        return 1.0 if group_bones[n]['x'] >= 0 else -1.0
+
+    def wing_flap(act, f, t, amp, cycles=1):
+        for n in wings:
+            act.key(n, f, rot=(Y, -side(n) * math.radians(amp) * math.sin(TAU * cycles * t)))
+
+    def idle_extras(act, f, t, k=1.0):
+        for i, n in enumerate(tails):
+            act.key(n, f, rot=(Y, k * math.radians(9) * math.sin(TAU * 2 * t + i * 0.7)))
+        for i, n in enumerate(ears):
+            act.key(n, f, rot=(Y, k * math.radians(3.5) * math.sin(TAU * t + 1.3 + i)))
+        for n in heads:
+            act.key(n, f, rot=(X, k * math.radians(3) * math.sin(TAU * t + 0.6)))
+        for n in arms:
+            act.key(n, f, rot=(Y, -side(n) * k * math.radians(4) * math.sin(TAU * t + 0.4)))
+
+    # ---------- Idle: breathing squash + gentle bob (bigger float for hoverers), tail wag, wing beat
     idle = ActionWriter(arm, 'Idle', loop_idle)
     for f in range(0, loop_idle + 1, 2):
         t = f / loop_idle
-        s = math.sin(2 * math.pi * t)
-        idle.key(root, f, loc=(0, 0, 0.025 * h * (0.5 - 0.5 * math.cos(2 * math.pi * t))),
-                 scl=(1 + 0.02 * s, 1 + 0.02 * s, 1 - 0.012 * s))
-        for n in tails:
-            idle.key(n, f, rot=(Z, math.radians(10) * math.sin(4 * math.pi * t)))
-        for n in wings:
-            sg = 1 if group_bones[n]['x'] >= 0 else -1
-            idle.key(n, f, rot=(Z, sg * math.radians(6) * math.sin(2 * math.pi * t)))
+        s = math.sin(TAU * t)
+        bob = (0.06 if floaty else 0.018) * h * (0.5 - 0.5 * math.cos(TAU * t))
+        idle.key(root, f, loc=(0, 0, bob), scl=(1 - 0.012 * s, 1 - 0.012 * s, 1 + 0.028 * s))
+        idle_extras(idle, f, t)
+        wing_flap(idle, f, t, 24 if flier else 7, 2 if flier else 1)
     # ---------- Walk
     walk = ActionWriter(arm, 'Walk', loop_walk)
     for f in range(0, loop_walk + 1):
         t = f / loop_walk
-        w = 2 * math.pi * t
+        w = TAU * t
         if legs:
-            walk.key(root, f, loc=(0, 0, 0.03 * h * (0.5 - 0.5 * math.cos(2 * w))))
+            walk.key(root, f, loc=(0, 0, 0.035 * h * (0.5 - 0.5 * math.cos(2 * w))),
+                     rot=(Y, math.radians(3) * math.sin(w)))
         else:
-            walk.key(root, f, loc=(0.02 * h * math.sin(w), 0, 0.04 * h * (0.5 - 0.5 * math.cos(2 * w))),
+            walk.key(root, f, loc=(0.02 * h * math.sin(w), 0, 0.05 * h * (0.5 - 0.5 * math.cos(2 * w))),
                      rot=(Y, math.radians(7) * math.sin(w)))
         for n in legs:
             walk.key(n, f, rot=(X, math.radians(28) * math.sin(w + phases[n])))
         for n in arms:
-            walk.key(n, f, rot=(X, math.radians(16) * math.sin(w + aph[n])))
-        for n in wings:
-            sg = 1 if group_bones[n]['x'] >= 0 else -1
-            walk.key(n, f, rot=(Z, sg * math.radians(22) * math.sin(2 * w)))
+            walk.key(n, f, rot=(X, math.radians(18) * math.sin(w + aph[n])))
         for n in tails:
-            walk.key(n, f, rot=(Z, math.radians(14) * math.sin(w)))
-    # ---------- Attack (non looping): wind-up, lunge forward (-Y = front), recover
-    atk = ActionWriter(arm, 'Attack', attack_len)
-    poses = [  # frame, forward offset (fraction of h, +=forward), squash (xy, z)
-        (0, 0.0, 1.0, 1.0),
-        (4, -0.06, 1.07, 0.9),
-        (7, 0.28, 0.93, 1.1),
-        (10, 0.12, 1.03, 0.97),
-        (attack_len, 0.0, 1.0, 1.0),
-    ]
-    for f, fwd, sxy, sz in poses:
-        atk.key(root, f, loc=(0, -fwd * h, 0), scl=(sxy, sxy, sz))
+            walk.key(n, f, rot=(Y, math.radians(14) * math.sin(w)))
         for n in heads:
-            k = max(0.0, fwd) / 0.28
-            atk.key(n, f, loc=(0, -0.08 * h * k, 0), rot=(X, math.radians(12) * k))
+            walk.key(n, f, rot=(X, math.radians(3) * math.sin(2 * w)))
+        wing_flap(walk, f, t, 28, 2)
+
+    # ---------- Attack (one-shot): anticipation, lunge toward the foe (-Y), recoil, settle
+    atk = ActionWriter(arm, 'Attack', attack_len)
+    poses = [  # frame, forward (fraction of h), squash xy, z, lean (deg, + = forward)
+        (0, 0.0, 1.0, 1.0, 0),
+        (4, -0.08, 1.08, 0.88, -8),
+        (8, 0.34, 0.92, 1.12, 14),
+        (11, 0.26, 1.04, 0.97, 10),
+        (14, 0.06, 1.0, 1.02, 2),
+        (attack_len, 0.0, 1.0, 1.0, 0),
+    ]
+    for f, fwd, sxy, sz, lean in poses:
+        atk.key(root, f, loc=(0, -fwd * h, 0.04 * h * max(0.0, fwd) / 0.34), scl=(sxy, sxy, sz),
+                rot=(X, math.radians(lean)))
+        k = max(0.0, fwd) / 0.34
+        for n in heads:
+            atk.key(n, f, loc=(0, -0.06 * h * k, 0), rot=(X, math.radians(10) * k))
         for n in arms:
-            k = max(0.0, fwd) / 0.28
-            atk.key(n, f, rot=(X, -math.radians(40) * k))
-    acts = [idle.write(all_bones), walk.write(all_bones), atk.write(all_bones)]
+            atk.key(n, f, rot=(X, -math.radians(50) * k))
+        for n in tails:
+            atk.key(n, f, rot=(Y, math.radians(-18) * k))
+        for n in wings:
+            atk.key(n, f, rot=(Y, -side(n) * math.radians(35) * (k - 0.4)))
+    # ---------- Hurt (one-shot): knocked back (+Y) with a shudder, then recover
+    hurt_len = 15
+    hurt = ActionWriter(arm, 'Hurt', hurt_len)
+    for f in range(0, hurt_len + 1):
+        t = f / hurt_len
+        env = math.sin(math.pi * min(1.0, t * 1.25)) if t < 0.8 else 0.0
+        shake = math.sin(t * TAU * 4) * (1 - t)
+        hurt.key(root, f, loc=(0.03 * h * shake, 0.12 * h * env, 0), rot=(X, -math.radians(12) * env),
+                 scl=(1 + 0.05 * env, 1 + 0.05 * env, 1 - 0.07 * env))
+        for n in heads:
+            hurt.key(n, f, rot=(X, -math.radians(10) * env))
+        for n in arms + wings:
+            hurt.key(n, f, rot=(Y, side(n) * math.radians(20) * env))
+    # ---------- Faint (one-shot, holds last frame): a weak hop, then crumple down and sink
+    faint_len = 30
+    faint = ActionWriter(arm, 'Faint', faint_len)
+    for f in range(0, faint_len + 1):
+        t = f / faint_len
+        hop = 0.06 * h * math.sin(math.pi * min(1.0, t / 0.25)) if t < 0.25 else 0.0
+        d = max(0.0, (t - 0.25) / 0.75)
+        d = d * d
+        faint.key(root, f, loc=(0, 0.05 * h * d, hop - 0.35 * h * d), rot=(Y, math.radians(-20) * d),
+                  scl=(1 + 0.12 * d, 1 + 0.12 * d, max(0.05, 1 - 0.7 * d)))
+        for n in heads:
+            faint.key(n, f, rot=(X, math.radians(25) * d))
+        for n in arms + wings + ears + tails:
+            faint.key(n, f, rot=(Y, -side(n) * math.radians(25) * d))
+    # ---------- Special (one-shot): hop + full spin, e.g. status / stat moves
+    sp_len = 30
+    spec = ActionWriter(arm, 'Special', sp_len)
+    for f in range(0, sp_len + 1):
+        t = f / sp_len
+        e = 0.5 - 0.5 * math.cos(math.pi * t)
+        spec.key(root, f, loc=(0, 0, 0.18 * h * math.sin(math.pi * t)), rot=(Z, TAU * e * 0.999))
+        wing_flap(spec, f, t, 30, 3)
+    acts = [idle.write(all_bones), walk.write(all_bones), atk.write(all_bones), hurt.write(all_bones),
+            faint.write(all_bones), spec.write(all_bones)]
     stash_actions(arm, acts)
     return acts

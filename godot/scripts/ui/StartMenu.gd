@@ -1,19 +1,14 @@
 class_name StartMenu
-extends Control
-## The `menu` action's top-level Start Menu (POKéDEX/POKéMON/ITEM/<name>/SHARE/
-## SAVE/OPTION/EXIT), matching the original game's structure: selecting your
-## own name opens the Trainer Card, and the Town Map is reached by picking the
-## TOWN MAP item from the bag — both real mechanics from the source game, not
-## flattened shortcuts. Owns (and lazily wires up) every start-menu-reachable
-## sub-screen as a child, following the PartyMenu overlay convention.
+extends PxScreen
+## Port of menus.js startMenu(): POKéDEX / POKéMON / ITEM / <name> / SHARE /
+## SAVE / OPTION / EXIT in upstream's frame at (222, 6, 92 wide), over the live
+## 3D overworld. Owns every start-menu sub-screen (as siblings, so they draw
+## over it): party_menu, bag_menu, pokedex_menu, trainer_card, options_menu,
+## town_map, summary_screen, pc_menu. Selecting a row hides this menu, runs the
+## sub-screen, and comes back to the same row, like upstream's loop.
 
-var ROW_KEYS := ["POKéDEX", "POKéMON", "ITEM", "", "SHARE", "SAVE", "OPTION", "EXIT"]
-
-var _panel: PanelContainer
-var _list: VBoxContainer
-var _row_labels: Array = []
-var _index := 0
-var _toast: DialogueBox
+var sel := 0
+var _items: Array = []
 
 var party_menu: PartyMenu
 var bag_menu: BagMenu
@@ -22,32 +17,11 @@ var trainer_card: TrainerCard
 var options_menu: OptionsMenu
 var town_map: TownMap
 var summary_screen: SummaryScreen
+var pc_menu: PCMenu
 
 func _ready() -> void:
-	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	visible = false
-
-	_panel = PanelContainer.new()
-	_panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	_panel.custom_minimum_size = Vector2(260, 300)
-	_panel.position = Vector2(-276, 16)
-	add_child(_panel)
-	_list = VBoxContainer.new()
-	_panel.add_child(_list)
-	for i in range(ROW_KEYS.size()):
-		var l := Label.new()
-		l.add_theme_font_size_override("font_size", 20)
-		_list.add_child(l)
-		_row_labels.append(l)
-
-	# Submenus are added as siblings (children of our own parent), not children
-	# of this Control: a child's `visible` is meaningless while an ancestor is
-	# hidden, and StartMenu hides itself the moment any of these opens.
+	super()
 	var host := get_parent()
-	_toast = DialogueBox.new()
-	host.add_child(_toast)
-
 	party_menu = PartyMenu.new(); host.add_child(party_menu)
 	bag_menu = BagMenu.new(); host.add_child(bag_menu)
 	pokedex_menu = PokedexMenu.new(); host.add_child(pokedex_menu)
@@ -55,59 +29,52 @@ func _ready() -> void:
 	options_menu = OptionsMenu.new(); host.add_child(options_menu)
 	town_map = TownMap.new(); host.add_child(town_map)
 	summary_screen = SummaryScreen.new(); host.add_child(summary_screen)
-
-	party_menu.closed.connect(open)
-	bag_menu.closed.connect(open)
-	pokedex_menu.closed.connect(open)
-	trainer_card.closed.connect(open)
-	options_menu.closed.connect(open)
-	town_map.closed.connect(func(): bag_menu.open())
-	summary_screen.closed.connect(func(): party_menu.open())
-	party_menu.mon_selected.connect(func(m): summary_screen.open_for(m))
-	bag_menu.item_selected.connect(_on_bag_item_selected)
+	pc_menu = PCMenu.new(); host.add_child(pc_menu)
+	party_menu.summary_screen = summary_screen
+	bag_menu.town_map = town_map
+	bag_menu.party_menu = party_menu
+	for s: PxScreen in [party_menu, bag_menu, pokedex_menu, trainer_card, options_menu]:
+		s.closed.connect(_back)
 
 func is_open() -> bool:
-	return visible or party_menu.visible or bag_menu.visible or pokedex_menu.visible \
-		or trainer_card.visible or options_menu.visible or town_map.visible or summary_screen.visible
+	if visible or busy:
+		return true
+	for s in [party_menu, bag_menu, pokedex_menu, trainer_card, options_menu, town_map, summary_screen, pc_menu]:
+		if s and s.visible:
+			return true
+	return false
 
-func open() -> void:
-	visible = true
-	mouse_filter = Control.MOUSE_FILTER_STOP
-	_index = 0
-	_refresh()
+func _on_open() -> void:
+	UI.sfx("menu")
+	_items = []
+	_items.append("POKéDEX")
+	if not GameState.party.is_empty():
+		_items.append("POKéMON")
+	_items.append_array(["ITEM", GameState.player_name, "SHARE", "SAVE", "OPTION", "EXIT"])
+	sel = mini(sel, _items.size() - 1)
 
-func close() -> void:
-	visible = false
-	mouse_filter = Control.MOUSE_FILTER_IGNORE
+func _back() -> void:
+	open()
 
-func _refresh() -> void:
-	ROW_KEYS[3] = GameState.player_name
-	for i in range(ROW_KEYS.size()):
-		var prefix := "▶ " if i == _index else "   "
-		_row_labels[i].text = prefix + ROW_KEYS[i]
-
-func _unhandled_input(event: InputEvent) -> void:
-	if not visible:
-		return
-	if event.is_action_pressed("move_up"):
-		_index = (_index - 1 + ROW_KEYS.size()) % ROW_KEYS.size()
-		_refresh()
-	elif event.is_action_pressed("move_down"):
-		_index = (_index + 1) % ROW_KEYS.size()
-		_refresh()
-	elif event.is_action_pressed("confirm"):
-		_activate(_index)
-	elif event.is_action_pressed("cancel") or event.is_action_pressed("menu"):
+func _input_event(e: InputEvent) -> bool:
+	var n := _items.size()
+	if pressed(e, "move_up", true):
+		sel = (sel + n - 1) % n
+		UI.sfx("cursor")
+	elif pressed(e, "move_down", true):
+		sel = (sel + 1) % n
+		UI.sfx("cursor")
+	elif pressed(e, "confirm"):
+		UI.sfx("select")
+		_activate(_items[sel])
+	elif pressed(e, "cancel") or pressed(e, "menu"):
 		close()
-	get_viewport().set_input_as_handled()
+	else:
+		return false
+	return true
 
-func _on_bag_item_selected(item_id: String) -> void:
-	if item_id == "TOWN_MAP":
-		bag_menu.close()
-		town_map.open()
-
-func _activate(i: int) -> void:
-	match ROW_KEYS[i]:
+func _activate(it: String) -> void:
+	match it:
 		"POKéDEX":
 			close(); pokedex_menu.open()
 		"POKéMON":
@@ -115,15 +82,18 @@ func _activate(i: int) -> void:
 		"ITEM":
 			close(); bag_menu.open()
 		"SHARE":
-			close(); _toast.show_lines(["Link feature not available in this version."])
-			_toast.finished.connect(open, CONNECT_ONE_SHOT)
+			await say("Share a picture of your adventure! (Not available in this version.)")
 		"SAVE":
-			GameState.save()
-			close(); _toast.show_lines(["%s saved the game!" % GameState.player_name])
-			_toast.finished.connect(open, CONNECT_ONE_SHOT)
+			if await ask("Would you like to SAVE the game?"):
+				GameState.save()
+				UI.sfx("save")
+				await say(GameState.player_name + " saved the game!")
 		"OPTION":
 			close(); options_menu.open()
 		"EXIT":
 			close()
 		_:
 			close(); trainer_card.open()
+
+func _draw() -> void:
+	Px.menu(self, _items, sel, 222, 6, 92, -1, 0, Px.frame_count())

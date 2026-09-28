@@ -1,105 +1,112 @@
 class_name PokedexMenu
-extends Control
-## The National Pokedex (Start Menu's POKéDEX entry): scrollable list of all
-## 151 species in dex order, marking species GameState has seen/caught, with
-## a live 3D preview of the selected species and SEEN/OWN totals.
+extends PxScreen
+## Port of menus.js pokedex(): red stripes, the 8-row numbered list with a
+## Poké Ball on owned species and "----------" for unseen ones, the portrait
+## panel (the species' real 3D model where upstream blits its sprite, "?" if
+## unseen) and SEEN/OWN counts. A on a seen species opens its dex page
+## (dexPage(): name, category, HT/WT, types, real Pokédex text).
 
-signal closed
-
-var _list: VBoxContainer
-var _scroll: ScrollContainer
-var _rows: Array = []
-var _index := 0
-var _preview: Mon3DPreview
-var _totals_label: Label
-var _species_ids: Array = []  # GameData.dex_order with its leading null (unused dex #0) dropped
+var sel := 0
+var top := 0
+var page_species := ""
+var _view: PxView3D
+var _page_view: PxView3D
 
 func _ready() -> void:
-	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	visible = false
+	super()
+	_view = PxView3D.new(64, 64)
+	add_child(_view)
+	_page_view = PxView3D.new(64, 64)
+	add_child(_page_view)
 
-	var panel := PanelContainer.new()
-	panel.set_anchors_preset(Control.PRESET_CENTER)
-	panel.custom_minimum_size = Vector2(560, 380)
-	panel.position = Vector2(-280, -190)
-	add_child(panel)
+func _on_open() -> void:
+	page_species = ""
 
-	var root := HBoxContainer.new()
-	panel.add_child(root)
+func species_at(n: int) -> String:
+	return GameData.dex_order[n] if n > 0 and n < GameData.dex_order.size() and GameData.dex_order[n] != null else ""
 
-	_scroll = ScrollContainer.new()
-	_scroll.custom_minimum_size = Vector2(300, 360)
-	root.add_child(_scroll)
-	_list = VBoxContainer.new()
-	_scroll.add_child(_list)
-
-	var right := VBoxContainer.new()
-	root.add_child(right)
-	_preview = Mon3DPreview.new()
-	_preview.custom_minimum_size = Vector2(200, 200)
-	right.add_child(_preview)
-	_totals_label = Label.new()
-	right.add_child(_totals_label)
-	var hint := Label.new()
-	hint.text = "(up/down: browse, cancel: back)"
-	hint.add_theme_font_size_override("font_size", 13)
-	right.add_child(hint)
-
-func open() -> void:
-	visible = true
-	mouse_filter = Control.MOUSE_FILTER_STOP
-	if _rows.is_empty():
-		_build_rows()
-	_refresh()
-
-func close() -> void:
-	visible = false
-	mouse_filter = Control.MOUSE_FILTER_IGNORE
-
-func _build_rows() -> void:
-	_species_ids = GameData.dex_order.filter(func(sid): return sid != null and sid != "")
-	for sid in _species_ids:
-		var l := Label.new()
-		l.name = sid
-		_list.add_child(l)
-		_rows.append(l)
-
-func _refresh() -> void:
-	var seen := 0
-	var owned := 0
-	for i in range(_species_ids.size()):
-		var sid: String = _species_ids[i]
-		var sp := GameData.get_species(sid)
-		var mark := "   "
-		if GameState.caught_species.has(sid):
-			mark = " ● "
-			owned += 1
-			seen += 1
-		elif GameState.seen_species.has(sid):
-			mark = " ○ "
-			seen += 1
-		var prefix := "▶" if i == _index else " "
-		var label: Label = _rows[i]
-		label.text = "%s%03d%s%s" % [prefix, int(sp.get("dex", i + 1)), mark, sp.get("name", sid)]
-	_totals_label.text = "SEEN  %d\nOWN   %d" % [seen, owned]
-	if not _species_ids.is_empty():
-		_preview.show_species(_species_ids[_index])
-
-func _unhandled_input(event: InputEvent) -> void:
-	if not visible or _species_ids.is_empty():
-		return
-	if event.is_action_pressed("move_up"):
-		_index = (_index - 1 + _species_ids.size()) % _species_ids.size()
-		_refresh()
-		_scroll.scroll_vertical = max(0, _index * 20 - 100)
-	elif event.is_action_pressed("move_down"):
-		_index = (_index + 1) % _species_ids.size()
-		_refresh()
-		_scroll.scroll_vertical = max(0, _index * 20 - 100)
-	elif event.is_action_pressed("cancel"):
-		close()
-		closed.emit()
+func _input_event(e: InputEvent) -> bool:
+	if page_species != "":
+		if pressed(e, "confirm") or pressed(e, "cancel"):
+			page_species = ""
+			return true
+		return false
+	if pressed(e, "move_up", true):
+		sel = maxi(0, sel - 1)
+	elif pressed(e, "move_down", true):
+		sel = mini(150, sel + 1)
+	elif pressed(e, "move_left", true):
+		sel = maxi(0, sel - 7)
+	elif pressed(e, "move_right", true):
+		sel = mini(150, sel + 7)
+	elif pressed(e, "cancel"):
+		exit()
+		return true
+	elif pressed(e, "confirm"):
+		var sp := species_at(sel + 1)
+		if GameState.seen_species.has(sp):
+			page_species = sp
+		return true
 	else:
+		return false
+	if sel < top:
+		top = sel
+	if sel > top + 7:
+		top = sel - 7
+	return true
+
+func _draw() -> void:
+	if page_species != "":
+		_draw_page(page_species)
 		return
-	get_viewport().set_input_as_handled()
+	Px.menu_bg(self, Color("#d84848"), Color("#c83838"), 0)
+	Px.frame(self, 4, 4, 180, 172, "red")
+	for i in 8:
+		var n := top + i + 1
+		if n > 151:
+			break
+		var sp := species_at(n)
+		var seen := GameState.seen_species.has(sp)
+		var caught := GameState.caught_species.has(sp)
+		var y := 12 + i * 20
+		if n - 1 == sel:
+			Px.rect(self, 9, y - 3, 170, 18, Color("#f8e0c0"))
+		Px.small(self, "%03d" % n, 24, y + 3, Px.INK)
+		if caught:
+			Px.draw_ball(self, 46, y + 5)
+		Px.text(self, GameData.get_species(sp).get("name", sp) if seen else "----------", 56, y)
+	var cur := species_at(sel + 1)
+	Px.frame(self, 188, 4, 128, 110)
+	if GameState.seen_species.has(cur):
+		_view.show_mon(cur)
+		_view.draw_at(self, 220, 20 + roundf(sin(t / 20.0)))
+	else:
+		Px.text(self, "?", 250, 50)
+	Px.frame(self, 188, 116, 128, 60)
+	Px.text(self, "SEEN  %d" % GameState.seen_species.size(), 200, 126)
+	Px.text(self, "OWN   %d" % GameState.caught_species.size(), 200, 144)
+
+func _draw_page(sp: String) -> void:
+	var d := GameData.get_species(sp)
+	var caught := GameState.caught_species.has(sp)
+	Px.menu_bg(self, Color("#e8e0c8"), Color("#dcd2b8"), t)
+	Px.frame(self, 4, 4, 312, 100, "red")
+	_page_view.show_mon(sp)
+	_page_view.draw_at(self, 16, 22)
+	Px.text(self, "No.%03d  %s" % [int(d.get("dex", 0)), d.get("name", sp)], 100, 16)
+	Px.text(self, "%s POKéMON" % d.get("cat", "???"), 100, 34)
+	if caught:
+		var ht: Array = d.get("ht", [0, 0])
+		Px.text(self, "HT  %d'%02d\"" % [int(ht[0]), int(ht[1]) if ht.size() > 1 else 0], 100, 54)
+		Px.text(self, "WT  %.1f lb" % (float(d.get("wt", 0)) / 10.0), 100, 70)
+	var types: Array = d.get("types", [])
+	for i in types.size():
+		var c := Px.type_color(types[i])
+		Px.rect(self, 220 + i * 46, 54, 42, 12, Px.OUTLINE)
+		Px.rect(self, 221 + i * 46, 55, 40, 10, c)
+		Px.text(self, Px.type_name(types[i]), 223 + i * 46, 56, Px.WHITE, Px.shade(c, -0.4))
+	Px.frame(self, 4, 106, 312, 70)
+	var txt := GameText.dex(sp) if caught else "No further data. Catch this POKéMON to learn more."
+	var lines := Px.wrap_text(txt, 290)
+	for i in mini(4, lines.size()):
+		Px.text(self, lines[i], 14, 114 + i * 14)

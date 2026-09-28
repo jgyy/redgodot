@@ -19,21 +19,27 @@ shot() {
     || { echo "FAILED: $name"; tail -30 /tmp/capture_screenshots.log; exit 1; }
 }
 
-# --- Core scenes -------------------------------------------------------
-shot "01-title"      --scene=title      --wait=1.0
-shot "02-intro"       --scene=intro      --wait=1.5
-shot "03-overworld"   --scene=overworld  --wait=1.5
+# --- Title / intro / menus / dialogue (UI suite) --------------------------
+# Pairs with docs/claude-red-screenshots/{001,002,092-100}-*.png. Menus use the
+# reference save (--save=showcase: RED, 6-mon party, 126/75 dex, 5 badges).
+shot "001-title-screen" --scene=title --title_t=100 --wait=1.5
+shot "002-intro"        --scene=intro --intro_frame=505 --intro_hold=1 --wait=1.0
+shot "03-overworld"     --scene=overworld --wait=1.5
+shot "092-start-menu"   --scene=start_menu   --save=showcase --wait=1.5
+shot "093-party"        --scene=party        --save=showcase --wait=1.5
+shot "094-summary"      --scene=summary      --save=showcase --wait=1.5
+shot "095-bag"          --scene=bag          --save=showcase --wait=1.5
+shot "096-pokedex"      --scene=pokedex      --save=showcase --wait=1.5
+shot "097-trainer-card" --scene=trainer_card --save=showcase --wait=1.5
+shot "098-town-map"     --scene=town_map     --save=showcase --wait=1.5
+shot "099-options"      --scene=options      --save=showcase --wait=1.5
+shot "100-dialogue"     --scene=dialogue     --save=showcase --wait=1.5 \
+  --text="Welcome to the world of POKéMON! Every pixel here was drawn by code."
 
-# --- Start menu suite ----------------------------------------------------
-shot "10-start-menu"   --scene=start_menu   --wait=1.5
-shot "11-party"        --scene=party        --wait=1.5
-shot "12-summary"      --scene=summary      --wait=1.5
-shot "13-bag"          --scene=bag          --wait=1.5
-shot "14-pokedex"      --scene=pokedex      --wait=1.5
-shot "15-trainer-card" --scene=trainer_card --wait=1.5
-shot "16-town-map"     --scene=town_map     --wait=1.5
-shot "17-options"      --scene=options      --wait=1.5
-shot "18-dialogue"     --scene=dialogue     --wait=1.5 --text="Hello there! Welcome to the world of POKéMON!"
+# --- Story autoload: Poké Mart (pc.js G.mart menu coords + quantity picker) ---
+# No upstream reference image; these check Story's PxCanvas overlays/coords.
+shot "story-mart-menu"     --scene=story_mart --step=menu     --wait=2.5
+shot "story-mart-quantity" --scene=story_mart --step=quantity --wait=2.0
 
 # --- Wild encounter states -----------------------------------------------
 shot "20-wild-intro" --scene=battle --player=SQUIRTLE --enemy=PIDGEY  --level=4  --wait=0.4
@@ -82,5 +88,14 @@ for entry in "${LOCATIONS[@]}"; do
   shot "$(printf '%02d' $i)-${map,,}-${time}" --scene=overworld --map="$map" --pc="$w,$h" --time="$time" --wait=1.5
   i=$((i+1))
 done
+
+# --- 3D model contact sheets (every Pokemon / character next to upstream's sprite) ----
+# docs/gallery/pokemon-151-3d.png, pokemon-151-3d-back.png, characters-3d.png, characters-3d-back.png
+# (needs node + UPSTREAM=/path/to/pokemon-claude-red for the reference sprites)
+if [ -n "${UPSTREAM:-}" ]; then
+  GODOT_BIN="$GODOT_BIN" "$ROOT_DIR/pipeline/scripts/model_sheets.sh"
+else
+  echo "[capture] skipping model sheets (set UPSTREAM=/path/to/pokemon-claude-red)"
+fi
 
 echo "Done. $(ls "$OUT_DIR" | wc -l) screenshots in $OUT_DIR"
