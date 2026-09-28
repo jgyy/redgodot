@@ -49,6 +49,7 @@ static func run(suite: TestSuite) -> void:
 	_brock(suite, host, ui)
 	_line_of_sight(suite, host, ui)
 	_hidden_item(suite, host, ui)
+	_mid_game(suite, host, ui)
 	suite.check(Story.running == 0, "no story script left running")
 
 	Story.fast = false
@@ -204,3 +205,26 @@ static func _hidden_item(suite: TestSuite, host: Node, _ui: Node) -> void:
 	suite.check(Story.bag_count(found) == before + 1, "hidden item found (%s)" % found)
 	Story.on_interact_cell(at, "up")
 	suite.check(Story.bag_count(found) == before + 1, "hidden item can't be found twice")
+
+static func _mid_game(suite: TestSuite, host: Node, ui: Node) -> void:
+	# Silph Co. card-key doors are closed on entry and open with the CARD KEY
+	host.load_map("SilphCo2F", Vector2i(4, 6), "up")
+	suite.check(host.blocked.has(Vector2i(4, 4)) and host.blocked.has(Vector2i(5, 4)), "Silph 2F card-key door closed")
+	Story.on_interact_cell(Vector2i(4, 4), "up")
+	suite.check(ui.said_has("[CardKeyFailText]") and host.blocked.has(Vector2i(4, 4)), "no CARD KEY: door stays shut")
+	Story.bag_add("CARD_KEY")
+	Story.on_interact_cell(Vector2i(4, 4), "up")
+	suite.check(Story.flag("EVENT_SILPH_CO_2_UNLOCKED_DOOR1") and not host.blocked.has(Vector2i(4, 4)), "CARD KEY opens the door")
+	# gift Pokémon: Eevee on the Celadon Mansion roof
+	host.load_map("CeladonMansionRoofHouse", Vector2i(4, 4), "up")
+	ui.answers = [false]
+	host.talk("CELADONMANSION_ROOF_HOUSE_EEVEE_POKEBALL")
+	suite.check(Story.party_has("EEVEE") and not host.is_actor_shown("CELADONMANSION_ROOF_HOUSE_EEVEE_POKEBALL"), "EEVEE gift received")
+	# elevators remember the floor you came from, and the panel changes the exits
+	host.load_map("CeladonMart3F", Vector2i(1, 1), "up")
+	host.load_map("CeladonMartElevator", Vector2i(1, 3), "up")
+	suite.check(Story.warp_redirects.get("CeladonMartElevator", []) == ["CeladonMart3F", 2], "elevator exits back to 3F")
+	ui.choices = [4]
+	Story.on_sign({"text": "TEXT_CELADONMARTELEVATOR"})
+	suite.check(Story.warp_redirects.get("CeladonMartElevator", []) == ["CeladonMart5F", 2], "elevator panel: 5F")
+	suite.check(Story.warp_dest_at(Vector2i(1, 3)).get("map", "") == "CeladonMart5F", "elevator warp now leads to 5F")

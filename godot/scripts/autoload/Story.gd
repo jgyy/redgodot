@@ -1001,7 +1001,11 @@ func trainer_sighted(id: String, dist: int) -> void:
 # ================================================================== dispatch hooks (called by the Overworld)
 ## Map loaded (called after actors spawn). Runs global hooks + the map's enter scripts.
 func on_enter(map_name: Variant = "") -> void:
-	var m: String = map_name if map_name is String else str((map_name as Object).get("name")) if map_name is Object else ""
+	var m := ""
+	if map_name is String:
+		m = map_name
+	elif map_name is Object:
+		m = str((map_name as Object).get("name"))
 	if m == "":
 		m = mapname()
 	prev_map = _cur_map
@@ -1505,6 +1509,11 @@ func is_outdoor(m: String = "") -> bool:
 ## Rock Tunnel needs FLASH (the overworld darkens the view while this is true).
 func is_dark() -> bool:
 	return DARK_MAPS.has(mapname()) and not flashed
+
+## Cycling Road (Route 17) slopes downhill: with nothing pressed the bike rolls down.
+## The Overworld should treat a non-empty result as a held d-pad direction.
+func forced_direction() -> String:
+	return "down" if mapname() == "Route17" and biking and running == 0 else ""
 
 ## True where scripts forbid wild battles (Mt.Moon fossil area, Tower 5F purified zone...).
 func encounters_blocked(c: Vector2i) -> bool:
