@@ -64,6 +64,11 @@ func _setup_scene(scene: String, args: Dictionary) -> void:
 			SceneRouter.start_battle({
 				"kind": "wild", "species": args.get("enemy", "PIDGEY"), "level": int(args.get("level", "4")),
 			})
+			if args.has("auto_move"):
+				await get_tree().create_timer(1.3).timeout
+				var battle := get_node_or_null("Battle")
+				if battle and battle.has_method("auto_use_first_move"):
+					battle.auto_use_first_move(int(args.get("move_index", "-1")))
 		"dialogue":
 			GameState.new_game(args.get("player", "CHARMANDER"))
 			_apply_overrides(args)
