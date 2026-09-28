@@ -79,9 +79,15 @@ func _act(on: bool, a: String) -> void:
 	ev.pressed = on
 	Input.parse_input_event(ev)
 
+## Waits n frames at a real 60 fps: headless Godot runs uncapped, and the
+## player's tap-to-turn / hold-to-walk thresholds are time-based, so counting
+## raw frames would make a "hold" last only milliseconds on a fast machine.
 func _frames(n: int) -> void:
 	for i in n:
+		var until := Time.get_ticks_usec() + 16667
 		await get_tree().process_frame
+		while Time.get_ticks_usec() < until:
+			await get_tree().process_frame
 
 func _press_action(a: String, hold: int = 3) -> void:
 	_act(true, a)

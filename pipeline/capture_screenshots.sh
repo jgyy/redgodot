@@ -23,16 +23,15 @@ shot() {
 # reference save (--save=showcase: RED, 6-mon party, 126/75 dex, 5 badges).
 shot "001-title-screen" --scene=title --title_t=100 --wait=1.5
 shot "002-intro"        --scene=intro --intro_frame=505 --intro_hold=1 --wait=1.0
-shot "03-overworld"     --scene=overworld --wait=1.5
-shot "092-start-menu"   --scene=start_menu   --save=showcase --wait=1.5
+shot "092-start-menu"   --scene=start_menu   --save=showcase --time=night --wait=1.5
 shot "093-party"        --scene=party        --save=showcase --wait=1.5
 shot "094-summary"      --scene=summary      --save=showcase --wait=1.5
 shot "095-bag"          --scene=bag          --save=showcase --wait=1.5
 shot "096-pokedex"      --scene=pokedex      --save=showcase --wait=1.5
 shot "097-trainer-card" --scene=trainer_card --save=showcase --wait=1.5
 shot "098-town-map"     --scene=town_map     --save=showcase --wait=1.5
-shot "099-options"      --scene=options      --save=showcase --wait=1.5
-shot "100-dialogue"     --scene=dialogue     --save=showcase --wait=1.5 \
+shot "099-options"      --scene=options      --save=showcase --time=night --wait=1.5
+shot "100-dialogue"     --scene=dialogue     --save=showcase --time=night --wait=1.5 \
   --text="Welcome to the world of POKéMON! Every pixel here was drawn by code."
 
 # --- Story autoload: Poké Mart (pc.js G.mart menu coords + quantity picker) ---
@@ -54,7 +53,7 @@ vshot 069-battle-pikachu-thunderbolt PIKACHU 105 GYARADOS THUNDERBOLT water 0.12
 vshot 070-battle-blastoise-hydro_pump BLASTOISE 146 ARCANINE HYDRO_PUMP grass 0.4
 vshot 071-battle-venusaur-solarbeam VENUSAUR 140 GOLEM SOLARBEAM grass 0.45
 vshot 072-battle-alakazam-psychic ALAKAZAM 123 MACHAMP PSYCHIC_M grass 0.35
-vshot 073-battle-gengar-night_shade GENGAR 121 ALAKAZAM NIGHT_SHADE grass 0.3 --time=night
+vshot 073-battle-gengar-night_shade GENGAR 121 ALAKAZAM NIGHT_SHADE grass 0.3
 vshot 074-battle-lapras-blizzard LAPRAS 195 DRAGONITE BLIZZARD ice 0.45
 vshot 075-battle-dragonite-hyper_beam DRAGONITE 164 LAPRAS HYPER_BEAM grass 0.45
 vshot 076-battle-jolteon-thunder JOLTEON 132 VAPOREON THUNDER grass 0.4

@@ -12,8 +12,11 @@ env:
 
 jobs:
   test:
-    name: Import, unit tests, screenshots
+    name: Import, unit tests, new-game playtest, screenshots
     runs-on: ubuntu-latest
+    # A GDScript parse error leaves Godot idling instead of exiting, so every
+    # Godot step is also wrapped in `timeout` to fail fast rather than hang.
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -39,20 +42,35 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends xvfb libgl1-mesa-dri
 
       - name: Import project
-        run: /opt/godot/godot4 --headless --path godot --import
+        run: timeout 20m /opt/godot/godot4 --headless --path godot --import
 
       - name: Run unit tests
-        run: /opt/godot/godot4 --headless --path godot -- --run-tests
+        run: |
+          set -o pipefail
+          timeout 10m /opt/godot/godot4 --headless --path godot -- --run-tests 2>&1 | tee test.log
+          grep -q "=== [0-9]* passed, 0 failed ===" test.log
 
-      - name: Capture screenshots (core scenes + start menu suite smoke test)
+      - name: New-game playtest (Pallet -> Oak -> starter -> rival battle)
+        run: timeout 10m /opt/godot/godot4 --headless --path godot -- --scene=ow_playtest
+
+      - name: Capture screenshots (core scenes, menus, battle, overworld)
         run: |
           mkdir -p artifacts/screenshots
+          shot() {
+            local name="$1"; shift
+            timeout 3m xvfb-run -a /opt/godot/godot4 --path godot --rendering-driver opengl3 \
+              -- --screenshot="$PWD/artifacts/screenshots/$name.png" "$@"
+            test -s "artifacts/screenshots/$name.png"
+          }
           for scene in title intro overworld battle start_menu party summary bag pokedex trainer_card town_map options dialogue; do
-            xvfb-run -a /opt/godot/godot4 --path godot --rendering-driver opengl3 \
-              -- --screenshot="$PWD/artifacts/screenshots/$scene.png" --scene="$scene" --wait=1.5
+            shot "$scene" --scene="$scene" --wait=1.5
           done
+          shot pallet-town --scene=overworld --map=PalletTown --pc=10,9 --wait=1.5
+          shot battle-flamethrower --scene=battle --wait=0.3 --player=CHARIZARD --player_level=50 \
+            --enemy=BLASTOISE --level=50 --env=grass --state=vfx --move=FLAMETHROWER --vfx_t=0.4
 
       - name: Upload screenshots
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: screenshots
