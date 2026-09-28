@@ -66,7 +66,7 @@ static func stand(cam: Camera3D, node: Node3D, feet: Vector2, height_px: float, 
 static func flat_material(unshaded: bool = true) -> StandardMaterial3D:
 	var m := StandardMaterial3D.new()
 	m.vertex_color_use_as_albedo = true
-	m.vertex_color_is_srgb = true
+	m.vertex_color_is_srgb = not compat()
 	if unshaded:
 		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.cull_mode = BaseMaterial3D.CULL_DISABLED
@@ -127,8 +127,17 @@ static func backdrop(cam: Camera3D, shader_code: String, depth: float) -> MeshIn
 
 ## GLSL helpers shared by the backdrop shaders: sRGB hex -> linear, the 4x4
 ## Bayer matrix and upstream's logical-pixel coordinate (0..320, 0..180).
+## The Compatibility (GLES3) renderer writes unshaded colours straight to the
+## sRGB framebuffer, Forward+ expects linear values: palette colours need the
+## sRGB->linear conversion only on the latter.
+static func compat() -> bool:
+	return RenderingServer.get_current_rendering_method() == "gl_compatibility"
+
+static func glsl_common() -> String:
+	return GLSL_COMMON.replace("LIN_ON", "0.0" if compat() else "1.0")
+
 const GLSL_COMMON := """
-vec3 lin(vec3 c) { return mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)), step(0.04045, c)); }
+vec3 lin(vec3 c) { return mix(c, mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)), step(0.04045, c)), LIN_ON); }
 vec3 hexc(int h) { return lin(vec3(float((h >> 16) & 255), float((h >> 8) & 255), float(h & 255)) / 255.0); }
 float bayer4(vec2 p) {
 	int x = int(mod(p.x, 4.0)); int y = int(mod(p.y, 4.0));

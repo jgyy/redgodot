@@ -130,6 +130,28 @@ static func exp_for_level(growth: String, n: int) -> int:
 		_:
 			return int(n3)
 
+## Upstream G.newState() for NEW GAME (title.js newGameIntro): no POKéMON yet,
+## an empty bag, a POTION in the PC, ₽3000, standing in RED's room facing up.
+func start_new_adventure() -> void:
+	party.clear()
+	bag = {}
+	pc_items = {"POTION": 1}
+	pc_boxes = []
+	current_box = 0
+	money = 3000
+	badges = []
+	seen_species = {}
+	caught_species = {}
+	options = DEFAULT_OPTIONS.duplicate()
+	trainer_id = randi() % 65536
+	play_seconds = 0.0
+	visited = {"PalletTown": true}
+	last_outdoor = "PalletTown"
+	current_map = "RedsHouse2F"
+	player_cell = Vector2i(3, 6)
+	player_facing = "up"
+	party_changed.emit()
+
 ## The fixed save the reference screenshots were taken with (Main.gd
 ## --save=showcase): RED, ₽48210, dex 126 seen / 75 owned, a Lv42-52 party and
 ## a bag of 7 staple items, standing in PALLET TOWN at noon.
