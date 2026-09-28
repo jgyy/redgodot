@@ -21,6 +21,7 @@ func _ready() -> void:
 	_maybe_capture_screenshot()
 
 func _run_tests() -> void:
+	await get_tree().process_frame  # let the root finish adding Main so tests can add scenes
 	var suite := TestSuite.new()
 	suite.run_all(get_tree())
 	print("\n=== %d passed, %d failed ===" % [suite.passed, suite.failures.size()])
@@ -89,20 +90,7 @@ func _setup_scene(scene: String, args: Dictionary) -> void:
 			await sheet.run(args, out)
 			await get_tree().create_timer(3600.0).timeout
 		"battle":
-			GameState.new_game(args.get("player", "SQUIRTLE"))
-			if args.has("player_level"):
-				var p: GameState.PartyMon = GameState.party[0]
-				p.level = int(args["player_level"])
-				p._recalc_stats()
-				p.hp = p.max_hp
-			SceneRouter.start_battle({
-				"kind": "wild", "species": args.get("enemy", "PIDGEY"), "level": int(args.get("level", "4")),
-			})
-			if args.has("auto_move"):
-				await get_tree().create_timer(1.3).timeout
-				var battle := get_node_or_null("Battle")
-				if battle and battle.has_method("auto_use_first_move"):
-					battle.auto_use_first_move(int(args.get("move_index", "-1")))
+			await _setup_battle(args)
 		"dialogue":
 			GameState.new_game(args.get("player", "CHARMANDER"))
 			_apply_overrides(args)
@@ -141,6 +129,82 @@ func _setup_scene(scene: String, args: Dictionary) -> void:
 				GameState.new_game(args.get("player", "CHARMANDER"))
 				_apply_overrides(args)
 				SceneRouter.goto_overworld()
+
+## --scene=battle flags (battle agent):
+##   --player=SP --player_level=N --player_maxhp=N (picks the HP DV) --player_moves=A,B
+##   --player_party=SP:LV,SP:LV  --enemy=SP --level=N --enemy_hp=0..1 --dvs=a,d,s,c
+##   --trainer=CLASS[:partyIndex]  --env=grass|forest|cave|water|beach|ice|...  --time=day|dusk|night
+##   --state=live|idle|intro|menu|moves|message|vfx  --text="..." --waiting=1
+##   --move=MOVE_ID --attacker=p|e --vfx_t=0.55 (freeze the move's animation at that fraction)
+##   --autoplay=1 (live battle that plays itself)
+func _setup_battle(args: Dictionary) -> void:
+	GameState.new_game(args.get("player", "SQUIRTLE"))
+	GameState.party.clear()
+	var party_specs: Array = []
+	if args.has("player_party"):
+		for e in str(args["player_party"]).split(","):
+			var kv: PackedStringArray = e.split(":")
+			party_specs.append([kv[0], int(kv[1]) if kv.size() > 1 else 50])
+	else:
+		party_specs.append([args.get("player", "SQUIRTLE"), int(args.get("player_level", "5"))])
+	for sp in party_specs:
+		GameState.party.append(GameState.PartyMon.new(sp[0], sp[1]))
+	var lead: GameState.PartyMon = GameState.party[0]
+	if args.has("player_maxhp"):
+		var want := int(args["player_maxhp"])
+		for dv in 16:
+			lead.set_dvs((dv >> 3) & 1, (dv >> 2) & 1, (dv >> 1) & 1, dv & 1)
+			lead._recalc_stats()
+			if lead.max_hp == want:
+				break
+	if args.get("player_nearlevel", "") == "1":
+		lead.xp = lead.exp_to_next() - 1
+	if args.has("player_moves"):
+		lead.moves.clear()
+		lead.pp.clear()
+		for mv in str(args["player_moves"]).split(","):
+			lead.add_move(mv)
+	if args.has("time"):
+		_apply_overrides({"time": args["time"]})
+	var enc := {"kind": "wild", "species": args.get("enemy", "PIDGEY"), "level": int(args.get("level", "4")),
+		"seed": 11, "dvs": {"atk": 8, "def": 8, "spd": 8, "spc": 8}}
+	if args.has("trainer"):
+		var tk: PackedStringArray = str(args["trainer"]).split(":")
+		enc = {"kind": "trainer", "trainer_class": tk[0], "party_index": int(tk[1]) if tk.size() > 1 else 1, "seed": 11}
+	if args.has("env"):
+		enc["env"] = args["env"]
+	for fk in ["ghost", "restless_soul", "safari", "demo", "no_catch"]:
+		if args.get(fk, "") == "1":
+			enc[fk] = true
+	for rk in ["rot_e", "rot_p"]:
+		if args.has(rk):
+			enc[rk] = float(args[rk])
+	if args.has("time"):
+		enc["time"] = GameState.time_period()
+	var state: String = args.get("state", "live")
+	enc["screenshot"] = state != "live"
+	enc["autoplay"] = args.get("autoplay", "") == "1"
+	if args.has("auto_actions"):
+		enc["auto_actions"] = Array(str(args["auto_actions"]).split(","))
+	if args.has("bag"):
+		for e in str(args["bag"]).split(","):
+			var kv: PackedStringArray = e.split(":")
+			GameState.bag[kv[0]] = int(kv[1]) if kv.size() > 1 else 1
+	SceneRouter.start_battle(enc)
+	var battle: Node = SceneRouter.current_battle()
+	if battle == null or state == "live":
+		return
+	await get_tree().process_frame
+	var o := {}
+	for k in ["text", "move", "attacker"]:
+		if args.has(k):
+			o[k] = args[k]
+	if args.has("enemy_hp"):
+		o["enemy_hp"] = float(args["enemy_hp"])
+	if args.has("vfx_t"):
+		o["vfx_t"] = float(args["vfx_t"])
+	o["waiting"] = args.get("waiting", "") == "1"
+	await battle.pose(state, o)
 
 func _apply_overrides(args: Dictionary) -> void:
 	if args.get("save", "") == "showcase":
