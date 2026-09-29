@@ -120,15 +120,34 @@ WING_MAX = 55.0     # lateral spread of a wing
 
 
 def natural_pose(V, W, names, sk, spec):
-    """Rotate hanging limbs into a natural rest pose. Returns (V', per-bone 3x3 world rotations, per-bone pivots)."""
+    """Rotate limbs into a natural rest pose and bake it: returns (V', log) and moves the bones to match.
+
+    Arms that stick out sideways (T/A pose) are aimed to hang (target spec arm_hang / arm_fwd degrees), splayed legs are rolled
+    under the body, wings are half-folded.  What is aimed is the *mesh* limb (root joint -> far vertices bound to the chain: what
+    the eye and the T-pose detector see); because vertices near a joint share weights with the trunk, the rotation is refined
+    a few times until the skinned limb really points where it should."""
     plan = spec.get('plan')
     rot = {n: np.eye(3) for n in sk.bones}
     piv = {n: sk.bones[n].head.copy() for n in sk.bones}
     arm_t = float(spec.get('arm_hang', 24.0))          # target angle from down (deg)
     arm_fwd = float(spec.get('arm_fwd', 16.0))
-    leg_t = float(spec.get('leg_hang', 10.0))
     log = {}
     cols = {n: i for i, n in enumerate(names)}
+
+    def fk():
+        world = {}
+        for n, bn in sk.bones.items():
+            Rp, tp = world.get(bn.parent, (np.eye(3), np.zeros(3)))
+            world[n] = (Rp @ rot[n], Rp @ (piv[n] - rot[n] @ piv[n]) + tp)
+        return world
+
+    def deform(world):
+        Vn = np.zeros_like(V)
+        for i, nm in enumerate(names):
+            R, t = world[nm]
+            Vn += W[:, i:i + 1] * (V @ R.T + t)
+        return np.where(W.sum(axis=1, keepdims=True) > 0.5, Vn, V)
+
     for gid, names_c in sk.chains.items():
         b0 = sk.bones[names_c[0]]
         if b0.role not in ('Arm', 'Leg', 'Wing'):
@@ -138,66 +157,64 @@ def natural_pose(V, W, names, sk, spec):
         L = np.linalg.norm(v)
         if L < 1e-9:
             continue
+        first = names_c[0]
         side = 1.0 if (b[0] - sk.info['hips'][0]) >= 0 else -1.0
         vm = mesh_vec(V, W, cols, names_c, a)
         if b0.role == 'Arm' and (angle_deg(v, -UP) > ARM_MAX or (vm is not None and _t_like(vm))):
-            ang = math.radians(arm_t)
-            fw = math.radians(arm_fwd)
+            ang, fw = math.radians(arm_t), math.radians(arm_fwd)
             tgt = np.array([side * math.sin(ang), -math.sin(fw), -math.cos(ang)])
-            src = vm if vm is not None else v           # aim the *mesh* (what the eye sees), not just the bone
-            log[gid] = ('arm', angle_deg(src, -UP))
-            R = rot_between(src, tgt)
-            rot[names_c[0]] = R
-            piv[names_c[0]] = a
-        elif b0.role == 'Leg' and max(abs(v[0]) / L, (abs(vm[0]) / np.linalg.norm(vm)) if vm is not None else 0.0) > math.sin(math.radians(LEG_MAX)):
-            # splayed legs: bring them under the body by rolling about the fore/aft axis only (keeps knees and paws pointing where they do)
-            src = vm if vm is not None and abs(vm[0]) / np.linalg.norm(vm) > abs(v[0]) / L else v
-            cur = math.degrees(math.asin(min(1.0, abs(src[0]) / np.linalg.norm(src))))
-            want = float(spec.get('leg_hang', 14.0))
-            log[gid] = ('leg', cur)
-            R = axis_angle(FWD, math.radians(cur - want) * (1.0 if src[0] > 0 else -1.0))
-            if abs((R @ src)[0]) > abs(src[0]):
-                R = R.T
-            rot[names_c[0]] = R
-            piv[names_c[0]] = a
+            log[gid] = ('arm', angle_deg(vm if vm is not None else v, -UP))
+            piv[first] = a
+            rot[first] = rot_between(vm if vm is not None else v, tgt)
+            for _ in range(10):
+                vm2 = mesh_vec(deform(fk()), W, cols, names_c, a)
+                if vm2 is None or angle_deg(vm2, tgt) < 3.0:
+                    break
+                rot[first] = rot_between(vm2, tgt) @ rot[first]
+        elif b0.role == 'Leg':
+            # legs are judged by their bones (hip joint -> ankle joint): splayed outward more than LEG_MAX -> roll under the body
+            vj = sk.bones[names_c[-1]].head - a
+            if np.linalg.norm(vj) < 1e-9:
+                continue
+            spread = math.degrees(math.asin(min(1.0, abs(vj[0]) / np.linalg.norm(vj))))
+            if spread > LEG_MAX:
+                want = float(spec.get('leg_hang', 14.0))
+                log[gid] = ('leg', spread)
+                R = axis_angle(FWD, math.radians(spread - want) * (1.0 if vj[0] > 0 else -1.0))
+                if abs((R @ vj)[0]) > abs(vj[0]):
+                    R = R.T
+                rot[first], piv[first] = R, a
         elif b0.role == 'Wing':
             sp = math.degrees(math.asin(min(1.0, abs(v[0]) / L)))
             if sp > WING_MAX or spec.get('wing_fold', True):
                 # half-folded: sweep the wing back and up along the body, keep some spread so it reads as wings
-                fold = float(spec.get('wing_fold_deg', 32.0))
+                fold = math.radians(float(spec.get('wing_fold_deg', 32.0)))
                 up_k = 0.55 if plan in ('winged', 'bird') else 0.4
-                tgt = np.array([side * math.sin(math.radians(fold)), 0.55 * math.cos(math.radians(fold)),
-                                up_k * math.cos(math.radians(fold))])
+                tgt = np.array([side * math.sin(fold), 0.55 * math.cos(fold), up_k * math.cos(fold)])
                 log[gid] = ('wing', sp)
-                R = rot_between(v, unit(tgt))
-                # roll about the wing's own axis so the flat membrane ends up standing on its edge
-                nrm = _flat_normal(V, W, names, sk, names_c, R)
-                if nrm is not None:
-                    Rn = R @ nrm
-                    want = np.array([side, 0.0, 0.0])
-                    axis = unit(R @ v)
-                    n_now = R @ (nrm) if False else nrm
-                rot[names_c[0]] = R
-                piv[names_c[0]] = a
-    # forward kinematics over the bone tree
-    world = {}
-    for n, bn in sk.bones.items():
-        par = bn.parent
-        Mp = world.get(par, (np.eye(3), np.zeros(3)))
-        R_l, t_l = rot[n], piv[n] - rot[n] @ piv[n]
-        Rp, tp = Mp
-        world[n] = (Rp @ R_l, Rp @ t_l + tp)
-    Vn = np.zeros_like(V)
-    for i, nm in enumerate(names):
-        R, t = world[nm]
-        Vn += W[:, i:i + 1] * (V @ R.T + t)
-    # roots (weightless) keep their place; everything with weights moves
-    wsum = W.sum(axis=1, keepdims=True)
-    Vn = np.where(wsum > 0.5, Vn, V)
+                rot[first], piv[first] = rot_between(v, unit(tgt)), a
+    world = fk()
+    Vn = deform(world)
     for n, bn in sk.bones.items():
         R, t = world[n]
         bn.head = R @ bn.head + t
         bn.tail = R @ bn.tail + t
+    # arms: lay the bones along the limb the eye sees (bones are only pivots, skinning is unaffected by where they sit)
+    for gid in log:
+        names_c = sk.chains[gid]
+        if sk.bones[names_c[0]].role != 'Arm':
+            continue
+        a = sk.bones[names_c[0]].head
+        vm = mesh_vec(Vn, W, cols, names_c, a)
+        cur = sk.bones[names_c[-1]].tail - a
+        if vm is None or angle_deg(vm, cur) < 8.0:
+            continue
+        d = unit(vm)
+        pos = a.copy()
+        for nm in names_c:
+            ln = sk.bones[nm].length
+            sk.bones[nm].head, sk.bones[nm].tail = pos.copy(), pos + d * ln
+            pos = pos + d * ln
     return Vn, log
 
 
@@ -220,6 +237,3 @@ def _t_like(v):
     spread = math.degrees(math.asin(min(1.0, abs(v[0]) / max(np.linalg.norm(v), 1e-9))))
     return 52.0 < down < 125.0 and spread > 32.0
 
-
-def _flat_normal(V, W, names, sk, chain_names, R):
-    return None

@@ -33,7 +33,8 @@ def idle(c, P, u):
     c.root_move(P, z=0.006 * s * a)
     P.scale(r.root, 1, 1, 1 + 0.012 * s)
     c.spine_pitch(P, 2.2 * s)
-    c.head_look(P, yaw=(3.5 if calm else 6.0) * math.sin(TAU * u + 1.2), pitch=2.5 * math.sin(TAU * u - 0.9),
+    ja, jp = c.jit('idle_amp', 0.8, 1.4), c.jit('idle_ph2', 0, TAU)      # every species idles with its own amplitude and phase
+    c.head_look(P, yaw=(3.5 if calm else 6.0) * ja * math.sin(TAU * u + jp), pitch=2.5 * ja * math.sin(TAU * u - 0.9 + jp),
                 roll=2.0 * s2 * (0.5 if calm else 1.0))
     if c.temper in ('fierce', 'wild'):
         c.root_move(P, x=0.0025 * math.sin(TAU * 9 * u))
@@ -44,7 +45,7 @@ def idle(c, P, u):
     if fam in ('biped', 'rock'):
         for i, arm in enumerate(r.arms):
             P.bend(arm.names[0], FWD, 5 * s + 3 * math.sin(TAU * u + i * 2))
-            P.bend(arm.names[0], OUT(arm.sign), 4 + 3 * s)
+            P.bend(arm.names[0], OUT(arm.sign), 2 + 2 * s)
             if len(arm.names) > 1:
                 P.bend(arm.names[1], FWD, 8 + 4 * math.sin(TAU * u - 0.5))
         for leg in r.legs:
@@ -86,7 +87,7 @@ def idle(c, P, u):
         c.sides_wobble(P, u, 0.06, 1.0)
         c.extras_sway(P, u, 14, 1.0)
         for arm in r.arms:
-            P.bend(arm.names[0], OUT(arm.sign), 8 + 6 * s)
+            P.bend(arm.names[0], OUT(arm.sign), 2 + 2 * s)
     elif fam == 'multi':
         for i, leg in enumerate(r.legs):
             P.bend(leg.names[0], FWD, 4 * math.sin(TAU * u + i))
@@ -365,7 +366,9 @@ def faint(c, P, u):
     elif fam in ('blob', 'radial'):
         P.scale(r.root, 1 + 0.5 * fall, 1 + 0.5 * fall, 1 - 0.55 * fall)
         c.root_move(P, z=-0.03 * fall)
-    elif fam == 'float':
+    elif fam in ('float', 'winged', 'bird'):     # airborne bodies without legs to fall on: tumble and sink
+        for w in r.wings:
+            P.bend(w.names[0], BACK, 50 * fall)
         c.root_move(P, z=-0.05 * fall + 0.05 * (1 - fall))
         P.roll(r.root, dirn * 60 * fall)
         P.pitch(r.root, 30 * fall)
@@ -447,7 +450,7 @@ def sleep(c, P, u):
     if fam == 'serpent':
         n = len(r.body)
         for i, b in enumerate(r.body):
-            P.yaw(b, 32)
+            P.yaw(b, min(32.0, 260.0 / n))
         c.spine_pitch(P, -30)
         P.wave(r.body, LEFT, 3, u, 1.0, 0.3)
     if fam == 'float':
@@ -766,6 +769,10 @@ def idle_fidget(c, P, u):
                 P.bend(l.names[1], FWD, 60 * k)
         c.root_move(P, z=-0.01 * k)
         c.spine_pitch(P, -8 * k)
+    if n != 2:      # every fidget also wriggles the whole body a little (bodies without limbs would barely move otherwise)
+        P.roll(r.root, 5 * math.sin(TAU * 2 * u) * k)
+        c.head_look(P, yaw=14 * math.sin(TAU * 3 * u) * k, roll=6 * sh)
+        c.squash(P, 0.05 * math.sin(TAU * 4 * u) * k)
     else:           # little hop-turn
         c.root_move(P, z=0.06 * bump(u, 0.2, 0.4, 0.6) * c.amp + 0.06 * bump(u, 0.6, 0.8, 0.95) * c.amp)
         P.yaw(r.root, 45 * math.sin(TAU * u))

@@ -355,7 +355,7 @@ def bind(c, P, u, v):
     if c.rig.serpent:
         n = len(c.rig.body)
         for i, b in enumerate(c.rig.body):
-            P.yaw(b, (34 + 8 * sq) * k * (1 if i % 2 == 0 else 1))
+            P.yaw(b, min(34.0 + 8 * sq, 300.0 / n) * k)
             P.pitch(b, -6 * k)
         rear_up(c, P, 0.6 * k, 20)
     else:

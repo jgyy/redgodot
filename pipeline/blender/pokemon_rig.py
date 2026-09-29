@@ -97,13 +97,6 @@ class Tip:
         self.side = ''
 
 
-def analyse(V, T, spec):
-    H = float(V[:, 2].max())
-    f = -V[:, 1]
-    g = PG.Graph(V, T, H)
-    return H, f, g
-
-
 def fit(V, T, spec):
     """Build the species skeleton. `spec` is the entry of pokemon_species_rig.json."""
     H = float(V[:, 2].max())
@@ -227,8 +220,9 @@ def _classify(tips, spec, V, H, L, xcore, cf, hc, hr, hips, posture):
     if cap['fins']:
         take(lambda a, t: a['len'] > 0.06, lambda a, t: t.pers, cap['fins'], 'Fin')
     legz = 0.34 if not horizontal else 0.42
-    take(lambda a, t: a['z'] < legz and t.pers > 0.05 * H, lambda a, t: (t.pers, -t.pos[2]), cap['legs'], 'Leg')
+    take(lambda a, t: a['z'] < legz and t.pers > 0.05 * H and (horizontal or a['bz'] - a['z'] > 0.05), lambda a, t: (t.pers, -t.pos[2]), cap['legs'], 'Leg')
     take(lambda a, t: 0.16 < a['z'] < (0.9 if plan != 'multileg' else 1.1) and a['lat'] > 0.55 and t.pers > 0.05 * H, lambda a, t: (t.pers * a['lat']), cap['arms'], 'Arm')
+
     def near_limb(t):
         """fingers, claws and hand-held props peak on their own: fold them into the limb they sit on (its bones will skin them)."""
         for o in chosen_all:
@@ -270,7 +264,7 @@ def _fill_slots(used, spec, V, H, L, xcore, cf, hips, chest, posture):
     """limbs the tip search could not separate (fused feet, arms hugging the body) are rebuilt from regional extremes so
     every two-/four-legged body gets its full set of limbs."""
     plan = spec.get('plan')
-    if plan in ('multileg', 'plant', 'rock', 'radial', 'sphere', 'blob', 'floating', 'serpent', 'fish', 'shell') and plan != 'shell':
+    if plan in ('multileg', 'plant', 'rock', 'radial', 'sphere', 'blob', 'floating', 'serpent', 'fish'):
         return []
     x, y, z = V[:, 0], V[:, 1], V[:, 2]
     f = -y
@@ -367,8 +361,31 @@ def _fit_trunk_body(sk, V, g, tips, spec, H, L, xcore, cf, posture):
     sk.info.update(hips=hips, hc=hc, hr=hr, chest=chest, ax=ax, xcore=xcore, cf=cf, head_base=head_base)
     top_spine = 'Spine%d' % n_spine
     used = _classify(tips, spec, V, H, L, xcore, cf, hc, hr, hips, posture)
+    if int(spec.get('legs', 2)) in (2, 4) and spec.get('plan') not in ('multileg', 'plant', 'rock', 'radial', 'sphere', 'blob', 'floating', 'serpent', 'fish'):
+        # a "leg" on the midline is two fused feet: drop it, _fill_slots builds a proper left and right leg
+        used = [t for t in used if not (t.role == 'Leg' and t.side == '')]
     used += _fill_slots(used, spec, V, H, L, xcore, cf, hips, chest, posture)
     _attach_limbs(sk, used, spec, V, H, L, xcore, cf, hc, hr, hips, chest, top_spine, horizontal)
+    _sanitize_legs(sk)
+
+
+def _sanitize_legs(sk):
+    """a leg chain must run from the hip down to the ground; anything else was a mis-read protrusion: stand it under the hip."""
+    H = sk.H
+    for gid, names in sk.chains.items():
+        b0 = sk.bones[names[0]]
+        if b0.role != 'Leg':
+            continue
+        a, b = b0.head, sk.bones[names[-1]].tail
+        d = b - a
+        if d[2] < -0.45 * np.linalg.norm(d) and b[2] < 0.22 * H:
+            continue
+        foot = np.array([b[0], b[1], 0.03 * H])
+        hip = np.array([b[0] * 0.5, a[1], min(a[2], sk.info['hips'][2])])
+        n = len(names)
+        for i, nm in enumerate(names):
+            sk.bones[nm].head = hip + (foot - hip) * (i / n)
+            sk.bones[nm].tail = hip + (foot - hip) * ((i + 1) / n)
 
 
 def _toward_axis(p, sk, k):
@@ -414,6 +431,12 @@ def _attach_limbs(sk, used, spec, V, H, L, xcore, cf, hc, hr, hips, chest, top_s
             n = 3 if (ln > 0.15 * ref or horizontal) else 2
             pts = _polyline_from_tip(t, n, V, H, sk, role)
             pts[0] = _toward_axis(pts[0], sk, 0.45)
+            dv = pts[-1] - pts[0]
+            if not horizontal and dv[2] > -0.45 * np.linalg.norm(dv):
+                # a "leg" that does not go down is a mis-read protrusion (tail tip, fin): stand it under the hip instead
+                hip = np.array([t.pos[0] * 0.5, hips[1], hips[2]])
+                foot = np.array([t.pos[0], t.pos[1], 0.03 * H])
+                pts = np.array([hip + (foot - hip) * (i / n) for i in range(n + 1)])
             parent = nm_hips if fh != 'F' else top_spine
             _seg_bones(sk, gid, 'Leg', PG.resample(pts, n), P(parent, pts[0]), side)
         elif role == 'Arm':

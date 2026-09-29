@@ -72,6 +72,11 @@ SPECIAL_BY_TYPE = {
 }
 
 
+# last resort when a species has too few moves of its own: type-neutral basics
+GENERIC_MOVES = ['TACKLE', 'HEADBUTT', 'SLAM', 'GROWL', 'HARDEN', 'QUICK_ATTACK', 'MEDITATE', 'HYPER_BEAM', 'RAGE', 'SCREECH',
+                 'DEFENSE_CURL', 'SPLASH', 'STOMP', 'BITE']
+
+
 def clip_name(move_id):
     return ''.join(p.capitalize() for p in move_id.replace('PSYCHIC_M', 'PSYCHIC').split('_'))
 
@@ -104,7 +109,7 @@ def signature_moves(sid, sd, all_species, exclude_arch=(), want=8, minimum=6):
     own = [m for m in pool if m in set(x for _, x in sd.get('learn', [])) | set(sd.get('moves1', []))]
     # prefer: own moves, then preview/evolved moves, then TM/HM, then type classics
     tiers = [own, [m for m in pool if m not in own], [m for t in sd.get('types', []) for m in TYPE_DEFAULTS.get(t, [])],
-             [m for ts in TYPE_DEFAULTS.values() for m in ts]]
+             GENERIC_MOVES]
     for tier in tiers:
         for m in tier:
             arch = MOVE_ARCH[m][0]

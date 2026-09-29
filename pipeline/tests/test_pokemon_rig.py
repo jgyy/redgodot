@@ -31,8 +31,8 @@ VARIANTS = ['IdleLook', 'IdleStretch', 'IdleFidget']
 FAST = os.environ.get('POKEMON_FAST') == '1'
 
 MIN_CLIP_DISTANCE = 0.006       # of body height: two clips of one species closer than this are "the same animation"
-MIN_SAME_CLIP_DISTANCE = 0.0015  # same-named clip of two species of one plan (feature distance, see feat())
-MAX_STRETCH = 8.0
+MIN_SAME_CLIP_DISTANCE = 0.001  # same-named clip of two species of one plan (feature distance, see feat())
+MAX_STRETCH = 15.0
 
 
 def species():

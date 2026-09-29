@@ -179,14 +179,14 @@ def limb_chains(g):
     return out
 
 
-BIPED_PLANS = ('biped_humanoid', 'biped_tail', 'shell', 'winged', 'bird')
+BIPED_PLANS = ('biped_humanoid', 'biped_tail', 'shell', 'winged')
 
 
 def tpose_report(g, clip='Idle', t=0.0, plan=None):
     """per limb chain: {role, down (deg from straight down), spread (deg out of the sagittal plane), violation}.
 
     An arm is T-posed when it sticks out sideways and roughly level (60-125 deg from straight down with most of that
-    outward); arms raised overhead or held forward are poses, not T-poses.  Legs only count for upright bipeds/birds."""
+    outward); arms raised overhead or held forward are poses, not T-poses.  Legs only count for upright bipeds (birds and quadrupeds splay theirs naturally)."""
     if clip not in g.anims:
         clip = None
     pos = g.skin(clip, t)
@@ -209,10 +209,12 @@ def tpose_report(g, clip='Idle', t=0.0, plan=None):
         d = np.linalg.norm(pts - root, axis=1)
         far = pts[d >= np.percentile(d, 85)]
         v = far.mean(0) - root
+        role = start.split('_')[0]
+        if role == 'Leg' and len(chain) > 1:      # legs are judged by their bones: hip joint -> last joint of the chain
+            v = G[next(j for j in g.joints if g.nodes[j]['name'] == chain[-1])][:3, 3] - root
         L = np.linalg.norm(v)
         if L < 1e-6:
             continue
-        role = start.split('_')[0]
         down = math.degrees(math.acos(float(np.clip(-v[1] / L, -1, 1))))
         spread = math.degrees(math.asin(float(min(1.0, abs(v[0]) / L))))       # glTF: X lateral, Y up, Z forward
         if role == 'Arm':
@@ -249,10 +251,11 @@ def stretch(g, clip, frames=6, nedge=1500):
     e = np.concatenate([tri[:, [0, 1]], tri[:, [1, 2]]])
     P0 = g.skin(None, 0.0)
     L0 = np.linalg.norm(P0[e[:, 0]] - P0[e[:, 1]], axis=1) + 1e-9
+    keep = L0 > 0.012 * g.H          # slivers and seam duplicates (length ~0) would make any ratio meaningless
+    if keep.sum() > 30:
+        e, L0 = e[keep], L0[keep]
     dur = g.duration(clip)
     worst = 1.0
-    prim_first = len(g.js['meshes'][next(n['mesh'] for n in g.nodes if 'mesh' in n)]['primitives'][0]['attributes'])
-    vcount = len(g.acc(prim['attributes']['POSITION']))
     for k in range(frames):
         Pk = g.skin(clip, dur * k / frames)
         r = np.linalg.norm(Pk[e[:, 0]] - Pk[e[:, 1]], axis=1) / L0
