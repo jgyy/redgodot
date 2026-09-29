@@ -22,6 +22,9 @@ def keep_features(d):
 def rebuild(d, parts, pal=None, features=None):
     """Replace the whole part list (keeping, unless `features` is given, the sprite's eyes / mouths)."""
     feats = keep_features(d) if features is None else features
+    for p in parts:               # ellipsoid groups hidden inside others would otherwise be flattened into decals
+        if p['t'] == 'e' and not p.get('face') and not p.get('frontOnly'):
+            p.setdefault('solid', True)
     d['parts'] = list(parts) + list(feats)
     if pal:
         d.setdefault('pal', {}).update(pal)
@@ -1121,3 +1124,618 @@ def sandslash(d, look):
              Eye(37.0, 25.0, 2.5, '#202030', look=(0, 0), sclera=False, style='angry', flip=True),
              Mouth(32.0, 34.0, 2.0, 'smile')]
     rebuild(d, parts, features=feats)
+
+
+def hint(look, chains=None, roles=None):
+    """Rig hints for this species (the look dict is the one gen_pokemon later reads `chains` / `roles` from)."""
+    if look is None:
+        return
+    if chains:
+        look.setdefault('chains', {}).update(chains)
+    if roles:
+        look.setdefault('roles', {}).update(roles)
+
+
+# ============================================================================ serpents
+def ring(g, cx, cy, cz, R, r, c, n=16, z=0.0, a0=0.0, a1=360.0, ry=None, **kw):
+    """A torus-like coil made of overlapping spheres, lying flat (x-depth plane) at height cy."""
+    out = []
+    for i in range(n):
+        a = math.radians(a0 + (a1 - a0) * i / float(n if a1 - a0 >= 360 else n - 1))
+        out.append(E(g, cx + R * math.cos(a), cy, r, ry or r, c, z=z, rd=r, d=cz + R * math.sin(a), solid=True, **kw))
+    return out
+
+
+@fix('EKANS')
+def ekans(d, look):
+    body, band, belly = '#a070c0', '#f0d050', '#f4e4a8'
+    parts = []
+    # coiled body: two stacked rings (anchor group), front arc lighter underneath
+    parts += ring('body', 32, 55.0, 4.0, 10.5, 4.7, body, n=18, z=0)
+    parts += ring('body', 32, 48.5, 3.0, 8.0, 4.3, body, n=16, z=0.1)
+    parts += ring('body', 32, 43.0, 2.0, 4.0, 4.0, body, n=8, z=0.2)
+    for yy in (52.5, 57.0):
+        parts.append(Stripe('body', [27, yy, 32, yy + 1.0, 37, yy], 1.3, belly, face=True))
+    # tail with a yellow rattle-like tip poking out behind the coil
+    parts.append(Stroke('tail', [40, 56, 47, 55, 52, 50, 53, 44], 5.0, body, z=-4, w2=2.0, d1=6.0, d2=9.0, cd=0.0))
+    parts.append(E('tail', 53.5, 42.0, 2.4, 3.6, band, z=-3.9, rd=2.4, d=9.5, solid=True, cd=0.0))
+    parts.append(Stripe('tail', [50.5, 42, 56.5, 42], 0.7, '#b89020'))
+    # rising neck (S curve) with a pale throat and a yellow collar
+    parts.append(Stroke('neck', [33, 48, 30, 41, 32, 34, 33.5, 28], 8.4, body, z=1, w2=7.0, d1=-5.0, d2=-7.0, cd=0.0))
+    parts.append(Stripe('neck', [33, 47, 31.5, 41, 33, 34.5], 3.6, belly, face=True))
+    parts.append(Stripe('neck', [28.5, 30.5, 38.5, 30.5], 2.4, band, face=True))
+    parts.append(E('head', 33.5, 23.0, 6.8, 5.6, body, z=3, rd=6.0, cd=-7.5))
+    parts.append(E('head', 33.5, 26.0, 4.2, 3.4, body, z=3, rd=4.6, d=-4.4, cd=-7.5))
+    parts.append(Spot('head', 33.5, 27.6, 3.0, 1.4, belly, face=True))
+    feats = [Eye(29.6, 21.6, 1.9, '#e8c030', look=(0, 0), style='angry', wide=1.0),
+             Eye(37.4, 21.6, 1.9, '#e8c030', look=(0, 0), style='angry', wide=1.0, flip=True),
+             Mouth(33.5, 28.6, 2.0, 'tongue')]
+    rebuild(d, parts, features=feats)
+    hint(look, chains={'body': 1, 'neck': 3, 'tail': 4})
+
+
+@fix('ARBOK')
+def arbok(d, look):
+    body, belly, red, yel, blk = '#8a5cac', '#f0dc98', '#d83838', '#f0d040', '#282030'
+    parts = []
+    parts += ring('body', 32, 55.5, 4.0, 13.0, 5.4, body, n=22, z=0)
+    parts += ring('body', 32, 48.0, 3.0, 10.0, 5.0, body, n=18, z=0.1)
+    parts += ring('body', 32, 41.5, 2.0, 6.0, 4.8, body, n=10, z=0.2)
+    for yy in (53.0, 59.0):
+        parts.append(Stripe('body', [26, yy, 32, yy + 1.0, 38, yy], 1.5, belly, face=True))
+    parts.append(Stroke('tail', [42, 57, 50, 56, 56, 50, 57, 42], 6.4, body, z=-4, w2=1.5, d1=7.0, d2=10.0, cd=0.0))
+    parts.append(Stroke('neck', [32, 44, 31, 36, 32, 28], 11.5, body, z=1, w2=10.0, d1=-4.0, d2=-6.0, cd=0.0))
+    # the wide hood with its fierce face pattern
+    parts.append(E('hood', 32, 24.0, 14.6, 15.0, body, z=2, rd=4.6, d=-1.0, cd=-6.0, solid=True))
+    parts.append(Spot('hood', 32, 31.5, 5.6, 6.2, red, face=True))
+    parts.append(Spot('hood', 24.5, 22.5, 3.4, 2.4, yel, face=True))
+    parts.append(Spot('hood', 39.5, 22.5, 3.4, 2.4, yel, face=True))
+    parts.append(Stripe('hood', [20.5, 21, 25.5, 16.5, 30.5, 20.5], 1.7, blk, face=True))
+    parts.append(Stripe('hood', [43.5, 21, 38.5, 16.5, 33.5, 20.5], 1.7, blk, face=True))
+    parts.append(Stripe('hood', [22, 35.5, 26.5, 40.5, 32, 42, 37.5, 40.5, 42, 35.5], 1.9, blk, face=True))
+    parts.append(Stripe('hood', [25.5, 32.5, 28.5, 36.5], 2.6, yel, face=True))
+    parts.append(Stripe('hood', [38.5, 32.5, 35.5, 36.5], 2.6, yel, face=True))
+    parts.append(Spot('hood', 32, 13.0, 1.4, 1.4, red, face=True))
+    parts.append(E('head', 32, 10.5, 9.0, 7.0, body, z=4, rd=7.4, cd=-8.5))
+    parts.append(E('head', 32, 14.2, 5.8, 4.2, body, z=4, rd=5.6, d=-5.4, cd=-8.5))
+    parts.append(Spot('head', 32, 15.6, 3.4, 1.4, belly, face=True))
+    for side in (-1, 1):
+        parts.append(Cap('fang', 32 + side * 2.3, 15.4, 32 + side * 2.3, 18.0, 0.9, 0.2, '#f4f0e2', z=7, d1=-9.0, d2=-9.4, cd=-8.5))
+    feats = [Eye(27.6, 9.4, 2.4, '#e8c030', look=(0, 0), style='angry', wide=1.0),
+             Eye(36.4, 9.4, 2.4, '#e8c030', look=(0, 0), style='angry', wide=1.0, flip=True)]
+    rebuild(d, parts, features=feats)
+    hint(look, chains={'body': 1, 'neck': 3, 'tail': 4})
+
+
+# ============================================================================ foxes
+def tail_fan(names, base, angles, L, w0, w1, c, tipc=None, curl=0.0, depth=(12.0, 14.0), z=-4.0, wave=0.0, tip_r=2.6):
+    """A fan of tails behind the body: each one leaves `base` at `ang` degrees from vertical, curling by `curl`."""
+    out = []
+    for i, (nm, ang) in enumerate(zip(names, angles)):
+        a = math.radians(ang)
+        sgn = 1.0 if ang >= 0 else -1.0
+        mx, my = base[0] + L * 0.5 * math.sin(a), base[1] - L * 0.5 * math.cos(a)
+        a2 = a - math.radians(curl) * sgn + math.radians(wave) * (1 if i % 2 else -1)
+        tx, ty = mx + L * 0.5 * math.sin(a2), my - L * 0.5 * math.cos(a2)
+        out.append(Stroke(nm, [base[0], base[1], mx, my, tx, ty], w0, c, z=z - i * 0.05, w2=w1, d1=depth[0], d2=depth[1],
+                          cd=0.0))
+        if tipc:
+            out.append(Spot(nm, tx, ty, tip_r, tip_r, tipc))
+    return out
+
+
+def _fox_legs(body, paw, by, leg_r=2.7, front=4.5, back=8.5, gnd=58.6, top_f=None):
+    out = []
+    for side, g in ((-1, 'legFL'), (1, 'legFR')):
+        out.append(Cap(g, 32 + side * 4.8, top_f or by + 3.0, 32 + side * 5.0, gnd - 0.6, leg_r, leg_r * 0.82, body, z=2, cd=-front))
+        out.append(E(g, 32 + side * 5.2, gnd, 3.0, 1.6, paw, z=2.1, rd=3.8, d=-1.2, cd=-front))
+    for side, g in ((-1, 'legBL'), (1, 'legBR')):
+        out.append(Cap(g, 32 + side * 5.6, by + 1.5, 32 + side * 5.8, gnd - 0.6, leg_r * 1.2, leg_r * 0.85, body, z=2, cd=back))
+        out.append(E(g, 32 + side * 5.8, gnd, 3.2, 1.6, paw, z=2.1, rd=4.0, d=-1.2, cd=back))
+    return out
+
+
+@fix('VULPIX')
+def vulpix(d, look):
+    body, tail, curl, paw, inner = '#cc5c34', '#e87838', '#f4a050', '#f0d4a4', '#6a3020'
+    parts = []
+    parts += tail_fan(['t1', 't2', 't3', 't4', 't5', 't6'], (32, 48.0), [-98, -60, -22, 22, 60, 98], 18.0, 7.0, 3.2, tail,
+                      tipc=curl, curl=75, depth=(11.0, 13.0), tip_r=2.4)
+    parts.append(E('body', 32, 49.0, 8.8, 7.4, body, z=0, rd=10.0, d=4.0, cd=0.0))
+    parts.append(E('chest', 32, 47.5, 4.8, 4.6, paw, z=0.5, rd=5.0, d=-5.0, cd=0.0, frontOnly=True))
+    parts += _fox_legs(body, paw, 49.0)
+    hy = 39.5
+    parts.append(E('head', 32, hy, 9.4, 7.8, body, z=4, rd=8.0, cd=-8.5))
+    parts.append(E('head', 32, hy + 3.6, 3.9, 3.2, body, z=4, rd=5.2, d=-6.0, cd=-8.5))
+    parts.append(E('nose', 32, hy + 2.6, 1.3, 1.1, '#2a1a18', z=6, rd=1.2, d=-11.6, cd=-8.5, solid=True))
+    for side, g in ((-1, 'earL'), (1, 'earR')):
+        parts += cone(g, 32 + side * 6.2, hy - 4.0, 32 + side * 10.2, hy - 17.5, 4.8, 0.8, body, z=1, cd=-8.5)
+        parts.append(Spot(g, 32 + side * 7.6, hy - 8.5, 1.6, 3.6, inner, face=True))
+    # curly forelock on the forehead
+    parts.append(head_curl('tuft', 27.5, hy - 8.0, curl, w=3.4, s=1.05, d=-8.5, cd=-8.5))
+    feats = [Eye(27.4, hy - 0.8, 2.7, '#7a4020', look=(0, 0), sclera=False), Eye(36.6, hy - 0.8, 2.7, '#7a4020', look=(0, 0), sclera=False)]
+    rebuild(d, parts, features=feats)
+
+
+@fix('NINETALES')
+def ninetales(d, look):
+    body, tip, mane, paw, inner = '#f2e2a4', '#ee9a44', '#fbf3d0', '#e4c888', '#c89858'
+    parts = []
+    names = ['nt%d' % i for i in range(9)]
+    parts += tail_fan(names, (32, 44.0), [-92, -70, -48, -26, 0, 26, 48, 70, 92], 26.0, 8.0, 3.0, body, tipc=tip,
+                      curl=-10, depth=(11.0, 13.0), wave=14, tip_r=3.0)
+    parts.append(E('body', 32, 46.0, 8.8, 7.8, body, z=0, rd=11.0, d=4.0, cd=0.0))
+    parts += _fox_legs(body, paw, 46.0, leg_r=2.8, gnd=58.6, top_f=48.0)
+    # long neck with a fluffy mane
+    parts.append(Cap('neck', 32, 44.0, 32, 33.0, 6.0, 4.8, body, z=3, d1=-4.0, d2=-7.0, cd=0.0))
+    parts.append(E('mane', 32, 39.0, 7.4, 6.4, mane, z=3.5, rd=6.0, d=-9.0, cd=0.0, frontOnly=True))
+    hy = 30.5
+    parts.append(E('head', 32, hy, 8.4, 7.2, body, z=4, rd=7.4, cd=-8.5))
+    parts.append(E('head', 32, hy + 3.8, 3.7, 3.2, body, z=4, rd=5.4, d=-6.2, cd=-8.5))
+    parts.append(E('nose', 32, hy + 3.0, 1.3, 1.1, '#1b1a2e', z=6, rd=1.2, d=-12.0, cd=-8.5, solid=True))
+    for side, g in ((-1, 'earL'), (1, 'earR')):
+        parts += cone(g, 32 + side * 5.6, hy - 3.8, 32 + side * 9.4, hy - 15.5, 4.4, 0.8, body, z=1, cd=-8.5)
+        parts.append(Spot(g, 32 + side * 6.8, hy - 8.5, 1.5, 3.4, inner, face=True))
+    # swept-back crest and cheek tufts
+    for i, (dx, L) in enumerate([(-3.0, 9.0), (0.0, 11.0), (3.0, 9.0)]):
+        parts.append(Cap('crest', 32 + dx, hy - 6.0, 32 + dx * 1.6, hy - 6.0 - L * 0.6, 2.6, 0.5, mane, z=6, d1=-5.0,
+                         d2=-2.0 + L * 0.5, cd=-8.5))
+    for side, g in ((-1, 'cheekL'), (1, 'cheekR')):
+        parts.append(Cap(g, 32 + side * 6.4, hy + 2.5, 32 + side * 11.0, hy + 6.0, 2.6, 0.4, mane, z=6, d1=-4.0, d2=-2.0, cd=-8.5))
+    feats = [Eye(27.6, hy - 0.4, 2.5, '#c82828', look=(0, 0), style='angry'),
+             Eye(36.4, hy - 0.4, 2.5, '#c82828', look=(0, 0), style='angry', flip=True)]
+    rebuild(d, parts, features=feats)
+
+
+# ============================================================================ bats
+@fix('ZUBAT')
+def zubat(d, look):
+    body, mem, inner = '#5a9ad8', '#a872c8', '#9a5ab8'
+    parts = []
+    for side, g in ((-1, 'wingL'), (1, 'wingR')):
+        m = lambda x: 32 + side * (x - 32)  # noqa: E731
+        parts += batwing(g, side, (m(37), 32), (m(46), 20), [(m(62), 8), (m(63), 22), (m(56), 34)], mem, body,
+                         back=(m(39), 40), cd=4.0, z=-3, bone_r=1.5, T=1.0, scallop=0.34)
+    parts.append(E('body', 32, 34.0, 8.6, 9.0, body, z=0, rd=8.0))
+    for side, g in ((-1, 'earL'), (1, 'earR')):
+        parts += cone(g, 32 + side * 5.0, 28.0, 32 + side * 9.4, 10.0, 4.4, 1.0, body, z=1, cd=-1.0)
+        parts.append(Spot(g, 32 + side * 6.4, 20.5, 1.7, 4.8, inner, face=True))
+    parts.append(E('mouth', 32, 38.0, 4.6, 3.4, '#7a1c2c', z=1.5, face=True))
+    for side in (-1, 1):
+        parts.append(Cap('fang', 32 + side * 2.6, 37.0, 32 + side * 2.6, 40.6, 1.0, 0.2, '#f4f0e2', z=7, d1=-7.4, d2=-7.8, cd=0.0))
+    # spindly legs with little clawed feet
+    for side, g in ((-1, 'legL'), (1, 'legR')):
+        parts.append(Cap(g, 32 + side * 3.0, 41.0, 32 + side * 3.6, 53.5, 1.7, 1.5, body, z=2, cd=-1.0))
+        parts += foot(g, 32 + side * 3.8, 57.0, body, w=2.0, ln=2.6, n=3, dz=-1.0, toe_r=0.8, z=2.2, claw=CLAW)
+    rebuild(d, parts, features=[])
+
+
+@fix('GOLBAT')
+def golbat(d, look):
+    body, mem, inner = '#5a9ad8', '#a872c8', '#9a5ab8'
+    parts = []
+    for side, g in ((-1, 'wingL'), (1, 'wingR')):
+        m = lambda x: 32 + side * (x - 32)  # noqa: E731
+        parts += batwing(g, side, (m(41), 30), (m(51), 15), [(m(66), 2), (m(68), 20), (m(60), 38)], mem, body,
+                         back=(m(43), 44), cd=6.0, z=-3, bone_r=1.8, T=1.2, scallop=0.34)
+    parts.append(E('body', 32, 35.0, 12.6, 12.4, body, z=0, rd=11.0))
+    for side, g in ((-1, 'earL'), (1, 'earR')):
+        parts += cone(g, 32 + side * 7.0, 26.0, 32 + side * 11.4, 9.0, 4.6, 1.0, body, z=1, cd=-1.0)
+        parts.append(Spot(g, 32 + side * 8.4, 19.0, 1.7, 4.4, inner, face=True))
+    parts.append(E('mouth', 32, 40.5, 8.8, 7.4, '#7a1c2c', z=1.5, face=True))
+    parts.append(Spot('mouth', 32, 45.0, 6.2, 2.8, '#e0607a', face=True))
+    for x, y, L in ((24.5, 36.0, 4.0), (39.5, 36.0, 4.0), (28.5, 47.2, 3.4), (35.5, 47.2, 3.4)):
+        parts.append(Cap('fang', x, y, x, y + (L if y < 40 else -L), 1.3, 0.25, '#f4f0e2', z=7, d1=-10.4, d2=-10.8, cd=0.0))
+    for side, g in ((-1, 'legL'), (1, 'legR')):
+        parts.append(Cap(g, 32 + side * 5.0, 45.0, 32 + side * 5.6, 54.0, 2.4, 2.0, body, z=2, cd=-1.0))
+        parts += foot(g, 32 + side * 5.8, 58.0, body, w=2.8, ln=3.2, n=3, dz=-1.0, toe_r=1.0, z=2.2, claw=CLAW)
+    feats = [Eye(26.5, 32.0, 2.1, '#c03040', look=(0, 0), style='angry', wide=1.0),
+             Eye(37.5, 32.0, 2.1, '#c03040', look=(0, 0), style='angry', wide=1.0, flip=True)]
+    rebuild(d, parts, features=feats)
+
+
+# ============================================================================ Oddish line
+def leaf_plate(g, x, y, ang, L, w, c, vein, z=-1.0, T=1.5, cd=0.0, bend=0.0, d0=0.0):
+    """A broad pointed leaf from its base (x, y), pointing `ang` degrees from straight up (+ = right), midrib painted on."""
+    a = math.radians(ang)
+    dx, dy = math.sin(a), -math.cos(a)
+    px, py = -dy, dx
+    def pt(t, s):
+        return (x + dx * L * t + px * w * s + px * bend * t * t * L, y + dy * L * t + py * w * s + py * bend * t * t * L)
+    prof = [(0.0, 0.0), (0.25, 0.75), (0.55, 1.0), (0.82, 0.62), (1.0, 0.0), (0.82, -0.62), (0.55, -1.0), (0.25, -0.75)]
+    pts = []
+    for t, s in prof:
+        pts += list(pt(t, s * 0.5))
+    out = [Poly(g, pts, c, z=z, T=T, cd=cd)]
+    p0, p1 = pt(0.06, 0), pt(0.92, 0)
+    out.append(Stripe(g, [p0[0], p0[1], p1[0], p1[1]], 0.9, vein))
+    return out
+
+
+def petals(g, cx, cy, cz, R, n, rx, ry, rd, c, dot=None, tilt=0.35, z=0.0, a0=0.0, dot_c=None, cd=0.0):
+    """A ring of flattened petals tilted toward the viewer (front petals lower)."""
+    out = []
+    for i in range(n):
+        a = math.radians(a0 + 360.0 * i / n)
+        px = cx + R * math.cos(a)
+        pz = cz + R * math.sin(a)
+        py = cy - tilt * R * math.sin(a)
+        out.append(E(g, px, py, rx, ry, c, z=z, rd=rd, d=pz, solid=True, cd=cd))
+    return out
+
+
+@fix('ODDISH')
+def oddish(d, look):
+    body, leaf, vein, foot = '#4a6cb0', '#4fae44', '#36782e', '#3c5898'
+    parts = []
+    # five leaves fanned out of the top
+    for ang, L, w, dd in ((-64, 15.0, 9.0, 1.0), (-32, 19.0, 9.0, 3.0), (0, 20.0, 9.5, 5.0), (32, 19.0, 9.0, 3.0), (64, 15.0, 9.0, 1.0)):
+        parts += leaf_plate('lf%d' % (int(ang) + 64), 32 + ang * 0.10, 35.0, ang, L, w, leaf, vein, z=-1, T=1.6, cd=dd, bend=0.05 * (1 if ang >= 0 else -1))
+    parts.append(E('body', 32, 45.0, 13.4, 12.8, body, z=0, rd=12.0))
+    for side, g in ((-1, 'footL'), (1, 'footR')):
+        parts.append(E(g, 32 + side * 6.4, 57.4, 4.6, 2.6, foot, z=2, rd=5.4, d=-3.0, cd=-2.0))
+        parts += toes(g, 32 + side * 6.4, 58.2, n=3, spread=2.4, r=1.25, dz=-8.0, c=foot, claw=None, z=2.1, cd=-2.0)
+    feats = [Eye(26.4, 44.6, 2.7, '#c02830', look=(0, 0), sclera=True, wide=0.9),
+             Eye(37.6, 44.6, 2.7, '#c02830', look=(0, 0), sclera=True, wide=0.9),
+             Mouth(32.0, 50.2, 1.7, 'smile')]
+    rebuild(d, parts, features=feats)
+
+
+def _plant_body(body, foot, by=45.5, brx=12.0, bry=11.4, arms=True, arm_l=7.0):
+    parts = [E('body', 32, by, brx, bry, body, z=0, rd=brx - 0.6)]
+    for side, g in ((-1, 'legL'), (1, 'legR')):
+        parts.append(Cap(g, 32 + side * 6.0, by + bry * 0.55, 32 + side * 6.2, 55.5, 3.6, 3.2, body, z=2, cd=-1.0))
+        parts.append(E(g, 32 + side * 6.4, 58.0, 4.8, 2.6, foot, z=2.1, rd=5.4, d=-2.5, cd=-1.0))
+        parts += toes(g, 32 + side * 6.4, 58.8, n=3, spread=2.5, r=1.25, dz=-7.5, c=foot, claw=None, z=2.2, cd=-1.0)
+    if arms:
+        for side, g in ((-1, 'armL'), (1, 'armR')):
+            parts.append(Cap(g, 32 + side * (brx - 1.0), by - 3.0, 32 + side * (brx + 3.6), by - 3.0 + arm_l, 2.9, 2.5, body, z=3, cd=-3.0))
+            parts += hand(g, 32 + side * (brx + 3.8), by - 3.0 + arm_l + 0.8, body, r=2.3, n=3, ang=-side * 8, fl=1.7, fr=0.8, claw=None, z=3.1)
+    return parts
+
+
+@fix('GLOOM')
+def gloom(d, look):
+    body, foot, petal, dot, leaf = '#4a6cb0', '#3c5898', '#c4503c', '#eeb878', '#5cb048'
+    parts = _plant_body(body, foot, by=46.5, brx=12.6, bry=11.6)
+    # the big red drooping flower on its head
+    parts += petals('flower', 32, 29.5, 0.0, 10.5, 5, 8.2, 4.4, 8.2, petal, tilt=0.36, z=1, a0=-90)
+    parts.append(E('flower', 32, 29.5, 8.0, 5.0, '#a03c30', z=1.2, rd=8.0, solid=True))
+    parts.append(E('ctr', 32, 27.0, 4.6, 3.4, '#8a3028', z=2, rd=4.6, d=-1.5, solid=True))
+    for x, y in ((21.5, 31.5), (43, 31.5), (27, 36.0), (37.5, 36.0), (32, 22.0), (26, 26.0), (38.5, 26.0)):
+        parts.append(Spot('flower', x, y, 1.9, 1.5, dot))
+    for side, g in ((-1, 'lfL'), (1, 'lfR')):
+        parts += leaf_plate(g, 32 + side * 7.0, 39.0, side * 78, 11.0, 6.0, leaf, '#36782e', z=0.1, T=1.3, cd=-1.0)
+    parts.append(Cap('drool', 28.0, 50.5, 28.0, 55.0, 1.0, 1.7, '#f4e27a', z=6, d1=-10.5, d2=-10.8, cd=0.0))
+    feats = [Eye(26.0, 43.4, 2.7, '#c02830', look=(0, 0), style='sleepy'),
+             Eye(38.0, 43.4, 2.7, '#c02830', look=(0, 0), style='sleepy'),
+             Mouth(30.0, 48.8, 2.4, 'open')]
+    rebuild(d, parts, features=feats)
+
+
+@fix('VILEPLUME')
+def vileplume(d, look):
+    body, foot, petal, dot = '#4a6cb0', '#3c5898', '#e04a3c', '#fad0c4'
+    parts = _plant_body(body, foot, by=46.5, brx=10.6, bry=10.4, arm_l=6.5)
+    # a huge rafflesia bloom: ring of big spotted petals around a purple centre
+    parts += petals('flower', 32, 26.5, 0.0, 14.0, 6, 11.0, 4.8, 10.0, petal, tilt=0.42, z=1, a0=-90)
+    parts.append(E('flower', 32, 27.0, 12.0, 6.4, '#c0382e', z=1.2, rd=11.0, solid=True))
+    parts.append(E('ctr', 32, 24.0, 8.6, 5.6, '#5a3a78', z=2, rd=8.6, d=-2.0, solid=True))
+    for x, y in ((26, 22), (34, 20), (38, 25), (28, 27), (33, 26), (31, 23)):
+        parts.append(Spot('ctr', x, y, 1.2, 0.9, '#e8c8f0'))
+    for x, y in ((14, 29), (50, 29), (20, 36), (44, 36), (32, 37), (13, 24), (51, 24), (24, 17), (40, 17), (32, 13.5)):
+        parts.append(Spot('flower', x, y, 2.3, 1.7, dot))
+    feats = [Eye(27.0, 43.0, 2.7, '#c02830', look=(0, 0), style='angry'),
+             Eye(37.0, 43.0, 2.7, '#c02830', look=(0, 0), style='angry', flip=True),
+             Mouth(32.0, 49.0, 1.6, 'smile')]
+    rebuild(d, parts, features=feats)
+
+
+# ============================================================================ Diglett, Paras line, Venonat line
+def _inset(pts, k):
+    """Shrink a flat [x, y, ...] polygon toward its centroid by factor k (0..1 kept)."""
+    xs, ys = pts[0::2], pts[1::2]
+    cx, cy = sum(xs) / len(xs), sum(ys) / len(ys)
+    out = []
+    for x, y in zip(xs, ys):
+        out += [cx + (x - cx) * k, cy + (y - cy) * k]
+    return out
+
+
+def bordered_wing(g, pts, border, fill, vein=None, veins=(), z=-3.0, T=1.1, cd=5.0, k=0.8):
+    """A wing plate with a dark border: outer plate in `border`, inner polygon painted on it in `fill`."""
+    out = [Poly(g, pts, border, z=z, T=T, cd=cd)]
+    inner = {'t': 'p', 'pts': _inset(pts, k), 'c': fill, 'on': g}
+    out.append(inner)
+    for vp in veins:
+        out.append(Stripe(g, vp, 0.8, vein or border))
+    return out
+
+
+@fix('DIGLETT')
+def diglett(d, look):
+    body, nose, dirt, rock = '#b0703e', '#f07a92', '#8a6440', '#a8988a'
+    parts = []
+    parts.append(E('body', 32, 42.0, 9.6, 14.0, body, z=0, rd=9.4))
+    # ring of loose earth around the base
+    for i in range(12):
+        a = 2 * math.pi * i / 12
+        parts.append(E('dirt', 32 + 14.5 * math.cos(a), 56.6 - 0.6 * math.sin(a), 5.0, 3.6, dirt, z=1, rd=5.2,
+                       d=13.0 * math.sin(a), solid=True, cd=0.0))
+    parts.append(E('dirt', 32, 57.5, 15.0, 3.6, dirt, z=1, rd=14.0, solid=True, cd=0.0))
+    for x, y, dd, r in ((17.5, 58.5, -6, 2.2), (46.5, 58.8, -3, 2.0), (39.0, 60.0, -12, 1.6)):
+        parts.append(E('rk', x, y, r, r * 0.75, rock, z=1.5, rd=r, d=dd, solid=True, cd=0.0))
+    parts.append(E('nose', 32, 46.5, 4.6, 4.0, nose, z=3, rd=4.2, d=-9.6, cd=0.0, solid=True))
+    feats = [Eye(27.6, 38.0, 2.3, '#101018', look=(0, 0), sclera=False), Eye(36.4, 38.0, 2.3, '#101018', look=(0, 0), sclera=False)]
+    rebuild(d, parts, features=feats)
+
+
+def _crab_legs(body, n=3, x0=8.0, y0=54.0, dx=2.4, ln=5.0, r=1.7, cd=1.0, bside=None):
+    out = []
+    for side, gs in ((-1, 'L'), (1, 'R')):
+        for i in range(n):
+            g = 'leg%s%d' % (gs, i)
+            x = 32 + side * (x0 + i * dx)
+            dd = -4.0 + i * 5.0
+            out.append(Cap(g, x, y0 - 1.0, x + side * 2.4, y0 + ln, r, r * 0.6, body, z=2, cd=dd))
+    return out
+
+
+@fix('PARAS')
+def paras(d, look):
+    body, cap, dot, claw, eye = '#f0903c', '#e44a30', '#fad870', '#faeac8', '#f8eed6'
+    parts = []
+    parts += _crab_legs(body, n=3, x0=7.5, y0=53.5, dx=3.0, ln=5.0, r=1.9)
+    parts.append(E('body', 32, 47.5, 12.4, 8.6, body, z=0, rd=10.5, d=2.0, cd=0.0))
+    parts.append(Stripe('body', [24, 41, 25, 55], 1.0, '#c86828', backOnly=True))
+    parts.append(Stripe('body', [40, 41, 39, 55], 1.0, '#c86828', backOnly=True))
+    # head + big round eyes
+    parts.append(E('head', 32, 48.0, 9.0, 7.4, body, z=4, rd=7.8, cd=-8.5))
+    # two mushrooms growing from the back
+    parts.append(Cap('stemA', 25.5, 42.0, 25.0, 34.0, 3.0, 2.6, '#f4dcb0', z=1, d1=3.0, d2=3.0, cd=0.0))
+    parts.append(E('capA', 25.0, 33.0, 9.0, 5.8, cap, z=2, rd=8.6, d=3.0, rot=-6, cd=0.0, solid=True))
+    parts.append(Cap('stemB', 40.5, 42.0, 41.0, 33.0, 3.2, 2.8, '#f4dcb0', z=1, d1=4.0, d2=4.0, cd=0.0))
+    parts.append(E('capB', 41.0, 31.5, 10.6, 6.8, cap, z=2, rd=10.0, d=4.0, rot=6, cd=0.0, solid=True))
+    for x, y in ((22, 30), (28, 32), (25, 35), (38, 28), (45, 30), (42, 34), (48, 33)):
+        parts.append(Spot('capA' if x < 32 else 'capB', x, y, 1.7, 1.3, dot))
+    # claws
+    for side, g in ((-1, 'armL'), (1, 'armR')):
+        parts.append(Cap(g, 32 + side * 11.0, 49.0, 32 + side * 15.2, 54.5, 3.2, 2.8, body, z=3, cd=-6.0))
+        parts.append(E(g, 32 + side * 15.6, 56.2, 4.4, 3.8, claw, z=3.1, rd=3.6, d=-1.5, cd=-6.0, solid=True))
+        parts.append(Cap(g, 32 + side * 14.2, 58.0, 32 + side * 12.6, 60.4, 1.3, 0.3, claw, z=3.2, d1=-2.0, d2=-3.0, cd=-6.0))
+        parts.append(Cap(g, 32 + side * 17.0, 58.4, 32 + side * 17.8, 61.0, 1.3, 0.3, claw, z=3.2, d1=-2.0, d2=-3.0, cd=-6.0))
+    feats = [Eye(27.0, 47.0, 3.4, '#f0e2b8', look=(0, 0), sclera=True, wide=0.85),
+             Eye(37.0, 47.0, 3.4, '#f0e2b8', look=(0, 0), sclera=True, wide=0.85)]
+    rebuild(d, parts, features=feats)
+
+
+@fix('PARASECT')
+def parasect(d, look):
+    body, cap, dot, claw, eye = '#ec8a3a', '#e05432', '#fad880', '#faeac8', '#f8f4e8'
+    parts = []
+    parts += _crab_legs(body, n=3, x0=8.0, y0=52.0, dx=3.2, ln=6.5, r=2.0)
+    parts.append(E('body', 32, 46.0, 11.2, 8.0, body, z=0, rd=10.0, d=2.0, cd=0.0))
+    parts.append(E('head', 32, 47.0, 8.0, 6.6, body, z=4, rd=7.4, cd=-8.0))
+    # the giant mushroom on its back
+    parts.append(E('cap', 32, 28.0, 25.0, 14.5, cap, z=2, rd=19.0, d=2.0, cd=0.0, solid=True))
+    parts.append(E('gills', 32, 38.5, 21.0, 4.0, '#f4c890', z=2.2, rd=16.0, d=1.0, cd=0.0, frontOnly=True))
+    for x, y in ((14, 24), (24, 15), (33, 12), (43, 15), (52, 22), (20, 32), (32, 24), (44, 30), (54, 32), (10, 32), (28, 33)):
+        parts.append(Spot('cap', x, y, 3.0 if y < 26 else 2.4, 2.3 if y < 26 else 1.8, dot))
+    for side, g in ((-1, 'armL'), (1, 'armR')):
+        parts.append(Cap(g, 32 + side * 10.0, 48.0, 32 + side * 15.6, 55.0, 3.4, 3.0, body, z=3, cd=-6.0))
+        parts.append(E(g, 32 + side * 16.2, 57.0, 4.8, 4.0, claw, z=3.1, rd=4.0, d=-1.5, cd=-6.0, solid=True))
+        parts.append(Cap(g, 32 + side * 14.6, 59.2, 32 + side * 13.0, 62.0, 1.4, 0.3, claw, z=3.2, d1=-2.0, d2=-3.0, cd=-6.0))
+        parts.append(Cap(g, 32 + side * 18.0, 59.6, 32 + side * 18.8, 62.4, 1.4, 0.3, claw, z=3.2, d1=-2.0, d2=-3.0, cd=-6.0))
+    feats = [Eye(28.0, 46.0, 3.0, '#f0e6c4', look=(0, 0), sclera=True, wide=0.9),
+             Eye(36.0, 46.0, 3.0, '#f0e6c4', look=(0, 0), sclera=True, wide=0.9)]
+    rebuild(d, parts, features=feats)
+
+
+@fix('VENONAT')
+def venonat(d, look):
+    body, fur, eye, eyel, mand, foot = '#8a5cb8', '#7a4ca8', '#e8404a', '#ff9a9a', '#eeeaea', '#6a4090'
+    parts = []
+    parts.append(E('body', 32, 42.0, 13.4, 13.2, body, z=0, rd=12.4))
+    # fuzzy tufts around the silhouette
+    for i in range(14):
+        a = math.radians(-180 + 360.0 * i / 14)
+        sx, sy = 32 + 12.8 * math.cos(a), 42 + 12.6 * math.sin(a)
+        if sy > 50:
+            continue
+        parts.append(Cap('fuzz', sx, sy, 32 + 16.4 * math.cos(a), 42 + 16.2 * math.sin(a), 2.0, 0.3, fur, z=-1,
+                         d1=0.0, d2=0.0, cd=0.0))
+    for side, g in ((-1, 'eyeL'), (1, 'eyeR')):
+        parts.append(E(g, 32 + side * 7.4, 39.0, 5.8, 6.4, eye, z=3, rd=5.0, d=-8.6, cd=0.0, solid=True))
+        parts.append(Spot(g, 32 + side * 8.6, 36.6, 2.0, 2.2, eyel, face=True))
+        parts.append(Spot(g, 32 + side * 5.6, 41.4, 1.0, 1.0, '#a01828', face=True))
+    for side, g in ((-1, 'antL'), (1, 'antR')):
+        parts.append(Stroke(g, [32 + side * 4.0, 31.5, 32 + side * 6.4, 25.0, 32 + side * 9.5, 21.0], 1.5, fur, z=2, w2=1.1,
+                            d1=-6.0, d2=-3.0, cd=0.0))
+        parts.append(E(g, 32 + side * 9.8, 20.4, 1.9, 1.9, body, z=2, rd=1.9, d=-3.0, cd=0.0, solid=True))
+    for side in (-1, 1):
+        parts.append(Cap('mand', 32 + side * 2.2, 49.0, 32 + side * 2.8, 53.6, 1.2, 0.3, mand, z=6, d1=-11.5, d2=-11.8, cd=0.0))
+    for side, g in ((-1, 'footL'), (1, 'footR')):
+        parts.append(E(g, 32 + side * 6.6, 57.2, 4.6, 2.6, foot, z=2, rd=5.4, d=-3.0, cd=-1.0))
+        parts += toes(g, 32 + side * 6.6, 58.0, n=3, spread=2.4, r=1.2, dz=-8.0, c=foot, claw=None, z=2.1, cd=-1.0)
+    rebuild(d, parts, features=[Mouth(32.0, 49.0, 1.5, 'smile')])
+
+
+@fix('VENOMOTH')
+def venomoth(d, look):
+    body, wing, vein, spot, eye, eyel, leg = '#9a72c4', '#c6aae6', '#a888d0', '#7c58ac', '#4a8ad4', '#a8d4ff', '#e8dcf4'
+    parts = []
+    for side, gu, gl in ((-1, 'wingUL', 'wingLL'), (1, 'wingUR', 'wingLR')):
+        m = lambda x: 32 + side * (x - 32)  # noqa: E731
+        up = [m(37), 30, m(43), 13, m(53), 3, m(62), 6, m(64), 16, m(58), 26, m(47), 33]
+        parts.append(Poly(gu, up, wing, z=-3, T=1.1, cd=5.0))
+        parts.append(Spot(gu, m(58), 10, 3.4, 2.7, spot))
+        parts.append(Spot(gu, m(51), 8, 1.8, 1.4, spot))
+        parts.append(Spot(gu, m(59), 19, 1.8, 1.4, spot))
+        parts.append(Stripe(gu, [m(38), 29, m(50), 13, m(59), 8], 0.8, vein))
+        lo = [m(37), 38, m(49), 34, m(58), 39, m(57), 48, m(48), 51, m(40), 45]
+        parts.append(Poly(gl, lo, wing, z=-3.2, T=1.1, cd=5.0))
+        parts.append(Spot(gl, m(52), 42, 2.6, 2.1, spot))
+        parts.append(Stripe(gl, [m(39), 40, m(52), 44], 0.8, vein))
+    parts.append(E('abd', 32, 47.0, 5.8, 9.6, body, z=-0.5, rd=5.4, d=2.0, cd=0.0))
+    for yy in (43.5, 47.5, 51.5):
+        parts.append(Stripe('abd', [26.5, yy, 32, yy + 1.0, 37.5, yy], 1.0, '#7a54a4'))
+    parts.append(E('thx', 32, 34.0, 7.0, 7.0, body, z=0, rd=6.6))
+    for side, g in ((-1, 'legL'), (1, 'legR')):
+        parts.append(Cap(g, 32 + side * 2.4, 39.0, 32 + side * 4.4, 46.0, 1.3, 1.0, leg, z=1, cd=-2.5))
+    parts.append(E('head', 32, 24.5, 7.6, 6.9, body, z=2, rd=7.0, cd=-2.0))
+    for side, g in ((-1, 'eyeL'), (1, 'eyeR')):
+        parts.append(E(g, 32 + side * 4.8, 24.0, 3.8, 4.4, eye, z=3, rd=3.2, d=-5.0, cd=-2.0, solid=True))
+        parts.append(Spot(g, 32 + side * 5.6, 22.4, 1.3, 1.6, eyel, face=True))
+    for side, g in ((-1, 'antL'), (1, 'antR')):
+        parts.append(Stroke(g, [32 + side * 3.0, 19.5, 32 + side * 5.6, 12.0, 32 + side * 10.5, 6.0], 1.5, body, z=2, w2=1.0,
+                            d1=-2.0, d2=-1.0, cd=0.0))
+    parts.append(Poly('mand', [30.4, 29.0, 32, 32.6, 33.6, 29.0], leg, z=6, T=0.8, cd=-8.0, face=True))
+    rebuild(d, parts, features=[])
+
+
+@fix('BUTTERFREE')
+def butterfree(d, look):
+    body, eye, wing, wk, limb = '#50508c', '#e03858', '#f2f2f4', '#262636', '#88c8e8'
+    parts = []
+    for side, gu, gl in ((-1, 'wingUL', 'wingLL'), (1, 'wingUR', 'wingLR')):
+        m = lambda x: 32 + side * (x - 32)  # noqa: E731
+        up = [m(37), 29, m(45), 12, m(56), 4, m(64), 8, m(63), 20, m(55), 29, m(45), 33]
+        parts += bordered_wing(gu, up, wk, wing, veins=[[m(39), 28, m(52), 13], [m(41), 30, m(59), 19]], z=-3, cd=5.0)
+        lo = [m(37), 38, m(50), 35, m(58), 41, m(56), 50, m(46), 52, m(39), 45]
+        parts += bordered_wing(gl, lo, wk, wing, veins=[[m(40), 40, m(53), 44]], z=-3.2, cd=5.0)
+    parts.append(E('abd', 32, 44.0, 5.6, 8.0, body, z=-0.5, rd=5.2, d=1.5, cd=0.0))
+    parts.append(E('body', 32, 36.5, 6.8, 8.6, body, z=0, rd=6.2))
+    for side, g in ((-1, 'armL'), (1, 'armR')):
+        parts.append(Cap(g, 32 + side * 4.6, 38.0, 32 + side * 8.6, 42.0, 1.9, 1.6, limb, z=3, cd=-4.0))
+        parts.append(E(g, 32 + side * 9.0, 42.8, 1.9, 1.6, limb, z=3.1, rd=1.7, d=-1.0, cd=-4.0, solid=True))
+    for side, g in ((-1, 'legL'), (1, 'legR')):
+        parts.append(Cap(g, 32 + side * 2.6, 47.0, 32 + side * 3.2, 54.0, 1.9, 1.6, limb, z=1, cd=-1.0))
+        parts.append(E(g, 32 + side * 3.6, 55.0, 2.4, 1.4, limb, z=1.1, rd=2.6, d=-1.5, cd=-1.0, solid=True))
+    parts.append(E('head', 32, 25.5, 8.2, 7.4, body, z=2, rd=7.4, cd=-2.0))
+    for side, g in ((-1, 'eyeL'), (1, 'eyeR')):
+        parts.append(E(g, 32 + side * 5.0, 24.5, 4.4, 5.0, eye, z=3, rd=3.6, d=-5.2, cd=-2.0, solid=True))
+        parts.append(Spot(g, 32 + side * 6.0, 22.6, 1.5, 1.8, '#ff8aa0', face=True))
+    for side, g in ((-1, 'antL'), (1, 'antR')):
+        parts.append(Stroke(g, [32 + side * 3.2, 20.0, 32 + side * 5.0, 12.5, 32 + side * 10.0, 7.0], 1.4, wk, z=2, w2=1.0,
+                            d1=-2.0, d2=-1.0, cd=0.0))
+    parts.append(Poly('mand', [30.6, 30.0, 32, 33.4, 33.4, 30.0], '#f0f0f0', z=6, T=0.8, cd=-9.0, face=True))
+    rebuild(d, parts, features=[])
+
+
+# ============================================================================ Caterpie / Weedle / Kakuna / Beedrill
+def _grub(d, look, P):
+    """Front-facing caterpillar: big head towards the viewer, body segments trailing away to the back-right."""
+    body, belly = P['body'], P['belly']
+    parts = []
+    segs = P['segs']                      # (x, y, r, depth)
+    for i, (x, y, r, dd) in enumerate(reversed(segs)):
+        k = len(segs) - i
+        parts.append(E('s%d' % k, x, y, r, r * 0.95, body, z=-k, rd=r, d=dd, cd=0.0, solid=True))
+        parts.append(Spot('s%d' % k, x, y + r * 0.72, r * 0.55, r * 0.28, belly))
+        if P.get('ring'):
+            parts.append(Spot('s%d' % k, x - r * 0.15, y - r * 0.1, r * 0.34, r * 0.34, P['ring']))
+        # tiny feet under each segment
+        parts.append(E('f%d' % k, x, y + r * 0.95, r * 0.55, 1.2, P['foot'], z=-k + 0.1, rd=r * 0.5, d=dd, cd=0.0, solid=True))
+    tx, ty, tr, td = segs[-1]
+    parts += P['tail'](tx, ty, tr, td)
+    hx, hy, hr = P['head']
+    parts.append(E('head', hx, hy, hr, hr * 0.95, body, z=4, rd=hr * 0.95, cd=-hr * 0.7))
+    parts += P['extras'](hx, hy, hr)
+    rebuild(d, parts, features=P['feats'](hx, hy, hr))
+
+
+@fix('CATERPIE')
+def caterpie(d, look):
+    def tail(tx, ty, tr, td):
+        return [Cap('s0', tx, ty, tx + 3.0, ty - 1.5, tr * 0.7, 0.6, '#80c850', z=-6, d1=td + 1.0, d2=td + 6.0, cd=0.0)]
+
+    def extras(hx, hy, hr):
+        out = []
+        # the red Y-shaped antenna
+        out.append(Cap('ant', hx, hy - hr + 1.2, hx, hy - hr - 5.5, 1.4, 1.1, '#e84830', z=6, d1=-2.0, d2=-2.0, cd=0.0))
+        out.append(Cap('ant', hx, hy - hr - 5.2, hx - 3.6, hy - hr - 10.0, 1.3, 0.8, '#e84830', z=6, d1=-2.0, d2=-2.0, cd=0.0))
+        out.append(Cap('ant', hx, hy - hr - 5.2, hx + 3.6, hy - hr - 10.0, 1.3, 0.8, '#e84830', z=6, d1=-2.0, d2=-2.0, cd=0.0))
+        out.append(Spot('head', hx, hy + hr * 0.62, hr * 0.35, hr * 0.18, '#f8e890', face=True))
+        return out
+
+    def feats(hx, hy, hr):
+        return [Eye(hx - hr * 0.48, hy - 0.5, 3.5, '#202030', look=(0, 0), sclera=True, wide=0.9),
+                Eye(hx + hr * 0.48, hy - 0.5, 3.5, '#202030', look=(0, 0), sclera=True, wide=0.9),
+                Mouth(hx, hy + hr * 0.55, 1.4, 'smile')]
+
+    _grub(d, look, dict(body='#80c850', belly='#f8e890', ring='#f4f0b0', foot='#f4e090',
+                        segs=[(33.5, 51.0, 7.6, 4.0), (36.0, 53.2, 7.0, 10.5), (38.6, 55.0, 6.2, 16.5), (41.0, 56.2, 5.2, 21.5),
+                              (43.0, 56.8, 4.2, 25.5)],
+                        head=(32.0, 44.0, 9.2), tail=tail, extras=extras, feats=feats))
+
+
+@fix('WEEDLE')
+def weedle(d, look):
+    def tail(tx, ty, tr, td):
+        return [Cap('sting', tx, ty, tx + 3.0, ty - 5.5, tr * 0.9, 0.3, '#ece4d4', z=-6, d1=td + 1.0, d2=td + 5.0, cd=0.0)]
+
+    def extras(hx, hy, hr):
+        out = [E('nose', hx, hy + hr * 0.3, 3.2, 3.0, '#f07c78', z=6, rd=3.0, d=-hr * 0.95 - 1.5, cd=0.0, solid=True)]
+        out.append(Cap('horn', hx, hy - hr + 1.0, hx + 0.6, hy - hr - 9.5, 2.4, 0.3, '#ece4d4', z=6, d1=-2.0, d2=-2.5, cd=0.0))
+        return out
+
+    def feats(hx, hy, hr):
+        return [Eye(hx - hr * 0.5, hy - 1.4, 2.4, '#101018', look=(0, 0), sclera=False),
+                Eye(hx + hr * 0.5, hy - 1.4, 2.4, '#101018', look=(0, 0), sclera=False)]
+
+    _grub(d, look, dict(body='#d8a038', belly='#e8c060', foot='#e87070', ring=None,
+                        segs=[(33.5, 51.5, 7.0, 4.0), (36.0, 53.4, 6.6, 10.5), (38.4, 55.0, 5.8, 16.0), (40.6, 56.2, 5.0, 21.0)],
+                        head=(32.0, 44.5, 8.8), tail=tail, extras=extras, feats=feats))
+
+
+@fix('KAKUNA')
+def kakuna(d, look):
+    shell, line, dark = '#e6c63e', '#a88a22', '#c8a830'
+    parts = []
+    parts.append(E('seg4', 32, 58.0, 3.4, 3.0, shell, z=-4, rd=3.2, cd=0.0, solid=True))
+    parts.append(E('seg3', 32, 54.0, 5.8, 4.4, shell, z=-3, rd=5.4, cd=0.0, solid=True))
+    parts.append(E('seg2', 32, 48.5, 8.0, 5.6, shell, z=-2, rd=7.4, cd=0.0, solid=True))
+    parts.append(E('seg1', 32, 42.0, 9.6, 6.6, shell, z=-1, rd=8.8, cd=0.0, solid=True))
+    for g, yy, w in (('seg2', 45.5, 6.6), ('seg3', 51.2, 5.0), ('seg4', 56.2, 3.0)):
+        parts.append(Stripe(g, [32 - w, yy, 32, yy + 1.0, 32 + w, yy], 0.9, line))
+    parts.append(E('head', 32, 28.5, 10.8, 13.0, shell, z=2, rd=10.0, cd=-0.5, solid=True))
+    parts.append(Cap('head', 32, 20.0, 32, 13.0, 4.0, 0.6, shell, z=2.1, d1=1.0, d2=2.0, cd=-0.5))
+    parts.append(Stripe('head', [32, 15, 32, 26], 1.0, line, backOnly=True))
+    parts.append(Stripe('head', [26.5, 33.5, 32, 34.8, 37.5, 33.5], 1.0, line, face=True))
+    for side, g in ((-1, 'armL'), (1, 'armR')):
+        parts.append(Cap(g, 32 + side * 9.0, 44.0, 32 + side * 14.6, 49.5, 2.6, 0.4, dark, z=3, d1=-3.0, d2=-3.5, cd=-3.0))
+    feats = [Eye(27.2, 31.0, 2.9, '#101018', look=(0, 0), sclera=False, style='angry'),
+             Eye(36.8, 31.0, 2.9, '#101018', look=(0, 0), sclera=False, style='angry', flip=True)]
+    rebuild(d, parts, features=feats)
+    hint(look, chains={'seg1': 1, 'seg2': 1, 'seg3': 1})
+
+
+@fix('BEEDRILL')
+def beedrill(d, look):
+    yel, blk, sting, eye, wing = '#f0c830', '#302838', '#eceaf0', '#e02838', '#d4eaf8'
+    parts = []
+    for side, gu, gl in ((-1, 'wingUL', 'wingLL'), (1, 'wingUR', 'wingLR')):
+        m = lambda x: 32 + side * (x - 32)  # noqa: E731
+        parts.append(Poly(gu, [m(38), 27, m(43), 10, m(52), 1, m(59), 4, m(58), 14, m(50), 24, m(43), 30], wing, z=-4, T=0.9, cd=6.0))
+        parts.append(Stripe(gu, [m(39), 26, m(48), 12, m(56), 4], 0.7, '#98b8d0'))
+        parts.append(Poly(gl, [m(38), 32, m(50), 27, m(60), 29, m(57), 36, m(47), 38, m(40), 36], wing, z=-4.2, T=0.9, cd=6.0))
+        parts.append(Stripe(gl, [m(40), 33, m(52), 30], 0.7, '#98b8d0'))
+    parts.append(E('abd', 32, 45.0, 8.6, 11.2, yel, z=-1, rd=8.4, d=4.0, cd=0.0))
+    for yy in (41.0, 47.0):
+        parts.append(Stripe('abd', [22.5, yy - 1.0, 32, yy + 1.6, 41.5, yy - 1.0], 2.6, blk))
+    parts.append(Cap('st3', 32, 54.0, 32, 60.5, 3.2, 0.4, sting, z=-2, d1=8.0, d2=16.0, cd=0.0))
+    parts.append(E('thx', 32, 32.0, 6.6, 7.2, blk, z=0, rd=6.4))
+    for side, ga, gs in ((-1, 'armL', 'lanceL'), (1, 'armR', 'lanceR')):
+        parts.append(Cap(ga, 32 + side * 5.0, 30.0, 32 + side * 10.5, 36.0, 2.2, 1.9, yel, z=3, cd=-2.0))
+        parts.append(Cap(gs, 32 + side * 10.5, 36.0, 32 + side * 13.0, 46.5, 3.4, 0.4, sting, z=3.1, d1=-3.0, d2=-9.5, cd=-2.0))
+    for side, g in ((-1, 'legL'), (1, 'legR')):
+        parts.append(Cap(g, 32 + side * 2.0, 38.0, 32 + side * 3.2, 46.0, 1.3, 1.0, blk, z=1, cd=-3.0))
+    parts.append(E('head', 32, 20.5, 7.8, 7.2, yel, z=2, rd=7.2, cd=-2.0))
+    for side, g in ((-1, 'eyeL'), (1, 'eyeR')):
+        parts.append(E(g, 32 + side * 4.8, 20.0, 3.6, 4.4, eye, z=3, rd=3.2, d=-5.2, cd=-2.0, solid=True))
+        parts.append(Spot(g, 32 + side * 5.6, 18.4, 1.2, 1.5, '#ff8a98', face=True))
+    for side, g in ((-1, 'antL'), (1, 'antR')):
+        parts.append(Stroke(g, [32 + side * 3.0, 14.5, 32 + side * 4.6, 8.0, 32 + side * 8.0, 3.0], 1.4, blk, z=2, w2=1.0,
+                            d1=-2.0, d2=-1.0, cd=0.0))
+    parts.append(Mouth(32.0, 25.4, 1.0, 'line'))
+    rebuild(d, parts, features=[Mouth(32.0, 25.6, 1.2, 'line')])
