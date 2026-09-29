@@ -39,6 +39,34 @@ The result: **151/151 species** (full stats, movesets, learnsets, evolutions),
 tile-accurate), **73 named cast members**, all sourced directly from the
 original game's real data tables — nothing here is invented.
 
+### 1b. Game versions: RED / BLUE / YELLOW (`pipeline/scripts/extract_versions.py`, Python 3, needs network)
+
+The upstream remake is Red only. `godot/data/versions.json` holds everything that differs in the other two cartridges,
+extracted from the real disassemblies ([pret/pokered](https://github.com/pret/pokered) for RED and BLUE,
+[pret/pokeyellow](https://github.com/pret/pokeyellow)) so it is reproducible:
+
+```sh
+python3 pipeline/scripts/extract_versions.py [--cache /tmp/pret-cache]   # writes godot/data/versions.json
+cp godot/data/versions.json pipeline/extracted/versions.json
+python3 pipeline/scripts/content_audit.py                                 # the numbers behind docs/CONTENT_AUDIT.md
+```
+
+| Key | Content | Source file(s) |
+| --- | --- | --- |
+| `wild` | grass/water tables per map, RED / BLUE / YELLOW (`IF DEF(_RED)` blocks resolved) | `data/wild/grass_water.asm`, `data/wild/maps/*.asm` |
+| `goodRod`, `superRod` | fishing groups | `data/wild/good_rod.asm`, `super_rod.asm` |
+| `trades` | the ten in-game trades | `data/events/trades.asm` |
+| `prizes` | Game Corner prize windows (species, coins, level) | `data/events/prizes.asm`, `prize_mon_levels.asm` |
+| `marts` (YELLOW) | stock of the marts that differ | `data/items/marts.asm` |
+| `parties`, `specialMoves`, `jessieJames` (YELLOW) | every trainer team, custom movesets, the four Jessie & James teams | `data/trainers/parties.asm`, `special_moves.asm` |
+| `species` (YELLOW) | base stats / start moves / learnset / evolution changes (34 POKeMON) | `data/pokemon/base_stats/*.asm`, `evos_moves.asm` |
+| `objects` (YELLOW) | per map: trainer/item/position patches, added and removed NPCs (matched by `TEXT_*` constant) | `data/maps/objects/*.asm` |
+| `text` (YELLOW) | dialogue that differs from RED (326 labels) | `text/*.asm` |
+
+`GameData.apply_version()` swaps all of this over the RED base data at runtime (`GameState.set_version`), and
+`VersionTests.gd` checks the results against the values the disassemblies document. RED's tables parsed from pokered are
+asserted equal to the upstream Red data, so the extractor itself is verified on every run.
+
 ## 2. 3D generation (`pipeline/blender/*.py`, run with headless Blender)
 
 Pokemon and trainer models are built from upstream's own art definitions — see

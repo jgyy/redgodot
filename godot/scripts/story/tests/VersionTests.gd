@@ -34,6 +34,7 @@ static func run(suite: TestSuite) -> void:
 	_yellow_data(suite)
 	_trades_prizes_marts(suite)
 	_rival_and_buddy(suite)
+	_trainer_objects(suite)
 	_save(suite)
 	_yellow_story(suite)
 	GameState.set_version("RED")
@@ -339,6 +340,32 @@ static func _rival_and_buddy(t: TestSuite) -> void:
 	GameState.pikachu_happiness = 200
 	t.check(PikachuBuddy.tier() == 4 and PikachuBuddy.is_friendly(), "200 is devoted, friendly (>= 147)")
 	GameState.pikachu_happiness = 90
+
+# ---------------------------------------------------------------- every trainer on every map, per version
+static func _trainer_objects(t: TestSuite) -> void:
+	for v in GameData.VERSIONS:
+		GameState.set_version(v)
+		var n := 0
+		var bad: Array = []
+		for m in GameData.maps.keys():
+			for o in GameData.maps[m].get("objs", []):
+				if not o.has("trainer") or o.get("removed", false):
+					continue
+				n += 1
+				var tr: Dictionary = o["trainer"]
+				var parties: Array = GameData.parties.get(str(tr["cls"]), [])
+				if int(tr["n"]) < 1 or int(tr["n"]) > parties.size():
+					bad.append("%s:%s has no party %s/%d" % [m, o["id"], tr["cls"], int(tr["n"])])
+					continue
+				var th: Dictionary = o.get("th", {})
+				# a trainer needs its three battle lines (a few are handled by map scripts instead: gym leaders, the rival ...)
+				if not th.is_empty():
+					for k in ["battle", "end", "after"]:
+						if not GameText.has(str(th.get(k, ""))):
+							bad.append("%s:%s lacks text %s" % [m, o["id"], th.get(k, "")])
+		t.check(bad.is_empty(), "%s: all %d trainers have a party and battle text (%s)" % [v, n, str(bad.slice(0, 4))])
+		t.check(n >= 320, "%s: %d trainers placed on the maps" % [v, n])
+	GameState.set_version("RED")
 
 # ---------------------------------------------------------------- saves
 static func _save(t: TestSuite) -> void:

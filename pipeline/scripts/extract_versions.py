@@ -358,6 +358,20 @@ def object_overlay(map_names, species):
         for t in rk:
             if t not in yk:
                 remove.append(t)
+        # Yellow sometimes renames an object's TEXT_ constant (ROCKET2 -> ROCKET) but leaves it where it stood: treat an
+        # added object on the very cell of a removed one as the same NPC with new details, not as remove + add
+        for a in list(add):
+            for t in list(remove):
+                ro = rk[t]
+                if (ro['x'], ro['y']) == (a['x'], a['y']) and 'trainer' in ro and 'trainer' in a:
+                    diff = {k: a.get(k) for k in ('move', 'dir', 'trainer', 'item') if ro.get(k) != a.get(k)}
+                    if ro['sprite'] != a['sprite']:
+                        diff['sprite'] = a['sprite']
+                    if diff:
+                        patch[t] = diff
+                    add.remove(a)
+                    remove.remove(t)
+                    break
         if patch or add or remove:
             out[m] = {'patch': patch, 'add': add, 'remove': remove}
     return out
