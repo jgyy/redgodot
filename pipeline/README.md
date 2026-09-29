@@ -41,14 +41,8 @@ original game's real data tables — nothing here is invented.
 
 ## 2. 3D generation (`pipeline/blender/*.py`, run with headless Blender)
 
-Each Pokemon's original 2D definition is a list of primitives in a 64x64,
-Y-down pixel space (`{t:'e', x,y,rx,ry}` ellipsoids, `{t:'c', x1,y1,x2,y2,r1,r2}`
-tapered capsules, `{t:'p', pts:[...]}` flat polygons for fins/ears/leaves, plus
-eyes/mouths/spot patterns). `gen_pokemon.py` reads that same definition and
-builds genuine 3D geometry from it (spheres/capsules/extruded polygons), rigs a
-generic armature from the part groups, bakes `Idle`/`Walk`/`Attack` animations,
-rescales the result to the species' real Pokedex height, and exports glTF —
-run once per species, for all 151, unattended.
+Pokemon and trainer models are built from upstream's own art definitions — see
+**Pokemon & character models** below for how, and for the one-command regeneration.
 
 **Blender version:** generated with **Blender 5.0.1**, via the official
 [`bpy` PyPI package](https://pypi.org/project/bpy/) (Blender Foundation's
@@ -90,27 +84,69 @@ gracefully falls back to a simple colored primitive for anything the pipeline
 hasn't generated yet, so the game is always playable even for parts of the
 pipeline still in progress.
 
-**Current run (Blender 5.0.1):** all 151 species generated from their own real
-per-species art data with **zero fallbacks** (1.4k–19k triangles each,
-0.20m–8.79m tall — scaled from the real Pokedex height), one humanoid
-character base (5.5k tris), a 14-piece tile kit, and 9 VFX meshes. Total
-generation time: ~95s for the whole pipeline (151-species batch: ~86s in a
-single headless invocation). Every `.glb` was verified
-(`pipeline/blender/verify_glb.py`): valid glTF header, at least one mesh +
-material, and the expected animation names (`Idle`/`Walk`/`Attack` for
-Pokemon and characters) — two of the smallest tile/VFX meshes (`roof.glb`,
-`spark.glb`, both legitimately tiny 8-triangle shapes) trip the verifier's
-2KB minimum-size heuristic; that's a verifier threshold quirk, not a bad file.
+### Pokemon & character models
 
-Known rough edges in this pass (cosmetic, not structural):
-- A handful of species have a small decorative part (spot/eye/accessory)
-  sitting slightly off the body surface rather than flush against it (e.g.
-  Lapras' head horn floats a little).
-- Species that hover in the original 2D art (e.g. Gastly) keep that same
-  hover offset in 3D rather than being grounded.
-- glTF import doesn't set animation loop mode on its own; Godot's runtime code
-  sets `Idle`/`Walk` to loop and leaves `Attack` one-shot (see `AnimUtil.gd`)
-  rather than relying on per-file import settings.
+One command regenerates every Pokemon (151 + MISSINGNO., ~2.5 min with 4 workers):
+
+```sh
+UPSTREAM=/path/to/pokemon-claude-red python3 pipeline/blender/gen_pokemon.py -- --all --jobs 4
+python3 pipeline/blender/gen_characters.py                       # 60 cast sprites + humanoid.glb (~2 min)
+# single species while iterating:  python3 pipeline/blender/gen_pokemon.py -- --only PIKACHU,ONIX
+# contact sheets vs upstream's sprites -> docs/gallery/{pokemon-151-3d,characters-3d}[-back].png
+UPSTREAM=/path/to/pokemon-claude-red GODOT_BIN=/opt/godot/godot4 pipeline/scripts/model_sheets.sh
+```
+
+(`UPSTREAM` is only needed for MISSINGNO., whose look is upstream's `glitchSprite()`
+output baked through `pipeline/scripts/bake_monsprites.js`; everything else reads
+`pipeline/extracted/*.json`.)
+
+**How a sprite definition becomes a model** (`gen_pokemon.py`, `monsdf.py`, `monraster.py`):
+
+- Geometry lives in upstream's own 64x64 sprite space (Blender X = x-32, Z = 60-y,
+  Y = depth, front = -Y = Godot +Z), so every part lines up with the sprite pixel-for-pixel.
+- Each art group (`g`) becomes ONE smooth, watertight surface: its ellipsoids, tapered
+  capsules, strokes and pillowed/bevelled polygon plates are signed-distance fields,
+  smooth-unioned and polygonised with surface nets (pure numpy), lightly smoothed,
+  then decimated (~6k tris per species). Groups stay separate surfaces — upstream
+  draws an inner line between groups, and the outline hull reproduces it where they meet.
+- Depth comes from paint order: groups painted later are pushed just in front of what
+  they overlap (big groups only for most of their overlap, so heads/limbs stay embedded);
+  ellipsoid groups lying over earlier ones (belly plates, cheeks, noses) are flattened
+  into lenses; big shapes that merely touch in 2D (a head resting on a body) get a short
+  "neck" so they don't float apart when seen from behind.
+- Texture: one albedo atlas per species. For every group a FRONT layer (parts, `on:`
+  spots/stripes, eyes, mouths, shines — pokesprite.js's coverage/feature code without its
+  lighting) and a BACK layer (no `face`/`frontOnly`/`belly` parts, `backOnly` parts added,
+  `bz` order) are rasterised at 4 texels/px; UVs are the planar sprite projection
+  (front-facing faces -> front layer, back-facing -> back layer). Eyes and patterns land
+  exactly where the sprite has them.
+- Rig: one bone per art group (face parts parented to `head`); clips `Idle` (breathing,
+  bob, tail wag, wing beat — fliers flap, hoverers float), `Walk`, `Attack` (anticipation +
+  lunge), `Hurt` (knock-back shudder), `Faint` (hop, crumple, sink; holds last frame),
+  `Special` (hop + spin).
+- Scale: model height = Pokedex height; `manifest.json` also records `px_height` (height
+  in sprite pixels) so `PokemonActor.use_sprite_scale(frame_m)` can size models exactly
+  like upstream's battle sprites (all drawn in one 64px frame).
+- Shading happens in Godot: `godot/assets/shaders/toon.gdshader` (upstream's 5-step
+  hue-shifted ramp from gfx.js `shade()`, screen-space upper-left light, `tint`/`flash`/
+  `fade`/`ramp_bias` uniforms) + `outline.gdshader` (inverted hull in upstream's outline
+  colour `mix(shade(c,-0.8), #141220, 0.55)`), applied by `Toon.apply(node)`; both run in
+  the Compatibility renderer.
+
+**Characters** (`gen_characters.py`): every humanoid `cast.json` entry (head style
+cap/spiky/short/long/bald/hat/beanie/bun/pony, body normal/coat/dress/shorts/swim,
+palette, backpack/glasses/beard/emblem) becomes a chibi figure — big round head like the
+16x24 sprite, SDF hair shells with the face carved out, caps/brims/hats, sleeves, hands,
+skirts/coats — with materials named by palette role (`mat_skin`, `mat_hair`, `mat_hat`,
+`mat_top`, `mat_pants`, ...), bones hips/spine/head/arm_L/arm_R/leg_L/leg_R, clips
+`Idle`/`Walk`/`Run`, 1.5 m tall, as `characters/<sprite>.glb`. `CharacterSkin.instantiate(key)`
+returns the right model (manifest `aliases`, then the tinted legacy `humanoid.glb`).
+Creature/object sprites (`monster`, `bird`, `poke_ball`, ...) are not built here.
+
+Known limits: parts are rigid per group (no smooth skin weights across groups); a few
+face details can peek out at the silhouette from behind (e.g. Diglett's nose); sprite
+art that is really a side view stays a relief (thin in depth) — it reads correctly from
+the battle camera angles, less so from a pure side view.
 
 ## Regenerating
 
@@ -119,3 +155,89 @@ re-run the extraction scripts, re-run the Blender scripts, and the Godot
 project picks up the new `.glb` files on its next asset import
 (`godot4 --headless --path godot --import`). No original assets are stored in
 this repository — only the generation pipeline and the generated output.
+
+## UI suite: text tables and 2D UI art (title / intro / menus)
+
+Both scripts load the upstream game headlessly (`UPSTREAM=/path/to/pokemon-claude-red`)
+and are deterministic; outputs are committed.
+
+- `node pipeline/scripts/extract_text.js` → `godot/data/text.json`: every upstream text
+  table (general.js, maps_a.js, maps_b.js, dex.js, aliases.js) keyed exactly like upstream
+  (`text` = G.TEXT labels, `dex` = G.DEX_TEXT, `aliases`, `files` = labels per source file).
+  Read it via `GameText` / `UI.text()`.
+- `node pipeline/scripts/bake_ui.js` → `godot/assets/ui/`: `title_logo_big/red.png`
+  (logo.js), `levy_mark/word.png` (intro card), `townmap.png` + `townmap.json`
+  (townmap.js build(): Kanto minimap from every outdoor map's terrain + map centres/names).
+
+Reference captures for 001/002/092–100 use `--save=showcase`, `--title_t=100` and
+`--scene=intro --intro_frame=505 --intro_hold=1` (see `capture_screenshots.sh`).
+
+## Battle: 3D stages and move effects (battle agent)
+
+```sh
+python3 pipeline/blender/gen_battlebg.py            # 15 environments + 11 platforms + layout.json (~6 s)
+python3 pipeline/blender/gen_battlebg.py -- ice     # one environment
+python3 pipeline/blender/gen_vfx.py                 # 22 particle meshes + poke_ball.glb
+/opt/godot/godot4 --headless --path godot --import  # pick up the new glbs
+```
+
+* `upstream_px.py` ports upstream's pixel primitives exactly (gfx.js `hash2`/`bayer`/`shade`,
+  palette.js `NoiseTex`, and battlebg.js's `vgrad`/`clouds`/`hills`/`treeLine`/`ground`/`platform`);
+  its hash and noise output match the JS bit-for-bit.
+* `gen_battlebg.py` fixes the battle camera (`CAM`, written to
+  `godot/assets/models/battle/layout.json`, which `BattleStage.gd` reads) and places every
+  prop along the camera ray through the pixel where upstream paints it in its 320x132 battle
+  framebuffer: 3D clouds, hill ridges, toon-shaded tree lines, stalactites, icicles, boulders,
+  pipes, pillars, light shafts. Sky / walls / ground / sea are 3D planes whose UVs are the camera
+  projection of upstream's own painting, so they read exactly like the 2D game from the battle
+  camera while still receiving the Pokémon's shadows. Platforms are real elliptical discs with
+  upstream's platform art on top. Environments: grass, forest, cave, ice, water, beach, indoor,
+  gym, tower, mountain, power, mansion, elite (tinted per room), cavewater, cavewater_ice.
+* `gen_vfx.py` builds a mesh for each of upstream `drawShape`'s particle shapes (flame, spark,
+  star, ring, bubble, leaf, snow, rock, note, z, coin, seed, needle, bone, egg, shard, heart) plus
+  impact, claw, fist, drop and the poke ball. `godot/scripts/battle/BattleVfx.gd` runs upstream's
+  vfx.js particle simulation and every per-move recipe in its pixel space and draws the result as
+  these meshes on the 3D plane through both battlers; beams, bolts, shock rings and the SURF wave
+  are real 3D geometry.
+
+Battle reference captures: `pipeline/capture_screenshots.sh` "Battle" section
+(`--scene=battle --state=vfx --move=... --vfx_t=...`, see `Main.gd _setup_battle()`).
+
+## Overworld: maps baked from upstream, rebuilt in 3D (overworld agent)
+
+```sh
+UPSTREAM=/path/to/pokemon-claude-red node pipeline/scripts/bake_maps.js   # all maps (~30 s), or list map names
+python3 pipeline/blender/gen_world.py                                    # 3D trees / Poké Ball / boulder
+godot4 --headless --path godot --import                                  # import the new textures
+godot4 --path godot -- --scene=ow_playtest                               # new-game autopilot (Pallet -> rival battle)
+```
+
+`bake_maps.js` runs upstream's own renderer code (map.js labels + connections + border, maprender.js,
+terrain.js, buildings.js, buildingstyles.js, interior.js) for every map and splits the result:
+
+- `godot/assets/maps/<Map>_ground.png` — the flat layer: `paintGround` (grass/path/sand/pavement/rock/water),
+  ledges, cliffs, bridges, curbs, stairs, ships, interior floors / carpets / mats / ladders, elevation edges and
+  the soft shadows every object casts. Outdoor maps carry a 14 x 10 cell margin (neighbour maps via `labelAt`,
+  then the border pattern) so the 3D camera never sees the void; interiors a 2-cell black void.
+- `godot/assets/maps/<Map>_atlas.png` + `<Map>.json` `blocks` — every object that becomes geometry, painted *in
+  isolation* by the same painter (paint once on the ground for its shadow, once on a transparent layer for its
+  pixels, restore the ground under it): whole buildings (`house`: roof top / wall top / wall bottom / chimney /
+  flat roof), interior wall runs (`walls`), furniture (`box` with the front-face height, `cellboxes`), and thin
+  sprites (`card`: signs, fences, cut trees, statues, plants...).
+- `<Map>.json` also: the margin-inclusive label grid, `trees` (kind + upstream variant), `grass`, `flowers`,
+  `lights` (windows / Center & Mart signs / fires, for the night light pools), `fires`, `fx` (barriers, teleports).
+- `<Map>_water.png` (water mask, shore distance, deep patch) + `noise_water.png` / `noise_big.png`: the world
+  shader re-evaluates upstream's `waterColor()` every 4 frames and its drifting cloud shadows.
+- `decor_atlas.png` (tall grass v0-3 x 2 frames, flowers x 2 frames), `objects_atlas.png`, `palette.json`,
+  and `pipeline/blender/world_defs.json` (tree clump layouts / tuft offsets evaluated with upstream's hash).
+
+Variant hashes use upstream's own surface coordinates (margin 11 x 7), so trees, flowers, grass tufts, roofs
+and statues pick exactly the variants the 2D game shows.
+
+In Godot (`godot/scripts/overworld/`): `WorldBuilder` extrudes each block into boxes / gable or flat roofs /
+cards whose UVs are the *oblique projection* of the 2D art (a point at (x, z) and height h samples the pixel
+(x, z - h)), with heights scaled by K = tan(camera pitch 60°): from the game camera every building reads
+exactly like its 2D sprite, but it is real geometry that occludes characters, catches the night lights and
+shows perspective. `TileKit` draws the Blender trees (chunked MultiMeshes + inverted-hull outline), layered
+tall-grass cards (upstream's sway / rustle timing), animated flowers, brazier flames, barriers and teleport
+pads. All world shaders do their colour maths in sRGB like the 2D game (grade, light pools, cloud shadows).

@@ -1,0 +1,68 @@
+{
+ "tree_tree0": {
+  "tris": 648,
+  "kind": "tree",
+  "variant": 0
+ },
+ "tree_tree1": {
+  "tris": 648,
+  "kind": "tree",
+  "variant": 1
+ },
+ "tree_tree2": {
+  "tris": 648,
+  "kind": "tree",
+  "variant": 2
+ },
+ "tree_tree20": {
+  "tris": 488,
+  "kind": "tree2",
+  "variant": 0
+ },
+ "tree_tree21": {
+  "tris": 488,
+  "kind": "tree2",
+  "variant": 1
+ },
+ "tree_tree22": {
+  "tris": 488,
+  "kind": "tree2",
+  "variant": 2
+ },
+ "tree_tree23": {
+  "tris": 488,
+  "kind": "tree2",
+  "variant": 3
+ },
+ "tree_tree24": {
+  "tris": 488,
+  "kind": "tree2",
+  "variant": 4
+ },
+ "tree_tree25": {
+  "tris": 488,
+  "kind": "tree2",
+  "variant": 5
+ },
+ "tree_tree3": {
+  "tris": 648,
+  "kind": "tree",
+  "variant": 3
+ },
+ "tree_tree4": {
+  "tris": 648,
+  "kind": "tree",
+  "variant": 4
+ },
+ "tree_tree5": {
+  "tris": 648,
+  "kind": "tree",
+  "variant": 5
+ },
+ "pokeball": {
+  "tris": 320
+ },
+ "boulder": {
+  "tris": 80
+ }
+}

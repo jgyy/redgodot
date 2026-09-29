@@ -1,0 +1,199 @@
+{
+ "W": 158,
+ "H": 166,
+ "towns": [
+  "PalletTown",
+  "ViridianCity",
+  "PewterCity",
+  "CeruleanCity",
+  "LavenderTown",
+  "VermilionCity",
+  "CeladonCity",
+  "FuchsiaCity",
+  "CinnabarIsland",
+  "IndigoPlateau",
+  "SaffronCity"
+ ],
+ "where": {
+  "CeladonCity": {
+   "x": 80,
+   "y": 59,
+   "name": "CELADON CITY"
+  },
+  "CeruleanCity": {
+   "x": 109,
+   "y": 27,
+   "name": "CERULEAN CITY"
+  },
+  "CinnabarIsland": {
+   "x": 30,
+   "y": 158,
+   "name": "CINNABAR ISLAND"
+  },
+  "FuchsiaCity": {
+   "x": 83,
+   "y": 130,
+   "name": "FUCHSIA CITY"
+  },
+  "IndigoPlateau": {
+   "x": 8,
+   "y": 11,
+   "name": "INDIGO PLATEAU"
+  },
+  "LavenderTown": {
+   "x": 148,
+   "y": 58,
+   "name": "LAVENDER TOWN"
+  },
+  "PalletTown": {
+   "x": 30,
+   "y": 110,
+   "name": "PALLET TOWN"
+  },
+  "PewterCity": {
+   "x": 30,
+   "y": 35,
+   "name": "PEWTER CITY"
+  },
+  "Route1": {
+   "x": 30,
+   "y": 98,
+   "name": "ROUTE 1"
+  },
+  "Route10": {
+   "x": 148,
+   "y": 39,
+   "name": "ROUTE 10"
+  },
+  "Route11": {
+   "x": 131,
+   "y": 90,
+   "name": "ROUTE 11"
+  },
+  "Route12": {
+   "x": 148,
+   "y": 86,
+   "name": "ROUTE 12"
+  },
+  "Route13": {
+   "x": 140,
+   "y": 114,
+   "name": "ROUTE 13"
+  },
+  "Route14": {
+   "x": 122,
+   "y": 122,
+   "name": "ROUTE 14"
+  },
+  "Route15": {
+   "x": 104,
+   "y": 129,
+   "name": "ROUTE 15"
+  },
+  "Route16": {
+   "x": 61,
+   "y": 58,
+   "name": "ROUTE 16"
+  },
+  "Route17": {
+   "x": 56,
+   "y": 94,
+   "name": "ROUTE 17"
+  },
+  "Route18": {
+   "x": 63,
+   "y": 129,
+   "name": "ROUTE 18"
+  },
+  "Route19": {
+   "x": 83,
+   "y": 150,
+   "name": "ROUTE 19"
+  },
+  "Route2": {
+   "x": 30,
+   "y": 59,
+   "name": "ROUTE 2"
+  },
+  "Route20": {
+   "x": 56,
+   "y": 158,
+   "name": "ROUTE 20"
+  },
+  "Route21": {
+   "x": 30,
+   "y": 134,
+   "name": "ROUTE 21"
+  },
+  "Route22": {
+   "x": 12,
+   "y": 82,
+   "name": "ROUTE 22"
+  },
+  "Route23": {
+   "x": 8,
+   "y": 47,
+   "name": "ROUTE 23"
+  },
+  "Route24": {
+   "x": 109,
+   "y": 11,
+   "name": "ROUTE 24"
+  },
+  "Route25": {
+   "x": 126,
+   "y": 7,
+   "name": "ROUTE 25"
+  },
+  "Route3": {
+   "x": 54,
+   "y": 35,
+   "name": "ROUTE 3"
+  },
+  "Route4": {
+   "x": 80,
+   "y": 27,
+   "name": "ROUTE 4"
+  },
+  "Route5": {
+   "x": 109,
+   "y": 43,
+   "name": "ROUTE 5"
+  },
+  "Route6": {
+   "x": 109,
+   "y": 75,
+   "name": "ROUTE 6"
+  },
+  "Route7": {
+   "x": 96,
+   "y": 58,
+   "name": "ROUTE 7"
+  },
+  "Route8": {
+   "x": 131,
+   "y": 58,
+   "name": "ROUTE 8"
+  },
+  "Route9": {
+   "x": 131,
+   "y": 27,
+   "name": "ROUTE 9"
+  },
+  "SaffronCity": {
+   "x": 109,
+   "y": 59,
+   "name": "SAFFRON CITY"
+  },
+  "VermilionCity": {
+   "x": 109,
+   "y": 90,
+   "name": "VERMILION CITY"
+  },
+  "ViridianCity": {
+   "x": 30,
+   "y": 83,
+   "name": "VIRIDIAN CITY"
+  }
+ }
+}
