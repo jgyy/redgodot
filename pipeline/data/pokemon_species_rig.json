@@ -1,0 +1,2725 @@
+{
+ "plans": {
+  "biped_humanoid": "upright, two arms with hands and two legs, mostly no tail (Machamp, Alakazam, Mr. Mime)",
+  "biped_tail": "upright, arms + legs + a real tail (Charmander, Pikachu, Snorlax, Mewtwo)",
+  "quadruped": "four-legged, horizontal spine (Growlithe, Eevee, Rhyhorn, Tauros)",
+  "quadruped_small": "small four-legged scurriers and crouchers (Rattata, Nidoran, Meowth, Slowpoke)",
+  "bird": "two legs, two wings, tail feathers, beak/jaw (Pidgeot, Fearow, Articuno, Doduo)",
+  "winged": "dragons, insects and bats with articulated wings (Charizard, Dragonite, Butterfree, Zubat, Aerodactyl)",
+  "serpent": "long body chain of 8-14 bones (Ekans, Arbok, Onix, Dragonair, Gyarados)",
+  "fish": "swimmers: spine wave, tail fin, pectoral/dorsal fins (Magikarp, Seaking, Lapras, Horsea)",
+  "blob": "amorphous / round bodies: squash-and-stretch bones (Ditto, Grimer, Jigglypuff, Diglett)",
+  "sphere": "balls and eggs with cap bones (Voltorb, Electrode, Exeggcute, Koffing)",
+  "multileg": "insects, crabs and tentacled things with 4-10 leg chains (Caterpie, Krabby, Kabuto, Tentacruel)",
+  "plant": "leaf / flower / vine bones (Oddish, Vileplume, Bellsprout, Exeggutor, Tangela)",
+  "floating": "hovering bodies with orbiting parts (Gastly, Magnemite, Porygon, Mew)",
+  "shell": "shelled bodies: shell bone + limbs that retract (Squirtle line, Shellder, Omanyte, Slowbro)",
+  "rock": "stiff stone/cocoon bodies with heavy short motion (Geodude, Golem, Metapod, Kakuna)",
+  "radial": "star bodies with a spinning core and 5 arms (Staryu, Starmie)"
+ },
+ "species": {
+  "MISSINGNO": {
+   "plan": "blob",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "wild",
+   "notes": "glitch block: glitches, tears and stutters",
+   "posture": "core",
+   "extras": 4,
+   "dex": 0,
+   "mass": 3,
+   "tempo": 1.0,
+   "types": [
+    "NORMAL"
+   ]
+  },
+  "BULBASAUR": {
+   "plan": "quadruped",
+   "arms": 0,
+   "legs": 4,
+   "wings": 0,
+   "ears": 2,
+   "tails": 0,
+   "temper": "calm",
+   "notes": "four short legs, back bulb sways",
+   "bulb": 1,
+   "dex": 1,
+   "mass": 2,
+   "tempo": 0.852,
+   "types": [
+    "GRASS",
+    "POISON"
+   ]
+  },
+  "IVYSAUR": {
+   "plan": "quadruped",
+   "arms": 0,
+   "legs": 4,
+   "wings": 0,
+   "ears": 2,
+   "tails": 0,
+   "temper": "calm",
+   "notes": "bud on the back, vines",
+   "bulb": 1,
+   "dex": 2,
+   "mass": 2,
+   "tempo": 0.896,
+   "types": [
+    "GRASS",
+    "POISON"
+   ]
+  },
+  "VENUSAUR": {
+   "plan": "quadruped",
+   "arms": 0,
+   "legs": 4,
+   "wings": 0,
+   "ears": 2,
+   "tails": 0,
+   "temper": "sturdy",
+   "notes": "big flower, heavy stomp",
+   "bulb": 1,
+   "dex": 3,
+   "mass": 5,
+   "tempo": 0.955,
+   "types": [
+    "GRASS",
+    "POISON"
+   ]
+  },
+  "CHARMANDER": {
+   "plan": "biped_tail",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "playful",
+   "notes": "flame tail",
+   "tail_bones": 5,
+   "dex": 4,
+   "mass": 2,
+   "tempo": 0.911,
+   "types": [
+    "FIRE"
+   ]
+  },
+  "CHARMELEON": {
+   "plan": "biped_tail",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "fierce",
+   "notes": "head crest, flame tail",
+   "tail_bones": 5,
+   "dex": 5,
+   "mass": 2,
+   "tempo": 0.955,
+   "types": [
+    "FIRE"
+   ]
+  },
+  "CHARIZARD": {
+   "plan": "winged",
+   "arms": 2,
+   "legs": 2,
+   "wings": 2,
+   "ears": 0,
+   "tails": 1,
+   "temper": "fierce",
+   "notes": "dragon wings with fingers, flame tail",
+   "tail_bones": 6,
+   "fingers": 2,
+   "dex": 6,
+   "mass": 4,
+   "tempo": 1.014,
+   "types": [
+    "FIRE",
+    "FLYING"
+   ]
+  },
+  "SQUIRTLE": {
+   "plan": "shell",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "playful",
+   "notes": "shell on back, curly tail",
+   "tail_bones": 3,
+   "dex": 7,
+   "mass": 2,
+   "tempo": 0.846,
+   "types": [
+    "WATER"
+   ]
+  },
+  "WARTORTLE": {
+   "plan": "shell",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 2,
+   "tails": 1,
+   "temper": "calm",
+   "notes": "shell, fluffy ears and tail",
+   "tail_bones": 4,
+   "dex": 8,
+   "mass": 3,
+   "tempo": 0.891,
+   "types": [
+    "WATER"
+   ]
+  },
+  "BLASTOISE": {
+   "plan": "shell",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "sturdy",
+   "notes": "shell cannons",
+   "extras": 2,
+   "dex": 9,
+   "mass": 5,
+   "tempo": 0.949,
+   "types": [
+    "WATER"
+   ]
+  },
+  "CATERPIE": {
+   "plan": "multileg",
+   "arms": 0,
+   "legs": 6,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "timid",
+   "notes": "worm: 4 body segments, feelers",
+   "extras": 2,
+   "posture": "horizontal",
+   "dex": 10,
+   "mass": 1,
+   "tempo": 0.852,
+   "types": [
+    "BUG"
+   ]
+  },
+  "METAPOD": {
+   "plan": "rock",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "sturdy",
+   "notes": "cocoon, only harden-wiggle",
+   "posture": "upright",
+   "dex": 11,
+   "mass": 2,
+   "tempo": 0.808,
+   "types": [
+    "BUG"
+   ]
+  },
+  "BUTTERFREE": {
+   "plan": "winged",
+   "arms": 2,
+   "legs": 2,
+   "wings": 4,
+   "ears": 0,
+   "tails": 0,
+   "temper": "playful",
+   "notes": "four butterfly wings, feelers",
+   "extras": 2,
+   "dex": 12,
+   "mass": 3,
+   "tempo": 0.926,
+   "types": [
+    "BUG",
+    "FLYING"
+   ]
+  },
+  "WEEDLE": {
+   "plan": "multileg",
+   "arms": 0,
+   "legs": 6,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "timid",
+   "notes": "worm with a stinger",
+   "extras": 2,
+   "posture": "horizontal",
+   "dex": 13,
+   "mass": 1,
+   "tempo": 0.867,
+   "types": [
+    "BUG",
+    "POISON"
+   ]
+  },
+  "KAKUNA": {
+   "plan": "rock",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "sturdy",
+   "notes": "cocoon",
+   "posture": "upright",
+   "dex": 14,
+   "mass": 2,
+   "tempo": 0.823,
+   "types": [
+    "BUG",
+    "POISON"
+   ]
+  },
+  "BEEDRILL": {
+   "plan": "winged",
+   "arms": 2,
+   "legs": 2,
+   "wings": 4,
+   "ears": 0,
+   "tails": 0,
+   "temper": "fierce",
+   "notes": "wasp with stinger arms",
+   "fingers": 0,
+   "dex": 15,
+   "mass": 3,
+   "tempo": 0.941,
+   "types": [
+    "BUG",
+    "POISON"
+   ]
+  },
+  "PIDGEY": {
+   "plan": "bird",
+   "arms": 0,
+   "legs": 2,
+   "wings": 2,
+   "ears": 0,
+   "tails": 1,
+   "temper": "timid",
+   "notes": "small bird, quick flutter",
+   "tail_bones": 2,
+   "dex": 16,
+   "mass": 1,
+   "tempo": 0.885,
+   "types": [
+    "NORMAL",
+    "FLYING"
+   ]
+  },
+  "PIDGEOTTO": {
+   "plan": "bird",
+   "arms": 0,
+   "legs": 2,
+   "wings": 2,
+   "ears": 0,
+   "tails": 1,
+   "temper": "wild",
+   "notes": "crest and tail feathers",
+   "tail_bones": 3,
+   "dex": 17,
+   "mass": 3,
+   "tempo": 0.929,
+   "types": [
+    "NORMAL",
+    "FLYING"
+   ]
+  },
+  "PIDGEOT": {
+   "plan": "bird",
+   "arms": 0,
+   "legs": 2,
+   "wings": 2,
+   "ears": 0,
+   "tails": 1,
+   "temper": "aloof",
+   "notes": "long crest, big wings",
+   "tail_bones": 3,
+   "extras": 1,
+   "dex": 18,
+   "mass": 3,
+   "tempo": 0.988,
+   "types": [
+    "NORMAL",
+    "FLYING"
+   ]
+  },
+  "RATTATA": {
+   "plan": "quadruped_small",
+   "arms": 0,
+   "legs": 4,
+   "wings": 0,
+   "ears": 2,
+   "tails": 1,
+   "temper": "wild",
+   "notes": "scurrying rodent",
+   "tail_bones": 3,
+   "dex": 19,
+   "mass": 2,
+   "tempo": 0.932,
+   "types": [
+    "NORMAL"
+   ]
+  },
+  "RATICATE": {
+   "plan": "quadruped_small",
+   "arms": 0,
+   "legs": 4,
+   "wings": 0,
+   "ears": 2,
+   "tails": 1,
+   "temper": "fierce",
+   "notes": "big incisors",
+   "tail_bones": 3,
+   "dex": 20,
+   "mass": 2,
+   "tempo": 1.005,
+   "types": [
+    "NORMAL"
+   ]
+  },
+  "SPEAROW": {
+   "plan": "bird",
+   "arms": 0,
+   "legs": 2,
+   "wings": 2,
+   "ears": 0,
+   "tails": 1,
+   "temper": "fierce",
+   "notes": "small angry bird",
+   "tail_bones": 2,
+   "dex": 21,
+   "mass": 1,
+   "tempo": 0.926,
+   "types": [
+    "NORMAL",
+    "FLYING"
+   ]
+  },
+  "FEAROW": {
+   "plan": "bird",
+   "arms": 0,
+   "legs": 2,
+   "wings": 2,
+   "ears": 0,
+   "tails": 1,
+   "temper": "fierce",
+   "notes": "long beak and neck",
+   "neck": 2,
+   "tail_bones": 3,
+   "dex": 22,
+   "mass": 3,
+   "tempo": 1.014,
+   "types": [
+    "NORMAL",
+    "FLYING"
+   ]
+  },
+  "EKANS": {
+   "plan": "serpent",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "sly",
+   "notes": "snake, hood",
+   "dex": 23,
+   "mass": 2,
+   "tempo": 0.882,
+   "types": [
+    "POISON"
+   ]
+  },
+  "ARBOK": {
+   "plan": "serpent",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "fierce",
+   "notes": "snake with cobra hood",
+   "dex": 24,
+   "mass": 3,
+   "tempo": 0.955,
+   "types": [
+    "POISON"
+   ]
+  },
+  "PIKACHU": {
+   "plan": "biped_tail",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 2,
+   "tails": 1,
+   "temper": "bouncy",
+   "notes": "long ears, lightning tail",
+   "tail_bones": 5,
+   "dex": 25,
+   "mass": 2,
+   "tempo": 0.985,
+   "types": [
+    "ELECTRIC"
+   ]
+  },
+  "RAICHU": {
+   "plan": "biped_tail",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 2,
+   "tails": 1,
+   "temper": "bouncy",
+   "notes": "long tail, big ears",
+   "tail_bones": 6,
+   "dex": 26,
+   "mass": 3,
+   "tempo": 1.014,
+   "types": [
+    "ELECTRIC"
+   ]
+  },
+  "SANDSHREW": {
+   "plan": "biped_tail",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "timid",
+   "notes": "curls up, claws",
+   "tail_bones": 2,
+   "dex": 27,
+   "mass": 2,
+   "tempo": 0.838,
+   "types": [
+    "GROUND"
+   ]
+  },
+  "SANDSLASH": {
+   "plan": "biped_tail",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "fierce",
+   "notes": "spiky back, long claws",
+   "tail_bones": 2,
+   "extras": 2,
+   "dex": 28,
+   "mass": 3,
+   "tempo": 0.911,
+   "types": [
+    "GROUND"
+   ]
+  },
+  "NIDORAN_F": {
+   "plan": "quadruped_small",
+   "arms": 0,
+   "legs": 4,
+   "wings": 0,
+   "ears": 2,
+   "tails": 1,
+   "temper": "timid",
+   "notes": "big ears",
+   "tail_bones": 2,
+   "dex": 29,
+   "mass": 2,
+   "tempo": 0.841,
+   "types": [
+    "POISON"
+   ]
+  },
+  "NIDORINA": {
+   "plan": "quadruped_small",
+   "arms": 0,
+   "legs": 4,
+   "wings": 0,
+   "ears": 2,
+   "tails": 1,
+   "temper": "calm",
+   "notes": "big ears",
+   "tail_bones": 2,
+   "dex": 30,
+   "mass": 2,
+   "tempo": 0.885,
+   "types": [
+    "POISON"
+   ]
+  },
+  "NIDOQUEEN": {
+   "plan": "biped_tail",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "sturdy",
+   "notes": "heavy queen",
+   "tail_bones": 4,
+   "dex": 31,
+   "mass": 4,
+   "tempo": 0.944,
+   "types": [
+    "POISON",
+    "GROUND"
+   ]
+  },
+  "NIDORAN_M": {
+   "plan": "quadruped_small",
+   "arms": 0,
+   "legs": 4,
+   "wings": 0,
+   "ears": 2,
+   "tails": 1,
+   "temper": "wild",
+   "notes": "horn and ears",
+   "tail_bones": 2,
+   "dex": 32,
+   "mass": 2,
+   "tempo": 0.867,
+   "types": [
+    "POISON"
+   ]
+  },
+  "NIDORINO": {
+   "plan": "quadruped_small",
+   "arms": 0,
+   "legs": 4,
+   "wings": 0,
+   "ears": 2,
+   "tails": 1,
+   "temper": "fierce",
+   "notes": "horn",
+   "tail_bones": 2,
+   "dex": 33,
+   "mass": 2,
+   "tempo": 0.911,
+   "types": [
+    "POISON"
+   ]
+  },
+  "NIDOKING": {
+   "plan": "biped_tail",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "fierce",
+   "notes": "horn, thick tail",
+   "tail_bones": 4,
+   "dex": 34,
+   "mass": 4,
+   "tempo": 0.97,
+   "types": [
+    "POISON",
+    "GROUND"
+   ]
+  },
+  "CLEFAIRY": {
+   "plan": "biped_tail",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "bouncy",
+   "notes": "tiny wings, curly tail",
+   "tail_bones": 2,
+   "extras": 2,
+   "dex": 35,
+   "mass": 2,
+   "tempo": 0.823,
+   "types": [
+    "NORMAL"
+   ]
+  },
+  "CLEFABLE": {
+   "plan": "biped_tail",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "dreamy",
+   "notes": "fairy wings",
+   "tail_bones": 3,
+   "extras": 2,
+   "dex": 36,
+   "mass": 3,
+   "tempo": 0.896,
+   "types": [
+    "NORMAL"
+   ]
+  },
+  "VULPIX": {
+   "plan": "quadruped",
+   "arms": 0,
+   "legs": 4,
+   "wings": 0,
+   "ears": 2,
+   "tails": 6,
+   "temper": "sly",
+   "notes": "six tails",
+   "tail_bones": 3,
+   "dex": 37,
+   "mass": 2,
+   "tempo": 0.911,
+   "types": [
+    "FIRE"
+   ]
+  },
+  "NINETALES": {
+   "plan": "quadruped",
+   "arms": 0,
+   "legs": 4,
+   "wings": 0,
+   "ears": 2,
+   "tails": 9,
+   "temper": "aloof",
+   "notes": "nine tails, each 2-3 bones",
+   "tail_bones": 3,
+   "dex": 38,
+   "mass": 2,
+   "tempo": 1.014,
+   "types": [
+    "FIRE"
+   ]
+  },
+  "JIGGLYPUFF": {
+   "plan": "blob",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 2,
+   "tails": 0,
+   "temper": "dreamy",
+   "notes": "round singer, ear tufts",
+   "posture": "core",
+   "extras": 2,
+   "dex": 39,
+   "mass": 2,
+   "tempo": 0.779,
+   "types": [
+    "NORMAL"
+   ]
+  },
+  "WIGGLYTUFF": {
+   "plan": "blob",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 2,
+   "tails": 0,
+   "temper": "dreamy",
+   "notes": "round, big ears",
+   "posture": "core",
+   "extras": 2,
+   "dex": 40,
+   "mass": 2,
+   "tempo": 0.852,
+   "types": [
+    "NORMAL"
+   ]
+  },
+  "ZUBAT": {
+   "plan": "winged",
+   "arms": 0,
+   "legs": 0,
+   "wings": 2,
+   "ears": 2,
+   "tails": 0,
+   "temper": "wild",
+   "notes": "bat: wing arms with finger bones",
+   "fingers": 2,
+   "dex": 41,
+   "mass": 2,
+   "tempo": 0.882,
+   "types": [
+    "POISON",
+    "FLYING"
+   ]
+  },
+  "GOLBAT": {
+   "plan": "winged",
+   "arms": 0,
+   "legs": 0,
+   "wings": 2,
+   "ears": 2,
+   "tails": 0,
+   "temper": "wild",
+   "notes": "big bat wings",
+   "fingers": 2,
+   "dex": 42,
+   "mass": 3,
+   "tempo": 0.985,
+   "types": [
+    "POISON",
+    "FLYING"
+   ]
+  },
+  "ODDISH": {
+   "plan": "plant",
+   "arms": 0,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "calm",
+   "notes": "leaf crown",
+   "extras": 5,
+   "dex": 43,
+   "mass": 2,
+   "tempo": 0.808,
+   "types": [
+    "GRASS",
+    "POISON"
+   ]
+  },
+  "GLOOM": {
+   "plan": "plant",
+   "arms": 0,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "calm",
+   "notes": "drooping flower",
+   "extras": 3,
+   "dex": 44,
+   "mass": 2,
+   "tempo": 0.838,
+   "types": [
+    "GRASS",
+    "POISON"
+   ]
+  },
+  "VILEPLUME": {
+   "plan": "plant",
+   "arms": 0,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "sturdy",
+   "notes": "giant flower petals",
+   "extras": 4,
+   "dex": 45,
+   "mass": 2,
+   "tempo": 0.867,
+   "types": [
+    "GRASS",
+    "POISON"
+   ]
+  },
+  "PARAS": {
+   "plan": "multileg",
+   "arms": 2,
+   "legs": 4,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "timid",
+   "notes": "mushrooms on back, digging claws",
+   "extras": 2,
+   "dex": 46,
+   "mass": 2,
+   "tempo": 0.794,
+   "types": [
+    "BUG",
+    "GRASS"
+   ]
+  },
+  "PARASECT": {
+   "plan": "multileg",
+   "arms": 2,
+   "legs": 4,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "sturdy",
+   "notes": "big mushroom",
+   "extras": 2,
+   "dex": 47,
+   "mass": 3,
+   "tempo": 0.808,
+   "types": [
+    "BUG",
+    "GRASS"
+   ]
+  },
+  "VENONAT": {
+   "plan": "multileg",
+   "arms": 0,
+   "legs": 4,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "timid",
+   "notes": "furry bug with antennae",
+   "extras": 2,
+   "dex": 48,
+   "mass": 3,
+   "tempo": 0.852,
+   "types": [
+    "BUG",
+    "POISON"
+   ]
+  },
+  "VENOMOTH": {
+   "plan": "winged",
+   "arms": 2,
+   "legs": 2,
+   "wings": 4,
+   "ears": 0,
+   "tails": 0,
+   "temper": "wild",
+   "notes": "moth: four wings, antennae",
+   "extras": 2,
+   "dex": 49,
+   "mass": 2,
+   "tempo": 0.985,
+   "types": [
+    "BUG",
+    "POISON"
+   ]
+  },
+  "DIGLETT": {
+   "plan": "blob",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "timid",
+   "notes": "mole popping from the ground",
+   "posture": "core",
+   "dex": 50,
+   "mass": 1,
+   "tempo": 0.999,
+   "types": [
+    "GROUND"
+   ]
+  },
+  "DUGTRIO": {
+   "plan": "blob",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "wild",
+   "notes": "three heads",
+   "posture": "core",
+   "heads": 3,
+   "dex": 51,
+   "mass": 3,
+   "tempo": 1.073,
+   "types": [
+    "GROUND"
+   ]
+  },
+  "MEOWTH": {
+   "plan": "quadruped_small",
+   "arms": 0,
+   "legs": 4,
+   "wings": 0,
+   "ears": 2,
+   "tails": 1,
+   "temper": "sly",
+   "notes": "coin on the forehead",
+   "tail_bones": 3,
+   "dex": 52,
+   "mass": 2,
+   "tempo": 0.985,
+   "types": [
+    "NORMAL"
+   ]
+  },
+  "PERSIAN": {
+   "plan": "quadruped",
+   "arms": 0,
+   "legs": 4,
+   "wings": 0,
+   "ears": 2,
+   "tails": 1,
+   "temper": "aloof",
+   "notes": "elegant cat",
+   "tail_bones": 4,
+   "dex": 53,
+   "mass": 3,
+   "tempo": 1.058,
+   "types": [
+    "NORMAL"
+   ]
+  },
+  "PSYDUCK": {
+   "plan": "biped_humanoid",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "dreamy",
+   "notes": "headache-hold",
+   "extras": 1,
+   "dex": 54,
+   "mass": 2,
+   "tempo": 0.882,
+   "types": [
+    "WATER"
+   ]
+  },
+  "GOLDUCK": {
+   "plan": "biped_humanoid",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "calm",
+   "notes": "swimmer",
+   "tail_bones": 2,
+   "dex": 55,
+   "mass": 3,
+   "tempo": 0.97,
+   "types": [
+    "WATER"
+   ]
+  },
+  "MANKEY": {
+   "plan": "biped_humanoid",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "fierce",
+   "notes": "angry pig monkey",
+   "tail_bones": 2,
+   "dex": 56,
+   "mass": 3,
+   "tempo": 0.926,
+   "types": [
+    "FIGHTING"
+   ]
+  },
+  "PRIMEAPE": {
+   "plan": "biped_humanoid",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "fierce",
+   "notes": "furious fighter",
+   "tail_bones": 2,
+   "dex": 57,
+   "mass": 3,
+   "tempo": 0.999,
+   "types": [
+    "FIGHTING"
+   ]
+  },
+  "GROWLITHE": {
+   "plan": "quadruped",
+   "arms": 0,
+   "legs": 4,
+   "wings": 0,
+   "ears": 2,
+   "tails": 1,
+   "temper": "playful",
+   "notes": "puppy",
+   "tail_bones": 3,
+   "dex": 58,
+   "mass": 2,
+   "tempo": 0.896,
+   "types": [
+    "FIRE"
+   ]
+  },
+  "ARCANINE": {
+   "plan": "quadruped",
+   "arms": 0,
+   "legs": 4,
+   "wings": 0,
+   "ears": 2,
+   "tails": 1,
+   "temper": "fierce",
+   "notes": "mane, fluffy tail",
+   "tail_bones": 4,
+   "extras": 2,
+   "dex": 59,
+   "mass": 4,
+   "tempo": 0.999,
+   "types": [
+    "FIRE"
+   ]
+  },
+  "POLIWAG": {
+   "plan": "fish",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "timid",
+   "notes": "tadpole with tail",
+   "tail_bones": 3,
+   "posture": "horizontal",
+   "dex": 60,
+   "mass": 2,
+   "tempo": 0.985,
+   "types": [
+    "WATER"
+   ]
+  },
+  "POLIWHIRL": {
+   "plan": "biped_humanoid",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "playful",
+   "notes": "belly swirl",
+   "dex": 61,
+   "mass": 2,
+   "tempo": 0.985,
+   "types": [
+    "WATER"
+   ]
+  },
+  "POLIWRATH": {
+   "plan": "biped_humanoid",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "sturdy",
+   "notes": "muscular fighter",
+   "dex": 62,
+   "mass": 4,
+   "tempo": 0.926,
+   "types": [
+    "WATER",
+    "FIGHTING"
+   ]
+  },
+  "ABRA": {
+   "plan": "biped_humanoid",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "dreamy",
+   "notes": "sleeps sitting up",
+   "tail_bones": 2,
+   "dex": 63,
+   "mass": 2,
+   "tempo": 0.985,
+   "types": [
+    "PSYCHIC_TYPE"
+   ]
+  },
+  "KADABRA": {
+   "plan": "biped_humanoid",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "aloof",
+   "notes": "holds a spoon",
+   "tail_bones": 2,
+   "dex": 64,
+   "mass": 3,
+   "tempo": 1.029,
+   "types": [
+    "PSYCHIC_TYPE"
+   ]
+  },
+  "ALAKAZAM": {
+   "plan": "biped_humanoid",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "aloof",
+   "notes": "two spoons, long moustache",
+   "extras": 2,
+   "dex": 65,
+   "mass": 3,
+   "tempo": 1.073,
+   "types": [
+    "PSYCHIC_TYPE"
+   ]
+  },
+  "MACHOP": {
+   "plan": "biped_humanoid",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "fierce",
+   "notes": "small fighter",
+   "dex": 66,
+   "mass": 2,
+   "tempo": 0.823,
+   "types": [
+    "FIGHTING"
+   ]
+  },
+  "MACHOKE": {
+   "plan": "biped_humanoid",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "sturdy",
+   "notes": "belt and muscles",
+   "dex": 67,
+   "mass": 3,
+   "tempo": 0.852,
+   "types": [
+    "FIGHTING"
+   ]
+  },
+  "MACHAMP": {
+   "plan": "biped_humanoid",
+   "arms": 4,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "sturdy",
+   "notes": "four arms",
+   "dex": 68,
+   "mass": 5,
+   "tempo": 0.882,
+   "types": [
+    "FIGHTING"
+   ]
+  },
+  "BELLSPROUT": {
+   "plan": "plant",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "timid",
+   "notes": "thin stem, leaf arms",
+   "extras": 4,
+   "posture": "upright",
+   "dex": 69,
+   "mass": 2,
+   "tempo": 0.838,
+   "types": [
+    "GRASS",
+    "POISON"
+   ]
+  },
+  "WEEPINBELL": {
+   "plan": "plant",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "wild",
+   "notes": "bell mouth, leaf arms",
+   "extras": 4,
+   "posture": "upright",
+   "dex": 70,
+   "mass": 2,
+   "tempo": 0.882,
+   "types": [
+    "GRASS",
+    "POISON"
+   ]
+  },
+  "VICTREEBEL": {
+   "plan": "plant",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "wild",
+   "notes": "pitcher head, vines",
+   "extras": 4,
+   "posture": "upright",
+   "dex": 71,
+   "mass": 2,
+   "tempo": 0.926,
+   "types": [
+    "GRASS",
+    "POISON"
+   ]
+  },
+  "TENTACOOL": {
+   "plan": "multileg",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "calm",
+   "notes": "jellyfish tentacles",
+   "extras": 8,
+   "posture": "upright",
+   "dex": 72,
+   "mass": 3,
+   "tempo": 0.926,
+   "types": [
+    "WATER",
+    "POISON"
+   ]
+  },
+  "TENTACRUEL": {
+   "plan": "multileg",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "fierce",
+   "notes": "ten tentacles",
+   "extras": 10,
+   "posture": "upright",
+   "dex": 73,
+   "mass": 3,
+   "tempo": 1.014,
+   "types": [
+    "WATER",
+    "POISON"
+   ]
+  },
+  "GEODUDE": {
+   "plan": "rock",
+   "arms": 2,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "sturdy",
+   "notes": "floating boulder with arms",
+   "posture": "core",
+   "extras": 2,
+   "dex": 74,
+   "mass": 2,
+   "tempo": 0.779,
+   "types": [
+    "ROCK",
+    "GROUND"
+   ]
+  },
+  "GRAVELER": {
+   "plan": "rock",
+   "arms": 4,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "sturdy",
+   "notes": "four arms",
+   "posture": "core",
+   "extras": 4,
+   "dex": 75,
+   "mass": 4,
+   "tempo": 0.823,
+   "types": [
+    "ROCK",
+    "GROUND"
+   ]
+  },
+  "GOLEM": {
+   "plan": "rock",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "sturdy",
+   "notes": "shell-back stone hulk",
+   "dex": 76,
+   "mass": 5,
+   "tempo": 0.852,
+   "types": [
+    "ROCK",
+    "GROUND"
+   ]
+  },
+  "PONYTA": {
+   "plan": "quadruped",
+   "arms": 0,
+   "legs": 4,
+   "wings": 0,
+   "ears": 2,
+   "tails": 1,
+   "temper": "playful",
+   "notes": "flame mane and tail",
+   "tail_bones": 4,
+   "extras": 2,
+   "dex": 77,
+   "mass": 3,
+   "tempo": 0.985,
+   "types": [
+    "FIRE"
+   ]
+  },
+  "RAPIDASH": {
+   "plan": "quadruped",
+   "arms": 0,
+   "legs": 4,
+   "wings": 0,
+   "ears": 2,
+   "tails": 1,
+   "temper": "aloof",
+   "notes": "flame mane, horn, tail",
+   "tail_bones": 5,
+   "extras": 2,
+   "dex": 78,
+   "mass": 4,
+   "tempo": 1.029,
+   "types": [
+    "FIRE"
+   ]
+  },
+  "SLOWPOKE": {
+   "plan": "quadruped_small",
+   "arms": 0,
+   "legs": 4,
+   "wings": 0,
+   "ears": 2,
+   "tails": 1,
+   "temper": "dreamy",
+   "notes": "slow, drooling",
+   "tail_bones": 3,
+   "dex": 79,
+   "mass": 3,
+   "tempo": 0.764,
+   "types": [
+    "WATER",
+    "PSYCHIC_TYPE"
+   ]
+  },
+  "SLOWBRO": {
+   "plan": "shell",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "dreamy",
+   "notes": "shellder on the tail",
+   "extras": 1,
+   "dex": 80,
+   "mass": 3,
+   "tempo": 0.808,
+   "types": [
+    "WATER",
+    "PSYCHIC_TYPE"
+   ]
+  },
+  "MAGNEMITE": {
+   "plan": "floating",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "aloof",
+   "notes": "sphere with two magnets and screws",
+   "extras": 4,
+   "posture": "core",
+   "dex": 81,
+   "mass": 2,
+   "tempo": 0.852,
+   "types": [
+    "ELECTRIC"
+   ]
+  },
+  "MAGNETON": {
+   "plan": "floating",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "aloof",
+   "notes": "three linked units",
+   "extras": 6,
+   "posture": "core",
+   "heads": 3,
+   "dex": 82,
+   "mass": 3,
+   "tempo": 0.926,
+   "types": [
+    "ELECTRIC"
+   ]
+  },
+  "FARFETCHD": {
+   "plan": "bird",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "sly",
+   "notes": "wing arms holding a leek",
+   "neck": 2,
+   "tail_bones": 2,
+   "dex": 83,
+   "mass": 2,
+   "tempo": 0.896,
+   "types": [
+    "NORMAL",
+    "FLYING"
+   ]
+  },
+  "DODUO": {
+   "plan": "bird",
+   "arms": 0,
+   "legs": 2,
+   "wings": 2,
+   "ears": 0,
+   "tails": 1,
+   "temper": "wild",
+   "notes": "two heads on long necks",
+   "neck": 3,
+   "tail_bones": 2,
+   "heads": 2,
+   "dex": 84,
+   "mass": 3,
+   "tempo": 0.941,
+   "types": [
+    "NORMAL",
+    "FLYING"
+   ]
+  },
+  "DODRIO": {
+   "plan": "bird",
+   "arms": 0,
+   "legs": 2,
+   "wings": 2,
+   "ears": 0,
+   "tails": 1,
+   "temper": "wild",
+   "notes": "three heads on long necks",
+   "neck": 3,
+   "tail_bones": 2,
+   "heads": 3,
+   "dex": 85,
+   "mass": 4,
+   "tempo": 1.014,
+   "types": [
+    "NORMAL",
+    "FLYING"
+   ]
+  },
+  "SEEL": {
+   "plan": "fish",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "playful",
+   "notes": "seal: flippers and tail",
+   "posture": "horizontal",
+   "fins": 2,
+   "dex": 86,
+   "mass": 4,
+   "tempo": 0.852,
+   "types": [
+    "WATER"
+   ]
+  },
+  "DEWGONG": {
+   "plan": "fish",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "calm",
+   "notes": "sea lion: flippers, horn, tail",
+   "posture": "horizontal",
+   "fins": 2,
+   "dex": 87,
+   "mass": 4,
+   "tempo": 0.926,
+   "types": [
+    "WATER",
+    "ICE"
+   ]
+  },
+  "GRIMER": {
+   "plan": "blob",
+   "arms": 2,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "wild",
+   "notes": "sludge",
+   "posture": "core",
+   "dex": 88,
+   "mass": 3,
+   "tempo": 0.794,
+   "types": [
+    "POISON"
+   ]
+  },
+  "MUK": {
+   "plan": "blob",
+   "arms": 2,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "wild",
+   "notes": "big sludge with arms",
+   "posture": "core",
+   "dex": 89,
+   "mass": 4,
+   "tempo": 0.867,
+   "types": [
+    "POISON"
+   ]
+  },
+  "SHELLDER": {
+   "plan": "shell",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "timid",
+   "notes": "clam shell hinge + tongue",
+   "posture": "core",
+   "dex": 90,
+   "mass": 2,
+   "tempo": 0.838,
+   "types": [
+    "WATER"
+   ]
+  },
+  "CLOYSTER": {
+   "plan": "shell",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "sturdy",
+   "notes": "spiked clam shell",
+   "posture": "core",
+   "dex": 91,
+   "mass": 4,
+   "tempo": 0.926,
+   "types": [
+    "WATER",
+    "ICE"
+   ]
+  },
+  "GASTLY": {
+   "plan": "floating",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "sly",
+   "notes": "gas cloud with tendrils",
+   "posture": "core",
+   "extras": 3,
+   "dex": 92,
+   "mass": 1,
+   "tempo": 0.955,
+   "types": [
+    "GHOST",
+    "POISON"
+   ]
+  },
+  "HAUNTER": {
+   "plan": "floating",
+   "arms": 2,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "sly",
+   "notes": "floating hands",
+   "posture": "core",
+   "extras": 3,
+   "dex": 93,
+   "mass": 1,
+   "tempo": 0.999,
+   "types": [
+    "GHOST",
+    "POISON"
+   ]
+  },
+  "GENGAR": {
+   "plan": "biped_tail",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 2,
+   "tails": 0,
+   "temper": "sly",
+   "notes": "shadowy grin, ear spikes",
+   "extras": 1,
+   "dex": 94,
+   "mass": 3,
+   "tempo": 1.044,
+   "types": [
+    "GHOST",
+    "POISON"
+   ]
+  },
+  "ONIX": {
+   "plan": "serpent",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "sturdy",
+   "notes": "rock snake of boulders",
+   "dex": 95,
+   "mass": 5,
+   "tempo": 0.926,
+   "types": [
+    "ROCK",
+    "GROUND"
+   ]
+  },
+  "DROWZEE": {
+   "plan": "biped_humanoid",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "dreamy",
+   "notes": "long trunk nose",
+   "tail_bones": 2,
+   "dex": 96,
+   "mass": 3,
+   "tempo": 0.844,
+   "types": [
+    "PSYCHIC_TYPE"
+   ]
+  },
+  "HYPNO": {
+   "plan": "biped_humanoid",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "aloof",
+   "notes": "pendulum",
+   "extras": 1,
+   "dex": 97,
+   "mass": 3,
+   "tempo": 0.917,
+   "types": [
+    "PSYCHIC_TYPE"
+   ]
+  },
+  "KRABBY": {
+   "plan": "multileg",
+   "arms": 2,
+   "legs": 6,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "wild",
+   "notes": "crab: 2 claws + 6 legs",
+   "legs_pair": true,
+   "dex": 98,
+   "mass": 2,
+   "tempo": 0.867,
+   "types": [
+    "WATER"
+   ]
+  },
+  "KINGLER": {
+   "plan": "multileg",
+   "arms": 2,
+   "legs": 6,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "fierce",
+   "notes": "giant claw",
+   "legs_pair": true,
+   "dex": 99,
+   "mass": 3,
+   "tempo": 0.941,
+   "types": [
+    "WATER"
+   ]
+  },
+  "VOLTORB": {
+   "plan": "sphere",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "wild",
+   "notes": "ball",
+   "posture": "core",
+   "dex": 100,
+   "mass": 2,
+   "tempo": 1.014,
+   "types": [
+    "ELECTRIC"
+   ]
+  },
+  "ELECTRODE": {
+   "plan": "sphere",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "wild",
+   "notes": "ball",
+   "posture": "core",
+   "dex": 101,
+   "mass": 3,
+   "tempo": 1.132,
+   "types": [
+    "ELECTRIC"
+   ]
+  },
+  "EXEGGCUTE": {
+   "plan": "sphere",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "timid",
+   "notes": "six eggs",
+   "posture": "core",
+   "heads": 6,
+   "dex": 102,
+   "mass": 1,
+   "tempo": 0.838,
+   "types": [
+    "GRASS",
+    "PSYCHIC_TYPE"
+   ]
+  },
+  "EXEGGUTOR": {
+   "plan": "plant",
+   "arms": 0,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "calm",
+   "notes": "palm tree with three heads",
+   "neck": 3,
+   "extras": 6,
+   "heads": 3,
+   "dex": 103,
+   "mass": 4,
+   "tempo": 0.882,
+   "types": [
+    "GRASS",
+    "PSYCHIC_TYPE"
+   ]
+  },
+  "CUBONE": {
+   "plan": "biped_tail",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "timid",
+   "notes": "skull helmet, bone club",
+   "tail_bones": 2,
+   "dex": 104,
+   "mass": 2,
+   "tempo": 0.823,
+   "types": [
+    "GROUND"
+   ]
+  },
+  "MAROWAK": {
+   "plan": "biped_tail",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "fierce",
+   "notes": "bone",
+   "tail_bones": 2,
+   "dex": 105,
+   "mass": 3,
+   "tempo": 0.852,
+   "types": [
+    "GROUND"
+   ]
+  },
+  "HITMONLEE": {
+   "plan": "biped_humanoid",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "fierce",
+   "notes": "extending legs",
+   "dex": 106,
+   "mass": 3,
+   "tempo": 0.976,
+   "types": [
+    "FIGHTING"
+   ]
+  },
+  "HITMONCHAN": {
+   "plan": "biped_humanoid",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "fierce",
+   "notes": "boxing gloves",
+   "dex": 107,
+   "mass": 3,
+   "tempo": 0.944,
+   "types": [
+    "FIGHTING"
+   ]
+  },
+  "LICKITUNG": {
+   "plan": "biped_tail",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "playful",
+   "notes": "long tongue",
+   "tail_bones": 2,
+   "dex": 108,
+   "mass": 3,
+   "tempo": 0.808,
+   "types": [
+    "NORMAL"
+   ]
+  },
+  "KOFFING": {
+   "plan": "sphere",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "wild",
+   "notes": "gas ball with skull",
+   "posture": "core",
+   "extras": 3,
+   "dex": 109,
+   "mass": 1,
+   "tempo": 0.823,
+   "types": [
+    "POISON"
+   ]
+  },
+  "WEEZING": {
+   "plan": "sphere",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "wild",
+   "notes": "two gas balls",
+   "posture": "core",
+   "extras": 3,
+   "heads": 2,
+   "dex": 110,
+   "mass": 2,
+   "tempo": 0.896,
+   "types": [
+    "POISON"
+   ]
+  },
+  "RHYHORN": {
+   "plan": "quadruped",
+   "arms": 0,
+   "legs": 4,
+   "wings": 0,
+   "ears": 2,
+   "tails": 1,
+   "temper": "sturdy",
+   "notes": "armoured horn charge",
+   "tail_bones": 2,
+   "dex": 111,
+   "mass": 4,
+   "tempo": 0.794,
+   "types": [
+    "GROUND",
+    "ROCK"
+   ]
+  },
+  "RHYDON": {
+   "plan": "biped_tail",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "fierce",
+   "notes": "drill horn",
+   "tail_bones": 3,
+   "dex": 112,
+   "mass": 5,
+   "tempo": 0.838,
+   "types": [
+    "GROUND",
+    "ROCK"
+   ]
+  },
+  "CHANSEY": {
+   "plan": "biped_tail",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "calm",
+   "notes": "egg pouch",
+   "tail_bones": 2,
+   "dex": 113,
+   "mass": 3,
+   "tempo": 0.867,
+   "types": [
+    "NORMAL"
+   ]
+  },
+  "TANGELA": {
+   "plan": "plant",
+   "arms": 0,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "wild",
+   "notes": "mass of vines",
+   "extras": 8,
+   "posture": "core",
+   "dex": 114,
+   "mass": 3,
+   "tempo": 0.896,
+   "types": [
+    "GRASS"
+   ]
+  },
+  "KANGASKHAN": {
+   "plan": "biped_tail",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "sturdy",
+   "notes": "baby in the pouch",
+   "tail_bones": 3,
+   "dex": 115,
+   "mass": 4,
+   "tempo": 0.985,
+   "types": [
+    "NORMAL"
+   ]
+  },
+  "HORSEA": {
+   "plan": "fish",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "playful",
+   "notes": "seahorse curled tail",
+   "neck": 2,
+   "posture": "upright",
+   "fins": 1,
+   "tail_bones": 4,
+   "dex": 116,
+   "mass": 2,
+   "tempo": 0.896,
+   "types": [
+    "WATER"
+   ]
+  },
+  "SEADRA": {
+   "plan": "fish",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "fierce",
+   "notes": "spiny seahorse",
+   "neck": 2,
+   "posture": "upright",
+   "fins": 2,
+   "tail_bones": 5,
+   "dex": 117,
+   "mass": 3,
+   "tempo": 0.97,
+   "types": [
+    "WATER"
+   ]
+  },
+  "GOLDEEN": {
+   "plan": "fish",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "playful",
+   "notes": "flowing fins",
+   "posture": "horizontal",
+   "fins": 2,
+   "dex": 118,
+   "mass": 2,
+   "tempo": 0.905,
+   "types": [
+    "WATER"
+   ]
+  },
+  "SEAKING": {
+   "plan": "fish",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "wild",
+   "notes": "horned, flowing fins",
+   "posture": "horizontal",
+   "fins": 3,
+   "dex": 119,
+   "mass": 3,
+   "tempo": 0.92,
+   "types": [
+    "WATER"
+   ]
+  },
+  "STARYU": {
+   "plan": "radial",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "aloof",
+   "notes": "star: five arms",
+   "posture": "core",
+   "extras": 5,
+   "dex": 120,
+   "mass": 3,
+   "tempo": 0.97,
+   "types": [
+    "WATER"
+   ]
+  },
+  "STARMIE": {
+   "plan": "radial",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "aloof",
+   "notes": "two stars: five long arms",
+   "posture": "core",
+   "extras": 5,
+   "dex": 121,
+   "mass": 3,
+   "tempo": 1.058,
+   "types": [
+    "WATER",
+    "PSYCHIC_TYPE"
+   ]
+  },
+  "MR_MIME": {
+   "plan": "biped_humanoid",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "playful",
+   "notes": "mime",
+   "extras": 2,
+   "dex": 122,
+   "mass": 3,
+   "tempo": 0.985,
+   "types": [
+    "PSYCHIC_TYPE"
+   ]
+  },
+  "SCYTHER": {
+   "plan": "winged",
+   "arms": 2,
+   "legs": 2,
+   "wings": 2,
+   "ears": 0,
+   "tails": 1,
+   "temper": "fierce",
+   "notes": "scythe arms and wings",
+   "tail_bones": 2,
+   "dex": 123,
+   "mass": 3,
+   "tempo": 1.029,
+   "types": [
+    "BUG",
+    "FLYING"
+   ]
+  },
+  "JYNX": {
+   "plan": "biped_humanoid",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "dreamy",
+   "notes": "dress and hair",
+   "extras": 2,
+   "dex": 124,
+   "mass": 3,
+   "tempo": 0.999,
+   "types": [
+    "ICE",
+    "PSYCHIC_TYPE"
+   ]
+  },
+  "ELECTABUZZ": {
+   "plan": "biped_humanoid",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 2,
+   "tails": 1,
+   "temper": "fierce",
+   "notes": "antennae, tail plug",
+   "tail_bones": 3,
+   "dex": 125,
+   "mass": 3,
+   "tempo": 1.029,
+   "types": [
+    "ELECTRIC"
+   ]
+  },
+  "MAGMAR": {
+   "plan": "biped_humanoid",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "fierce",
+   "notes": "flame head and tail",
+   "tail_bones": 4,
+   "dex": 126,
+   "mass": 3,
+   "tempo": 0.994,
+   "types": [
+    "FIRE"
+   ]
+  },
+  "PINSIR": {
+   "plan": "biped_humanoid",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "fierce",
+   "notes": "pincer horns",
+   "extras": 2,
+   "dex": 127,
+   "mass": 3,
+   "tempo": 0.97,
+   "types": [
+    "BUG"
+   ]
+  },
+  "TAUROS": {
+   "plan": "quadruped",
+   "arms": 0,
+   "legs": 4,
+   "wings": 0,
+   "ears": 2,
+   "tails": 3,
+   "temper": "wild",
+   "notes": "three tails, horns",
+   "tail_bones": 3,
+   "extras": 2,
+   "dex": 128,
+   "mass": 4,
+   "tempo": 1.044,
+   "types": [
+    "NORMAL"
+   ]
+  },
+  "MAGIKARP": {
+   "plan": "fish",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "timid",
+   "notes": "flopping fish",
+   "posture": "horizontal",
+   "fins": 2,
+   "tail_bones": 2,
+   "dex": 129,
+   "mass": 2,
+   "tempo": 0.955,
+   "types": [
+    "WATER"
+   ]
+  },
+  "GYARADOS": {
+   "plan": "serpent",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 2,
+   "tails": 0,
+   "temper": "fierce",
+   "notes": "sea serpent with fins",
+   "fins": 2,
+   "dex": 130,
+   "mass": 5,
+   "tempo": 0.958,
+   "types": [
+    "WATER",
+    "FLYING"
+   ]
+  },
+  "LAPRAS": {
+   "plan": "fish",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "calm",
+   "notes": "plesiosaur: four flippers, neck, shell",
+   "posture": "horizontal",
+   "neck": 3,
+   "fins": 4,
+   "tail_bones": 3,
+   "dex": 131,
+   "mass": 5,
+   "tempo": 0.896,
+   "types": [
+    "WATER",
+    "ICE"
+   ]
+  },
+  "DITTO": {
+   "plan": "blob",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "playful",
+   "notes": "amorphous",
+   "posture": "core",
+   "dex": 132,
+   "mass": 2,
+   "tempo": 0.861,
+   "types": [
+    "NORMAL"
+   ]
+  },
+  "EEVEE": {
+   "plan": "quadruped",
+   "arms": 0,
+   "legs": 4,
+   "wings": 0,
+   "ears": 2,
+   "tails": 1,
+   "temper": "playful",
+   "notes": "fluffy neck fur",
+   "tail_bones": 3,
+   "dex": 133,
+   "mass": 2,
+   "tempo": 0.882,
+   "types": [
+    "NORMAL"
+   ]
+  },
+  "VAPOREON": {
+   "plan": "quadruped",
+   "arms": 0,
+   "legs": 4,
+   "wings": 0,
+   "ears": 2,
+   "tails": 1,
+   "temper": "calm",
+   "notes": "fin tail, neck frills",
+   "tail_bones": 4,
+   "extras": 2,
+   "dex": 134,
+   "mass": 3,
+   "tempo": 0.911,
+   "types": [
+    "WATER"
+   ]
+  },
+  "JOLTEON": {
+   "plan": "quadruped",
+   "arms": 0,
+   "legs": 4,
+   "wings": 0,
+   "ears": 2,
+   "tails": 1,
+   "temper": "wild",
+   "notes": "spiky fur",
+   "tail_bones": 2,
+   "extras": 2,
+   "dex": 135,
+   "mass": 3,
+   "tempo": 1.102,
+   "types": [
+    "ELECTRIC"
+   ]
+  },
+  "FLAREON": {
+   "plan": "quadruped",
+   "arms": 0,
+   "legs": 4,
+   "wings": 0,
+   "ears": 2,
+   "tails": 1,
+   "temper": "sturdy",
+   "notes": "fluffy tail and neck fur",
+   "tail_bones": 4,
+   "extras": 1,
+   "dex": 136,
+   "mass": 3,
+   "tempo": 0.911,
+   "types": [
+    "FIRE"
+   ]
+  },
+  "PORYGON": {
+   "plan": "floating",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "aloof",
+   "notes": "polygon duck",
+   "posture": "horizontal",
+   "tail_bones": 2,
+   "dex": 137,
+   "mass": 3,
+   "tempo": 0.838,
+   "types": [
+    "NORMAL"
+   ]
+  },
+  "OMANYTE": {
+   "plan": "shell",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "timid",
+   "notes": "spiral shell with ten tentacles",
+   "posture": "core",
+   "extras": 8,
+   "dex": 138,
+   "mass": 2,
+   "tempo": 0.823,
+   "types": [
+    "ROCK",
+    "WATER"
+   ]
+  },
+  "OMASTAR": {
+   "plan": "shell",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "fierce",
+   "notes": "shell with tentacles",
+   "posture": "core",
+   "extras": 10,
+   "dex": 139,
+   "mass": 3,
+   "tempo": 0.882,
+   "types": [
+    "ROCK",
+    "WATER"
+   ]
+  },
+  "KABUTO": {
+   "plan": "multileg",
+   "arms": 0,
+   "legs": 4,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "timid",
+   "notes": "fossil shell crab",
+   "extras": 2,
+   "dex": 140,
+   "mass": 2,
+   "tempo": 0.882,
+   "types": [
+    "ROCK",
+    "WATER"
+   ]
+  },
+  "KABUTOPS": {
+   "plan": "biped_tail",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "fierce",
+   "notes": "scythe arms",
+   "tail_bones": 3,
+   "dex": 141,
+   "mass": 3,
+   "tempo": 0.955,
+   "types": [
+    "ROCK",
+    "WATER"
+   ]
+  },
+  "AERODACTYL": {
+   "plan": "winged",
+   "arms": 0,
+   "legs": 2,
+   "wings": 2,
+   "ears": 0,
+   "tails": 1,
+   "temper": "wild",
+   "notes": "pterosaur with clawed wings",
+   "tail_bones": 3,
+   "fingers": 2,
+   "dex": 142,
+   "mass": 3,
+   "tempo": 1.102,
+   "types": [
+    "ROCK",
+    "FLYING"
+   ]
+  },
+  "SNORLAX": {
+   "plan": "biped_tail",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "sturdy",
+   "notes": "giant sleeper",
+   "dex": 143,
+   "mass": 5,
+   "tempo": 0.808,
+   "types": [
+    "NORMAL"
+   ]
+  },
+  "ARTICUNO": {
+   "plan": "bird",
+   "arms": 0,
+   "legs": 2,
+   "wings": 2,
+   "ears": 0,
+   "tails": 1,
+   "temper": "aloof",
+   "notes": "ice bird with long tail streamers",
+   "tail_bones": 5,
+   "neck": 1,
+   "extras": 2,
+   "dex": 144,
+   "mass": 3,
+   "tempo": 0.97,
+   "types": [
+    "ICE",
+    "FLYING"
+   ]
+  },
+  "ZAPDOS": {
+   "plan": "bird",
+   "arms": 0,
+   "legs": 2,
+   "wings": 2,
+   "ears": 0,
+   "tails": 1,
+   "temper": "wild",
+   "notes": "electric bird with jagged wings",
+   "tail_bones": 3,
+   "extras": 2,
+   "dex": 145,
+   "mass": 3,
+   "tempo": 1.014,
+   "types": [
+    "ELECTRIC",
+    "FLYING"
+   ]
+  },
+  "MOLTRES": {
+   "plan": "bird",
+   "arms": 0,
+   "legs": 2,
+   "wings": 2,
+   "ears": 0,
+   "tails": 1,
+   "temper": "fierce",
+   "notes": "flame bird",
+   "tail_bones": 5,
+   "extras": 2,
+   "dex": 146,
+   "mass": 3,
+   "tempo": 0.985,
+   "types": [
+    "FIRE",
+    "FLYING"
+   ]
+  },
+  "DRATINI": {
+   "plan": "serpent",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "timid",
+   "notes": "small serpentine dragon",
+   "dex": 147,
+   "mass": 1,
+   "tempo": 0.867,
+   "types": [
+    "DRAGON"
+   ]
+  },
+  "DRAGONAIR": {
+   "plan": "serpent",
+   "arms": 0,
+   "legs": 0,
+   "wings": 0,
+   "ears": 0,
+   "tails": 0,
+   "temper": "calm",
+   "notes": "serpentine dragon, tiny wings",
+   "dex": 148,
+   "mass": 2,
+   "tempo": 0.926,
+   "types": [
+    "DRAGON"
+   ]
+  },
+  "DRAGONITE": {
+   "plan": "winged",
+   "arms": 2,
+   "legs": 2,
+   "wings": 2,
+   "ears": 0,
+   "tails": 1,
+   "temper": "calm",
+   "notes": "small dragon wings, antennae",
+   "tail_bones": 4,
+   "extras": 2,
+   "dex": 149,
+   "mass": 5,
+   "tempo": 0.955,
+   "types": [
+    "DRAGON",
+    "FLYING"
+   ]
+  },
+  "MEWTWO": {
+   "plan": "biped_tail",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "aloof",
+   "notes": "psychic humanoid with long tail",
+   "tail_bones": 5,
+   "dex": 150,
+   "mass": 4,
+   "tempo": 1.102,
+   "types": [
+    "PSYCHIC_TYPE"
+   ]
+  },
+  "MEW": {
+   "plan": "floating",
+   "arms": 2,
+   "legs": 2,
+   "wings": 0,
+   "ears": 0,
+   "tails": 1,
+   "temper": "playful",
+   "notes": "floats, long tail",
+   "posture": "upright",
+   "tail_bones": 5,
+   "dex": 151,
+   "mass": 2,
+   "tempo": 1.014,
+   "types": [
+    "PSYCHIC_TYPE"
+   ]
+  }
+ }
+}
