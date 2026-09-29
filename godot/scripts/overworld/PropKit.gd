@@ -9,13 +9,15 @@ extends RefCounted
 
 const CHUNK := 8
 ## baked block labels that a 3D prop replaces (WorldBuilder skips them)
-const REPLACED := ["sign", "plant", "fence", "crate", "barrel", "grave", "cut_tree", "statue", "gym_statue", "brazier"]
+const REPLACED := ["sign", "plant", "fence", "crate", "barrel", "grave", "cut_tree", "statue", "gym_statue", "brazier", "bed"]
 ## label cells -> one prop per cell: label -> [prop, foot z offset inside the cell, yaw jitter]
 const CELL_PROPS := {
 	"sign": ["sign", 0.82, 0.10], "plant": ["plant", 0.86, 0.6], "crate": ["crate", 0.6, 0.16], "barrel": ["barrel", 0.66, 0.5],
 }
 ## card blocks -> prop
 const BLOCK_PROPS := {"cut_tree": "bush", "statue": "statue", "gym_statue": "statue"}
+## sprite boxes (art extruded by WorldBuilder) that a prop replaces, fitted to the box footprint: label -> [prop, model width, model length]
+const BOX_PROPS := {"bed": ["bed", 0.96, 1.9]}
 const FLOWER_MESHES := ["flower_red", "flower_yellow", "flower_white", "flower_pink"]
 
 static var _meshes: Dictionary = {}
@@ -118,6 +120,25 @@ static func build(bake: Dictionary, overrides: Dictionary, mat: ShaderMaterial) 
 		if overrides.has(cell) and String(overrides[cell]) != lab:
 			continue
 		add.call(BLOCK_PROPS[lab], Vector3(fx / 16.0 - mx, 0.0, fz / 16.0 - my - 0.14), (_h(cell.x, cell.y, 2) - 0.5) * 0.1, cell)
+	# ---- extruded sprite boxes (beds), scaled to the box's ground footprint
+	for b in bake.get("blocks", []):
+		var lab2: String = String(b.get("lbl", ""))
+		if not BOX_PROPS.has(lab2) or String(b.get("t", "")) != "box":
+			continue
+		var bp: Array = BOX_PROPS[lab2]
+		var z0 := float(b.sy) + float(b.get("hgt", 0))
+		var z1 := float(b.sy) + float(b.h)
+		var cxp := (float(b.sx) + float(b.w) * 0.5) / 16.0 - mx
+		var czp := (z0 + z1) * 0.5 / 16.0 - my
+		var cell3 := Vector2i(floori((float(b.sx) + float(b.w) * 0.5) / 16.0) - mx, floori((z1 - 1.0) / 16.0) - my)
+		if overrides.has(cell3) and String(overrides[cell3]) != lab2:
+			continue
+		var sxw: float = float(b.w) / 16.0 / float(bp[1])
+		var szl: float = (z1 - z0) / 16.0 / float(bp[2])
+		var key3 := "%d,%d|%s" % [floori(float(cell3.x) / CHUNK), floori(float(cell3.y) / CHUNK), bp[0]]
+		if not groups.has(key3):
+			groups[key3] = []
+		groups[key3].append([Transform3D(Basis.from_scale(Vector3(sxw, WorldData.K, szl)), Vector3(cxp, 0.0, czp)), Color(0, 0, 0, 0)])
 	# ---- braziers (their flames are the bake's fire list)
 	for f in bake.get("fires", []):
 		var cell2 := Vector2i(floori(float(f[0]) / 16.0) - mx, floori((float(f[1]) + 8.0) / 16.0) - my)

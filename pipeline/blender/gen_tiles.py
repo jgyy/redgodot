@@ -25,7 +25,7 @@ ROOT = os.path.abspath(os.path.join(HERE, '..', '..'))
 OUT_DIR = os.path.join(ROOT, 'godot', 'assets', 'models', 'tiles')
 
 # in-game prop twins that are also part of the textured kit (same geometry, 'tex' style)
-KIT_PROPS = ['sign', 'fence_x', 'fence_post', 'plant', 'barrel', 'crate', 'grave_a', 'grave_b', 'brazier', 'bush', 'statue',
+KIT_PROPS = ['bed', 'sign', 'fence_x', 'fence_post', 'plant', 'barrel', 'crate', 'grave_a', 'grave_b', 'brazier', 'bush', 'statue',
              'flower_red', 'flower_yellow', 'flower_white', 'flower_pink', 'pokeball', 'rail_x', 'rail_z', 'rail_post']
 
 

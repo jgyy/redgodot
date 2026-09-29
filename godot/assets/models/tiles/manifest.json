@@ -104,12 +104,6 @@
    "bytes": 107612,
    "notes": "bookshelf with books"
   },
-  "bed": {
-   "file": "bed.glb",
-   "tris": 312,
-   "bytes": 44776,
-   "notes": "bed with headboard, blanket and pillow (1 x 1.8 m)"
-  },
   "table": {
    "file": "table.glb",
    "tris": 264,
@@ -145,6 +139,12 @@
    "tris": 152,
    "bytes": 25848,
    "notes": "gym trainer podium"
+  },
+  "bed": {
+   "file": "bed.glb",
+   "tris": 400,
+   "bytes": 52984,
+   "notes": "bed, head toward +Y (fitted to the 14 x 32 px sprite footprint by PropKit)"
   },
   "sign": {
    "file": "sign.glb",

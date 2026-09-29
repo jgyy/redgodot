@@ -268,16 +268,19 @@ def p_shelf(style):
 
 
 def p_bed(style):
+    """Bed, head toward +Y (the wall): tall headboard, pillow, folded blanket, low footboard (0.95 x 1.9 m)."""
     P = Prop('bed', style, seed=124)
-    P.box((-0.46, -0.9, 0.06), (0.46, 0.9, 0.26), 'wood', bevel=0.015)
+    P.box((-0.45, -0.92, 0.05), (0.45, 0.92, 0.2), 'wood', bevel=0.015)
     for sx in (-1, 1):
         for sy in (-1, 1):
-            P.box((sx * 0.42 - 0.04, sy * 0.86 - 0.04, 0.0), (sx * 0.42 + 0.04, sy * 0.86 + 0.04, 0.08), 'wood_dark')
-    P.box((-0.43, -0.86, 0.26), (0.43, 0.86, 0.34), 'white', bevel=0.02)
-    P.box((-0.43, -0.2, 0.34), (0.43, 0.86, 0.4), 'blue', bevel=0.03)
-    P.box((-0.33, -0.82, 0.34), (0.33, -0.42, 0.42), 'white', bevel=0.03, bias=1)
-    P.box((-0.48, 0.86, 0.06), (0.48, 0.92, 0.62), 'wood_dark', bevel=0.012)
-    P.box((-0.48, -0.94, 0.06), (0.48, -0.88, 0.42), 'wood_dark', bevel=0.012)
+            P.box((sx * 0.41 - 0.04, sy * 0.88 - 0.04, 0.0), (sx * 0.41 + 0.04, sy * 0.88 + 0.04, 0.07), 'wood_dark')
+    P.box((-0.42, -0.88, 0.2), (0.42, 0.88, 0.29), 'white', bevel=0.02)                 # sheet
+    P.box((-0.43, -0.9, 0.24), (0.43, 0.3, 0.36), 'blue', bevel=0.035)                  # blanket
+    P.box((-0.43, -0.9, 0.34), (0.43, -0.78, 0.37), 'white', bevel=0.01, bias=1)         # blanket fold
+    P.box((-0.32, 0.38, 0.29), (0.32, 0.8, 0.4), 'white', bevel=0.05, bias=1)            # pillow
+    P.box((-0.47, 0.88, 0.05), (0.47, 0.95, 0.56), 'wood_dark', bevel=0.012)             # headboard
+    P.box((-0.47, 0.88, 0.5), (0.47, 0.95, 0.58), 'wood', bevel=0.012, bias=1)
+    P.box((-0.47, -0.95, 0.05), (0.47, -0.89, 0.34), 'wood_dark', bevel=0.012)           # footboard
     return P
 
 
@@ -370,7 +373,6 @@ PROPS_EXTRA = [
     ('mailbox', p_mailbox, 'mailbox on a post'),
     ('pc', p_pc, 'PC terminal on a desk'),
     ('shelf', p_shelf, 'bookshelf with books'),
-    ('bed', p_bed, 'bed with headboard, blanket and pillow (1 x 1.8 m)'),
     ('table', p_table, 'wooden table'),
     ('chair', p_chair, 'wooden chair'),
     ('bench', p_bench, 'park bench'),

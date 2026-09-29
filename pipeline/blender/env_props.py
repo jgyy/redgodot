@@ -317,6 +317,12 @@ def p_pebbles(style):
     return P
 
 
+def p_bed_game(style):
+    import env_tiles
+    P = env_tiles.p_bed(style)
+    return P
+
+
 PROPS = {
     'sign': (p_sign, 'wooden sign on a post with nails and text lines'),
     'fence_x': (p_fence_x, 'white picket fence cell running along X'),
@@ -335,6 +341,7 @@ PROPS = {
     'rail_x': (p_rail_x, 'wooden ship railing along X'),
     'rail_z': (p_rail_z, 'wooden ship railing along Z'),
     'rail_post': (p_rail_post, 'railing post'),
+    'bed': (p_bed_game, 'bed, head toward +Y (fitted to the 14 x 32 px sprite footprint by PropKit)'),
     'tuft': (p_tuft, 'grass tuft (wind sway in game)'),
     'pebbles': (p_pebbles, 'small stones'),
     'flower_red': (p_flower_red, 'flower tuft (3 blooms)'),
@@ -346,4 +353,4 @@ PROPS = {
 
 # exported to godot/assets/models/world (used by PropKit / OwActor); the rest only go into the tiles/ kit
 GAME = ['sign', 'fence_x', 'fence_z', 'fence_post', 'plant', 'barrel', 'crate', 'boulder', 'pokeball', 'grave_a', 'grave_b',
-        'brazier', 'bush', 'statue', 'tuft', 'pebbles', 'flower_red', 'flower_yellow', 'flower_white', 'flower_pink']
+        'brazier', 'bush', 'statue', 'bed', 'tuft', 'pebbles', 'flower_red', 'flower_yellow', 'flower_white', 'flower_pink']
