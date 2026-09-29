@@ -110,6 +110,7 @@ var _last_enc: Dictionary = {}   # the encounter of the battle overlay currently
 
 func _ready() -> void:
 	pokedata = _load_json("res://data/pokedata.json")
+	GameData.sync_story(pokedata)   # the active version's trades / rods / marts / prizes
 	_patch_trainer_headers()
 	for path in SCRIPT_FILES:
 		if not ResourceLoader.exists(path):
@@ -276,6 +277,8 @@ func raw(label: String) -> String:
 	var key := label.trim_prefix("_")
 	if text_override.has(key):
 		return str(text_override[key])
+	if GameData.version_text.has(key):   # this version's own wording (Yellow rewrote many NPC lines)
+		return str(GameData.version_text[key])
 	var u := get_ui()
 	if u and u.has_method("raw_text"):
 		return str(u.call("raw_text", key))

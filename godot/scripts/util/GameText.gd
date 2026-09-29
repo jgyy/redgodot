@@ -25,11 +25,13 @@ static func data() -> Dictionary:
 	return _data
 
 static func has(label: String) -> bool:
-	return data()["text"].has(label.trim_prefix("_"))
+	return data()["text"].has(label.trim_prefix("_")) or GameData.version_text.has(label.trim_prefix("_"))
 
 static func get_text(label: String, fallback: String = "") -> String:
 	var t: Dictionary = data()["text"]
 	var key := label.trim_prefix("_")
+	if GameData.version_text.has(key):   # the active version's own wording (YELLOW rewrote many NPC lines)
+		return GameData.version_text[key]
 	if t.has(key):
 		return t[key]
 	var al: Dictionary = data()["aliases"]
