@@ -341,8 +341,13 @@ def arcanine(d, look):
         retoe(d, g, dirx=-1, n=3, tl=0.7, tip='cream')
     mod(d, 'mane', T=3.0)
     mod(d, 'tuft', T=2.6)
-    for g in ('fluffF1', 'fluffF2'):
-        mod(d, g, T=1.8)
+    drop(d, 'fluffF1')
+    drop(d, 'fluffF2')
+    drop(d, 'belly')
+    d['parts'].append(E('belly', 42, 43.5, 11.5, 3.6, 'cream', z=0.3, solid=True, rd=6.8))
+    d['parts'] += [SolidE('fluffF1', 27.4, 47.5, 3.4, 5.2, 'cream', z=1.3, rd=3.0),
+                   SolidE('fluffF2', 49.2, 47.5, 3.4, 5.2, 'cream', z=1.1, rd=3.0)]
+    scale(d, 'body', 1.1, about=(40.5, 37.2))
     mod(d, 'earF', T=2.6)
     mod(d, 'earB', T=2.6)
     scale(d, 'head', 1.08, about=(16, 22))
@@ -530,8 +535,8 @@ def bellsprout(d, look):
     # leaf "arms" sprout right under the bell, drooping, and are real leaves (thick, pointed, with a midrib)
     drop(d, 'leafF')
     drop(d, 'leafB')
-    add(d, Poly('leafF', [31.4, 37.5, 26, 33.5, 15, 34.5, 10.5, 41, 21, 41, 28.5, 42.5], 'leaf', z=1, T=1.7))
-    add(d, Poly('leafB', [31.6, 37, 37, 33, 47, 34, 51.5, 41, 41, 41, 34, 42], 'leaf', z=-1, T=1.7))
+    add(d, Poly('leafF', [31.4, 38, 26.5, 35, 18, 36, 14, 42, 22, 42, 28.5, 43], 'leaf', z=1, T=1.7))
+    add(d, Poly('leafB', [31.6, 37.5, 36.5, 34.5, 44, 35.5, 48, 42, 40, 42, 34, 43], 'leaf', z=-1, T=1.7))
     # thicker stem + root feet
     thick(d, 'stem', 1.25)
     thick(d, 'root', 1.4)
