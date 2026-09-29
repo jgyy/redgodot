@@ -314,7 +314,9 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Caterpie_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Caterpie"
-  ]
+  ],
+  "view": "side",
+  "face": "left"
  },
  "METAPOD": {
   "dex": 11,
@@ -337,7 +339,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Metapod_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Metapod"
-  ]
+  ],
+  "view": "front"
  },
  "BUTTERFREE": {
   "dex": 12,
@@ -361,7 +364,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Butterfree_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Butterfree"
-  ]
+  ],
+  "view": "front"
  },
  "WEEDLE": {
   "dex": 13,
@@ -385,7 +389,9 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Weedle_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Weedle"
-  ]
+  ],
+  "view": "side",
+  "face": "left"
  },
  "KAKUNA": {
   "dex": 14,
@@ -408,7 +414,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Kakuna_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Kakuna"
-  ]
+  ],
+  "view": "front"
  },
  "BEEDRILL": {
   "dex": 15,
@@ -672,7 +679,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Pikachu_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Pikachu"
-  ]
+  ],
+  "view": "front"
  },
  "RAICHU": {
   "dex": 26,
@@ -912,7 +920,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Clefairy_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Clefairy"
-  ]
+  ],
+  "view": "front"
  },
  "CLEFABLE": {
   "dex": 36,
@@ -936,7 +945,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Clefable_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Clefable"
-  ]
+  ],
+  "view": "front"
  },
  "VULPIX": {
   "dex": 37,
@@ -1008,7 +1018,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Jigglypuff_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Jigglypuff"
-  ]
+  ],
+  "view": "front"
  },
  "WIGGLYTUFF": {
   "dex": 40,
@@ -1032,7 +1043,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Wigglytuff_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Wigglytuff"
-  ]
+  ],
+  "view": "front"
  },
  "ZUBAT": {
   "dex": 41,
@@ -1056,7 +1068,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Zubat_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Zubat"
-  ]
+  ],
+  "view": "front"
  },
  "GOLBAT": {
   "dex": 42,
@@ -1080,7 +1093,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Golbat_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Golbat"
-  ]
+  ],
+  "view": "front"
  },
  "ODDISH": {
   "dex": 43,
@@ -1175,7 +1189,9 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Paras_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Paras"
-  ]
+  ],
+  "view": "side",
+  "face": "left"
  },
  "PARASECT": {
   "dex": 47,
@@ -1269,7 +1285,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Diglett_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Diglett"
-  ]
+  ],
+  "view": "front"
  },
  "DUGTRIO": {
   "dex": 51,
@@ -1292,12 +1309,13 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Dugtrio_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Dugtrio"
-  ]
+  ],
+  "view": "front"
  },
  "MEOWTH": {
   "dex": 52,
   "shape": "quadruped",
-  "gait": "quad",
+  "gait": "biped",
   "attack": "slash",
   "special": "dance",
   "weight": "light",
@@ -1316,7 +1334,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Meowth_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Meowth"
-  ]
+  ],
+  "view": "front"
  },
  "PERSIAN": {
   "dex": 53,
@@ -1364,7 +1383,9 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Psyduck_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Psyduck"
-  ]
+  ],
+  "view": "side",
+  "face": "left"
  },
  "GOLDUCK": {
   "dex": 55,
@@ -1388,7 +1409,9 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Golduck_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Golduck"
-  ]
+  ],
+  "view": "side",
+  "face": "left"
  },
  "MANKEY": {
   "dex": 56,
@@ -1412,7 +1435,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Mankey_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Mankey"
-  ]
+  ],
+  "view": "front"
  },
  "PRIMEAPE": {
   "dex": 57,
@@ -1436,7 +1460,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Primeape_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Primeape"
-  ]
+  ],
+  "view": "front"
  },
  "GROWLITHE": {
   "dex": 58,
@@ -1507,7 +1532,9 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Poliwag_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Poliwag"
-  ]
+  ],
+  "view": "side",
+  "face": "left"
  },
  "POLIWHIRL": {
   "dex": 61,
@@ -1652,7 +1679,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Machop_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Machop"
-  ]
+  ],
+  "view": "front"
  },
  "MACHOKE": {
   "dex": 67,
@@ -1676,7 +1704,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Machoke_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Machoke"
-  ]
+  ],
+  "view": "front"
  },
  "MACHAMP": {
   "dex": 68,
@@ -1700,7 +1729,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Machamp_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Machamp"
-  ]
+  ],
+  "view": "front"
  },
  "BELLSPROUT": {
   "dex": 69,
@@ -1724,7 +1754,9 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Bellsprout_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Bellsprout"
-  ]
+  ],
+  "view": "side",
+  "face": "left"
  },
  "WEEPINBELL": {
   "dex": 70,
@@ -1748,7 +1780,9 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Weepinbell_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Weepinbell"
-  ]
+  ],
+  "view": "side",
+  "face": "left"
  },
  "VICTREEBEL": {
   "dex": 71,
@@ -1772,7 +1806,9 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Victreebel_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Victreebel"
-  ]
+  ],
+  "view": "side",
+  "face": "left"
  },
  "TENTACOOL": {
   "dex": 72,
@@ -1984,7 +2020,9 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Slowbro_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Slowbro"
-  ]
+  ],
+  "view": "side",
+  "face": "left"
  },
  "MAGNEMITE": {
   "dex": 81,
@@ -2075,7 +2113,9 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Doduo_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Doduo"
-  ]
+  ],
+  "view": "side",
+  "face": "left"
  },
  "DODRIO": {
   "dex": 85,
@@ -2098,7 +2138,9 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Dodrio_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Dodrio"
-  ]
+  ],
+  "view": "side",
+  "face": "left"
  },
  "SEEL": {
   "dex": 86,
@@ -2213,7 +2255,9 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Shellder_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Shellder"
-  ]
+  ],
+  "view": "side",
+  "face": "left"
  },
  "CLOYSTER": {
   "dex": 91,
@@ -2307,7 +2351,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Gengar_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Gengar"
-  ]
+  ],
+  "view": "front"
  },
  "ONIX": {
   "dex": 95,
@@ -2330,7 +2375,9 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Onix_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Onix"
-  ]
+  ],
+  "view": "side",
+  "face": "left"
  },
  "DROWZEE": {
   "dex": 96,
@@ -2354,7 +2401,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Drowzee_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Drowzee"
-  ]
+  ],
+  "view": "front"
  },
  "HYPNO": {
   "dex": 97,
@@ -2400,7 +2448,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Krabby_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Krabby"
-  ]
+  ],
+  "view": "front"
  },
  "KINGLER": {
   "dex": 99,
@@ -2423,7 +2472,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Kingler_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Kingler"
-  ]
+  ],
+  "view": "front"
  },
  "VOLTORB": {
   "dex": 100,
@@ -2581,7 +2631,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Hitmonlee_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Hitmonlee"
-  ]
+  ],
+  "view": "front"
  },
  "HITMONCHAN": {
   "dex": 107,
@@ -2604,7 +2655,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Hitmonchan_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Hitmonchan"
-  ]
+  ],
+  "view": "front"
  },
  "LICKITUNG": {
   "dex": 108,
@@ -2627,7 +2679,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Lickitung_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Lickitung"
-  ]
+  ],
+  "view": "front"
  },
  "KOFFING": {
   "dex": 109,
@@ -2741,7 +2794,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Chansey_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Chansey"
-  ]
+  ],
+  "view": "front"
  },
  "TANGELA": {
   "dex": 114,
@@ -2810,7 +2864,9 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Horsea_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Horsea"
-  ]
+  ],
+  "view": "side",
+  "face": "left"
  },
  "SEADRA": {
   "dex": 117,
@@ -2833,7 +2889,9 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Seadra_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Seadra"
-  ]
+  ],
+  "view": "side",
+  "face": "left"
  },
  "GOLDEEN": {
   "dex": 118,
@@ -2856,7 +2914,9 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Goldeen_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Goldeen"
-  ]
+  ],
+  "view": "side",
+  "face": "left"
  },
  "SEAKING": {
   "dex": 119,
@@ -2879,7 +2939,9 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Seaking_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Seaking"
-  ]
+  ],
+  "view": "side",
+  "face": "left"
  },
  "STARYU": {
   "dex": 120,
@@ -2901,7 +2963,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Staryu_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Staryu"
-  ]
+  ],
+  "view": "front"
  },
  "STARMIE": {
   "dex": 121,
@@ -2946,7 +3009,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Mr._Mime_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Mr._Mime"
-  ]
+  ],
+  "view": "front"
  },
  "SCYTHER": {
   "dex": 123,
@@ -2993,7 +3057,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Jynx_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Jynx"
-  ]
+  ],
+  "view": "front"
  },
  "ELECTABUZZ": {
   "dex": 125,
@@ -3108,7 +3173,9 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Magikarp_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Magikarp"
-  ]
+  ],
+  "view": "side",
+  "face": "left"
  },
  "GYARADOS": {
   "dex": 130,
@@ -3155,7 +3222,9 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Lapras_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Lapras"
-  ]
+  ],
+  "view": "side",
+  "face": "left"
  },
  "DITTO": {
   "dex": 132,
@@ -3316,7 +3385,9 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Omanyte_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Omanyte"
-  ]
+  ],
+  "view": "side",
+  "face": "left"
  },
  "OMASTAR": {
   "dex": 139,
@@ -3339,7 +3410,9 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Omastar_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Omastar"
-  ]
+  ],
+  "view": "side",
+  "face": "left"
  },
  "KABUTO": {
   "dex": 140,
@@ -3361,7 +3434,9 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Kabuto_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Kabuto"
-  ]
+  ],
+  "view": "side",
+  "face": "left"
  },
  "KABUTOPS": {
   "dex": 141,
@@ -3431,7 +3506,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Snorlax_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Snorlax"
-  ]
+  ],
+  "view": "front"
  },
  "ARTICUNO": {
   "dex": 144,
@@ -3546,7 +3622,9 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Dragonair_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Dragonair"
-  ]
+  ],
+  "view": "side",
+  "face": "left"
  },
  "DRAGONITE": {
   "dex": 149,

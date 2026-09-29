@@ -229,3 +229,158 @@ def _apply_pt(p, fn):
 def set_color(d, g, c):
     for p in parts(d, g):
         p['c'] = c
+
+
+# ============================================================================ fixes
+@fix('SQUIRTLE', 'WARTORTLE', 'BLASTOISE')
+def turtles(d, look):
+    """The sprite shows the plastron head-on with the shell behind; in 3D the shell must sit on the BACK
+    (flatter, pushed away from the viewer) and the belly is a proper torso, not a ball of shell."""
+    for p in parts(d, 'shell'):
+        p['rd'] = 0.66 * p['rx']
+        p['d'] = 0.28 * p['rx']
+
+
+@fix('WEEDLE')
+def weedle(d, look):
+    # the three pairs of little feet floated below the body: make them part of the segment above them
+    for f, s in (('f1', 's3'), ('f2', 's4'), ('f3', 's2')):
+        for p in parts(d, f):
+            p['g'] = s
+            p['y'] -= 2.0
+            p['rx'], p['ry'] = 2.0, 2.2
+
+
+@fix('KABUTO')
+def kabuto(d, look):
+    # legs were four hairlines detached from the shell: thicker, and merged with the shell group
+    for g in ('l1', 'l2', 'l3', 'l4'):
+        for p in parts(d, g):
+            p['g'] = 'shell'
+            p['w'] = 3.2
+            p['w2'] = 2.2
+            p['z'] = -0.5
+
+
+@fix('POLIWAG')
+def poliwag(d, look):
+    # the flat five-sided fin looked like a paper flag: a curled, tapering tail
+    drop(d, 'tail')
+    add(d, Stroke('tail', [42, 50, 49, 47, 55, 43, 58, 40, 57, 37], 7.5, 'fin', z=-2, w2=2.2))
+
+
+@fix('STARYU')
+def staryu(d, look):
+    for p in parts(d, 'star'):
+        p['T'] = 3.6
+
+
+@fix('STARMIE')
+def starmie(d, look):
+    for g, T in (('back', 3.4), ('front', 3.6), ('ring', 4.2)):
+        for p in parts(d, g):
+            p['T'] = T
+
+
+@fix('EEVEE', 'FLAREON', 'JOLTEON', 'VAPOREON')
+def eeveelutions(d, look):
+    # the neck ruff / frill is fluff, not a flat sheet
+    for g in ('collar', 'frill', 'mane'):
+        for p in parts(d, g):
+            if p['t'] == 'p':
+                p['T'] = 3.0
+
+
+@fix('GYARADOS')
+def gyarados(d, look):
+    # give the open mouth a real interior so it is not see-through from the side
+    add(d, E('mouthin', 12, 25, 8.5, 4.8, 'mouth', z=1.6, rd=5.0))
+
+
+@fix('CHARIZARD')
+def charizard(d, look):
+    for p in parts(d, 'body'):
+        if p['t'] == 'c':                      # the neck
+            p['r1'] = 7.6
+            p['r2'] = 5.6
+    scale(d, 'head', 1.14, about=(22, 16))
+    for g in ('wingL', 'wingR'):
+        for p in parts(d, g):
+            p['T'] = 2.0
+
+
+@fix('BLASTOISE')
+def blastoise(d, look):
+    turtles(d, look)
+    scale(d, 'head', 1.14, about=(23, 30))
+    for g in ('armF', 'armB'):
+        thick(d, g, 1.15)
+    for g in ('canL', 'canR'):
+        thick(d, g, 1.18)
+
+
+@fix('HITMONLEE')
+def hitmonlee(d, look):
+    # the sprite has no head shape (the eyes sit on the torso): add one and lift the face onto it
+    for g in ('eyeL', 'eyeLi', 'eyeR', 'eyeRi'):
+        shift(d, g, 0, -4.5)
+    for p in d['parts']:
+        if p['t'] == 'eye':
+            p['y'] -= 4.5
+    add(d, E('head', 37.5, 14.5, 9.6, 8.6, 'body', z=2))
+
+
+@fix('JYNX')
+def jynx(d, look):
+    # a tall paper slab of hair -> a proper mane: a thick back mass, two long side locks, a fringe cap
+    drop(d, 'hairBk')
+    drop(d, 'bangs')
+    add(d, E('hairBk', 32, 33, 13.5, 24.5, 'hair', z=-3, rd=6.0), at=0)
+    add(d, Cap('lockL', 21, 17, 15.5, 52, 4.6, 3.6, 'hair', z=1.6))
+    add(d, Cap('lockR', 43, 17, 48.5, 52, 4.6, 3.6, 'hair', z=1.6))
+    add(d, E('bangs', 31, 11.8, 11.6, 6.2, 'hair', z=2.6, rd=8.5))
+    add(d, Spot('bangs', 36, 10, 1.0, 5.0, 'hairD'))
+
+
+def _recentre_face(d, dx, features_only=True, groups=()):
+    """The sprite shows a 3/4 turn; the battle camera sees the front, so slide the face toward the
+    middle of the body (eyes, mouth, listed face groups)."""
+    for p in d['parts']:
+        if p['t'] in ('eye', 'mouth', 'shine'):
+            p['x'] += dx
+    for g in groups:
+        shift(d, g, dx, 0)
+
+
+@fix('JIGGLYPUFF')
+def jigglypuff(d, look):
+    for p in d['parts']:
+        if p['t'] == 'eye':
+            p['x'] = 27.6 if p['x'] < 30 else 38.0
+            p['look'] = [-0.25, 0]
+        elif p['t'] == 'mouth':
+            p['x'] = 32.9
+    shift(d, 'curl', 5.2, 0)
+    scale(d, 'curl', 1.25, about=(30, 33))
+
+
+@fix('WIGGLYTUFF')
+def wigglytuff(d, look):
+    for p in d['parts']:
+        if p['t'] == 'eye':
+            p['x'] = 28.0 if p['x'] < 27 else 37.8
+            p['look'] = [-0.25, 0]
+        elif p['t'] == 'mouth':
+            p['x'] = 32.9
+
+
+@fix('EEVEE')
+def eevee(d, look):
+    eeveelutions(d, look)
+    # tall, pointed, leaf-shaped ears instead of two slanted bars
+    for p in parts(d, 'earF'):
+        if p['t'] == 'p':
+            p['pts'] = [15.5, 29, 12.6, 18, 9.0, 6.2, 15.5, 11.2, 21.5, 16.5, 27.5, 24]
+    for p in parts(d, 'earB'):
+        if p['t'] == 'p':
+            p['pts'] = [27, 25, 30.5, 14, 37.5, 4.6, 39.5, 12.5, 37.6, 20.5, 35.5, 27.5]

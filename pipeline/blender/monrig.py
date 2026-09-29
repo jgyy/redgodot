@@ -15,7 +15,7 @@ import numpy as np
 
 # ----------------------------------------------------------------------------- roles
 _ROLE_RULES = [
-    ('head', r'^(head|skull|face|dome|hd)\d*$'),
+    ('head', r'^(head|skull|face|dome|hd)\w*$'),
     ('jaw', r'^(jaw|mouth|lip|beak|tongue|snout|mand|bill)\w*'),
     ('ear', r'^(ear|antenna|ant\d?$|anten|antB|antF)\w*'),
     ('horn', r'^(horn|crest|tusk|tooth|fang|spike|spk|sp\d|nose|nos|str|fore|hair|tuft|mane|ruff|frill|comb|cap|stalk|eye|must|cheek|gem|coin)\w*'),

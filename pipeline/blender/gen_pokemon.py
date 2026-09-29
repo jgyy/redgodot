@@ -141,25 +141,35 @@ def build_layers(defn, groups, decals, pal, micro_kind, seed):
         for side in ('front', 'back'):
             Rg = RS.Region(x0, y0, x1, y1, S * SS, mult=SS)
             L = RS.Layer(Rg)
+            cov_all = np.zeros(L.cov.shape, dtype=bool)      # everything this group paints on this side
             for order, p in enumerate(parts):
-                if side == 'front' and p.get('backOnly'):
-                    continue
-                if side == 'back' and (p.get('face') or p.get('frontOnly') or p.get('belly')):
-                    continue
-                if order in part_group:
-                    if part_group[order] != G.name:
+                if order in part_group and part_group[order] == G.name:
+                    if (side == 'front' and p.get('backOnly')) or \
+                            (side == 'back' and (p.get('face') or p.get('frontOnly') or p.get('belly'))):
                         continue
-                    z = MP.fnum(p, 'bz', MP.fnum(p, 'z', 0)) if side == 'back' else MP.fnum(p, 'z', 0)
-                    key = z * 1000 + order
-                    m = RS.part_mask(Rg, p) & (key >= L.z)
-                    L.z[m] = key
-                    L.cov |= m
-                    L.put(m, MP.resolve_color(p.get('c'), pal))
-                elif order in target and target[order][0] in ('on', 'decal'):
-                    if target[order][1] != G.name:
+                    cov_all |= RS.part_mask(Rg, p)
+            # solids first (z-buffered), then the spots / stripes / decals that sit on them, in list order
+            for pass_on in (False, True):
+                for order, p in enumerate(parts):
+                    if side == 'front' and p.get('backOnly'):
                         continue
-                    m = RS.part_mask(Rg, p) & L.cov
-                    L.put(m, MP.resolve_color(p.get('c'), pal))
+                    if side == 'back' and (p.get('face') or p.get('frontOnly') or p.get('belly')):
+                        continue
+                    if order in part_group and not pass_on:
+                        if part_group[order] != G.name:
+                            continue
+                        z = MP.fnum(p, 'bz', MP.fnum(p, 'z', 0)) if side == 'back' else MP.fnum(p, 'z', 0)
+                        key = z * 1000 + order
+                        m = RS.part_mask(Rg, p) & (key >= L.z)
+                        L.z[m] = key
+                        L.cov |= m
+                        L.put(m, MP.resolve_color(p.get('c'), pal))
+                    elif pass_on and order not in part_group and order in target \
+                            and target[order][0] in ('on', 'decal'):
+                        if target[order][1] != G.name:
+                            continue
+                        m = RS.part_mask(Rg, p) & cov_all
+                        L.put(m, MP.resolve_color(p.get('c'), pal))
             before = L.rgb.copy()
             if side == 'front':
                 for order, p in enumerate(parts):
@@ -344,7 +354,7 @@ def face_owners(FM, tris, groups, nsum_y):
     cd = np.array([G.cd for G in groups])
     n = len(tris)
     G = len(groups)
-    front = nsum_y <= 0.0
+    front = nsum_y <= 0.6            # avg normal.y <= 0.2: side-on faces take the front (face) layer
     # a vertex belongs to the group whose own surface it lies on (smallest field value); exact ties
     # (coincident surfaces) go to the group nearest the viewing side
     fm = FM[tris].sum(axis=1) / 3.0                                # (m, G)
@@ -368,7 +378,7 @@ def face_owners(FM, tris, groups, nsum_y):
         vb = votes[np.arange(n), best]
         # a face flips only when at least two neighbours agree on another label and none share its own
         vs = votes[np.arange(n), label]
-        label = np.where((best != label) & (vb >= 2) & (vs == 0), best, label)
+        label = np.where((best != label) & (vb >= 2) & (vs <= 1), best, label)
     return label // 2, (label % 2) == 0
 
 

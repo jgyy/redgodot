@@ -186,6 +186,7 @@ class Skel:
             self.size[g] = float(pts.max(0)[2] - pts.min(0)[2]), float(pts.max(0)[0] - pts.min(0)[0])
         lo, hi = V.min(0), V.max(0)
         self.bbox = (Vector(lo), Vector(hi))
+        self.V = V
         self.width = float(hi[0] - lo[0])
         self.height = float(hi[2] - lo[2])
         self.body_c = self.cen[self.anchor]
@@ -562,13 +563,18 @@ def _walk_legged(S, P, u, gait, heavy, light):
         sq = 0.03 * math.cos(2 * ph)
         P.scale(body, 1 - 0.5 * sq, 1 - 0.5 * sq, 1 + sq)
     # ---- legs (feet stay planted while the torso bobs)
+    stride = (0.085 if not waddle else 0.055) * (1.25 if gait == 'bound' else 1.0)
+    lift_min = (0.05 if front else 0.035) * h
     for g in S.legs:
         f = S.leg_phase[g]
-        a = A * math.sin(ph + f)
+        ll = S.leg_len[g]
+        # stride length is a fraction of the body size, so stubby legs still visibly step
+        Ag = min(rad(38), max(rad(15), math.atan2(stride * h, ll))) * (A / rad(26))
+        a = Ag * math.sin(ph + f)
         sw = max(0.0, math.cos(ph + f))                 # swing (air) phase weight
         b0 = S.first(g)
         P.rot(b0, S.a_sw, a)
-        P.move(b0, (0, 0, -z + lift_f * S.leg_len[g] * sw ** 0.9))
+        P.move(b0, (0, 0, -z + max(lift_f * ll, lift_min) * sw ** 0.9))
         knee(P, S, g, rad(38) * sw ** 1.2)
     for g in S.feet:
         f = S.leg_phase.get(g, 0.0)
@@ -821,18 +827,22 @@ def faint_pose(S, P, u, gait):
     topple = sstep((u - 0.30) / 0.55)
     settle = 1.0 - math.exp(-6 * max(0.0, u - 0.8) / 0.2) if u > 0.8 else 0.0
     floaty = gait in ('float', 'hover', 'flap', 'serpent', 'slither', 'swim')
-    ground = 0.0 if not S.hover else 0.0
-    if floaty and S.hover:
-        # let it sink to the ground
-        low = -min(S.bbox[0].z, 0.0)
-    P.move('root', (0.012 * h * shudder, 0, -0.10 * h * drop * (0.7 if not floaty else 1.0)))
     side = 1.0 if S.look.get('fall', 'right') == 'right' else -1.0
     roll_ang = rad(78 if not floaty else 55) * topple * side
-    P.rot(body, S.fwd, roll_ang)
+    P.rot(body, Y, roll_ang)              # topple over in the screen plane (about the depth axis)
     P.rot(body, S.a_sw, rad(-8) * topple)
     sq = 0.28 * drop
     P.scale(body, 1 + 0.35 * sq, 1 + 0.35 * sq, 1 - sq)
-    P.move('root', (0.06 * h * topple * side, 0, 0.0))
+    # keep the tipped body ON the ground: lift/lower the root by how far the rotated mesh dips below the floor
+    pv = S.body_c
+    V = S.V
+    ca, sa = math.cos(roll_ang), math.sin(roll_ang)
+    dx, dz0 = V[:, 0] - pv.x, V[:, 2] - pv.z
+    low = float((-dx * sa + dz0 * ca + pv.z).min())
+    low0 = float(S.V[:, 2].min())
+    gap = low0 if S.hover else 0.0
+    hover_fall = sstep((u - 0.2) / 0.5) * gap        # hovering species come down to the ground
+    P.move('root', (0.012 * h * shudder, 0, (low0 - low) * 0.85 - hover_fall - 0.015 * h * drop))
     for g in S.heads:
         P.rot(S.first(g), S.a_sw, rad(-30) * drop)
         P.rot(S.first(g), S.fwd, rad(-10) * topple * side)
