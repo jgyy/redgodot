@@ -34,7 +34,7 @@ vec3 rgb2hsl(vec3 c) {
 	float s = 0.0;
 	float d = mx - mn;
 	if (d > 1e-5) {
-		s = l > 0.5 ? d / (2.0 - mx - mn) : d / (mx + mn);
+		s = clamp(l > 0.5 ? d / max(2.0 - mx - mn, 1e-4) : d / max(mx + mn, 1e-4), 0.0, 1.0);
 		if (mx == c.r) {
 			h = (c.g - c.b) / d + (c.g < c.b ? 6.0 : 0.0);
 		} else if (mx == c.g) {
