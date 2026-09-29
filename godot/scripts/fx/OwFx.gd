@@ -35,6 +35,9 @@ func set_grade(g: Color) -> void:
 	for e in _live:
 		((e as Dictionary)["mat"] as ShaderMaterial).set_shader_parameter("grade", grade)
 
+## Rigid chunks (leaves / rock chips) that accompany the billboard particles; set by the scene.
+var debris: Debris
+
 func active_count() -> int:
 	return _live.size()
 
@@ -99,6 +102,9 @@ func dust(pos: Vector3, count: int = 2, strength: float = 1.0, col: Color = DUST
 
 ## Landing after a ledge hop: a ring of dust puffs pushed outward plus a flat shock ring.
 func land(pos: Vector3, col: Color = DUST) -> void:
+	if debris:
+		debris.ground_y = pos.y
+		debris.chips(pos, 5, 0.6, col.darkened(0.25))
 	for i in 7:
 		var ang := float(i) / 7.0 * TAU + _rand(-0.2, 0.2)
 		spawn({"kind": Kind.PUFF, "pos": pos + Vector3(cos(ang) * 0.12, 0.06, sin(ang) * 0.08),
@@ -124,6 +130,9 @@ func splash(pos: Vector3, count: int = 6, strength: float = 1.0) -> void:
 
 ## Blades of grass flung out of a tall-grass cell as something walks through it.
 func grass(pos: Vector3, count: int = 5, col: Color = GRASS) -> void:
+	if debris and count >= 3:
+		debris.ground_y = pos.y
+		debris.leaves(pos + Vector3(0, 0.15, 0), 2, 0.5)
 	for i in count:
 		var ang := _rand(0.0, TAU)
 		var c := col.lerp(Color(0.62, 0.84, 0.36), _rng.randf() * 0.6)

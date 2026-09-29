@@ -151,6 +151,45 @@ shot "065-LancesRoom" --scene=overworld --map=LancesRoom --pc=10,10 --time=day -
 shot "066-ChampionsRoom" --scene=dialogue --map=ChampionsRoom --pc=5,2 --time=day --facing=up --player=PIKACHU --follower=none --text="BLUE: Hey there!" --story=off --wait=1.5
 shot "067-CeruleanCave1F" --scene=overworld --map=CeruleanCave1F --pc=15,9 --time=day --facing=down --player=MEWTWO --story=off --wait=1.5
 
+# --- Additions: rigged Pokemon, transitions, physics/ambient, 3D ground items ----------
+shot "110-wtp-quiz" --scene=wtp --wait=1.5
+shot "111-fireflies-route1-night" --scene=overworld --map=Route1 --pc=10,20 --time=night --facing=down --player=PIKACHU --follower=none --story=off --wait=2.5
+for kind in wild trainer boss; do
+  shot "112-transition-$kind-a" --scene=battle --state=transition --snap="$OUT_DIR/003-PalletTown.png" --tkind=$kind --vfx_t=0.55 --wait=0.3
+  shot "112-transition-$kind-b" --scene=battle --state=transition --snap="$OUT_DIR/003-PalletTown.png" --tkind=$kind --vfx_t=0.85 --wait=0.3
+done
+shot "113-oaks-lab-pokedex" --scene=overworld --map=OaksLab --pc=3,4 --time=day --facing=up --story=off --wait=1.5
+shot "114-museum-old-amber" --scene=overworld --map=Museum1F --pc=16,4 --time=day --facing=up --follower=none --story=off --wait=1.5
+shot "115-mtmoon-fossils" --scene=overworld --map=MtMoonB2F --pc=12,8 --time=day --facing=up --follower=none --story=off --wait=1.5
+shot "116-viridian-gym-spinners" --scene=overworld --map=ViridianGym --pc=16,15 --time=day --facing=up --follower=none --story=off --wait=1.5
+
+# 18 baked clips per Pokemon: rows = Idle / Walk / Attack / Special / Hurt / Faint / Hop / Roar sampled mid-clip
+ANIM_MONS="PIKACHU,CHARIZARD,SQUIRTLE,BULBASAUR,EEVEE,MEOWTH,GYARADOS,MACHAMP"
+i=0
+for clip in "Idle 0.0" "Walk 0.25" "Attack 0.45" "Special 0.75" "Hurt 0.2" "Faint 1.1" "Hop 0.4" "Roar 0.45"; do
+  set -- $clip
+  shot "anim-row-$i" --scene=model_sheet --kind=pokemon --species="$ANIM_MONS" --cols=8 --cell=170 --anim="$1" --anim_t="$2" --wait=1
+  i=$((i + 1))
+done
+python3 "$ROOT_DIR/pipeline/scripts/stitch_rows.py" "$OUT_DIR/pokemon-animations.png" "$OUT_DIR"/anim-row-*.png
+rm -f "$OUT_DIR"/anim-row-*.png
+
+# --- Character creator, custom player looks, NPC gestures ---------------------------------
+shot "120-creator-boy"    --scene=creator --gender=boy  --row=0 --wait=2
+shot "121-creator-girl"   --scene=creator --gender=girl --row=3 --wait=2
+shot "122-creator-random" --scene=creator --random=1 --seed=3 --row=8 --wait=2
+shot "123-overworld-custom-look" --scene=overworld --map=PalletTown --pc=10,9 --look=random --seed=21 --follower=none --wait=2
+shot "124-battle-custom-look" --scene=battle --look=girl --wait=1.5
+NPC_CAST="oak,misty,brock,nurse,youngster,rocket,sailor,girl"   # every id must be a cast.json key ("lass" is not: it renders the untinted humanoid)
+i=0
+for clip in "Nod 0.1" "Think 0.5" "Laugh 0.1" "Bow 0.5" "Point 0.5" "Surprised 0.15" "Salute 0.5" "Stretch 0.5" "Dance 0.15" "Sad 0.5" "Shiver 0.1" "Sleep 0.5"; do
+  set -- $clip
+  shot "gesture-row-$(printf %02d $i)" --scene=model_sheet --kind=characters --species="$NPC_CAST" --cols=8 --cell=150 --anim="$1" --anim_t="$2" --yaw=-20 --wait=1
+  i=$((i + 1))
+done
+python3 "$ROOT_DIR/pipeline/scripts/stitch_rows.py" "$OUT_DIR/npc-gestures.png" "$OUT_DIR"/gesture-row-*.png
+rm -f "$OUT_DIR"/gesture-row-*.png
+
 # --- 3D model contact sheets (every Pokemon / character next to upstream's sprite) ----
 # docs/gallery/pokemon-151-3d.png, pokemon-151-3d-back.png, characters-3d.png, characters-3d-back.png
 # (needs node + UPSTREAM=/path/to/pokemon-claude-red for the reference sprites)

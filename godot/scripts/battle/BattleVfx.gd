@@ -636,8 +636,8 @@ func _bolt_seg(nodes: Array, used: int, a: Vector2, b: Vector2, thick: float) ->
 	var inner: MeshInstance3D = nodes[used]
 	outer.visible = true
 	inner.visible = true
-	_put(outer, Transform3D(bb.scaled(Vector3(d.length() * w * 1.05, thick * 3.0 * w, thick * 3.0 * w)), pos))
-	_put(inner, Transform3D(bb.scaled(Vector3(d.length() * w * 1.05, thick * 1.2 * w, thick * 1.2 * w)), pos - stage.camera.global_transform.basis.z * -0.02))
+	_put(outer, Transform3D(bb * Basis.from_scale(Vector3(d.length() * w * 1.05, thick * 3.0 * w, thick * 3.0 * w)), pos))
+	_put(inner, Transform3D(bb * Basis.from_scale(Vector3(d.length() * w * 1.05, thick * 1.2 * w, thick * 1.2 * w)), pos - stage.camera.global_transform.basis.z * -0.02))
 	return used + 2
 
 func ring(k: String, frames: int, col: String, r0: float, r1: float, thick: int = 1) -> void:
@@ -1206,8 +1206,8 @@ func r_bite(_a: String, t: String, _ar: Variant) -> void:
 		var p1 := to3d(Vector2(c.x, c.y - g - 4), 0.4)
 		var p2 := to3d(Vector2(c.x, c.y + g + 4), 0.4)
 		var w := px_world(p1) * 22.0
-		_put(top, Transform3D(_face_basis(PI * 0.25).scaled(Vector3(w, w * 0.5, w * 0.2)), p1))
-		_put(bot, Transform3D(_face_basis(PI * 1.25).scaled(Vector3(w, w * 0.5, w * 0.2)), p2))
+		_put(top, Transform3D(_face_basis(PI * 0.25) * Basis.from_scale(Vector3(w, w * 0.5, w * 0.2)), p1))
+		_put(bot, Transform3D(_face_basis(PI * 1.25) * Basis.from_scale(Vector3(w, w * 0.5, w * 0.2)), p2))
 		return true, {"nodes": [top, bot]})
 	await wait(10)
 	await impact(t)
@@ -1723,7 +1723,7 @@ func r_lick(_a: String, t: String, _ar: Variant) -> void:
 			return false
 		var pos := to3d(Vector2(c.x, c.y - 4 + (int(f["age"]) - 8)), 0.6)
 		var w := px_world(pos) * 8.0
-		_put(tongue, Transform3D(_face_basis(PI).scaled(Vector3(w, w * 2.0, w)), pos))
+		_put(tongue, Transform3D(_face_basis(PI) * Basis.from_scale(Vector3(w, w * 2.0, w)), pos))
 		return true, {"nodes": [tongue]})
 	await wait(16)
 	await impact(t)
@@ -1906,7 +1906,7 @@ func r_string(a: String, t: String, _ar: Variant) -> void:
 			var pos := to3d(c, 0.5)
 			var w := px_world(pos)
 			var ang := atan2(32.0, -2.0 * i)
-			_put(threads[k], Transform3D(_face_basis(ang).scaled(Vector3(36 * w, 0.8 * w, 0.8 * w)), pos))
+			_put(threads[k], Transform3D(_face_basis(ang) * Basis.from_scale(Vector3(36 * w, 0.8 * w, 0.8 * w)), pos))
 		return true, {"nodes": threads})
 	await wait(30)
 

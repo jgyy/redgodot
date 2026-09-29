@@ -32,13 +32,16 @@ func _ready() -> void:
 		add_child(v)
 		_views.append(v)
 
+func _default_msg() -> String:
+	return "Bring out which POKéMON?" if mode.get("forced", false) else "Choose a POKéMON."
+
 func open_with(o: Dictionary) -> void:
 	mode = o
 	open()
 
 func open() -> void:
 	super()
-	msg = mode.get("msg", "Choose a POKéMON.")
+	msg = mode.get("msg", _default_msg())
 
 func _on_open() -> void:
 	sel = clampi(int(mode.get("sel", 0)), 0, maxi(0, GameState.party.size() - 1))
@@ -71,8 +74,10 @@ func _input_event(e: InputEvent) -> bool:
 	var n := GameState.party.size()
 	if pressed(e, "move_up", true):
 		sel = n - 1 if sel == n else (sel - 1 + n + 1) % (n + 1)
+		UI.sfx("cursor")
 	elif pressed(e, "move_down", true):
 		sel = (sel + 1) % (n + 1)
+		UI.sfx("cursor")
 	elif pressed(e, "move_left"):
 		if sel > 0 and sel < n:
 			sel = 0
@@ -82,10 +87,11 @@ func _input_event(e: InputEvent) -> bool:
 	elif pressed(e, "cancel"):
 		if swap_from >= 0:
 			swap_from = -1
-			msg = "Choose a POKéMON."
+			msg = _default_msg()
 		elif not mode.get("forced", false):
 			exit()
 	elif pressed(e, "confirm"):
+		UI.sfx("select")
 		if sel == n:
 			if not mode.get("forced", false):
 				exit()
@@ -95,7 +101,7 @@ func _input_event(e: InputEvent) -> bool:
 			GameState.party[a] = GameState.party[sel]
 			GameState.party[sel] = tmp
 			swap_from = -1
-			msg = "Choose a POKéMON."
+			msg = _default_msg()
 			_sync_views()
 			GameState.party_changed.emit()
 		else:
@@ -156,12 +162,20 @@ func _field_move(mv: String, m: GameState.PartyMon) -> void:
 			if r < 0:
 				return
 			var tgt: GameState.PartyMon = GameState.party[r]
+			if tgt == m or tgt.hp >= tgt.max_hp or tgt.hp <= 0:
+				await party_say("It won't have any effect.")
+				return
 			m.hp -= cost
 			var before := tgt.hp
 			tgt.hp = mini(tgt.max_hp, tgt.hp + cost)
 			await party_say("%s recovered by %d!" % [tgt.nickname, tgt.hp - before])
 		_:
-			await party_say("There's no place to use %s here." % GameData.get_move(mv).get("name", mv))
+			# CUT / SURF / STRENGTH / FLASH / FLY / DIG / TELEPORT run through Story (dialogue, effects, warps) with the
+			# menus out of the way; if the move can't be used here we come back to the party screen
+			close()
+			var used: bool = await Story.use_field_move(m, mv)
+			if not used:
+				open()
 
 ## PartyScreen.say(): shows a message in the party's own box until A/B.
 func party_say(text: String) -> void:
@@ -172,7 +186,7 @@ func party_say(text: String) -> void:
 		await get_tree().process_frame
 		if Input.is_action_just_pressed("confirm") or Input.is_action_just_pressed("cancel"):
 			break
-	msg = "Choose a POKéMON."
+	msg = _default_msg()
 	busy = false
 
 func _draw() -> void:

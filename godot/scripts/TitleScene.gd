@@ -208,7 +208,7 @@ func _open_menu() -> void:
 	_menu_open = true
 	UI.sfx("select")
 	while true:
-		var opts: Array = (["CONTINUE"] if GameState.has_save() else []) + ["NEW GAME", "OPTION"]
+		var opts: Array = (["CONTINUE"] if GameState.has_save() else []) + ["NEW GAME", "OPTION", "WHO'S THAT?"]
 		var r := await PxMenu.pick(_overlay.get_parent(), opts, {"x": 6, "y": 6, "w": 150, "no_cancel": true})
 		if opts[r] == "OPTION":
 			var om := OptionsMenu.new()
@@ -217,10 +217,19 @@ func _open_menu() -> void:
 			await om.closed
 			om.queue_free()
 			continue
+		if opts[r] == "WHO'S THAT?":
+			var wp := WtpScreen.new()
+			_overlay.get_parent().add_child(wp)
+			wp.open()
+			await wp.closed
+			wp.queue_free()
+			continue
+		if opts[r] == "CONTINUE" and not GameState.load_save():
+			await UI.say("The save file could not be loaded.")   # stay on the title instead of starting with empty state
+			continue
 		done = true
 		await _overlay.fade(20, Color.BLACK, true)
 		if opts[r] == "CONTINUE":
-			GameState.load_save()
 			SceneRouter.goto_overworld()
 		else:
 			SceneRouter.goto_oak_speech()

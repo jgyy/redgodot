@@ -27,6 +27,11 @@ func _ready() -> void:
 				starter = a.substr(10)
 		pt.run(starter)
 		return
+	if OS.get_cmdline_user_args().has("--scene=ow_spinner_test"):
+		var t: Node = load("res://scripts/overworld/SpinnerTest.gd").new()
+		add_child(t)
+		t.run()
+		return
 	_maybe_capture_screenshot()
 
 func _run_tests() -> void:
@@ -151,6 +156,28 @@ func _setup_scene(scene: String, args: Dictionary) -> void:
 				Story.info_box(func() -> Array: return [Story.money_str(), Story.coin_str()])
 			else:
 				Story.spawn(Story.mart, [Story.pokedata.get("marts", {}).get("ViridianMartClerkText", [])], "mart")
+		"creator":   # --gender=boy|girl --random=1 --row=N
+			GameState.start_new_adventure()
+			var chost := CanvasLayer.new()
+			chost.layer = 100
+			add_child(chost)
+			var start := PlayerLook.default_girl() if args.get("gender", "boy") == "girl" else PlayerLook.default_boy()
+			if args.get("random", "") == "1":
+				var rr := RandomNumberGenerator.new()
+				rr.seed = int(args.get("seed", "7"))
+				start = PlayerLook.random(rr)
+			var cc := CharacterCreator.new()
+			chost.add_child(cc)
+			cc.look = start
+			cc.open()
+			cc.row = int(args.get("row", "0"))
+		"wtp":
+			var host := CanvasLayer.new()
+			host.layer = 100
+			add_child(host)
+			var wp := WtpScreen.new()
+			host.add_child(wp)
+			wp.open()
 		_:
 			if MENU_SCENES.has(scene):
 				GameState.new_game(args.get("player", "CHARMANDER"))
@@ -201,6 +228,8 @@ func _setup_battle(args: Dictionary) -> void:
 			lead.add_move(mv)
 	if args.has("time"):
 		_apply_overrides({"time": args["time"]})
+	if args.get("look", "") != "":
+		_apply_overrides({"look": args["look"], "seed": args.get("seed", "11")})
 	var enc := {"kind": "wild", "species": args.get("enemy", "PIDGEY"), "level": int(args.get("level", "4")),
 		"seed": 11, "dvs": {"atk": 8, "def": 8, "spd": 8, "spc": 8}}
 	if args.has("trainer"):
@@ -231,7 +260,7 @@ func _setup_battle(args: Dictionary) -> void:
 		return
 	await get_tree().process_frame
 	var o := {}
-	for k in ["text", "move", "attacker"]:
+	for k in ["text", "move", "attacker", "snap", "tkind"]:
 		if args.has(k):
 			o[k] = args[k]
 	if args.has("enemy_hp"):
@@ -242,6 +271,13 @@ func _setup_battle(args: Dictionary) -> void:
 	await battle.pose(state, o)
 
 func _apply_overrides(args: Dictionary) -> void:
+	if args.get("look", "") != "":   # --look=girl | random | boy : the creator's player model in any scene
+		var rl := RandomNumberGenerator.new()
+		rl.seed = int(args.get("seed", "11"))
+		match str(args["look"]):
+			"girl": GameState.set_look(PlayerLook.default_girl())
+			"random": GameState.set_look(PlayerLook.random(rl))
+			_: GameState.set_look(PlayerLook.default_boy())
 	if args.get("save", "") == "showcase":
 		GameState.build_showcase()  # the fixed save the reference screenshots use
 	if args.has("map"):

@@ -16,7 +16,7 @@ FireRed and the anime/manga -- see pipeline/data/character_looks.json):
 Output: godot/assets/models/characters/<sprite>.glb (+ humanoid.glb legacy base, manifest.json).
 Conventions: front = Blender -Y (glTF/Godot +Z), feet at the origin, 1.5 m nominal height,
 bones root > hips > spine > chest > neck > head (+ arms, legs, eyes, mouth, hair chains),
-one material `mat_atlas`.  Clips (60 fps): Idle Walk Run Talk Wave Cheer.
+one material `mat_atlas`.  Clips (60 fps): Idle Walk Run Talk Wave Cheer + 13 gestures (Nod Shake Think Laugh Bow Point Sleep Surprised Salute Stretch Dance Sad Shiver).
 """
 import json
 import os
@@ -99,7 +99,9 @@ def main():
                 'Walk': {'seconds': 0.2667, 'loop': True, 'note': 'one full 2-step gait per 16-frame cell (feet plant at walk speed)'},
                 'Run': {'seconds': 0.2667, 'loop': True},
                 'Talk': {'seconds': 1.2, 'loop': True}, 'Wave': {'seconds': 0.8, 'loop': True},
-                'Cheer': {'seconds': 0.6667, 'loop': True}},
+                'Cheer': {'seconds': 0.6667, 'loop': True}, 'Surf': {'seconds': 1.5, 'loop': True},
+                **{n: {'loop': n not in ('Bow', 'Surprised'), 'note': 'NPC gesture'} for n in
+                   ('Nod', 'Shake', 'Think', 'Laugh', 'Bow', 'Point', 'Sleep', 'Surprised', 'Salute', 'Stretch', 'Dance', 'Sad', 'Shiver')}},
             'conventions': {'front': 'Blender -Y == glTF/Godot +Z', 'origin': 'feet at origin',
                             'materials': 'single mat_atlas (procedural atlas: AO x gradient ramps + eye/cheek/emblem decals); cel-shade with Toon.apply',
                             'bones': 'root > hips > spine > chest > neck > head; chest > clavicle_X > upper_arm_X > forearm_X > hand_X; '

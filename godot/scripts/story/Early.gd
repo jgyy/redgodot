@@ -258,7 +258,7 @@ func trade(idx: int) -> void:
 	await Story.say("ConnectCableText")
 	var nm := Story.new_mon(tr["get"], int(m.get("level")))
 	nm.set("nickname", tr["nick"])
-	nm.set_meta("ot", "TRAINER")
+	nm.set("ot", "TRAINER")  # traded: BattleEngine gives it the 1.5x traded-Pokémon EXP bonus
 	await Story.trade_animation(m, nm)
 	# the traded mon leaves the party; the new one is appended at the end
 	GameState.party.remove_at(i)
@@ -450,6 +450,7 @@ func _jigglypuff(o: Dictionary) -> void:
 		k += 1
 		await Story.wait(24)
 	await Story.wait(48)
+	Story.drop_sticky()  # G.engine.pop(bg): the JIGGLYPUFF text box goes away with the song
 	Story.map_music()
 
 # ======================================================================

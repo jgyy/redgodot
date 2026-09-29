@@ -52,7 +52,10 @@ static func bounds(n: Node, xf: Transform3D = Transform3D.IDENTITY) -> AABB:
 static func stand(cam: Camera3D, node: Node3D, feet: Vector2, height_px: float, yaw_deg: float = 0.0) -> void:
 	node.rotation_degrees = Vector3(0, yaw_deg, 0)
 	node.scale = Vector3.ONE
-	var b := bounds(node, Transform3D(node.basis, Vector3.ZERO))
+	# bounds() applies node.transform itself: reset the position (stand() runs every frame in OakSpeech, the previous
+	# frame's position leaked into b.position.y) and don't hand the rotation in twice
+	node.position = Vector3.ZERO
+	var b := bounds(node, Transform3D.IDENTITY)
 	var h := maxf(b.size.y, 0.01)
 	var pos := ground_at(cam, feet)
 	var depth := depth_of(cam, pos)

@@ -168,6 +168,12 @@ func _run() -> void:
 		GameState.rival_name = ["", "BLUE", "GARY", "JOHN"][r]
 	await _say("HisNameIsText")
 	await _fade_pic(true)
+	# character creator (upstream customizer.js): boy / girl, hair, face, clothes ... then RED walks back on stage
+	_fade_canvas.visible = false
+	var chosen: PlayerLook = await CharacterCreator.run(_layer, GameState.player_look())
+	GameState.set_look(chosen)
+	_fade_canvas.visible = true
+	_rebuild_player_model()
 	who = "red"
 	x = 160
 	await _fade_pic(false)
@@ -179,6 +185,15 @@ func _run() -> void:
 	await _fade_canvas.fade(30, Color.WHITE, true)
 	GameState.clock_running = true
 	SceneRouter.goto_overworld()
+
+## The stage's RED is rebuilt from the look picked in the creator.
+func _rebuild_player_model() -> void:
+	var holder: Node3D = _models["red"]
+	for c in holder.get_children():
+		holder.remove_child(c)   # out of the tree now: play_anim() below must find the NEW model's AnimationPlayer
+		c.queue_free()
+	holder.add_child(CharacterModel.build("red"))
+	Diorama.play_anim(holder, ["Idle"])
 
 ## no_wait boxes stay up under the menu (ui.js); drop them once answered.
 func _close_boxes() -> void:

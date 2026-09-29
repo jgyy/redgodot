@@ -205,8 +205,9 @@ static func _knot_mesh(R: float) -> ArrayMesh:
 					var ii: int = i + (1 if q == 1 or q == 2 else 0)
 					var jj: int = j + (1 if q >= 2 else 0)
 					pts.append(Vector3(-span + ii * step, -(-span + jj * step), c[q][2] * H * sgn[face]) * sc)
-				# screen y is flipped into world y, so the front face winds 0-2-1
-				var order := [0, 2, 1, 0, 3, 2] if face == 0 else [0, 1, 2, 0, 2, 3]
+				# q0..q3 run TL,TR,BR,BL on screen; world y = -screen y keeps that clockwise seen from +Z, and Godot's
+				# front faces are clockwise, so the front (face 0) winds 0-1-2 and the back face the reverse
+				var order := [0, 1, 2, 0, 2, 3] if face == 0 else [0, 2, 1, 0, 3, 2]
 				for o in order:
 					st.set_color(c[o][1] if face == 0 else Color("#9aa2ae"))
 					st.add_vertex(pts[o])

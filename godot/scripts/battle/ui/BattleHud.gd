@@ -137,13 +137,12 @@ func _hp_box(x: int, y: int, w: int, h: int, k: String) -> void:
 	var edge := Color("#b8b4a0")
 	# rows as runs (the enemy box has its bottom-right corner cut at a slant)
 	for j in h:
-		var i_end := w
-		if k == "e":
-			for i in range(w - 8, w):
-				if j > h - (w - i) * 2:
-					i_end = i
-					break
-		for i in range(i_end):
+		# columns [0, run_end) are never cut, so their interior is filled as one rect
+		var run_end := (w - 7) if k == "e" else (w - 2)
+		for i in range(w):
+			# upstream: cut = i > w - 8 && j > h - (w - i) * 2 (per pixel, not a truncated run)
+			if k == "e" and i > w - 8 and j > h - (w - i) * 2:
+				continue
 			var c := mid
 			if j == 0 or i == 0 or j == h - 1 or i == w - 1:
 				c = dark
@@ -151,11 +150,11 @@ func _hp_box(x: int, y: int, w: int, h: int, k: String) -> void:
 				c = light
 			elif j == h - 2 or i == w - 2:
 				c = edge
-			if c != mid:
+			if c != mid or i >= run_end:
 				Px.pset(self, x + i, y + j, c)
 		# fill the interior run in one rect
 		if j >= 2 and j < h - 2:
-			Px.rect(self, x + 2, y + j, mini(i_end, w - 2) - 2, 1, mid)
+			Px.rect(self, x + 2, y + j, run_end - 2, 1, mid)
 	var tab := Color("#d05858") if k == "e" else Color("#5878d0")
 	Px.rect(self, x + 2, y + 2, 2, h - 4, tab)
 	# drop shadow (upstream multiplies by rgb(150,150,180))
@@ -304,7 +303,7 @@ func _menu_bg(c1: String, c2: String) -> void:
 	# diagonal 8px stripes, scrolling (upstream ((x + y + t/4) >> 3) % 2)
 	var off := (t / 4) % 16
 	for k in range(-24, 44):
-		var x0 := k * 16 - off
+		var x0 := k * 16 + 8 - off   # `a` where ((x + y + T) >> 3) is odd, like Px.menu_bg / upstream
 		for yy in 180:
 			var xs := x0 - yy
 			Px.rect(self, xs, yy, 8, 1, a)
@@ -420,7 +419,7 @@ func _draw_slot(i: int, m: GameState.PartyMon) -> void:
 	Px.rect(self, x, y + 1, w, h - 2, OUTLINE)
 	Px.rect(self, x + 1, y + 1, w - 2, h - 2, base)
 	Px.rect(self, x + 1, y + 1, w - 2, 2, base.lightened(0.25))
-	Px.rect(self, x + 1, y + h - 4, w - 2, 3, base.darkened(0.2))
+	Px.rect(self, x + 1, y + h - 3, w - 2, 2, base.darkened(0.2))
 	var sh := base.darkened(0.45)
 	var types: Array = m.types()
 	var ic := Color(TYPE_COL.get(types[0] if not types.is_empty() else "NORMAL", "#a8a878"))

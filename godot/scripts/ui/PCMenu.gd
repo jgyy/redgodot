@@ -14,11 +14,17 @@ var _qty_max := 0
 func use_pc() -> void:
 	visible = true
 	busy = true
+	UI.sfx("pc_on")
 	await say(GameState.player_name + " turned on the PC.")
 	while true:
-		var opts := ["BILL's PC", GameState.player_name + "'s PC", "PROF.OAK's PC", "LOG OFF"]
+		# pc.js usePC(): SOMEONE's PC until BILL is met, PROF.OAK's PC only with the POKéDEX
+		var opts := ["BILL's PC" if Story.flag("EVENT_MET_BILL") else "SOMEONE's PC", GameState.player_name + "'s PC"]
+		if Story.flag("EVENT_GOT_POKEDEX"):
+			opts.append("PROF.OAK's PC")
+		opts.append("LOG OFF")
 		var r := await choose(opts, {"x": 150, "y": 20, "w": 164})
 		if r < 0 or opts[r] == "LOG OFF":
+			UI.sfx("pc_off")
 			break
 		if r == 0:
 			await _bills_pc()
@@ -34,7 +40,8 @@ func _mon_rows(b: Array) -> Array:
 	return b.map(func(m): return "%s  Lv%d" % [m.nickname, m.level])
 
 func _bills_pc() -> void:
-	await say("Accessed BILL's PC.\fAccessed POKéMON Storage System.")
+	UI.sfx("pc_access")
+	await say(("Accessed BILL's PC." if Story.flag("EVENT_MET_BILL") else "Accessed someone's PC.") + "\fAccessed POKéMON Storage System.")
 	while true:
 		var b := GameState.box()
 		var r := await choose(["WITHDRAW PKMN", "DEPOSIT PKMN", "RELEASE PKMN", "CHANGE BOX", "SEE YA!"], {"x": 150, "y": 20, "w": 164})
@@ -104,6 +111,7 @@ func _item_rows(d: Dictionary) -> Array:
 	return d.keys().map(func(id): return "%s ×%d" % [BagMenu.item_name(id), int(d[id])])
 
 func _players_pc() -> void:
+	UI.sfx("pc_access")
 	await say("Accessed my PC.\fAccessed Item Storage System.")
 	while true:
 		var r := await choose(["WITHDRAW ITEM", "DEPOSIT ITEM", "TOSS ITEM", "LOG OFF"], {"x": 150, "y": 20, "w": 164})
@@ -127,7 +135,9 @@ func _players_pc() -> void:
 			var q := await quantity(int(pc[id]))
 			if q <= 0:
 				continue
-			GameState.bag[id] = int(GameState.bag.get(id, 0)) + q
+			if not Story.bag_add(id, q):
+				await say("You can't carry any more items.")
+				continue
 			pc[id] = int(pc[id]) - q
 			if int(pc[id]) <= 0:
 				pc.erase(id)
@@ -156,6 +166,7 @@ func quantity(mx: int) -> int:
 	busy = true
 	queue_redraw()
 	var result := 0
+	await get_tree().process_frame   # skip the frame of the A press that chose the item (it would confirm ×1 at once)
 	while true:
 		await get_tree().process_frame
 		if Input.is_action_just_pressed("move_up"):

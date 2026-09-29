@@ -76,8 +76,10 @@ func _input_event(e: InputEvent) -> bool:
 	var l := list()
 	if pressed(e, "move_up", true):
 		sel = maxi(0, sel - 1)
+		UI.sfx("cursor")
 	elif pressed(e, "move_down", true):
 		sel = mini(l.size() - 1, sel + 1)
+		UI.sfx("cursor")
 	elif pressed(e, "cancel"):
 		exit()
 		return true
@@ -86,6 +88,7 @@ func _input_event(e: InputEvent) -> bool:
 		if id == "CANCEL":
 			exit()
 		else:
+			UI.sfx("select")
 			item_selected.emit(id)
 			_pick(id)
 		return true
@@ -107,6 +110,7 @@ func _pick(id: String) -> void:
 		elif await ask("Throw away " + item_name(id) + "?"):
 			GameState.bag.erase(id)
 			sel = mini(sel, list().size() - 1)
+			scroll = clampi(scroll, 0, maxi(0, list().size() - 7))
 
 ## bag.js BagScreen.say(): message in the description box until A/B.
 func bag_say(text: String) -> void:
@@ -131,6 +135,8 @@ func use_item_field(id: String) -> void:
 		await party_menu.picked
 		visible = true
 		busy = false
+		sel = clampi(sel, 0, list().size() - 1)
+		scroll = clampi(scroll, 0, maxi(0, list().size() - 7))
 		return
 	if id == "TOWN_MAP" and town_map:
 		busy = true
@@ -139,6 +145,14 @@ func use_item_field(id: String) -> void:
 		await town_map.closed
 		visible = true
 		busy = false
+		return
+	if id in ["BICYCLE", "OLD_ROD", "GOOD_ROD", "SUPER_ROD", "ESCAPE_ROPE", "REPEL", "SUPER_REPEL", "MAX_REPEL", "POKE_FLUTE", "ITEMFINDER", "COIN_CASE"]:
+		busy = true
+		close()
+		var used: bool = await Story.use_field_item(id)
+		busy = false
+		if not used:
+			open()
 		return
 	if id.ends_with("BALL") or id.begins_with("X_") or id in ["POKE_DOLL", "GUARD_SPEC", "DIRE_HIT"]:
 		await bag_say("That can't be used now.")
@@ -173,10 +187,11 @@ static func apply_to_mon(id: String, m: GameState.PartyMon, ps: PartyMenu) -> bo
 		if m.level >= 100:
 			await ps.party_say("It won't have any effect.")
 			return false
-		var frac := float(m.hp) / maxf(1.0, m.max_hp)
 		m.level += 1
-		m._recalc_stats()
-		m.hp = int(round(m.max_hp * frac))
+		m.xp = maxi(m.xp, m.exp_this())
+		m.recalc_keep_hp()
+		for nm in m.moves_at_level(m.level):
+			m.add_move(nm)
 		await ps.party_say(m.nickname + " grew to level %d!" % m.level)
 		ok = true
 	if ok:

@@ -26,7 +26,7 @@ func choose_action(b: BattleEngine) -> Dictionary:
 		return {"type": "safari", "what": "ball"}
 	var ml := b.move_list(b.p)
 	for i in ml.size():
-		if int(ml[i]["pp"]) > 0:
+		if int(ml[i]["pp"]) > 0 and not b.is_disabled(b.p, ml[i]["id"]):
 			return {"type": "fight", "slot": i}
 	return {"type": "fight", "slot": 0}
 
@@ -74,6 +74,9 @@ func stat_anim(_side: Variant, _up: bool) -> void:
 
 func anim(move: String, _side: Variant, _hit: int) -> void:
 	anims.append(move)
+
+func dodge(_side: Variant) -> void:
+	pass
 
 func hide_side(_side: Variant, _h: bool) -> void:
 	pass

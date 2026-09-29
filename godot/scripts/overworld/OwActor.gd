@@ -77,6 +77,9 @@ var _amp := 0.0                   # 0..1 how strongly the walk is playing (fades
 var _breath := 0.0
 var _foot := 0
 var _ripple_t := 0.0
+var _gesture := ""                # a gesture clip (Nod, Think, Laugh ...) currently playing
+var _gesture_left := 0.0
+var gesture_wait := -1.0          # s until this idle NPC picks its next gesture (set by the overworld)
 var _proc_bob := false            # no Walk clip: bob and sway procedurally instead
 
 func _init() -> void:
@@ -88,6 +91,13 @@ static func cell_pos(c: Vector2i) -> Vector3:
 	return Vector3(c.x + 0.5, 0.0, c.y + FOOT_Z)
 
 const OBJECT_SPRITES := ["poke_ball", "boulder", "pokedex", "clipboard", "paper", "fossil", "old_amber"]
+## Every ground object has a 3D model (pipeline/blender/gen_world.py, gen_objprops.py); the atlas cards are a fallback.
+const OBJECT_MESHES := {
+	"poke_ball": "res://assets/models/world/pokeball.glb", "boulder": "res://assets/models/world/boulder.glb",
+	"pokedex": "res://assets/models/world/pokedex.glb", "clipboard": "res://assets/models/world/clipboard.glb",
+	"paper": "res://assets/models/world/paper.glb", "fossil": "res://assets/models/world/fossil.glb",
+	"old_amber": "res://assets/models/world/old_amber.glb",
+}
 const CREATURE_DEFAULT := {"bird": "PIDGEY", "fairy": "CLEFAIRY", "seel": "SEEL", "snorlax": "SNORLAX", "monster": "NIDORAN_M"}
 
 ## upstream objsprites.js speciesFromLabel: the longest species name found in a text label
@@ -108,6 +118,9 @@ func setup(sprite_key: String, px_height: float = CHAR_PX, o: Dictionary = {}) -
 	for c in get_children():
 		c.queue_free()
 	_anim = null
+	_gesture = ""            # a re-skinned actor has no gesture playing on its new model
+	_gesture_left = 0.0
+	gesture_wait = -1.0
 	_body = null
 	_lean = null
 	_mount = null
@@ -149,11 +162,10 @@ func setup(sprite_key: String, px_height: float = CHAR_PX, o: Dictionary = {}) -
 	add_child(_shadow)
 	face(facing, true)
 
-## Items on the map: 3D Poké Ball / boulder (pipeline/blender/gen_world.py), other objects as a standing
-## sprite card of upstream's object art.
+## Items on the map: 3D Poké Ball, boulder, Pokédex, clipboard, paper, fossil and Old Amber (pipeline/blender).
 func _setup_object(key: String) -> void:
 	is_object = true
-	var mesh_path: String = {"poke_ball": "res://assets/models/world/pokeball.glb", "boulder": "res://assets/models/world/boulder.glb"}.get(key, "")
+	var mesh_path: String = OBJECT_MESHES.get(key, "")
 	_model = Node3D.new()
 	_model.name = "Object"
 	add_child(_model)
@@ -278,6 +290,51 @@ static func _find_anim(node: Node) -> AnimationPlayer:
 	return null
 
 
+## Plays one of a character's gesture clips (CharacterSkin.GESTURES, plus Talk / Wave / Cheer) for `secs` seconds
+## (0 = once through), then returns to Idle.  Walking cancels it.  False if this actor has no such clip.
+func gesture(clip: String, secs: float = 0.0) -> bool:
+	if _anim == null or is_mon or is_object or moving or not _anim.has_animation(clip):
+		return false
+	_gesture = clip
+	_gesture_left = secs if secs > 0.0 else _anim.get_animation(clip).length
+	_anim.speed_scale = 1.0
+	_anim.play(clip, 0.18)
+	return true
+
+func stop_gesture() -> void:
+	if _gesture != "":
+		_gesture = ""
+		if _anim and _anim.has_animation("Idle"):
+			_anim.play("Idle", BLEND_IDLE)
+
+func is_gesturing() -> bool:
+	return _gesture != ""
+
+## The gestures an idle NPC of this look picks from (upstream has none of this: static sprites).
+static func gesture_pool(sprite_key: String, o: Dictionary) -> Array:
+	var k := sprite_key.to_lower()
+	if k.contains("asleep"):
+		return ["Sleep"]
+	if k == "nurse":
+		return ["Bow", "Nod", "Stretch"]
+	for kid in ["youngster", "lass", "little", "boy", "girl", "kid"]:
+		if k.contains(kid):
+			return ["Dance", "Stretch", "Nod", "Laugh", "Point"]
+	for old in ["old", "gramps", "granny", "fuji", "oak", "guru", "man_"]:
+		if k.contains(old):
+			return ["Stretch", "Think", "Nod", "Shake"]
+	for sci in ["scientist", "gentleman", "nerd", "professor", "bill", "erika", "sabrina", "agatha"]:
+		if k.contains(sci):
+			return ["Think", "Nod", "Point", "Shake"]
+	for cop in ["guard", "police", "officer", "sailor", "biker", "cool", "black", "lance", "koga", "bruno"]:
+		if k.contains(cop):
+			return ["Salute", "Stretch", "Nod", "Point"]
+	if k.contains("rocket") or k.contains("giovanni"):
+		return ["Laugh", "Point", "Shake", "Stretch"]
+	if o.has("trainer"):
+		return ["Stretch", "Point", "Shake", "Nod"]
+	return ["Stretch", "Think", "Nod", "Shake"]
+
 func _play(n: String) -> void:
 	if _anim and _anim.has_animation(n) and _anim.current_animation != n:
 		_anim.play(n)
@@ -317,6 +374,7 @@ func place(c: Vector2i, dir: String = "") -> void:
 	if dir != "":
 		face(dir, true)
 	_clip = ""
+	_gesture = ""   # placed = teleported: whatever it was gesturing is over (an Idle pose is playing now)
 	if _anim and _anim.has_animation("Idle"):
 		_anim.speed_scale = 1.0
 		_anim.play("Idle", 0.0)
@@ -493,6 +551,13 @@ func _update_facing(dt: float) -> void:
 	_apply_yaw()
 
 func _update_gait(dt: float) -> void:
+	if _gesture != "":
+		if moving:
+			_gesture = ""
+		else:
+			_gesture_left -= dt
+			if _gesture_left <= 0.0:
+				stop_gesture()
 	var v := speed_cells if moving else 0.0
 	if moving and _clip != "":
 		gait += v * dt / _gait_cells
@@ -500,13 +565,13 @@ func _update_gait(dt: float) -> void:
 		gait += v * dt / (1.0 if is_mon else 2.0)
 	_amp = move_toward(_amp, 1.0 if moving and not _jump else 0.0, dt * 7.0)
 	if _anim:
-		var walking := (moving or _since_end < IDLE_GRACE) and _clip != ""
+		var walking := (moving or (_since_end < IDLE_GRACE and _gesture == "")) and _clip != ""
 		if walking:
 			if _anim.current_animation != _clip:
 				_anim.play(_clip, BLEND_WALK)
 			# the clip runs as fast as the feet travel: one cycle per _gait_cells of ground, whatever its length
 			_anim.speed_scale = maxf(0.0, _clip_len * v / _gait_cells)
-		else:
+		elif _gesture == "":
 			if _anim.has_animation("Idle") and _anim.current_animation != "Idle":
 				_anim.play("Idle", BLEND_IDLE)
 			_anim.speed_scale = 1.0

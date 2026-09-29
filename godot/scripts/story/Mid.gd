@@ -359,7 +359,7 @@ func _name_rater(_o: Dictionary) -> void:
 	var m: Object = GameState.party[i]
 	Story.setvar("wNameBuffer", Story.mon_name(m))
 	# traded POKéMON (different OT) can't be renamed
-	if m.has_meta("ot") and str(m.get_meta("ot")) != GameState.player_name:
+	if str(m.get("ot")) != "" and str(m.get("ot")) != GameState.player_name:
 		await Story.say("NameRatersHouseNameRaterATrulyImpeccableNameText")
 		return
 	if not await Story.ask("NameRatersHouseNameRaterGiveItANiceNameText"):

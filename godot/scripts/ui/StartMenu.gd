@@ -9,6 +9,7 @@ extends PxScreen
 
 var sel := 0
 var _items: Array = []
+var _returning := false
 
 var party_menu: PartyMenu
 var bag_menu: BagMenu
@@ -45,15 +46,19 @@ func is_open() -> bool:
 	return false
 
 func _on_open() -> void:
-	UI.sfx("menu")
+	if not _returning:
+		UI.sfx("menu")
+	_returning = false
 	_items = []
-	_items.append("POKéDEX")
+	if Story.flag("EVENT_GOT_POKEDEX"):
+		_items.append("POKéDEX")
 	if not GameState.party.is_empty():
 		_items.append("POKéMON")
 	_items.append_array(["ITEM", GameState.player_name, "SHARE", "SAVE", "OPTION", "EXIT"])
 	sel = mini(sel, _items.size() - 1)
 
 func _back() -> void:
+	_returning = true
 	open()
 
 func _input_event(e: InputEvent) -> bool:
@@ -85,9 +90,11 @@ func _activate(it: String) -> void:
 			await say("Share a picture of your adventure! (Not available in this version.)")
 		"SAVE":
 			if await ask("Would you like to SAVE the game?"):
-				GameState.save()
-				UI.sfx("save")
-				await say(GameState.player_name + " saved the game!")
+				if GameState.save():
+					UI.sfx("save")
+					await say(GameState.player_name + " saved the game!")
+				else:
+					await say("SAVE FAILED!")
 		"OPTION":
 			close(); options_menu.open()
 		"EXIT":

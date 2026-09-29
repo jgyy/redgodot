@@ -300,8 +300,9 @@ def s_seed(bm):
 
 def s_needle(bm):
     # along +X (the travel direction)
-    cyl(bm, 0.06, 0.0, 0.7, seg=6, mat_=Matrix.Translation((0.35, 0, 0)) @ Matrix.Rotation(-math.pi / 2, 4, 'Y'))
-    cyl(bm, 0.06, 0.0, 0.3, seg=6, mat_=Matrix.Translation((-0.15, 0, 0)) @ Matrix.Rotation(math.pi / 2, 4, 'Y'))
+    # Rotation(+90 deg, Y) maps the cone's +Z apex to +X: the long spike's tip leads (+0.7), the short tail tapers behind (-0.3)
+    cyl(bm, 0.06, 0.0, 0.7, seg=6, mat_=Matrix.Translation((0.35, 0, 0)) @ Matrix.Rotation(math.pi / 2, 4, 'Y'))
+    cyl(bm, 0.06, 0.0, 0.3, seg=6, mat_=Matrix.Translation((-0.15, 0, 0)) @ Matrix.Rotation(-math.pi / 2, 4, 'Y'))
 
 
 def s_bone(bm):

@@ -1,3 +1,4 @@
+class_name OverworldScene
 extends Node3D
 ## The 3D overworld: current map (MapLoader, built from the upstream bake), the player, NPCs, the walking
 ## partner Pokémon, the camera and day/night. Movement, collision, ledges, warps, connections and NPC idling
@@ -39,6 +40,10 @@ var _start_menu: StartMenu
 var _dialogue: DialogueBox
 var _fade_layer: CanvasLayer
 var _fade_rect: ColorRect
+var _fade_mat: ShaderMaterial
+const TRANSITION_SHADER := preload("res://assets/shaders/transition.gdshader")
+## Wipe used by the next fade_out/fade_in pair (see transition.gdshader modes); reset to a plain fade afterwards.
+var transition_style := 0
 var _amb_layer: CanvasLayer
 var _amb_rect: ColorRect
 var _amb_mat: ShaderMaterial
@@ -51,6 +56,7 @@ var _arrived_dir := ""       # the way we came through a door, until the first s
 var _pending_conn: Dictionary = {}
 var _rng := RandomNumberGenerator.new()
 var _light_key := ""
+var _light_maps_for := ""   # map whose light/glow textures are on the world materials
 var _follower_species := ""
 var _hidden_ids := {}        # object ids hidden by scripts on this map
 var _shown_ids := {}         # object ids shown by scripts (objs[].shown == false)
@@ -62,6 +68,8 @@ var _exit_redirect: Array = []   # [to_map, warp_index] for every exit warp of t
 var _shake := 0.0
 var _shake_t := 0.0
 var ow_fx: OwFx
+var debris: Debris
+var fireflies: Fireflies
 # camera: critically damped follow with the player's velocity fed forward (no lag at a steady pace, no overshoot
 # when it stops), snapped on warps and map changes
 const CAM_OMEGA := 22.0
@@ -89,6 +97,11 @@ func _ready() -> void:
 	_build_ambient()
 	ow_fx = OwFx.new()
 	add_child(ow_fx)
+	debris = Debris.new()
+	add_child(debris)
+	ow_fx.debris = debris
+	fireflies = Fireflies.new()
+	add_child(fireflies)
 	player = OwActor.new()
 	player.name = "Player"
 	add_child(player)
@@ -199,6 +212,9 @@ func _build_fade() -> void:
 	_fade_rect.color = Color(0, 0, 0, 0)
 	_fade_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_fade_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_fade_mat = ShaderMaterial.new()
+	_fade_mat.shader = TRANSITION_SHADER
+	_fade_rect.material = _fade_mat
 	_fade_layer.add_child(_fade_rect)
 	_flash_rect = ColorRect.new()
 	_flash_rect.color = Color(1, 1, 1, 0)
@@ -221,6 +237,10 @@ func _load_map(map_name: String, cell: Vector2i, facing: String) -> void:
 	_hidden_ids.clear()
 	_shown_ids.clear()
 	_exit_redirect = []
+	_spinning = false
+	_light_maps_for = ""
+	_pending_conn = {}
+	_pending_land = false
 	if _map_loader.outdoor:
 		flashed = false   # FLASH lasts until you're back outside (upstream)
 	player.place(cell, facing if facing != "" else player.facing)
@@ -249,13 +269,15 @@ func _update_lighting() -> void:
 		return
 	var h := fmod(GameState.clock_minutes / 60.0, 24.0)
 	var td := LightingRig.time_of_day(h)
+	if not bool(GameState.options.get("day_night", true)):
+		td = {"night": 0.0, "dusk": 0.0}   # upstream timeOfDay(): OPTION day/night off = always daytime
 	var graded := _map_loader.outdoor or _map_loader.ts_file == "forest"
 	var g := LightingRig.grade(td) if graded else Color(1, 1, 1)
 	var la := LightingRig.light_amount(td) if graded else 0.0
 	var key := "%s|%.3f|%.3f|%.3f|%.2f" % [_map_loader.map_name, g.r, g.g, g.b, la]
 	if key == _light_key:
 		return
-	var rebuild := not _light_key.begins_with(_map_loader.map_name + "|")
+	var rebuild := not _light_key.begins_with(_map_loader.map_name + "|") or (la > 0.0 and _light_maps_for != _map_loader.map_name)
 	_light_key = key
 	var lt: Texture2D = null
 	var gt: Texture2D = null
@@ -263,6 +285,7 @@ func _update_lighting() -> void:
 		var maps := LightingRig.build_light_maps(_map_loader.bake)
 		lt = maps[0]
 		gt = maps[1]
+		_light_maps_for = _map_loader.map_name
 	_map_loader.apply_grade(g, la, lt, gt)
 	var mn := _map_loader.map_name
 	var cloudy_env := (_map_loader.outdoor and not mn.begins_with("PokemonTower")) or mn.begins_with("SafariZone")
@@ -281,17 +304,31 @@ func _process(dt: float) -> void:
 	if not held:
 		var st := _story()
 		held = st != null and st.has_method("forced_direction") and String(st.forced_direction()) != ""
-	player.stop_hint = not held
-	follower.stop_hint = not held
+	if not player.scripted:   # a scripted path (move_actor) chains its own steps with start_move(..., more)
+		player.stop_hint = not held
+		follower.stop_hint = not held
 	if not ui_open and _locks == 0 and not _busy:
 		_player_control(dt)
 		_npcs_idle(dt)
+		_player_gestures(dt, false)
 	elif not player.moving:
 		_was_moving = false
+		_player_idle = 0.0   # menus / dialogue count as activity: no fidget the instant they close
 	_update_camera(dt)
 	_update_follower_visibility()
 
+func _update_fireflies() -> void:
+	if fireflies == null or player == null or _map_loader == null:
+		return
+	fireflies.center = player.global_position
+	var m := _map_loader
+	# night, outdoors, away from towns' streets (grass routes, forests, the safari zone)
+	var env := ambient_env(m.map_name, m.outdoor)
+	var wild: bool = env == "outdoor" or env == "safari" or env == "forest"
+	fireflies.set_active(wild and float(LightingRig.time_of_day(fmod(GameState.clock_minutes / 60.0, 24.0)).night) > 0.5 and bool(GameState.options.get("day_night", true)))
+
 func _update_camera(dt: float) -> void:
+	_update_fireflies()
 	if player == null:
 		return
 	var target := player.position + Vector3(0.0, 0.0, 0.5 - OwActor.FOOT_Z)
@@ -457,6 +494,7 @@ func _push_warp(cell: Vector2i, d: String) -> bool:
 func _on_player_step(_a: OwActor) -> void:
 	GameState.player_cell = player.cell
 	GameState.player_facing = player.facing
+	_arrived_dir = ""   # upstream onPlayerStep: `arrived` only lasts until the first step is done
 	if not _pending_conn.is_empty():
 		var c := _pending_conn
 		_pending_conn = {}
@@ -470,6 +508,8 @@ func _on_player_step(_a: OwActor) -> void:
 		_do_warp(wi)
 		return
 	if player.scripted:
+		return
+	if _spinner_continue():
 		return
 	if _pending_land:
 		_pending_land = false
@@ -485,10 +525,50 @@ func _on_player_step(_a: OwActor) -> void:
 	if no_encounters or (story and story.has_method("encounters_blocked") and bool(story.encounters_blocked(player.cell))):
 		return
 	var on_water := ride == "surf" and m.is_water(player.cell)
-	if m.is_tall_grass(player.cell) or on_water:
+	# upstream encounters.check: repel ticks down every step, and the message ends the step
+	if GameState.repel > 0:
+		GameState.repel -= 1
+		if GameState.repel == 0:
+			_dialogue.show_lines(["REPEL's effect wore off."])
+			return
+	# tilesets without a tall-grass tile (caves, buildings) roll on every dry cell
+	if m.is_tall_grass(player.cell) or on_water or (m.has_no_grass_tile() and not m.is_water(player.cell)):
 		var res := EncounterSystem.roll(m.map_name, on_water, _rng)
+		if not res.is_empty() and GameState.repel > 0 and not GameState.party.is_empty():
+			for pm in GameState.party:
+				if pm.hp > 0:
+					if int(res["level"]) < pm.level:
+						res = {}
+					break
 		if not res.is_empty():
 			SceneRouter.start_battle({"kind": "wild", "species": res["species"], "level": res["level"]})
+
+## Spinner tiles (Rocket Hideout B2F/B3F, Viridian Gym; upstream fieldmoves.js afterStep): an arrow tile keeps sliding
+## you at double speed in its direction until a spinner_stop tile or a wall ends the ride.
+var _spinning := false
+
+func _spinner_continue() -> bool:
+	var lbl := cell_label(player.cell)
+	var d := ""
+	if lbl.begins_with("spinner_") and lbl != "spinner_stop":
+		d = lbl.substr(8)
+	elif _spinning and lbl != "spinner_stop":
+		d = player.facing
+	if d != "" and bool(can_move(player, d).get("ok", false)):
+		if not _spinning:
+			ow_fx.dust(OwActor.cell_pos(player.cell), 3, 1.2)
+		_spinning = true
+		var from := player.cell
+		_set_ground_fx(player, from + OwActor.DIRS[d])
+		player.start_move(d, 2.0, false, true)
+		_was_moving = true
+		_follower_follow(from, 2.0, false, true)
+		return true
+	_spinning = false
+	return false
+
+func is_spinning() -> bool:
+	return _spinning
 
 func _do_warp(wi: int) -> void:
 	if _busy or wi < 0:
@@ -517,11 +597,12 @@ func _do_warp(wi: int) -> void:
 		player.visible = false
 		follower.visible = false
 		await get_tree().create_timer(4.0 * FRAME).timeout
-	await fade_out(10)
+	transition_style = style_for_map(to, entering_door)
+	await fade_out(14 if transition_style != 0 else 10)
 	player.visible = true
 	_load_map(to, dcell, dir)
 	_arrived_dir = dir
-	await fade_in(10)
+	await fade_in(14 if transition_style != 0 else 10)
 	var m := _map_loader
 	if m.is_door_tile(dcell) or (m.outdoor and m.is_warp_tile(dcell) and m.passable(dcell + Vector2i(0, 1))):
 		if can_move(player, "down").get("ok", false):
@@ -551,13 +632,28 @@ func _try_interact() -> void:
 		interacted.emit("follower", {"species": _follower_species})
 		var mon: GameState.PartyMon = GameState.party[0] if not GameState.party.is_empty() else null
 		if mon:
-			_dialogue.show_lines(["%s is happy to be walking with you!" % mon.nickname])
+			var mood := follower_mood(mon, _map_loader.map_name, _map_loader.is_tall_grass(player.cell), _rng)
+			var au := get_node_or_null("/root/Audio")
+			if au and au.has_method("cry"):
+				au.cry(mon.species_id)
+			var pa := _follower_actor()
+			if pa:
+				pa.play_once("Talk" if pa.has_anim("Talk") else "Idle")
+				if pa.has_anim("Talk"):   # Talk is a looping clip: play_once's queued Idle never comes, hand back by hand
+					get_tree().create_timer(1.6).timeout.connect(func() -> void:
+						if is_instance_valid(pa) and pa.current_clip() == "Talk":
+							pa.play("Idle"))
+			emote_on(follower, str(mood[1]))
+			_dialogue.show_lines([str(mood[0])])
 		return
 	var story := get_node_or_null("/root/Story")
 	if a:
-		if not ["UP", "DOWN", "LEFT", "RIGHT"].has(String(a.obj.get("dir", ""))) or a.obj.get("move", "") == "WALK":
+		if not a.is_object:   # upstream talkTo: every non-object actor turns to face you, fixed-facing ones too
 			a.face(OPP[player.facing])
 		interacted.emit("npc", a.obj)
+		if OwActor.gesture_pool(a.sprite, a.obj) != ["Sleep"]:
+			a.stop_gesture()
+			a.gesture("Talk", 2.6)
 		if story and story.has_method("on_talk") and story.on_talk(a.obj):
 			return
 		_dialogue.show_lines(DialogueText.for_obj(a.obj))
@@ -573,12 +669,47 @@ func _try_interact() -> void:
 	if story and story.has_method("on_interact_cell"):
 		story.on_interact_cell(t, player.facing)
 
+# ---------------------------------------------------------------- NPC gestures
+## Idle NPCs occasionally play a gesture from their pool (stretch, think, nod, salute, dance ...); sleepers keep snoring.
+func _npc_gestures(act: OwActor, dt: float) -> void:
+	if act.is_gesturing():
+		return
+	var pool: Array = OwActor.gesture_pool(act.sprite, act.obj)
+	if pool == ["Sleep"]:
+		act.gesture("Sleep", 1e6)
+		return
+	if act.gesture_wait < 0.0:
+		act.gesture_wait = 2.0 + _rng.randf() * 12.0
+	act.gesture_wait -= dt
+	if act.gesture_wait <= 0.0:
+		act.gesture_wait = 7.0 + _rng.randf() * 14.0
+		act.gesture(pool[_rng.randi() % pool.size()])
+
+var _player_idle := 0.0
+
+## The player also fidgets after standing still for a while (stretches, thinks, dances a little).
+func _player_gestures(dt: float, ui_open: bool) -> void:
+	if player.moving or ui_open or player.scripted or _input_dir() != "":
+		_player_idle = 0.0
+		player.stop_gesture()
+		return
+	_player_idle += dt
+	if _player_idle > 14.0 and not player.is_gesturing():
+		_player_idle = 8.0 + _rng.randf() * 4.0
+		var pool := ["Stretch", "Think", "Nod", "Dance", "Wave"]
+		player.gesture(pool[_rng.randi() % pool.size()])
+
+## Emote bubbles come with a matching body reaction.
+const EMOTE_GESTURE := {"!": "Surprised", "?": "Think", "heart": "Dance", "...": "Sad"}
+
 # ---------------------------------------------------------------- NPC idle (upstream npcIdle)
 func _npcs_idle(dt: float) -> void:
 	for a in _map_loader.actors:
 		var act: OwActor = a
 		if act.moving or act.scripted or not act.visible:
 			continue
+		if not act.is_mon and not act.is_object:
+			_npc_gestures(act, dt)
 		act.idle_t -= dt
 		if act.idle_t > 0.0:
 			continue
@@ -594,13 +725,65 @@ func _npcs_idle(dt: float) -> void:
 			act.face(d)
 			if can_move(act, d).get("ok", false) and _rng.randf() < 0.7:
 				act.start_move(d, 1.0)
-		elif String(o.get("dir", "")) == "NONE" and not o.has("trainer") and not o.has("item"):
+		elif String(o.get("dir", "")) == "NONE" and not o.has("trainer") and not o.has("item") and not act.is_object:
 			act.face(["up", "down", "left", "right"][_rng.randi() % 4])
 
 # ---------------------------------------------------------------- walking partner (upstream follower.js)
+## The follower's PokemonActor (its model node), if it has one.
+func _follower_actor() -> PokemonActor:
+	for n in follower.find_children("*", "Node3D", true, false):
+		if n is PokemonActor:
+			return n
+	return null
+
+## upstream follower.js mood(): what your partner says (and which emote it shows) when you talk to it, from status, HP,
+## the place you are in, its type and level.  Returns [text, emote].
+static func follower_mood(m: GameState.PartyMon, map_name: String, in_grass: bool, rng: RandomNumberGenerator) -> Array:
+	var n := m.display_name()
+	var st := {"PSN": [n + " is shivering from the poison!", "..."], "BRN": [n + " is hurting from its burn.", "..."],
+		"PAR": [n + " is paralyzed. It can barely move!", "..."], "SLP": [n + " is fast asleep... zzz", "..."],
+		"FRZ": [n + " is frozen solid!", "..."]}
+	if st.has(m.status):
+		return st[m.status]
+	if float(m.hp) / maxf(1.0, float(m.max_hp)) < 0.25:
+		return [n + " looks exhausted. Maybe rest at a POKéMON CENTER?", "..."]
+	var lines: Array = []
+	if map_name.contains("Pokecenter") or map_name.contains("PokemonCenter"):
+		lines.append([n + " looks relaxed here.", "heart"])
+	if map_name.ends_with("Gym"):
+		lines.append([n + " is fired up for a GYM battle!", "!"])
+	if map_name.begins_with("PokemonTower"):
+		lines.append([n + " is trembling... it senses something.", "..."])
+	for cave in ["MtMoon", "RockTunnel", "DiglettsCave", "SeafoamIslands", "CeruleanCave", "VictoryRoad"]:
+		if map_name.begins_with(cave):
+			lines.append([n + " is sticking close to you in the dark.", "..."])
+	if map_name.begins_with("SafariZone"):
+		lines.append([n + " is excited by all the wild POKéMON!", "!"])
+	if map_name == "PalletTown":
+		lines.append([n + " seems to like PALLET TOWN.", "heart"])
+	if in_grass:
+		lines.append([n + " is rustling around in the tall grass!", "!"])
+	var by_type := {"FIRE": " is giving off a gentle warmth.", "WATER": " wants to go for a swim!",
+		"ELECTRIC": "'s cheeks are crackling with electricity!", "GRASS": " is soaking up the sunshine.",
+		"GHOST": " is floating around mischievously.", "PSYCHIC_TYPE": " is staring into the distance...",
+		"ICE": " is chilling the air around it.", "DRAGON": " looks proud and powerful.",
+		"FIGHTING": " is throwing punches at the air!", "BUG": " is chasing a butterfly.",
+		"FLYING": " is watching the birds overhead.", "POISON": " is sniffing the air.",
+		"ROCK": " is sitting as still as a stone.", "GROUND": " is digging at the ground."}
+	for t in GameData.get_species(m.species_id).get("types", []):
+		if by_type.has(t):
+			lines.append([n + by_type[t], "..."])
+	lines.append([n + " is happy to be walking with you!", "heart"])
+	lines.append([n + " is looking around curiously.", "?"])
+	lines.append([n + " seems to be enjoying the walk!", "heart"])
+	lines.append([n + " is keeping a close eye on you.", "..."])
+	if m.level >= 50:
+		lines.append([n + " looks strong and confident!", "!"])
+	return lines[rng.randi_range(0, lines.size() - 1)]
+
 ## upstream follower.js lead(): the first party Pokémon, while it hasn't fainted (OPTION > FOLLOWER off hides it)
 func _lead_species() -> String:
-	if bool(GameState.get_meta("no_follower", false)) or GameState.party.is_empty():
+	if bool(GameState.get_meta("no_follower", false)) or not bool(GameState.options.get("follower", true)) or GameState.party.is_empty():
 		return ""
 	var pm: GameState.PartyMon = GameState.party[0]
 	return pm.species_id if pm.hp > 0 else ""
@@ -659,10 +842,13 @@ func _follower_follow(from: Vector2i, speed: float, jump: bool, more: bool = fal
 		pass
 
 func _update_follower_visibility() -> void:
-	if _follower_species == "" or _lead_species() == "":
+	var lead := _lead_species()
+	if lead != "" and lead != _follower_species and _map_loader != null:
+		_place_follower()   # first Pokémon received / a new lead / the option switched back on (upstream tick())
+	if _follower_species == "" or lead == "":
 		follower.visible = false
 		return
-	if not player.visible:
+	if not player.visible or ride != "walk":   # it goes back in its ball while surfing or cycling
 		follower.visible = false
 		return
 	var tucked := not follower.moving and follower.cell == player.cell
@@ -714,6 +900,11 @@ func move_actor(id: String, path: String) -> void:
 			continue
 		var from := a.cell
 		var more := idx < path.length() - 1
+		if a.sprite == "boulder":   # Strength: rock chips + dust kicked up as it grinds along
+			var bp := OwActor.cell_pos(from)
+			debris.ground_y = bp.y
+			debris.chips(bp + Vector3(0, 0.1, 0), 6, 0.8)
+			ow_fx.dust(bp, 4, 1.4)
 		a.start_move(d, 1.0, false, more)
 		if a == player:
 			_follower_follow(from, 1.0, false, more)
@@ -783,35 +974,110 @@ func warp_to(map_name: String, cell: Vector2i, facing: String = "") -> void:
 	await fade_in(10)
 	_busy = false
 
+## Picks the wipe for a warp: doors close in on the player (iris), caves dissolve into pixels, towers/dungeons
+## use blinds, big buildings a diagonal wipe, everything else a plain fade.
+static func style_for_map(map_name: String, entering_door: bool) -> int:
+	var n := map_name.to_lower()
+	for k in ["cave", "tunnel", "mtmoon", "seafoam", "victoryroad", "diglett", "hideout", "powerplant", "underground"]:
+		if k in n:
+			return 4
+	if "tower" in n or "mansion" in n or "silph" in n or "ssanne" in n:
+		return 2
+	if "gym" in n or "lab" in n or "league" in n or "indigo" in n or "lorelei" in n or "bruno" in n or "agatha" in n or "lance" in n:
+		return 3
+	if entering_door:
+		return 1
+	return 0
+
+func _player_uv() -> Vector2:
+	var cam := get_viewport().get_camera_3d()
+	if cam == null or player == null:
+		return Vector2(0.5, 0.5)
+	var sz := get_viewport().get_visible_rect().size
+	var p := cam.unproject_position(player.global_position + Vector3(0, 0.5, 0))
+	return Vector2(clampf(p.x / sz.x, 0.0, 1.0), clampf(p.y / sz.y, 0.0, 1.0))
+
+func _apply_transition_style() -> void:
+	_fade_mat.set_shader_parameter("mode", transition_style)
+	_fade_mat.set_shader_parameter("center", _player_uv())
+	var sz := get_viewport().get_visible_rect().size
+	_fade_mat.set_shader_parameter("aspect", sz.x / maxf(1.0, sz.y))
+
 func fade_out(frames: int = 10) -> void:
+	_apply_transition_style()
 	var tw := create_tween()
 	tw.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	tw.tween_property(_fade_rect, "color:a", 1.0, frames * FRAME)
 	await tw.finished
 
 func fade_in(frames: int = 10) -> void:
+	_apply_transition_style()
 	var tw := create_tween()
 	tw.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	tw.tween_property(_fade_rect, "color:a", 0.0, frames * FRAME)
 	await tw.finished
+	transition_style = 0
 
 ## Emote bubble ("!", "?", "...", "heart") above an actor for ~1 s.
 func emote(id: String, kind: String = "!") -> void:
-	var a := get_actor(id) as OwActor
+	await emote_on(get_actor(id) as OwActor, kind)
+
+func emote_on(a: OwActor, kind: String) -> void:
 	if a == null:
 		return
+	if EMOTE_GESTURE.has(kind):
+		a.gesture(EMOTE_GESTURE[kind])
+	var l := _emote_node(kind)
+	a.add_child(l)
+	# pops up with an overshoot, bobs while it hangs there, then shrinks away
+	l.scale = Vector3.ONE * 0.01
+	var tw := l.create_tween()
+	tw.tween_property(l, "scale", Vector3.ONE * 1.15, 10.0 * FRAME).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.tween_property(l, "scale", Vector3.ONE, 5.0 * FRAME)
+	await get_tree().create_timer(50.0 * FRAME).timeout
+	if not is_instance_valid(l):   # the actor's map was unloaded while the bubble hung there
+		return
+	var tw2 := l.create_tween()
+	tw2.tween_property(l, "scale", Vector3.ONE * 0.01, 8.0 * FRAME)
+	await get_tree().create_timer(8.0 * FRAME).timeout   # (a tween on a freed bubble never emits `finished`)
+	if is_instance_valid(l):
+		l.queue_free()
+
+const EMOTE_MESHES := {"!": "emote_exclaim", "?": "emote_question", "heart": "emote_heart", "...": "emote_dots"}
+
+## 3D speech-bubble glyph (exclaim / question / heart / dots) above an actor; falls back to a text label.
+func _emote_node(kind: String) -> Node3D:
+	var holder := Node3D.new()
+	holder.position = Vector3(0, WorldData.px_h(26.0), 0)
+	var path := "res://assets/models/world/%s.glb" % EMOTE_MESHES.get(kind, "")
+	if EMOTE_MESHES.has(kind) and ResourceLoader.exists(path):
+		var inst: Node = (load(path) as PackedScene).instantiate()
+		var mi := TileKit._find_mesh(inst)
+		if mi:
+			var m := MeshInstance3D.new()
+			m.mesh = mi.mesh
+			var mat := StandardMaterial3D.new()
+			mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+			mat.vertex_color_use_as_albedo = true
+			mat.no_depth_test = true
+			mat.render_priority = 5
+			mat.billboard_mode = BaseMaterial3D.BILLBOARD_FIXED_Y
+			m.material_override = mat
+			m.scale = Vector3(1.0, 1.0, 1.0) * 0.9
+			holder.add_child(m)
+			inst.free()
+			return holder
+		inst.free()
 	var l := Label3D.new()
-	l.text = {"heart": "♥", "...": "…"}.get(kind, kind)
+	l.text = {"heart": "♥", "...": "…"}.get(kind, kind)   # (the glyph-less fallback must not print the word "heart")
 	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	l.no_depth_test = true
 	l.font_size = 64
 	l.outline_size = 12
 	l.modulate = Color(0.1, 0.1, 0.15)
 	l.outline_modulate = Color(1, 1, 1)
-	l.position = Vector3(0, WorldData.px_h(30.0), 0)
-	a.add_child(l)
-	await get_tree().create_timer(60.0 * FRAME).timeout
-	l.queue_free()
+	holder.add_child(l)
+	return holder
 
 ## BFS over passable, unoccupied cells; returns an upstream "UDLR" path or "" (also "" when from == to).
 func path_to(from: Vector2i, to: Vector2i) -> String:
@@ -912,25 +1178,33 @@ func set_flash(on: bool) -> void:
 	flashed = on
 	_apply_ambient_env()
 
+var _flash_tw: Tween = null   # the running flash fade (a new flash replaces it instead of fighting it)
+
+func _flash_fade(start: Color, secs: float, trans: Tween.TransitionType = Tween.TRANS_LINEAR) -> Tween:
+	if _flash_tw and _flash_tw.is_valid():
+		_flash_tw.kill()
+	_flash_rect.color = start
+	_flash_tw = create_tween()
+	_flash_tw.set_trans(trans).set_ease(Tween.EASE_OUT)
+	_flash_tw.tween_property(_flash_rect, "color:a", 0.0, secs)
+	return _flash_tw
+
 func flash_white(frames: int = 8) -> void:
-	_flash_rect.color = Color(1, 1, 1, 1)
-	var tw := create_tween()
-	tw.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tw.tween_property(_flash_rect, "color:a", 0.0, frames * FRAME)
-	await tw.finished
+	_flash_fade(Color(1, 1, 1, 1), frames * FRAME, Tween.TRANS_QUAD)
+	await get_tree().create_timer(frames * FRAME).timeout   # (a killed tween never emits `finished`)
 
 func poison_flash() -> void:
-	_flash_rect.color = Color(0.69, 0.28, 0.63, 0.35)
-	var tw := create_tween()
-	tw.tween_property(_flash_rect, "color:a", 0.0, 6.0 * FRAME)
+	_flash_fade(Color(0.69, 0.28, 0.63, 0.35), 6.0 * FRAME)
 
 ## Pokémon Center healing machine: `count` balls placed, `glow` while it runs.
 func heal_machine(count: int, glow: bool) -> void:
+	if _map_loader:
+		for na in _map_loader.actors:
+			if (na as OwActor).sprite == "nurse" and not (na as OwActor).is_gesturing():   # called once per ball: don't restart the bow
+				(na as OwActor).gesture("Bow")
 	_heal_count = count
 	if glow:
-		_flash_rect.color = Color(1.0, 0.95, 0.8, 0.25)
-		var tw := create_tween()
-		tw.tween_property(_flash_rect, "color:a", 0.0, 20.0 * FRAME)
+		_flash_fade(Color(1.0, 0.95, 0.8, 0.25), 20.0 * FRAME)
 
 ## S.S. Anne leaves Vermilion's dock (Early.gd): the ship sails off into a fade.
 func ship_departs() -> void:
@@ -941,6 +1215,14 @@ func ship_departs() -> void:
 
 ## Small field effects: "cut" (a tree is cut down), "purified_zone" (Pokémon Tower).
 func fx(kind: String, cell: Vector2i) -> void:
+	var at := OwActor.cell_pos(cell)
+	debris.ground_y = at.y
+	if kind == "cut":
+		debris.leaves(at + Vector3(0, 0.4, 0), 18)
+		ow_fx.grass(at + Vector3(0, 0.1, 0), 6)
+		return
+	if kind == "purified_zone":
+		ow_fx.sparkle(at + Vector3(0, 0.3, 0), 8, Color(0.85, 0.8, 1.0))
 	var l := Label3D.new()
 	l.text = {"cut": "✂", "purified_zone": "✦"}.get(kind, "*")
 	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED

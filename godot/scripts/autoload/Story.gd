@@ -53,6 +53,15 @@ const GYM_LEADER_MAPS := {"BROCK": "PewterGym", "MISTY": "CeruleanGym", "LT_SURG
 const DARK_MAPS := ["RockTunnel1F", "RockTunnelB1F"]
 const BIKE_TILESETS := ["overworld", "forest", "underground", "ship_port", "cavern"]
 const BADGE_FOR := {"CUT": "CASCADEBADGE", "FLY": "THUNDERBADGE", "SURF": "SOULBADGE", "STRENGTH": "RAINBOWBADGE", "FLASH": "BOULDERBADGE"}
+## mapdata.bookshelves: [tileset (tsc, upper snake), tile id, text label] (story.js G.fieldInteract)
+const BOOKSHELVES := [["PLATEAU", 48, "IndigoPlateauStatues"], ["HOUSE", 61, "TownMapText"], ["HOUSE", 30, "BookOrSculptureText"],
+	["MANSION", 50, "BookOrSculptureText"], ["REDS_HOUSE_1", 50, "BookOrSculptureText"], ["LAB", 40, "BookOrSculptureText"],
+	["LOBBY", 22, "ElevatorText"], ["GYM", 29, "BookOrSculptureText"], ["DOJO", 29, "BookOrSculptureText"], ["GATE", 34, "BookOrSculptureText"],
+	["MART", 84, "PokemonStuffText"], ["MART", 85, "PokemonStuffText"], ["POKECENTER", 84, "PokemonStuffText"], ["POKECENTER", 85, "PokemonStuffText"],
+	["LOBBY", 80, "PokemonStuffText"], ["LOBBY", 82, "PokemonStuffText"], ["SHIP", 54, "BookOrSculptureText"]]
+const BOOKSHELF_FALLBACK := {"BookOrSculptureText": "Crammed full of POKéMON books!", "TownMapText": "A TOWN MAP.",
+	"PokemonStuffText": "Wow! Tons of POKéMON stuff!", "ElevatorText": "This is an elevator.",
+	"IndigoPlateauStatues": "INDIGO PLATEAU\fThe ultimate goal of trainers! POKéMON LEAGUE HQ"}
 const SCRIPT_FILES := ["res://scripts/story/Pallet.gd", "res://scripts/story/Early.gd", "res://scripts/story/Mid.gd",
 	"res://scripts/story/Late.gd", "res://scripts/story/Extra.gd"]
 
@@ -96,6 +105,8 @@ var _overlay: Node = null
 var _own_text: Dictionary = {}
 var _own_text_loaded := false
 var _cur_map := ""
+var _flags_ref: Variant = null   # GameState.flags instance the runtime state below belongs to
+var _last_enc: Dictionary = {}   # the encounter of the battle overlay currently open (SceneRouter.battle_started)
 
 func _ready() -> void:
 	pokedata = _load_json("res://data/pokedata.json")
@@ -111,6 +122,28 @@ func _ready() -> void:
 		modules.append(mod)
 		if mod.has_method("register"):
 			mod.call("register")
+	# random encounters (Overworld -> SceneRouter.start_battle) never pass through wild_battle(): tag them here
+	var sr := get_node_or_null("/root/SceneRouter")
+	if sr:
+		sr.battle_started.connect(_on_battle_started)
+		sr.battle_ended.connect(_on_battle_ended)
+
+## Safari Zone flags for a wild encounter that did not come from wild_battle() (upstream encounters.check).
+func _on_battle_started(enc: Dictionary) -> void:
+	_last_enc = enc
+	if str(enc.get("kind", "wild")) == "wild" and mapname().begins_with("SafariZone") and flag("EVENT_IN_SAFARI_ZONE") and GameState.safari_steps >= 0:
+		enc["safari"] = true
+
+## Out of SAFARI BALLs after such a random encounter: the PA announcement and back to the gate (SafariZoneCheck).
+func _on_battle_ended(_result: String) -> void:
+	var enc := _last_enc
+	_last_enc = {}
+	if enc.get("_via_story", false) or not enc.get("safari", false):
+		return
+	if in_safari() and GameState.safari_balls <= 0 and not flag("EVENT_SAFARI_GAME_OVER") and mapname().begins_with("SafariZone"):
+		for m in modules:
+			if m.has_method("safari_game_over"):
+				spawn(Callable(m, "safari_game_over"), [], "safari_over")
 
 func _load_json(path: String) -> Dictionary:
 	if not FileAccess.file_exists(path):
@@ -334,6 +367,12 @@ func choose(items: Array, opts: Dictionary = {}) -> int:
 	return int(r)
 
 ## early.js menuWithText / mid.js chooseWith: question kept on screen under a menu.
+## Drops the question left on screen by say(..., {"no_wait": true}) (upstream G.engine.pop(StaticBox)).
+func drop_sticky() -> void:
+	var u := get_ui()
+	if u != null and u.has_method("_drop_sticky"):
+		u.call("_drop_sticky")
+
 func menu_with_text(label: String, items: Array, opts: Dictionary = {}) -> int:
 	await say(label, {"no_wait": true})
 	var o := opts.duplicate()
@@ -608,7 +647,13 @@ func species_name(sp: String) -> String:
 	return str(GameData.get_species(sp).get("name", sp))
 
 func mon_name(m: Object) -> String:
-	return str(m.get("nickname")) if m else ""
+	# upstream Mon.name: the nickname, else the species' display name (PartyMon.nickname defaults to the species id,
+	# e.g. "MR_MIME" / "NIDORAN_M")
+	if m == null:
+		return ""
+	if m.has_method("display_name"):
+		return str(m.call("display_name"))
+	return str(m.get("nickname"))
 
 func dex_seen(sp: String) -> void:
 	GameState.mark_seen(sp)
@@ -625,6 +670,17 @@ func dex_page(sp: String) -> void:
 	var u := get_ui()
 	if u and u.has_method("dex_page"):
 		await u.call("dex_page", sp)
+	elif u != null and u.get("layer") is Node and is_inside_tree():
+		# no UI hook: show the POKéDEX data page (menus.js dexPage) with the pokedex screen itself
+		var screen := PokedexMenu.new()
+		(u.get("layer") as Node).add_child(screen)
+		screen.open()
+		screen.page_species = sp
+		screen.busy = false
+		while is_instance_valid(screen) and screen.page_species != "":
+			await get_tree().process_frame
+		if is_instance_valid(screen):
+			screen.queue_free()
 	else:
 		_warn("UI.dex_page")
 
@@ -675,11 +731,10 @@ func party_has(sp: String) -> bool:
 	return false
 
 func heal_all() -> void:
+	# PartyMon.heal_full(): HP, status, sleep counter and PP back to each move's max (PP UPs included)
 	for m in GameState.party:
-		m.hp = m.max_hp
-		m.status = ""
-		for mv in m.moves:
-			m.pp[mv] = int(GameData.get_move(mv).get("pp", 0))
+		m.heal_full()
+	GameState.party_changed.emit()
 
 ## G.rivalParty: rival party index offset by the starter he picked.
 func rival_party(base: int) -> int:
@@ -729,7 +784,10 @@ func give_item(item: String, recv: String, no_room: String = "", n: int = 1) -> 
 
 # ================================================================== Pokémon
 func new_mon(sp: String, lv: int) -> Object:
-	return GameState.PartyMon.new(sp, lv)
+	# upstream new G.Mon(sp, lv): random DVs and the player as original trainer
+	var m := GameState.PartyMon.new(sp, lv, {"random": true})
+	m.ot = GameState.player_name
+	return m
 
 func _box() -> Array:
 	return GameState.box()
@@ -778,6 +836,9 @@ func name_entry(prompt: String, def: String, max_len: int = 10) -> String:
 	if u and u.has_method("name_entry"):
 		var r = await u.call("name_entry", prompt, def, max_len)
 		return str(r)
+	# no UI hook: use the naming screen directly on the UI layer (menus.js namingScreen)
+	if u != null and u.get("layer") is Node:
+		return await NamingScreen.ask_name(u.get("layer") as Node, prompt, def, max_len)
 	_warn("UI.name_entry")
 	return def
 
@@ -789,7 +850,7 @@ func party_screen(msg: String) -> int:
 		return int(r)
 	var names: Array = []
 	for m in GameState.party:
-		names.append("%s  Lv%d" % [m.nickname, m.level])
+		names.append("%s  Lv%d" % [m.display_name(), m.level])
 	await say(msg, {"no_wait": true})
 	return await choose(names, {"x": 100, "y": 4, "w": 214})
 
@@ -817,8 +878,9 @@ func in_game_trade(idx: int, texts: Dictionary) -> void:
 		return
 	var nm := new_mon(tr["get"], int(m.get("level")))
 	nm.set("nickname", tr["nick"])
-	nm.set_meta("ot", "TRAINER")
+	nm.set("ot", "TRAINER")  # traded: BattleEngine gives it the 1.5x traded-Pokémon EXP bonus
 	GameState.party[i] = nm
+	GameState.party_changed.emit()
 	dex_caught(tr["get"])
 	setf(k)
 	await trade_animation(m, nm)
@@ -859,7 +921,7 @@ func battle_song(cls: String) -> String:
 
 ## G.startWildBattle (+ Pokémon Tower ghosts / Safari flags from mid.js & late.js)
 func wild_battle(sp: String, lv: int, opts: Dictionary = {}) -> String:
-	var enc := {"kind": "wild", "species": sp, "level": lv}
+	var enc := {"kind": "wild", "species": sp, "level": lv, "_via_story": true}
 	enc.merge(opts, true)
 	var tower := RegEx.create_from_string("^PokemonTower[1-7]F$")
 	if not opts.get("restless_soul", false) and tower.search(mapname()) != null and not bag_has("SILPH_SCOPE"):
@@ -999,8 +1061,25 @@ func trainer_sighted(id: String, dist: int) -> void:
 	await trainer_battle_flow(o)
 
 # ================================================================== dispatch hooks (called by the Overworld)
+## Runtime-only story state (cell overrides, elevator exits, Mt.Moon sight, ride flags) is not part of the save: when
+## GameState hands out a fresh `flags` dictionary (NEW GAME / CONTINUE after another run) it must not leak into it.
+func _sync_runtime_state() -> void:
+	if _flags_ref != null and not is_same(_flags_ref, GameState.flags):
+		cell_overrides.clear()
+		warp_redirects.clear()
+		sight_off.clear()
+		surfing = false
+		biking = false
+		strength = false
+		flashed = false
+		busy = 0
+		prev_map = ""
+		_cur_map = ""
+	_flags_ref = GameState.flags
+
 ## Map loaded (called after actors spawn). Runs global hooks + the map's enter scripts.
 func on_enter(map_name: Variant = "") -> void:
+	_sync_runtime_state()
 	var m := ""
 	if map_name is String:
 		m = map_name
@@ -1181,6 +1260,9 @@ func hidden_event(h: Dictionary, d: String) -> Callable:
 		return _say_h.bind(raw(arg))
 	return Callable()
 
+func _say_text(text: String) -> void:
+	await say(text)
+
 func _say_h(_h: Dictionary, text: String) -> void:
 	await say(text)
 
@@ -1277,6 +1359,9 @@ func nurse_heal(o: Dictionary) -> void:
 	var spot: Variant = blackout_spot(town)
 	if spot is Vector2i:
 		GameState.last_heal_town = {"map": town, "x": spot.x, "y": spot.y}
+		# SceneRouter.whiteout() (random-encounter losses) reads the legacy pair: keep it in sync with the blackout point
+		GameState.last_heal_map = town
+		GameState.last_heal_cell = spot
 	face(id, "down")
 	map_music()
 	await say(tf("PokemonFightingFitText", "Thank you!\fYour POKéMON are fighting fit!"))
@@ -1435,6 +1520,8 @@ func set_cells(cells: Array, map_name: String = "") -> void:
 				cell_overrides[m] = {}
 			cell_overrides[m][Vector2i(c[0], c[1])] = ["", c[3]]
 			if m == mapname():
+				# the original look comes back (drops an earlier "barrier"/"door" label), only passability is overridden
+				hq("clear_cell_override", [Vector2i(c[0], c[1])])
 				hq("set_cell_override", [Vector2i(c[0], c[1]), "", c[3]])
 		else:
 			set_cell(int(c[0]), int(c[1]), str(c[2]), bool(c[3]), map_name)
@@ -1669,11 +1756,35 @@ func field_interact(c: Vector2i) -> Callable:
 			var g: Callable = m.call("field_interact", c)
 			if g.is_valid():
 				return g
+	var shelf := _bookshelf_label(c)
+	if shelf != "":
+		return _say_text.bind(tf(shelf, str(BOOKSHELF_FALLBACK.get(shelf, "..."))))
 	if cell_label(c) == "cut_tree":
 		return _cut_prompt.bind(c)
 	if is_water(c) and not surfing:
 		return _surf_prompt
 	return Callable()
+
+## Text label of the tile-based "sign" (bookshelf, wall map, PC shelf, elevator panel...) at cell `c`, or "".
+func _bookshelf_label(c: Vector2i) -> String:
+	var md := map_data()
+	var w := int(md.get("w", 0))
+	var cells: Array = md.get("cells", [])
+	if c.x < 0 or c.y < 0 or c.x >= w or c.y * w + c.x >= cells.size():
+		return ""
+	WorldData.ensure()
+	var quads: Array = WorldData.quads.get(str(md.get("ts", "")), [])
+	var qi := int(cells[c.y * w + c.x])
+	if qi < 0 or qi >= quads.size():
+		return ""
+	var quad: Array = quads[qi]
+	var ts_name := RegEx.create_from_string("([a-z])([A-Z0-9])").sub(str(md.get("tsc", "")), "$1_$2", true).to_upper()
+	for e in BOOKSHELVES:
+		if e[0] == ts_name or (e[0] == "REDS_HOUSE_1" and str(md.get("ts", "")) == "reds_house"):
+			for tid in quad:  # JSON numbers are floats: compare as ints
+				if int(tid) == int(e[1]):
+					return str(e[2])
+	return ""
 
 func _cut_prompt(c: Vector2i) -> void:
 	var mon := party_with("CUT")
@@ -1782,7 +1893,14 @@ func fish(rod: String) -> void:
 ## Strength: push the boulder in front of the player (G.tryPushBoulder). true = pushed.
 func try_push_boulder(d: String) -> bool:
 	if not strength:
-		return false
+		# the party menu has no STRENGTH entry (use_field_move is never called from it), so nothing else could ever
+		# switch it on: pushing against a boulder with the badge and a STRENGTH mon uses the move (ow.strength)
+		var smon := party_with("STRENGTH")
+		if smon == null or not has_badge("RAINBOWBADGE") or not _boulder_ahead(d):
+			return false
+		strength = true
+		spawn(_strength_used, [smon], "strength")
+		return true
 	var b := ""
 	var ahead: Vector2i = pcell() + DVEC[d]
 	for o in map_data().get("objs", []):
@@ -1796,6 +1914,17 @@ func try_push_boulder(d: String) -> bool:
 	sfx("boulder")
 	spawn(_push_boulder, [b, d], "boulder")
 	return true
+
+func _boulder_ahead(d: String) -> bool:
+	var ahead: Vector2i = pcell() + DVEC[d]
+	for o in map_data().get("objs", []):
+		if str(o.get("sprite", "")) == "boulder" and actor(o["id"]) and cell(o["id"]) == ahead:
+			return true
+	return false
+
+func _strength_used(mon: Object) -> void:
+	await say(mon_name(mon) + " used STRENGTH.")
+	await say(mon_name(mon) + " can move boulders.")
 
 func _push_boulder(b: String, d: String) -> void:
 	await ha("move_actor", [b, DCHAR[d]])

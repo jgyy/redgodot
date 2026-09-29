@@ -15,7 +15,11 @@ func run(battle: Node, args: Dictionary, out_png: String) -> void:
 	if want == "all":
 		moves = BattleVfx.MOVES.keys()
 	else:
-		moves = Array(want.split(","))
+		moves = Array(want.to_upper().split(",", false))
+	if moves.is_empty():
+		push_error("[vfx_sheet] no moves given")
+		get_tree().quit(1)
+		return
 	var ts: Array = []
 	for t in String(args.get("ts", "0.15,0.35,0.55,0.8")).split(","):
 		ts.append(float(t))
@@ -48,6 +52,10 @@ func run(battle: Node, args: Dictionary, out_png: String) -> void:
 ## --moves=evo:CHARMANDER:CHARMELEON: the evolution stage at each --ts fraction of its build-up (22 form swaps).
 func _evo_sheet(battle: Node, want: String, args: Dictionary, out_png: String) -> void:
 	var parts := want.split(":")
+	if parts.size() < 3:
+		push_error("[vfx_sheet] usage: --moves=evo:FROM:TO")
+		get_tree().quit(1)
+		return
 	var evo := EvolutionStage.new()
 	battle.add_child(evo)
 	evo.build(battle, parts[1], parts[2])

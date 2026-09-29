@@ -23,6 +23,8 @@ def main():
         ids = opts[opts.index('--ids') + 1].split(',')
     elif '--manifest' in opts:
         ids = json.load(open(opts[opts.index('--manifest') + 1]))['generated']
+    if ids is None:
+        sys.exit('compose_model_sheet.py: pass --ids A,B,C or --manifest manifest.json')
     out_cols = int(opts[opts.index('--out-cols') + 1]) if '--out-cols' in opts else 8
     chunk = int(opts[opts.index('--chunk') + 1]) if '--chunk' in opts else 0
     sheet = Image.open(sheet_path).convert('RGBA')

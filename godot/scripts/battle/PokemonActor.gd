@@ -16,9 +16,24 @@ const TYPE_COLORS := {
 	"DRAGON": Color(0.44, 0.22, 0.97),
 }
 
+## Every glb carries these clips (pipeline/blender/gen_rigged_pokemon.py); Idle/Walk/Run/Sleep/Charge/Taunt/Hover/Talk loop.
+const CLIPS := ["Idle", "Walk", "Run", "Attack", "Special", "Hurt", "Faint", "Victory", "Sleep", "Roar",
+		"Dodge", "Spin", "Hop", "Charge", "Taunt", "Spawn", "Hover", "Talk"]
+## Species that float or fly idle in Hover (flapping / bobbing) instead of standing.
+const HOVERERS := ["GASTLY", "HAUNTER", "GENGAR", "MAGNEMITE", "MAGNETON", "KOFFING", "WEEZING", "VOLTORB", "ELECTRODE",
+		"PORYGON", "STARYU", "STARMIE", "MEW", "MEWTWO"]
+
 var species_id: String = ""
 var model: Node3D
 var _anim: AnimationPlayer
+## Sleeping mons (status SLP) loop the Sleep clip instead of Idle.
+var sleeping := false:
+	set(v):
+		if v == sleeping:
+			return
+		sleeping = v
+		if _anim and current_clip() in ["Idle", "Hover", "Sleep"]:
+			play("Idle")
 
 static var _manifest: Dictionary = {}
 
@@ -38,7 +53,6 @@ func setup(sid: String) -> void:
 		model = _fallback_model(sid)
 	add_child(model)
 	Toon.apply(model)
-	Toon.set_param(model, "use_vertex_ao", 1.0)   # the glbs carry baked ambient occlusion in COLOR_0
 	_anim = _find_anim_player(model)
 	AnimUtil.fix_looping(_anim)
 	if _anim:
@@ -49,8 +63,23 @@ func setup(sid: String) -> void:
 
 ## Plays a baked clip: Idle / Walk (looping), Attack / Hurt / Faint / Special (one-shot).
 func play(anim_name: String) -> void:
+	if anim_name == "Idle":
+		anim_name = idle_clip()
 	if _anim and _anim.has_animation(anim_name):
 		_anim.play(anim_name)
+
+## The looping clip a mon rests in: Sleep when asleep, Hover for fliers and floaters, else Idle.
+func idle_clip() -> String:
+	if sleeping and has_anim("Sleep"):
+		return "Sleep"
+	if is_hoverer() and has_anim("Hover"):
+		return "Hover"
+	return "Idle"
+
+func is_hoverer() -> bool:
+	if HOVERERS.has(species_id):
+		return true
+	return "FLYING" in GameData.get_species(species_id).get("types", [])
 
 ## One-shot clip that returns to Idle when done (Faint stays on its last frame).
 func play_once(anim_name: String) -> void:
@@ -58,7 +87,7 @@ func play_once(anim_name: String) -> void:
 		return
 	_anim.play(anim_name, 0.06)   # quick lead-in, the hand-back to Idle uses the longer blend from AnimUtil
 	if anim_name != "Faint":
-		_anim.queue("Idle")
+		_anim.queue(idle_clip())
 
 ## Name of the clip that is playing now ("" if none).
 func current_clip() -> String:

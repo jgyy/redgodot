@@ -1,7 +1,7 @@
 class_name IntroOverlay
 extends PxCanvas
 ## The 2D half of intro.js, drawn with upstream's own coordinates/timings:
-##  - drawPresents(): the whole LEVY ST. GAMES card (opaque, frames 0-329),
+##  - drawPresents(): the opening title card (opaque, frames 0-329),
 ##  - over the 3D battle: energy-shot twinkles, the lunge slash, the leap's
 ##    spark trail, the clash's ray burst and white-out, the letterbox bars,
 ##    the PRESS ANY KEY hints and the fade from black.
@@ -10,8 +10,6 @@ extends PxCanvas
 const NAVY := Color("#141a2e")
 const IVORY := Color("#f3f0e9")
 const ORANGE := Color("#d97757")
-const LEVY_MARK: Texture2D = preload("res://assets/ui/levy_mark.png")
-const LEVY_WORD: Texture2D = preload("res://assets/ui/levy_word.png")
 
 var scene: Node
 static var _spark_icon: ImageTexture
@@ -103,29 +101,18 @@ func _draw_presents(t: int) -> void:
 		_circle(160, 58, (t - land) * 3, Px.mix(NAVY, Color.WHITE, 1.0 - (t - land) / 18.0))
 	if t >= land:
 		var g := _ease((t - land) / 14.0)
-		var mw := maxf(1.0, roundf(LEVY_MARK.get_width() * g))
-		var mh := maxf(1.0, roundf(LEVY_MARK.get_height() * g))
-		Px.blit(self, LEVY_MARK, 160 - (int(mw) >> 1), 58 - (int(mh) >> 1), mw, mh)
-		var ww := LEVY_WORD.get_width()
-		var wipe := roundf(ww * _ease((t - land - 16) / 26.0))
-		if wipe > 0.0:
-			draw_texture_rect_region(LEVY_WORD, Rect2(160 - (ww >> 1), 84, wipe, LEVY_WORD.get_height()), Rect2(0, 0, wipe, LEVY_WORD.get_height()))
-		var spaced := "G  A  M  E  S"
+		var title := "REDGODOT"
+		var tk := _ease((t - land - 8) / 20.0)
+		if tk > 0.0:
+			var tw := Px.measure(title)
+			Px.text(self, title, 160 - (tw >> 1), 50, Px.mix(NAVY, IVORY, tk), Color(ORANGE, 0.9 * g))
+		var spaced := "A  3 D  F A N  P O R T"
 		var gk := _ease((t - land - 44) / 18.0)
 		if gk > 0.0:
 			Px.small(self, spaced, 160 - (Px.measure_small(spaced) >> 1), 117, Px.mix(NAVY, IVORY, gk * 0.85))
 		var pk := _ease((t - land - 70) / 20.0)
 		if pk > 0.0:
 			Px.text(self, "presents", 160 - (Px.measure("presents") >> 1), 128, Px.mix(NAVY, IVORY, pk), Color(0, 0, 0, 0))
-		var vk := _ease((t - land - 110) / 24.0)
-		var vibe := "VIBE CODED WITH CLAUDE OPUS 5.5"
-		if vk > 0.0:
-			var vw := Px.measure_small(vibe)
-			var vx := 160 - (vw >> 1) + 5
-			Px.small(self, vibe, vx, 164, Px.mix(NAVY, ORANGE, vk))
-			if _spark_icon == null:
-				_spark_icon = IntroCreatures.claude_sprite(4.0, 0, "eyes")
-			Px.blit(self, _spark_icon, vx - 12, 161, -1, -1, Color(1, 1, 1, vk))
 		for i in 3:
 			var ph := (t + i * 37) % 90
 			if ph < 16:

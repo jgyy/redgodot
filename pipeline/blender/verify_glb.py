@@ -1,6 +1,6 @@
 """Verify generated .glb files without external deps (plain python3, not Blender).
 
-  python3 pipeline/blender/verify_glb.py godot/assets/models/pokemon --anims Idle,Walk,Attack
+  python3 pipeline/blender/verify_glb.py godot/assets/models/pokemon --require-skin --anims Idle,Walk,Attack
 Prints one line per file + a summary; exit code 1 if any file fails.
 """
 import json
@@ -26,8 +26,11 @@ def main():
     args = sys.argv[1:]
     folder = args[0]
     anims = args[args.index('--anims') + 1].split(',') if '--anims' in args else []
+    need_skin = '--require-skin' in args
     min_kb = float(args[args.index('--min-kb') + 1]) if '--min-kb' in args else 2.0
-    files = sorted(f for f in os.listdir(folder) if f.endswith('.glb'))
+    prefix = args[args.index('--prefix') + 1] if '--prefix' in args else ''
+    skip = args[args.index('--skip') + 1].split(',') if '--skip' in args else []
+    files = sorted(f for f in os.listdir(folder) if f.endswith('.glb') and f.startswith(prefix) and f not in skip)
     bad, total = [], 0
     for f in files:
         p = os.path.join(folder, f)
@@ -43,7 +46,7 @@ def main():
                 for pr in m['primitives']:
                     acc = js['accessors'][pr['indices']] if 'indices' in pr else js['accessors'][pr['attributes']['POSITION']]
                     tris += acc['count'] // 3
-            ok = meshes >= 1 and mats >= 1 and n >= min_kb * 1024 and all(a in an for a in anims)
+            ok = meshes >= 1 and mats >= 1 and n >= min_kb * 1024 and all(a in an for a in anims) and (skins >= 1 or not need_skin)
             print('%-22s %s %7.1fKB meshes=%d mats=%d skins=%d tris=%d anims=%s' % (
                 f, 'OK ' if ok else 'BAD', n / 1024, meshes, mats, skins, tris, ','.join(an) or '-'))
             if not ok:

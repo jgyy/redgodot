@@ -21,3 +21,4 @@ __pycache__/
 
 # textures Godot extracts from the battle-stage glbs on import (regenerated)
 godot/assets/models/battle/*_tex.png
+pipeline/_assets

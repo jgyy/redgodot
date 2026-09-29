@@ -21,7 +21,7 @@ func run(args: Dictionary, out_png: String) -> void:
 		get_tree().quit(1)
 		return
 	_ow.no_encounters = true
-	var path := String(args.get("route", "RRRRRRRR"))
+	var path := String(args.get("route", "RRRRRRRR")).to_upper()
 	var n_shots := int(args.get("shots", "8"))
 	var csv := String(args.get("csv", ""))
 	await _frames(20)
@@ -134,7 +134,7 @@ func _find_skel(n: Node) -> Skeleton3D:
 
 func _record(t: float) -> void:
 	var p: OwActor = _ow.player
-	var f: OwActor = _ow.follower
+	var f: OwActor = _ow.follower   # null with --follower=none
 	var cam: Node3D = _ow.get_node("CameraRig")
 	var ap: AnimationPlayer = p._anim
 	var feet := _foot_positions()
@@ -142,7 +142,7 @@ func _record(t: float) -> void:
 	var f1: Vector3 = feet[1] if feet.size() > 1 else Vector3.ZERO
 	_rows.append([t, get_process_delta_time(), p.position.x, p.position.y, p.position.z, p._yaw, 1 if p.moving else 0,
 		ap.current_animation if ap else "", snappedf(ap.current_animation_position, 0.0001) if ap else 0.0,
-		ap.speed_scale if ap else 0.0, cam.position.x, cam.position.z, f.position.x, f.position.z, f0.x, f1.x])
+		ap.speed_scale if ap else 0.0, cam.position.x, cam.position.z, f.position.x if f else 0.0, f.position.z if f else 0.0, f0.x, f1.x])
 	if (p.moving or _rows.size() > 1 and _rows[-2][6] == 1) and _shots.size() < 400 and DisplayServer.get_name() != "headless":
 		var img := get_viewport().get_texture().get_image()
 		_shots.append(img.get_region(Rect2i(img.get_width() / 2 - CW / 2, img.get_height() / 2 - CH / 2 - 20, CW, CH)))
@@ -191,12 +191,18 @@ func _report(path: String, moved: bool) -> void:
 	var restarts := 0
 	var prev_anim := ""
 	var prev_pos := 0.0
+	# the generated Walk clip is one 16-frame cell (~0.27 s), the legacy one 0.8 s: a wrap is only a natural loop end
+	# when the previous sample was in the last quarter of the *actual* clip length
+	var walk_len := 0.8
+	var pa: AnimationPlayer = _ow.player._anim
+	if pa and pa.has_animation("Walk"):
+		walk_len = pa.get_animation("Walk").length
 	for i in range(first, n):
 		var a: String = _rows[i][7]
 		var ap: float = _rows[i][8]
 		if a == "Walk" and prev_anim != "Walk":
 			walk_starts += 1
-		if a == "Walk" and prev_anim == "Walk" and ap < prev_pos - 0.001 and prev_pos < 0.75 * 0.8:
+		if a == "Walk" and prev_anim == "Walk" and ap < prev_pos - 0.001 and prev_pos < 0.75 * walk_len:
 			restarts += 1   # jumped backwards without reaching the end of the loop
 		prev_anim = a
 		prev_pos = ap

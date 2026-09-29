@@ -129,7 +129,19 @@ func stat(side: BattleSide, k: String) -> int:
 		val = int(floor(val / 4.0))
 	if k == "atk" and m.status == "BRN":
 		val = int(floor(val / 2.0))
-	return maxi(1, val)
+	return clampi(val, 1, 999)
+
+## Unmodified stat of a side's mon, honouring an earlier TRANSFORM (upstream copies `T.atk` etc.).
+func _raw_stat(side: BattleSide, k: String) -> int:
+	var tr: Dictionary = side.v["transformed"]
+	return int(tr[k]) if not tr.is_empty() else mon(side).stat(k)
+
+## Species whose *base* stats drive the crit roll (a transformed mon uses the copied species).
+func atr_species(side: BattleSide) -> String:
+	var tr: Dictionary = side.v["transformed"]
+	if not tr.is_empty():
+		return str(tr.get("species", mon(side).species_id))
+	return mon(side).species_id
 
 func types_of(side: BattleSide) -> Array:
 	if not (side.v["types"] as Array).is_empty():
@@ -180,6 +192,9 @@ func run(the_ui: Object) -> String:
 	_add_participant(mon(p))
 	while true:
 		turn += 1
+		for s0: BattleSide in [p, e]:
+			s0.v["moved"] = false
+			s0.v["flinch"] = false
 		var p_act: Dictionary = await player_action()
 		if p_act["type"] == "run":
 			var r: bool = await try_run(false)
@@ -188,6 +203,8 @@ func run(the_ui: Object) -> String:
 			var e_act0 := enemy_action()
 			if e_act0["type"] == "fight":
 				await do_move(e, e_act0["move"])
+				if result != "":
+					return _finish(result)
 			if await check_faints():
 				if result != "":
 					return result
@@ -198,7 +215,7 @@ func run(the_ui: Object) -> String:
 			return _finish("fled")
 		if p_act["type"] == "safari":
 			if result != "":
-				return result
+				return _finish(result)
 			continue
 		var e_act := enemy_action()
 		if p_act["type"] == "switch":
@@ -220,7 +237,7 @@ func run(the_ui: Object) -> String:
 				continue
 			await do_move(side, mv)
 			if result != "":
-				return result
+				return _finish(result)
 			if not mon(foe(side)).is_fainted():
 				await after_move_damage(side)
 			if await check_faints():
@@ -286,7 +303,7 @@ func player_action() -> Dictionary:
 			mv = v["thrash"]["move"]
 		elif not (v["bide"] as Dictionary).is_empty():
 			mv = "BIDE"
-		elif not (v["trapping"] as Dictionary).is_empty():
+		elif not (v["trapping"] as Dictionary).is_empty() and int(v["trapping"]["turns"]) > 0:
 			mv = v["trapping"]["move"]
 		elif v["rage"]:
 			mv = "RAGE"
@@ -305,13 +322,14 @@ func player_action() -> Dictionary:
 				if all_out:
 					return {"type": "fight", "move": "STRUGGLE"}
 				var slot: int = int(act.get("slot", 0))
-				if slot >= moves.size():
+				if slot < 0 or slot >= moves.size():
 					continue
 				var mvd: Dictionary = moves[slot]
-				if int(mvd["pp"]) <= 0:
+				var immobile: bool = m.status == "SLP" or m.status == "FRZ"   # the UI auto-picks slot 0 for these
+				if int(mvd["pp"]) <= 0 and not immobile:
 					await ui.msg("No PP left for this move!")
 					continue
-				if is_disabled(p, mvd["id"]):
+				if is_disabled(p, mvd["id"]) and not immobile:
 					await ui.msg(move_name(mvd["id"]) + " is disabled!")
 					continue
 				return {"type": "fight", "move": mvd["id"], "slot": slot}
@@ -410,6 +428,7 @@ func do_move(side: BattleSide, move_id: String) -> void:
 	var fs := foe(side)
 	var nm := label(side)
 	v["moved"] = true
+	v["last_dmg_dealt"] = 0
 	if o.get("ghost", false):
 		if side.is_player:
 			if a.status != "SLP" and a.status != "FRZ":
@@ -444,6 +463,7 @@ func do_move(side: BattleSide, move_id: String) -> void:
 			return
 		v["trapped"] = 0
 		if move_id == "_TRAPPED":
+			await ui.msg(nm + " can't move!")
 			return
 	if v["flinch"]:
 		v["flinch"] = false
@@ -464,11 +484,15 @@ func do_move(side: BattleSide, move_id: String) -> void:
 			await ui.msg(nm + " is confused!")
 			if chance(0.5):
 				var dmg := calc_damage(side, side, {"power": 40, "type": "NORMAL_CONF", "id": "", "effect": ""}, false)["dmg"] as int
+				if v["invuln"]:
+					await ui.hide_side(side, false)
 				_break_lock(v)
 				await ui.msg("It hurt itself in its confusion!")
 				await apply_damage(side, dmg)
 				return
 	if a.status == "PAR" and chance(0.25):
+		if v["invuln"]:
+			await ui.hide_side(side, false)
 		_break_lock(v)
 		await ui.status_anim(side, "PAR")
 		await ui.msg(nm + "'s fully paralyzed!")
@@ -477,7 +501,7 @@ func do_move(side: BattleSide, move_id: String) -> void:
 	var continuing: bool = v["charging"] == move_id \
 		or (not (v["thrash"] as Dictionary).is_empty() and v["thrash"].get("started", false)) \
 		or (not (v["bide"] as Dictionary).is_empty() and v["bide"].get("started", false)) \
-		or (not (v["trapping"] as Dictionary).is_empty() and v["trapping"].get("started", false)) \
+		or (not (v["trapping"] as Dictionary).is_empty() and int(v["trapping"].get("turns", 0)) > 0 and v["trapping"].get("started", false)) \
 		or (v["rage"] and move_id == "RAGE" and v["rage_started"])
 	if not continuing and move_id != "STRUGGLE":
 		use_pp(side, move_id)
@@ -562,6 +586,7 @@ func execute_move(side: BattleSide, md: Dictionary) -> void:
 		await status_move(side, md)
 		return
 	if not accuracy_check(side, md):
+		await ui.dodge(fs)
 		await ui.msg(nm + "'s attack missed!")
 		if eff == "JUMP_KICK":
 			await ui.msg(nm + " kept going and crashed!")
@@ -583,6 +608,9 @@ func execute_move(side: BattleSide, md: Dictionary) -> void:
 	if tm == 0.0 and eff != "SPECIAL_DAMAGE" and eff != "SUPER_FANG":
 		await ui.msg("It doesn't affect " + tname + "!")
 		v["thrash"] = {}
+		if eff == "EXPLODE":
+			a.hp = 0
+			await ui.sync_hp(side)
 		return
 	if eff == "DREAM_EATER" and t.status != "SLP":
 		await ui.msg("It didn't affect " + tname + "!")
@@ -711,7 +739,8 @@ func calc_damage(side: BattleSide, fs: BattleSide, md: Dictionary, use_crit: boo
 	var physical := PHYSICAL.has(typ)
 	var crit := false
 	if use_crit and mtype != "NORMAL_CONF":
-		var base := int(floor(a.stat("spd") / 2.0))
+		var crit_sp: String = str(atr_species(side))
+		var base := int(floor(int(GameData.get_species(crit_sp).get("spd", 0)) / 2.0))
 		if HIGH_CRIT.has(md.get("id", "")):
 			base *= 8
 		if side.v["focus"]:
@@ -1035,9 +1064,9 @@ func status_move(side: BattleSide, md: Dictionary) -> void:
 			var pick := ""
 			if side.is_player:
 				var r: int = await ui.choose_index(opts.map(func(x): return move_name(x)), "Mimic which move?")
-				pick = opts[r] if r >= 0 else ""
+				pick = opts[r] if r >= 0 and r < opts.size() else ""
 			else:
-				pick = opts[rnd(opts.size())]
+				pick = opts[rnd(opts.size())] if not opts.is_empty() else ""
 			if pick == "":
 				await _failed()
 				return
@@ -1061,11 +1090,12 @@ func status_move(side: BattleSide, md: Dictionary) -> void:
 			var mvs: Array = []
 			for x in move_list(fs):
 				mvs.append({"id": x["id"], "pp": 5, "max": 5})
-			v["transformed"] = {"species": t.species_id, "types": types_of(fs).duplicate(), "atk": t.stat("atk"),
-				"def": t.stat("def"), "spd": t.stat("spd"), "spc": t.stat("spc"), "moves": mvs}
+			var tsp: String = atr_species(fs)
+			v["transformed"] = {"species": tsp, "types": types_of(fs).duplicate(), "atk": _raw_stat(fs, "atk"),
+				"def": _raw_stat(fs, "def"), "spd": _raw_stat(fs, "spd"), "spc": _raw_stat(fs, "spc"), "moves": mvs}
 			v["st"] = (tv["st"] as Dictionary).duplicate()
-			await ui.transform_to(side, t.species_id)
-			await ui.msg(nm + " transformed into " + str(GameData.get_species(t.species_id).get("name", t.species_id)) + "!")
+			await ui.transform_to(side, tsp)
+			await ui.msg(nm + " transformed into " + str(GameData.get_species(tsp).get("name", tsp)) + "!")
 		"CONVERSION":
 			await ui.anim(mid, side, 0)
 			v["types"] = types_of(fs).duplicate()
@@ -1458,7 +1488,7 @@ func catch_roll(item: String, em: GameState.PartyMon) -> Dictionary:
 	if item == "MASTER_BALL":
 		caught = true
 	else:
-		var r1max := 256 if (item == "POKE_BALL" or item == "SAFARI_BALL") else (201 if item == "GREAT_BALL" else 151)
+		var r1max := 256 if item == "POKE_BALL" else (201 if item == "GREAT_BALL" else 151)
 		var r1 := rnd(r1max)
 		var st := 0
 		if em.status == "SLP" or em.status == "FRZ":
@@ -1476,7 +1506,7 @@ func catch_roll(item: String, em: GameState.PartyMon) -> Dictionary:
 			var f: int = mini(255, int(floor(floor(em.max_hp * 255.0 / (8.0 if item == "GREAT_BALL" else 12.0)) / maxi(1, int(floor(em.hp / 4.0))))))
 			caught = f >= rnd(256)
 			if not caught:
-				var x := int(floor(rate * 100.0 / (255.0 if (item == "POKE_BALL" or item == "SAFARI_BALL") else (200.0 if item == "GREAT_BALL" else 150.0))))
+				var x := int(floor(rate * 100.0 / (255.0 if item == "POKE_BALL" else (200.0 if item == "GREAT_BALL" else 150.0))))
 				var z := int(floor(x * f / 255.0)) + (10 if st == 25 else (5 if st > 0 else 0))
 				shakes = 0 if z < 10 else (1 if z < 30 else (2 if z < 70 else 3))
 	if caught:
@@ -1527,11 +1557,14 @@ func enemy_use_item(item: String) -> void:
 		m.hp = mini(m.max_hp, m.hp + heal)
 		if item == "FULL_RESTORE":
 			m.status = ""
+			e.v["toxic"] = 0
+			e.v["confused"] = 0
 		await ui.anim("HEAL_ITEM", e, 0)
 		await ui.sync_hp(e)
 		await ui.refresh()
 	elif item == "FULL_HEAL":
 		m.status = ""
+		e.v["toxic"] = 0
 		e.v["confused"] = 0
 		await ui.refresh()
 	elif X_ITEM.has(item):
@@ -1616,7 +1649,7 @@ static func trainer_opts(cls: String, n: int, extra: Dictionary = {}) -> Diction
 		party = make_trainer_party(cls, n)
 	return {
 		"kind": "trainer", "enemy_party": party,
-		"trainer": {"cls": cls, "n": n, "display_name": display, "money": int(extra.get("money", tc.get("money", 1000))),
+		"trainer": {"cls": cls, "n": n, "display_name": display, "boss": LEADERS.has(cls) or is_rival, "money": int(extra.get("money", tc.get("money", 1000))),
 			"win_text": extra.get("on_win_text", extra.get("win_text", "")), "lose_text": extra.get("lose_text", "")},
 		"trainer_items": (TRAINER_ITEMS.get(cls, []) as Array).duplicate(),
 		"boss": LEADERS.has(cls) or is_rival,

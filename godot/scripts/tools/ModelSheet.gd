@@ -18,7 +18,7 @@ var _frame_m := 0.0  # --sprite_frame=M: size Pokemon like upstream sprites, fix
 func run(args: Dictionary, out_path: String) -> void:
 	var kind: String = args.get("kind", "pokemon")
 	var ids: Array = _ids(kind, args)
-	var cols := int(args.get("cols", "12"))
+	var cols := maxi(1, int(args.get("cols", "12")))
 	var cell := int(args.get("cell", "160"))
 	var view: String = args.get("view", "front")
 	var yaw := float(args.get("yaw", "-25"))
@@ -42,11 +42,12 @@ func run(args: Dictionary, out_path: String) -> void:
 		var ap := _find_anim(model)
 		if ap:
 			AnimUtil.fix_looping(ap)
+			ap.playback_default_blend_time = 0.0   # paused poses: a pending cross-fade would hide the clip
 			var nm := anim_name if ap.has_animation(anim_name) else "Idle"
 			if ap.has_animation(nm):
 				ap.play(nm)
 				ap.seek(anim_t, true)
-				ap.pause()
+				ap.speed_scale = 0.0
 		match view:
 			"back":
 				holder.rotation_degrees.y = 180.0 - yaw * 0.5

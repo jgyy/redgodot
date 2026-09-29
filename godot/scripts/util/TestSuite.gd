@@ -36,6 +36,8 @@ func run_all(tree: SceneTree) -> void:
 	_test_new_game_defaults()
 	AudioTests.run(self)
 	_test_models_3d(tree)
+	_test_new_features()
+	_test_character_creator()
 	StoryTests.run(self)
 	MotionTests.run(self, tree.current_scene if tree.current_scene else tree.root)  # overworld motion continuity
 	BattleTests.run(self)  # battle engine / stage / UI (scripts/battle/BattleTests.gd)
@@ -312,6 +314,98 @@ func _test_new_game_defaults() -> void:
 
 ## Generated Pokemon / character models: every species has a glb with all clips, the cel
 ## shader applies, sprite-frame sizing works, and characters resolve to their own model.
+## Debris physics, follower moods, transitions and the Who's That Pokémon quiz.
+func _test_new_features() -> void:
+	var d := Debris.new()
+	d.ground_y = 1.0
+	d.spawn({"pos": Vector3(0, 3.0, 0), "vel": Vector3(0.5, 2.0, 0), "size": Vector3.ONE * 0.05, "life": 3.0, "bounce": 0.5})
+	var min_y := 99.0
+	var bounced := false
+	var last_vy := 0.0
+	for i in 400:
+		d._process(1.0 / 60.0)
+		if d.active_count() == 0:
+			break
+		var c: Dictionary = d._live[0]
+		min_y = minf(min_y, (c["node"] as Node3D).position.y)
+		if float(c["vel"].y) > last_vy + 1.0 and last_vy < 0.0:
+			bounced = true
+		last_vy = float(c["vel"].y)
+	check(min_y >= 1.0 - 0.001, "debris never falls through the ground (min y %f)" % min_y)
+	check(bounced, "debris bounces off the ground")
+	check(d.active_count() == 0, "debris fades out and is released")
+	d.free()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 5
+	var m := GameState.PartyMon.new("PIKACHU", 30)
+	m.status = "PSN"
+	check("poison" in str(OverworldScene.follower_mood(m, "Route1", false, rng)[0]), "poisoned follower says so")
+	m.status = ""
+	m.hp = 1
+	check("exhausted" in str(OverworldScene.follower_mood(m, "Route1", false, rng)[0]), "weak follower looks exhausted")
+	m.hp = m.max_hp
+	var mood: Array = OverworldScene.follower_mood(m, "PalletTown", false, rng)
+	check(mood.size() == 2 and ["heart", "!", "?", "..."].has(mood[1]), "follower mood has a text and an emote")
+	check(BattleTransition.FRAMES.size() == 3 and BattleTransition.KINDS.has("boss"), "wild / trainer / boss transitions exist")
+	check(OverworldScene.style_for_map("MtMoonB1F", false) == 4 and OverworldScene.style_for_map("PewterMart", true) == 1 and OverworldScene.style_for_map("Route1", false) == 0, "warp transition styles by destination")
+	var w := WtpScreen.new()
+	var ch := w.choices_for("SNORLAX")
+	check(ch.size() == 4 and ch.has("SNORLAX"), "quiz offers four species including the answer")
+	var uniq := {}
+	for c2 in ch:
+		uniq[c2] = true
+	check(uniq.size() == 4, "quiz choices are distinct")
+	w.free()
+
+## Character creator: every look combination has its model parts, recolouring works, gestures are baked.
+func _test_character_creator() -> void:
+	var missing: Array = []
+	for h in PlayerLook.HAIRS:
+		for hat in PlayerLook.HATS:
+			for e in PlayerLook.EYES:
+				var k := "head_%s_%s_%s" % [h, hat, e]
+				if not ResourceLoader.exists("res://assets/models/player/%s.glb" % k) or not ResourceLoader.exists("res://assets/models/player/%s.png" % k):
+					missing.append(k)
+	for o in PlayerLook.OUTFITS:
+		if not ResourceLoader.exists("res://assets/models/player/body_%s.glb" % o):
+			missing.append(o)
+	check(missing.is_empty(), "every creator head/body part exists (missing %s)" % [missing])
+	var look := PlayerLook.default_girl()
+	var m: Node3D = PlayerModel.build(look)
+	check(m != null and m.find_child("Skeleton3D", true, false) != null, "creator model is rigged")
+	var ap := AnimUtil.find_player(m)
+	for clip in CharacterSkin.GESTURES + ["Idle", "Walk", "Run", "Talk", "Wave", "Cheer"]:
+		check(ap != null and ap.has_animation(clip), "player has clip %s" % clip)
+	var skel: Skeleton3D = m.find_child("Skeleton3D", true, false)
+	var meshes := 0
+	for c in skel.get_children():
+		if c is MeshInstance3D:
+			meshes += 1
+	check(meshes == 2, "head and body parts share one skeleton (%d meshes)" % meshes)
+	m.free()
+	var cols := {}
+	for r in PlayerModel.ROLES:
+		cols[r] = Color(look.colors.get(r, "#808080"))
+	var a := PlayerModel.recolored_texture("res://assets/models/player/body_dress.png", cols)
+	cols["shirt"] = Color("#00ff00")
+	var b := PlayerModel.recolored_texture("res://assets/models/player/body_dress.png", cols)
+	check(a != null and b != null and a.get_image().get_data() != b.get_image().get_data(), "recolouring the dress changes the atlas")
+	var l2 := PlayerLook.from_dict(look.to_dict())
+	check(l2.head_key() == look.head_key() and l2.colors == look.colors, "PlayerLook round-trips through a dict (save file)")
+	l2.set_gender("boy")
+	check(l2.hair == "short" and l2.outfit == "jacket_jeans", "switching to BOY swaps the girl defaults")
+	var cc := CharacterCreator.new()
+	cc.look = PlayerLook.default_boy()
+	var n_rows: int = cc.rows().size()
+	cc.row = 1
+	cc.step_value(1)
+	check(n_rows == 15 and cc.look.hair == "spiky", "creator steps the hair style")
+	cc.row = 3
+	var before: String = cc.look.colors["skin"]
+	cc.step_value(1)
+	check(cc.look.colors["skin"] != before, "creator steps the skin tone")
+	cc.free()
+
 func _test_models_3d(_tree: SceneTree) -> void:
 	var missing: Array = []
 	for sid in GameData.species.keys():
@@ -320,8 +414,17 @@ func _test_models_3d(_tree: SceneTree) -> void:
 	check(missing.is_empty(), "every species has a glb (missing %s)" % [missing])
 	var actor := PokemonActor.new()  # not added to the tree (root is busy during boot)
 	actor.setup("PIKACHU")
-	for clip in ["Idle", "Walk", "Attack", "Hurt", "Faint", "Special"]:
+	check(PokemonActor.CLIPS.size() >= 10, "at least 10 Pokemon clips are defined")
+	for clip in PokemonActor.CLIPS:
 		check(actor.has_anim(clip), "PIKACHU has clip %s" % clip)
+	check(actor.model.find_child("Skeleton3D", true, false) != null, "PIKACHU is rigged (Skeleton3D)")
+	actor.sleeping = true
+	check(actor.idle_clip() == "Sleep", "sleeping mons rest in the Sleep clip")
+	actor.sleeping = false
+	var bird := PokemonActor.new()
+	bird.setup("PIDGEY")
+	check(bird.idle_clip() == "Hover", "fliers idle in Hover")
+	bird.free()
 	var mi: MeshInstance3D = Toon._mesh_instances(actor)[0]
 	var mat := mi.get_surface_override_material(0) as ShaderMaterial
 	check(mat != null and mat.shader == Toon.TOON_SHADER and mat.next_pass != null, "PIKACHU uses toon + outline")

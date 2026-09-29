@@ -388,7 +388,7 @@ func _articuno_binoculars(_h: Dictionary) -> void:
 	await Story.say("Route15UpstairsBinocularsText")
 	Story.cry("ARTICUNO")
 	var box := Story.mon_popup("ARTICUNO", Rect2i(110, 24, 100, 96))
-	await Story.wait_button(90)
+	await Story.wait_button(60 * 60 * 10)  # DisplayMonFrontSpriteInBox waits for A/B (no timeout)
 	Story.close_box(box)
 
 # ================================================================= FUCHSIA CITY
@@ -1110,7 +1110,7 @@ func _hof() -> void:
 func hall_of_fame() -> void:
 	var team: Array = []
 	for m in GameState.party:
-		team.append({"species": m.species_id, "level": m.level, "name": m.nickname})
+		team.append({"species": m.species_id, "level": m.level, "name": m.display_name()})
 	await Story.fade_out(20)
 	Story.music("hall_of_fame")
 	var ui := Story.get_ui()
@@ -1134,6 +1134,8 @@ func hall_of_fame() -> void:
 	GameState.last_outdoor = "PalletTown"
 	GameState.last_heal = {}
 	GameState.last_heal_town = {"map": "PalletTown", "x": 5, "y": 6}
+	GameState.last_heal_map = "PalletTown"  # SceneRouter.whiteout()'s legacy pair
+	GameState.last_heal_cell = Vector2i(5, 6)
 	Story.surfing = false
 	Story.biking = false
 	GameState.save()

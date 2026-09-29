@@ -5,7 +5,7 @@ extends RefCounted
 ## set the Animation resource's loop mode on its own - do it here once per loaded
 ## model instead of per call site.
 
-const LOOPING := ["Idle", "Walk", "Run", "Fly"]
+const LOOPING := ["Idle", "Walk", "Run", "Fly", "Sleep", "Charge", "Taunt", "Hover", "Talk"]
 ## Crossfade between any two clips (s). A play() with no explicit blend eases from the pose the model is in
 ## into the new clip instead of snapping to it.
 const DEFAULT_BLEND := 0.12
