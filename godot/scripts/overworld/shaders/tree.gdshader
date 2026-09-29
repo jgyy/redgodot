@@ -33,6 +33,8 @@ void vertex() {
 
 void fragment() {
 	vec3 col = linear_to_srgb(COLOR.rgb);
+	// vertex alpha 15/16 marks self-lit faces (monitor screens, LEDs, lamp glass): they keep their colour at night
+	bool glow = COLOR.a > 0.955 && COLOR.a < 0.985;
 	if (detail_on && COLOR.a < 0.99) {
 		int tile = int(floor(COLOR.a * 16.0));
 		if (tile < 11) {
@@ -41,5 +43,6 @@ void fragment() {
 		}
 	}
 	col *= 1.0 + inst.r;
-	ALBEDO = to_output(clamp(night_light(col, p2d), 0.0, 1.0));
+	vec3 lit = glow ? col : night_light(col, p2d);
+	ALBEDO = to_output(clamp(lit, 0.0, 1.0));
 }

@@ -18,25 +18,58 @@ const CELL_PROPS := {
 const BLOCK_PROPS := {"cut_tree": "bush", "statue": "statue", "gym_statue": "statue"}
 ## sprite boxes (art extruded by WorldBuilder) that a prop replaces, fitted to the box footprint: label -> [prop, model width, model length]
 const BOX_PROPS := {"bed": ["bed", 0.96, 1.9]}
+## sprite blocks drawn as one model at the block's footprint centre / front edge: label -> prop
+const BLOCK_MODELS := {"truck": "truck"}
 const FLOWER_MESHES := ["flower_red", "flower_yellow", "flower_white", "flower_pink"]
 
 static var _meshes: Dictionary = {}
+## Draw statistics of the last build (multimesh instances = draw calls, instances, triangles): PROP_STATS=1 prints them.
+static var stats := {"draw_calls": 0, "instances": 0, "tris": 0, "kinds": 0}
 
+## `prop` = a glb name, or "set/piece" for one mesh of a modular set glb (table_set/m5 ...: FurnitureKit).
 static func mesh(prop: String) -> Mesh:
 	if _meshes.has(prop):
 		return _meshes[prop]
 	var m: Mesh = null
-	var path := "res://assets/models/world/%s.glb" % prop
+	var parts := prop.split("/")
+	var path := "res://assets/models/world/%s.glb" % parts[0]
 	if ResourceLoader.exists(path):
 		var ps: PackedScene = load(path)
 		if ps:
 			var inst := ps.instantiate()
-			var mi := TileKit._find_mesh(inst)
+			var mi: MeshInstance3D = TileKit._find_mesh(inst) if parts.size() == 1 else _find_named(inst, parts[1])
 			if mi:
 				m = mi.mesh
 			inst.free()
 	_meshes[prop] = m
 	return m
+
+static var _tri_cache: Dictionary = {}
+static func _tri_count(m: Mesh) -> int:
+	var id := m.get_instance_id()
+	if not _tri_cache.has(id):
+		var n := 0
+		for i in range(m.get_surface_count()):
+			var arr := m.surface_get_arrays(i)
+			var idx: Variant = arr[Mesh.ARRAY_INDEX]
+			n += (idx as PackedInt32Array).size() / 3 if idx != null and (idx as PackedInt32Array).size() > 0 else (arr[Mesh.ARRAY_VERTEX] as PackedVector3Array).size() / 3
+		_tri_cache[id] = n
+	return _tri_cache[id]
+
+static func _find_named(n: Node, nm: String) -> MeshInstance3D:
+	if n is MeshInstance3D and String(n.name) == nm:
+		return n
+	for c in n.get_children():
+		var f := _find_named(c, nm)
+		if f:
+			return f
+	return null
+
+## True when the sprite block with this label is drawn by a 3D prop instead (WorldBuilder skips it).
+static func replaces(label: String) -> bool:
+	if REPLACED.has(label) or FurnitureKit.replaced(label):
+		return true
+	return BLOCK_MODELS.has(label) and mesh(String(BLOCK_MODELS[label])) != null
 
 static func _h(x: int, y: int, s: int) -> float:
 	var h: int = (x * 374761393 + y * 668265263 + s * 2147483647) & 0xffffffff
@@ -44,8 +77,9 @@ static func _h(x: int, y: int, s: int) -> float:
 	h = h ^ (h >> 16)
 	return float(h & 0xffffff) / 16777216.0
 
-## `overrides`: Vector2i (map cell) -> label set by scripts. Returns the Props node (or an empty one).
-static func build(bake: Dictionary, overrides: Dictionary, mat: ShaderMaterial) -> Node3D:
+## `overrides`: Vector2i (map cell) -> label set by scripts; `ctx`: {map, objs, passable: Callable} of the loaded map.
+## Returns the Props node (or an empty one).
+static func build(bake: Dictionary, overrides: Dictionary, mat: ShaderMaterial, ctx: Dictionary = {}) -> Node3D:
 	var root := Node3D.new()
 	root.name = "Props"
 	var cw := int(bake.get("cw", 0))
@@ -139,11 +173,28 @@ static func build(bake: Dictionary, overrides: Dictionary, mat: ShaderMaterial) 
 		if not groups.has(key3):
 			groups[key3] = []
 		groups[key3].append([Transform3D(Basis.from_scale(Vector3(sxw, WorldData.K, szl)), Vector3(cxp, 0.0, czp)), Color(0, 0, 0, 0)])
+	# ---- furniture / appliances / machines (label cells; see FurnitureKit)
+	FurnitureKit.place(bake, overrides, ctx, add)
+	DressingKit.place(bake, overrides, ctx, add)
+	for b in bake.get("blocks", []):
+		var bl: String = String(b.get("lbl", ""))
+		if BLOCK_MODELS.has(bl) and mesh(String(BLOCK_MODELS[bl])) != null:
+			var bfx: float = (float(b.sx) + float(b.w) * 0.5) / 16.0 - mx
+			var bfz: float = (float(b.sy) + float(b.h)) / 16.0 - my
+			var bbx := mesh(String(BLOCK_MODELS[bl])).get_aabb()
+			add.call(String(BLOCK_MODELS[bl]), Vector3(bfx, 0.0, bfz - (bbx.position.z + bbx.size.z)), 0.0, Vector2i(floori(bfx), floori(bfz)), 1.0)
 	# ---- braziers (their flames are the bake's fire list)
 	for f in bake.get("fires", []):
 		var cell2 := Vector2i(floori(float(f[0]) / 16.0) - mx, floori((float(f[1]) + 8.0) / 16.0) - my)
 		add.call("brazier", Vector3(float(f[0]) / 16.0 - mx, 0.0, (float(f[1]) + 9.0) / 16.0 - my), 0.0, cell2)
+	stats = {"draw_calls": 0, "instances": 0, "tris": 0, "kinds": 0}
+	var kinds := {}
+	for key in groups.keys():
+		kinds[String(key).get_slice("|", 1)] = true
 	_flush(root, groups, mat)
+	stats["kinds"] = kinds.size()
+	if OS.has_environment("PROP_STATS"):
+		print("[PropKit] %s: %d draw calls, %d instances, %d tris, %d model kinds" % [bake.get("map", "?"), stats["draw_calls"], stats["instances"], stats["tris"], stats["kinds"]])
 	return root
 
 ## Grass tufts on plain grass / path-edge cells and stones along ledge feet (visual sprinkles, windy material).
@@ -258,3 +309,6 @@ static func _flush(root: Node3D, groups: Dictionary, mat: ShaderMaterial) -> voi
 		mmi.material_override = mat
 		mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		root.add_child(mmi)
+		stats["draw_calls"] += 1
+		stats["instances"] += items.size()
+		stats["tris"] += items.size() * _tri_count(m)

@@ -15,7 +15,7 @@
   "floor_pave": {
    "file": "floor_pave.glb",
    "tris": 242,
-   "bytes": 77296,
+   "bytes": 77336,
    "notes": "walkable ground (town): four bevelled slabs, grout, moss and a crack"
   },
   "tallgrass": {
@@ -82,44 +82,44 @@
  "props": {
   "lamp_post": {
    "file": "lamp_post.glb",
-   "tris": 212,
-   "bytes": 40808,
-   "notes": "street lamp"
+   "tris": 336,
+   "bytes": 35204,
+   "notes": "iron street lamp"
   },
   "mailbox": {
    "file": "mailbox.glb",
-   "tris": 228,
-   "bytes": 34948,
-   "notes": "mailbox on a post"
+   "tris": 352,
+   "bytes": 48968,
+   "notes": "mailbox with flag"
   },
   "pc": {
    "file": "pc.glb",
-   "tris": 276,
-   "bytes": 48492,
-   "notes": "PC terminal on a desk"
+   "tris": 1134,
+   "bytes": 126440,
+   "notes": "PC terminal: desk cabinet, tilted LCD, keyboard, mouse, mini-tower, cables"
   },
   "shelf": {
    "file": "shelf.glb",
-   "tris": 772,
-   "bytes": 107612,
-   "notes": "bookshelf with books"
+   "tris": 1652,
+   "bytes": 187516,
+   "notes": "bookcase with five shelves of books"
   },
   "table": {
    "file": "table.glb",
-   "tris": 264,
-   "bytes": 38296,
-   "notes": "wooden table"
+   "tris": 412,
+   "bytes": 51224,
+   "notes": "wooden table (single-cell piece of table_set)"
   },
   "chair": {
    "file": "chair.glb",
-   "tris": 180,
-   "bytes": 30160,
-   "notes": "wooden chair"
+   "tris": 532,
+   "bytes": 62328,
+   "notes": "wooden dining chair"
   },
   "bench": {
    "file": "bench.glb",
-   "tris": 176,
-   "bytes": 46496,
+   "tris": 704,
+   "bytes": 79404,
    "notes": "park bench"
   },
   "window": {
@@ -331,6 +331,138 @@
    "tris": 84,
    "bytes": 7112,
    "notes": "building part (neutral grey in the kit; tinted per building in game)"
+  },
+  "heal_machine": {
+   "file": "heal_machine.glb",
+   "tris": 2920,
+   "bytes": 277480,
+   "notes": "Pokemon Center healing machine, 2 x 2 cells (six balls in cradles)"
+  },
+  "tv_crt": {
+   "file": "tv_crt.glb",
+   "tris": 492,
+   "bytes": 78628,
+   "notes": "CRT television with aerial on a wooden cabinet"
+  },
+  "vending_machine": {
+   "file": "vending_machine.glb",
+   "tris": 724,
+   "bytes": 92128,
+   "notes": "red drinks vending machine"
+  },
+  "fridge": {
+   "file": "fridge.glb",
+   "tris": 320,
+   "bytes": 37328,
+   "notes": "two-door fridge"
+  },
+  "stove": {
+   "file": "stove.glb",
+   "tris": 928,
+   "bytes": 102640,
+   "notes": "kitchen range with pot"
+  },
+  "sink": {
+   "file": "sink.glb",
+   "tris": 452,
+   "bytes": 64544,
+   "notes": "basin with tap"
+  },
+  "cabinet_wood": {
+   "file": "cabinet_wood.glb",
+   "tris": 500,
+   "bytes": 60724,
+   "notes": "drawer cabinet"
+  },
+  "cash_register": {
+   "file": "cash_register.glb",
+   "tris": 492,
+   "bytes": 69312,
+   "notes": "mart till"
+  },
+  "tree_oak": {
+   "file": "tree_oak.glb",
+   "tris": 848,
+   "bytes": 133708,
+   "notes": "broad oak: forked trunk, nine leaf clumps"
+  },
+  "tree_pine": {
+   "file": "tree_pine.glb",
+   "tris": 562,
+   "bytes": 77848,
+   "notes": "conifer: five drooping tiers on a straight trunk"
+  },
+  "tree_birch": {
+   "file": "tree_birch.glb",
+   "tris": 314,
+   "bytes": 65180,
+   "notes": "birch: white bark with black bands, light foliage"
+  },
+  "rock_mossy": {
+   "file": "rock_mossy.glb",
+   "tris": 140,
+   "bytes": 40788,
+   "notes": "mossy rock pair"
+  },
+  "boulder_large": {
+   "file": "boulder_large.glb",
+   "tris": 140,
+   "bytes": 40784,
+   "notes": "large boulder with chunks and moss"
+  },
+  "fountain": {
+   "file": "fountain.glb",
+   "tris": 512,
+   "bytes": 56420,
+   "notes": "town fountain, 2 x 2 cells"
+  },
+  "market_stall": {
+   "file": "market_stall.glb",
+   "tris": 1004,
+   "bytes": 146648,
+   "notes": "striped-awning market stall, 2 cells"
+  },
+  "lighthouse": {
+   "file": "lighthouse.glb",
+   "tris": 540,
+   "bytes": 64332,
+   "notes": "striped lighthouse, 3.6 + lamp room"
+  },
+  "rowboat": {
+   "file": "rowboat.glb",
+   "tris": 338,
+   "bytes": 47160,
+   "notes": "rowboat with oars, 2 cells"
+  },
+  "well": {
+   "file": "well.glb",
+   "tris": 330,
+   "bytes": 88784,
+   "notes": "stone well with roof and bucket"
+  },
+  "sofa": {
+   "file": "sofa.glb",
+   "tris": 656,
+   "bytes": 71852,
+   "notes": "sofa, 2 cells wide"
+  },
+  "armchair": {
+   "file": "armchair.glb",
+   "tris": 536,
+   "bytes": 60160,
+   "notes": "armchair"
+  },
+  "wardrobe": {
+   "file": "wardrobe.glb",
+   "tris": 392,
+   "bytes": 50652,
+   "notes": "wardrobe"
+  },
+  "display_case": {
+   "file": "display_case.glb",
+   "tris": 476,
+   "bytes": 65796,
+   "notes": "glass display case"
   }
  },
  "conventions": {

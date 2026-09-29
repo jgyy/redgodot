@@ -34,6 +34,7 @@ import common as C  # noqa: E402
 import env_kit as K  # noqa: E402
 import env_props as EP  # noqa: E402
 import env_buildings as EBL  # noqa: E402
+import env_registry as REG  # noqa: E402
 from upstream_px import hash2 as _hash2  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -223,7 +224,10 @@ def main():
     pal = defs['pal']
     C.ensure_dir(OUT_DIR)
     manifest = {}
-    for key, d in sorted(defs['trees'].items()):
+    only = os.environ.get('GEN_ONLY')       # comma list of prop names: regenerate just those (manifest entries are merged)
+    gset = os.environ.get('GEN_SET')        # comma list of set labels (furniture,nature,town,building)
+    skip_base = bool(only or gset)
+    for key, d in sorted(defs['trees'].items()) if not skip_base else []:
         C.reset_scene()
         ob = build_tree(key, d, pal)
         tris = sum(len(p.vertices) - 2 for p in ob.data.polygons)
@@ -231,7 +235,7 @@ def main():
         export_static(path)
         manifest['tree_%s' % key] = {'tris': tris, 'kind': d['kind'], 'variant': d['v']}
         print('[gen_world] %s: %d tris' % (path, tris))
-    for name in EP.GAME:
+    for name in (EP.GAME if not skip_base else []):
         fn, note = EP.PROPS[name]
         K.reset()
         P = fn('vcol')
@@ -241,7 +245,7 @@ def main():
         size = K.export(path)
         manifest[name] = {'tris': tris, 'bytes': size, 'notes': note}
         print('[gen_world] %s: %d tris' % (path, tris))
-    for name, fn in EBL.PARTS.items():
+    for name, fn in (EBL.PARTS.items() if not skip_base else []):
         K.reset()
         P = fn()
         tris = P.tri_count()
@@ -250,6 +254,38 @@ def main():
         size = K.export(path)
         manifest[name] = {'tris': tris, 'bytes': size, 'notes': 'building part (tintable slots in vertex alpha), see env_buildings.py'}
         print('[gen_world] %s: %d tris' % (path, tris))
+    # ---- extended sets: furniture / nature / town dressing / building modules (env_registry.py)
+    if skip_base and os.path.exists(os.path.join(OUT_DIR, 'manifest.json')):
+        manifest = json.load(open(os.path.join(OUT_DIR, 'manifest.json')))
+    for label, group in REG.GROUPS:
+        for name, (fn, note) in group.items():
+            if skip_base and not ((only and name in only.split(',')) or (gset and label in gset.split(','))):
+                continue
+            K.reset()
+            P = fn('vcol')
+            P.name = name
+            tris = P.tri_count()
+            P.to_object()
+            path = os.path.join(OUT_DIR, '%s.glb' % name)
+            size = K.export(path)
+            manifest[name] = {'tris': tris, 'bytes': size, 'notes': note, 'set': label}
+            print('[gen_world] %s: %d tris %d bytes' % (path, tris, size))
+    for label, sets in REG.SETS:
+        for gname, (pieces, builder) in sets.items():
+            if skip_base and not ((only and gname in only.split(',')) or (gset and label in gset.split(','))):
+                continue
+            K.reset()
+            tris = 0
+            for pname, arg in pieces:
+                P = builder('vcol', arg)
+                P.name = pname
+                tris += P.tri_count()
+                P.to_object()
+            path = os.path.join(OUT_DIR, '%s.glb' % gname)
+            size = K.export(path)
+            manifest[gname] = {'tris': tris, 'bytes': size, 'set': label, 'pieces': [p for p, _ in pieces],
+                               'notes': 'modular set of %d meshes (%s..%s) picked by the neighbour mask' % (len(pieces), pieces[0][0], pieces[-1][0])}
+            print('[gen_world] %s: %d pieces %d tris %d bytes' % (path, len(pieces), tris, size))
     json.dump(manifest, open(os.path.join(OUT_DIR, 'manifest.json'), 'w'), indent=1)
 
 

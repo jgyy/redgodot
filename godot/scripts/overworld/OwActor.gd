@@ -199,6 +199,11 @@ func _setup_object(key: String) -> void:
 		_model.add_child(m2)
 	face(facing)
 
+## Raise a ground object (ball, Pokedex ...) onto the surface of the furniture it stands on.
+func lift_object(y: float) -> void:
+	if _model:
+		_model.position.y = y
+
 func _load_mon(species: String, px_height: float) -> Node3D:
 	# the battle agent's PokemonActor: cel-shaded species model with Idle/Walk clips
 	var m := PokemonActor.new()

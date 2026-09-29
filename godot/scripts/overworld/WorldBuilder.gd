@@ -85,7 +85,7 @@ func build_objects(mat: ShaderMaterial, hide_cells: Array = []) -> MeshInstance3
 	var n := 0
 	for b in bake.get("blocks", []):
 		_cur = b
-		if PropKit.REPLACED.has(String(b.get("lbl", ""))):
+		if PropKit.replaces(String(b.get("lbl", ""))):
 			continue   # drawn as a real 3D prop (PropKit)
 		if not hide_cells.is_empty() and _covers_hidden(b, hide_cells):
 			continue

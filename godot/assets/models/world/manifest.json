@@ -228,5 +228,1001 @@
   "tris": 84,
   "bytes": 7112,
   "notes": "building part (tintable slots in vertex alpha), see env_buildings.py"
+ },
+ "pc": {
+  "tris": 1134,
+  "bytes": 82624,
+  "notes": "PC terminal: cabinet desk, tilted LCD with lit screen, keyboard, mouse, mini-tower, cables",
+  "set": "furniture"
+ },
+ "pc_dark": {
+  "tris": 1002,
+  "bytes": 73200,
+  "notes": "PC terminal with a switched-off monitor (Celadon mansion)",
+  "set": "furniture"
+ },
+ "laptop": {
+  "tris": 390,
+  "bytes": 28976,
+  "notes": "open laptop on a stand",
+  "set": "furniture"
+ },
+ "tv_crt": {
+  "tris": 492,
+  "bytes": 37948,
+  "notes": "CRT television with aerial on a wooden cabinet",
+  "set": "furniture"
+ },
+ "tv_game": {
+  "tris": 672,
+  "bytes": 50520,
+  "notes": "CRT television with a console and pad",
+  "set": "furniture"
+ },
+ "game_console": {
+  "tris": 232,
+  "bytes": 17612,
+  "notes": "retro game console with pad",
+  "set": "furniture"
+ },
+ "server_rack": {
+  "tris": 1172,
+  "bytes": 85544,
+  "notes": "tall data rack with blinking bays",
+  "set": "furniture"
+ },
+ "server_unit": {
+  "tris": 660,
+  "bytes": 48680,
+  "notes": "waist-high computer bank",
+  "set": "furniture"
+ },
+ "tableware": {
+  "tris": 276,
+  "bytes": 19468,
+  "notes": "two plates, cutlery, mug",
+  "set": "furniture"
+ },
+ "flower_vase": {
+  "tris": 296,
+  "bytes": 25800,
+  "notes": "vase of flowers",
+  "set": "furniture"
+ },
+ "book_stack": {
+  "tris": 224,
+  "bytes": 17944,
+  "notes": "stack of four books",
+  "set": "furniture"
+ },
+ "fruit_bowl": {
+  "tris": 216,
+  "bytes": 18920,
+  "notes": "bowl of fruit",
+  "set": "furniture"
+ },
+ "cutting_board": {
+  "tris": 128,
+  "bytes": 10392,
+  "notes": "kitchen board with knife",
+  "set": "furniture"
+ },
+ "stew_pot": {
+  "tris": 234,
+  "bytes": 17104,
+  "notes": "steaming pot",
+  "set": "furniture"
+ },
+ "paper_pile": {
+  "tris": 97,
+  "bytes": 7992,
+  "notes": "paperwork with pen",
+  "set": "furniture"
+ },
+ "cash_register": {
+  "tris": 492,
+  "bytes": 36360,
+  "notes": "mart till",
+  "set": "furniture"
+ },
+ "vending_machine": {
+  "tris": 724,
+  "bytes": 51984,
+  "notes": "red drinks vending machine",
+  "set": "furniture"
+ },
+ "slot_machine": {
+  "tris": 628,
+  "bytes": 50776,
+  "notes": "Game Corner slot machine",
+  "set": "furniture"
+ },
+ "heal_machine": {
+  "tris": 2920,
+  "bytes": 200180,
+  "notes": "Pokemon Center healing machine, 2 x 2 cells (six balls in cradles)",
+  "set": "furniture"
+ },
+ "heal_cabinet": {
+  "tris": 228,
+  "bytes": 17936,
+  "notes": "Pokemon Center wall cabinet, 1 cell",
+  "set": "furniture"
+ },
+ "bookshelf": {
+  "tris": 1652,
+  "bytes": 118484,
+  "notes": "bookcase, 1.35 tall, five shelves of books",
+  "set": "furniture"
+ },
+ "bookshelf_low": {
+  "tris": 1652,
+  "bytes": 118492,
+  "notes": "low bookcase, 0.9 tall",
+  "set": "furniture"
+ },
+ "mart_shelf": {
+  "tris": 1185,
+  "bytes": 89192,
+  "notes": "mart goods shelf, four stocked levels",
+  "set": "furniture"
+ },
+ "cabinet_wood": {
+  "tris": 500,
+  "bytes": 38712,
+  "notes": "drawer cabinet",
+  "set": "furniture"
+ },
+ "display_case": {
+  "tris": 476,
+  "bytes": 37128,
+  "notes": "glass display case",
+  "set": "furniture"
+ },
+ "fridge": {
+  "tris": 320,
+  "bytes": 24588,
+  "notes": "two-door fridge",
+  "set": "furniture"
+ },
+ "stove": {
+  "tris": 928,
+  "bytes": 66848,
+  "notes": "kitchen range with pot",
+  "set": "furniture"
+ },
+ "sink": {
+  "tris": 452,
+  "bytes": 34148,
+  "notes": "basin with tap",
+  "set": "furniture"
+ },
+ "trash_can": {
+  "tris": 296,
+  "bytes": 20224,
+  "notes": "metal bin",
+  "set": "furniture"
+ },
+ "chair": {
+  "tris": 532,
+  "bytes": 40328,
+  "notes": "wooden chair",
+  "set": "furniture"
+ },
+ "stool": {
+  "tris": 104,
+  "bytes": 7948,
+  "notes": "three-legged stool",
+  "set": "furniture"
+ },
+ "armchair": {
+  "tris": 536,
+  "bytes": 39016,
+  "notes": "armchair",
+  "set": "furniture"
+ },
+ "sofa": {
+  "tris": 656,
+  "bytes": 47600,
+  "notes": "sofa, 2 cells wide",
+  "set": "furniture"
+ },
+ "floor_lamp": {
+  "tris": 174,
+  "bytes": 12264,
+  "notes": "standing lamp",
+  "set": "furniture"
+ },
+ "wall_clock": {
+  "tris": 354,
+  "bytes": 24820,
+  "notes": "wall clock",
+  "set": "furniture"
+ },
+ "poster_view": {
+  "tris": 108,
+  "bytes": 10332,
+  "notes": "framed landscape picture",
+  "set": "furniture"
+ },
+ "poster_ball": {
+  "tris": 88,
+  "bytes": 8292,
+  "notes": "Poke Ball poster",
+  "set": "furniture"
+ },
+ "poster_map": {
+  "tris": 104,
+  "bytes": 8772,
+  "notes": "framed map",
+  "set": "furniture"
+ },
+ "painting": {
+  "tris": 96,
+  "bytes": 9488,
+  "notes": "framed painting",
+  "set": "furniture"
+ },
+ "doormat": {
+  "tris": 104,
+  "bytes": 8764,
+  "notes": "welcome mat",
+  "set": "furniture"
+ },
+ "globe": {
+  "tris": 204,
+  "bytes": 20372,
+  "notes": "desk globe",
+  "set": "furniture"
+ },
+ "microscope": {
+  "tris": 164,
+  "bytes": 12780,
+  "notes": "lab microscope",
+  "set": "furniture"
+ },
+ "lab_machine": {
+  "tris": 792,
+  "bytes": 57360,
+  "notes": "lab analyser with dome chamber",
+  "set": "furniture"
+ },
+ "teleporter_pad": {
+  "tris": 260,
+  "bytes": 18616,
+  "notes": "warp pad",
+  "set": "furniture"
+ },
+ "generator": {
+  "tris": 504,
+  "bytes": 35492,
+  "notes": "power plant generator",
+  "set": "furniture"
+ },
+ "rocket_console": {
+  "tris": 788,
+  "bytes": 55996,
+  "notes": "Rocket hideout control desk",
+  "set": "furniture"
+ },
+ "fossil_case": {
+  "tris": 678,
+  "bytes": 51812,
+  "notes": "museum fossil plinth with glass hood",
+  "set": "furniture"
+ },
+ "school_desk": {
+  "tris": 208,
+  "bytes": 16408,
+  "notes": "classroom desk",
+  "set": "furniture"
+ },
+ "blackboard": {
+  "tris": 192,
+  "bytes": 15444,
+  "notes": "wall blackboard",
+  "set": "furniture"
+ },
+ "wardrobe": {
+  "tris": 392,
+  "bytes": 30404,
+  "notes": "wardrobe",
+  "set": "furniture"
+ },
+ "kitchen_rack": {
+  "tris": 472,
+  "bytes": 33280,
+  "notes": "kitchen rack with pans",
+  "set": "furniture"
+ },
+ "tree_pine": {
+  "tris": 562,
+  "bytes": 39256,
+  "notes": "conifer: five drooping tiers on a straight trunk",
+  "set": "nature"
+ },
+ "tree_pine_slim": {
+  "tris": 470,
+  "bytes": 33076,
+  "notes": "slim four-tier conifer",
+  "set": "nature"
+ },
+ "tree_oak": {
+  "tris": 848,
+  "bytes": 83336,
+  "notes": "broad oak: forked trunk, nine leaf clumps",
+  "set": "nature"
+ },
+ "tree_birch": {
+  "tris": 314,
+  "bytes": 26948,
+  "notes": "birch: white bark with black bands, light foliage",
+  "set": "nature"
+ },
+ "tree_dead": {
+  "tris": 274,
+  "bytes": 20560,
+  "notes": "leafless dead tree",
+  "set": "nature"
+ },
+ "tree_cherry": {
+  "tris": 1008,
+  "bytes": 95824,
+  "notes": "cherry blossom tree with fallen petals",
+  "set": "nature"
+ },
+ "tree_palm": {
+  "tris": 330,
+  "bytes": 26080,
+  "notes": "coconut palm with nine fronds",
+  "set": "nature"
+ },
+ "tree_autumn": {
+  "tris": 992,
+  "bytes": 93420,
+  "notes": "autumn oak (orange/red/yellow) with leaf litter",
+  "set": "nature"
+ },
+ "tree_apple": {
+  "tris": 676,
+  "bytes": 66948,
+  "notes": "small orchard tree with apples",
+  "set": "nature"
+ },
+ "bush_round": {
+  "tris": 120,
+  "bytes": 13492,
+  "notes": "round bush",
+  "set": "nature"
+ },
+ "bush_flowering": {
+  "tris": 340,
+  "bytes": 35952,
+  "notes": "bush with pink/white blooms",
+  "set": "nature"
+ },
+ "bush_berry": {
+  "tris": 260,
+  "bytes": 27772,
+  "notes": "bush with berries",
+  "set": "nature"
+ },
+ "fern": {
+  "tris": 72,
+  "bytes": 6260,
+  "notes": "nine-frond fern",
+  "set": "nature"
+ },
+ "tall_reeds": {
+  "tris": 166,
+  "bytes": 13432,
+  "notes": "reeds with cattail heads",
+  "set": "nature"
+ },
+ "lily_pads": {
+  "tris": 200,
+  "bytes": 15300,
+  "notes": "lily pads with a lotus",
+  "set": "nature"
+ },
+ "seaweed": {
+  "tris": 168,
+  "bytes": 13012,
+  "notes": "seaweed strands",
+  "set": "nature"
+ },
+ "mushrooms": {
+  "tris": 540,
+  "bytes": 43524,
+  "notes": "toadstool cluster",
+  "set": "nature"
+ },
+ "flower_patch_a": {
+  "tris": 656,
+  "bytes": 47428,
+  "notes": "mixed flower patch (red/yellow/white)",
+  "set": "nature"
+ },
+ "flower_patch_b": {
+  "tris": 656,
+  "bytes": 47496,
+  "notes": "mixed flower patch (pink/white/purple)",
+  "set": "nature"
+ },
+ "flower_patch_c": {
+  "tris": 656,
+  "bytes": 47620,
+  "notes": "mixed flower patch (yellow/orange/blue)",
+  "set": "nature"
+ },
+ "sunflower": {
+  "tris": 513,
+  "bytes": 37076,
+  "notes": "three sunflowers",
+  "set": "nature"
+ },
+ "grass_clump": {
+  "tris": 96,
+  "bytes": 8980,
+  "notes": "tall grass clump (wind sway)",
+  "set": "nature"
+ },
+ "cactus": {
+  "tris": 200,
+  "bytes": 16572,
+  "notes": "desert cactus",
+  "set": "nature"
+ },
+ "rock_small_a": {
+  "tris": 100,
+  "bytes": 11212,
+  "notes": "two small rocks",
+  "set": "nature"
+ },
+ "rock_small_b": {
+  "tris": 60,
+  "bytes": 7356,
+  "notes": "three grey pebbles",
+  "set": "nature"
+ },
+ "rock_mossy": {
+  "tris": 140,
+  "bytes": 15448,
+  "notes": "mossy rock pair",
+  "set": "nature"
+ },
+ "boulder_large": {
+  "tris": 140,
+  "bytes": 15456,
+  "notes": "large boulder with chunks and moss",
+  "set": "nature"
+ },
+ "rock_pile": {
+  "tris": 140,
+  "bytes": 15512,
+  "notes": "pile of stones",
+  "set": "nature"
+ },
+ "cairn": {
+  "tris": 80,
+  "bytes": 9404,
+  "notes": "stone cairn",
+  "set": "nature"
+ },
+ "stalagmite_a": {
+  "tris": 116,
+  "bytes": 8908,
+  "notes": "stalagmite trio",
+  "set": "nature"
+ },
+ "stalagmite_b": {
+  "tris": 176,
+  "bytes": 13048,
+  "notes": "stalagmite cluster",
+  "set": "nature"
+ },
+ "crystal_blue": {
+  "tris": 110,
+  "bytes": 10408,
+  "notes": "blue crystal cluster",
+  "set": "nature"
+ },
+ "crystal_purple": {
+  "tris": 110,
+  "bytes": 10540,
+  "notes": "purple crystal cluster",
+  "set": "nature"
+ },
+ "crystal_green": {
+  "tris": 110,
+  "bytes": 10540,
+  "notes": "green crystal cluster",
+  "set": "nature"
+ },
+ "ice_spike": {
+  "tris": 80,
+  "bytes": 8108,
+  "notes": "ice spikes on snow",
+  "set": "nature"
+ },
+ "ice_block": {
+  "tris": 168,
+  "bytes": 14144,
+  "notes": "ice block",
+  "set": "nature"
+ },
+ "lava_rock": {
+  "tris": 136,
+  "bytes": 13472,
+  "notes": "obsidian rock with glowing veins",
+  "set": "nature"
+ },
+ "log_fallen": {
+  "tris": 104,
+  "bytes": 8660,
+  "notes": "fallen log with moss",
+  "set": "nature"
+ },
+ "stump": {
+  "tris": 243,
+  "bytes": 17780,
+  "notes": "tree stump with rings",
+  "set": "nature"
+ },
+ "log_pile": {
+  "tris": 387,
+  "bytes": 25752,
+  "notes": "stack of 9 logs",
+  "set": "nature"
+ },
+ "driftwood": {
+  "tris": 88,
+  "bytes": 7924,
+  "notes": "driftwood branch and shell",
+  "set": "nature"
+ },
+ "seashell": {
+  "tris": 41,
+  "bytes": 5052,
+  "notes": "fan shell",
+  "set": "nature"
+ },
+ "coral": {
+  "tris": 156,
+  "bytes": 11780,
+  "notes": "coral branches",
+  "set": "nature"
+ },
+ "bones": {
+  "tris": 112,
+  "bytes": 10940,
+  "notes": "skull and bone",
+  "set": "nature"
+ },
+ "mailbox": {
+  "tris": 352,
+  "bytes": 27120,
+  "notes": "roadside mailbox with flag",
+  "set": "town"
+ },
+ "lamp_post": {
+  "tris": 336,
+  "bytes": 25520,
+  "notes": "iron street lamp with lit lantern",
+  "set": "town"
+ },
+ "park_bench": {
+  "tris": 704,
+  "bytes": 54620,
+  "notes": "outdoor slatted bench",
+  "set": "town"
+ },
+ "fountain": {
+  "tris": 512,
+  "bytes": 35124,
+  "notes": "town fountain, 2 x 2 cells",
+  "set": "town"
+ },
+ "fire_hydrant": {
+  "tris": 214,
+  "bytes": 15968,
+  "notes": "fire hydrant",
+  "set": "town"
+ },
+ "market_stall": {
+  "tris": 1004,
+  "bytes": 89668,
+  "notes": "striped-awning market stall, 2 cells",
+  "set": "town"
+ },
+ "flag_pole": {
+  "tris": 140,
+  "bytes": 11928,
+  "notes": "flag pole with Poke Ball pennant",
+  "set": "town"
+ },
+ "satellite_dish": {
+  "tris": 188,
+  "bytes": 14680,
+  "notes": "roof satellite dish",
+  "set": "town"
+ },
+ "windmill": {
+  "tris": 256,
+  "bytes": 18752,
+  "notes": "small windmill with lattice sails",
+  "set": "town"
+ },
+ "wooden_gate": {
+  "tris": 408,
+  "bytes": 32108,
+  "notes": "five-bar ranch gate",
+  "set": "town"
+ },
+ "stone_arch": {
+  "tris": 448,
+  "bytes": 33752,
+  "notes": "stone gateway arch, 3 cells",
+  "set": "town"
+ },
+ "footbridge": {
+  "tris": 440,
+  "bytes": 34568,
+  "notes": "plank bridge section",
+  "set": "town"
+ },
+ "pier_post": {
+  "tris": 79,
+  "bytes": 6480,
+  "notes": "mooring post with rope",
+  "set": "town"
+ },
+ "dock_plank": {
+  "tris": 408,
+  "bytes": 31292,
+  "notes": "dock deck cell",
+  "set": "town"
+ },
+ "rowboat": {
+  "tris": 338,
+  "bytes": 25612,
+  "notes": "rowboat with oars, 2 cells",
+  "set": "town"
+ },
+ "sailboat": {
+  "tris": 136,
+  "bytes": 10732,
+  "notes": "sailboat with mast and two sails, 2 cells",
+  "set": "town"
+ },
+ "lighthouse": {
+  "tris": 540,
+  "bytes": 38720,
+  "notes": "striped lighthouse, 3.6 + lamp room",
+  "set": "town"
+ },
+ "street_sign": {
+  "tris": 112,
+  "bytes": 9012,
+  "notes": "street name plate with arrow",
+  "set": "town"
+ },
+ "bin_street": {
+  "tris": 256,
+  "bytes": 18008,
+  "notes": "street litter bin",
+  "set": "town"
+ },
+ "water_tower": {
+  "tris": 632,
+  "bytes": 43456,
+  "notes": "lattice water tower",
+  "set": "town"
+ },
+ "billboard": {
+  "tris": 256,
+  "bytes": 20816,
+  "notes": "roadside billboard",
+  "set": "town"
+ },
+ "telephone_pole": {
+  "tris": 210,
+  "bytes": 16136,
+  "notes": "utility pole with insulators",
+  "set": "town"
+ },
+ "barricade": {
+  "tris": 608,
+  "bytes": 46768,
+  "notes": "striped barrier with blinkers",
+  "set": "town"
+ },
+ "traffic_cone": {
+  "tris": 180,
+  "bytes": 13520,
+  "notes": "traffic cone",
+  "set": "town"
+ },
+ "hay_bale": {
+  "tris": 412,
+  "bytes": 30524,
+  "notes": "hay bale",
+  "set": "town"
+ },
+ "well": {
+  "tris": 330,
+  "bytes": 24048,
+  "notes": "stone well with roof and bucket",
+  "set": "town"
+ },
+ "scarecrow": {
+  "tris": 340,
+  "bytes": 25740,
+  "notes": "scarecrow",
+  "set": "town"
+ },
+ "buoy": {
+  "tris": 242,
+  "bytes": 17380,
+  "notes": "floating buoy with lamp",
+  "set": "town"
+ },
+ "anchor": {
+  "tris": 136,
+  "bytes": 10444,
+  "notes": "ship anchor",
+  "set": "town"
+ },
+ "container": {
+  "tris": 640,
+  "bytes": 48840,
+  "notes": "shipping container, 2 cells",
+  "set": "town"
+ },
+ "cargo_crates": {
+  "tris": 228,
+  "bytes": 17952,
+  "notes": "stack of cargo crates",
+  "set": "town"
+ },
+ "life_ring": {
+  "tris": 32,
+  "bytes": 3432,
+  "notes": "red/white life ring (wall mounted)",
+  "set": "town"
+ },
+ "power_pylon": {
+  "tris": 360,
+  "bytes": 27996,
+  "notes": "lattice power pylon",
+  "set": "town"
+ },
+ "incense_burner": {
+  "tris": 176,
+  "bytes": 12816,
+  "notes": "brass incense burner with smoke",
+  "set": "town"
+ },
+ "candle_stand": {
+  "tris": 210,
+  "bytes": 17416,
+  "notes": "three-arm candle stand",
+  "set": "town"
+ },
+ "town_sign": {
+  "tris": 224,
+  "bytes": 17684,
+  "notes": "town welcome board",
+  "set": "town"
+ },
+ "safari_gate": {
+  "tris": 354,
+  "bytes": 29956,
+  "notes": "Safari Zone entrance frame, 3 cells",
+  "set": "town"
+ },
+ "truck": {
+  "tris": 584,
+  "bytes": 39840,
+  "notes": "delivery truck (Vermilion dock)",
+  "set": "town"
+ },
+ "ship_funnel": {
+  "tris": 348,
+  "bytes": 25148,
+  "notes": "S.S. Anne funnel",
+  "set": "town"
+ },
+ "tv_antenna": {
+  "tris": 164,
+  "bytes": 13184,
+  "notes": "roof TV aerial",
+  "set": "building"
+ },
+ "weather_vane": {
+  "tris": 92,
+  "bytes": 8128,
+  "notes": "roof-ridge weather vane",
+  "set": "building"
+ },
+ "wall_lantern": {
+  "tris": 180,
+  "bytes": 14356,
+  "notes": "porch wall lantern",
+  "set": "building"
+ },
+ "radio_mast": {
+  "tris": 304,
+  "bytes": 22324,
+  "notes": "red/white radio mast with beacon",
+  "set": "building"
+ },
+ "roof_hatch": {
+  "tris": 240,
+  "bytes": 18804,
+  "notes": "rooftop stair hatch",
+  "set": "building"
+ },
+ "roof_tank": {
+  "tris": 256,
+  "bytes": 18660,
+  "notes": "rooftop water tank",
+  "set": "building"
+ },
+ "gym_top_rock": {
+  "tris": 228,
+  "bytes": 22196,
+  "notes": "gym roof ornament: rock",
+  "set": "building"
+ },
+ "gym_top_water": {
+  "tris": 216,
+  "bytes": 16172,
+  "notes": "gym roof ornament: wave and droplet",
+  "set": "building"
+ },
+ "gym_top_electric": {
+  "tris": 212,
+  "bytes": 16920,
+  "notes": "gym roof ornament: lightning rod",
+  "set": "building"
+ },
+ "gym_top_grass": {
+  "tris": 548,
+  "bytes": 54076,
+  "notes": "gym roof ornament: topiary",
+  "set": "building"
+ },
+ "gym_top_poison": {
+  "tris": 344,
+  "bytes": 27564,
+  "notes": "gym roof ornament: bubbling cauldron",
+  "set": "building"
+ },
+ "gym_top_psychic": {
+  "tris": 300,
+  "bytes": 26468,
+  "notes": "gym roof ornament: crystal eye orb",
+  "set": "building"
+ },
+ "gym_top_fire": {
+  "tris": 384,
+  "bytes": 27224,
+  "notes": "gym roof ornament: flame brazier",
+  "set": "building"
+ },
+ "gym_top_ground": {
+  "tris": 192,
+  "bytes": 15452,
+  "notes": "gym roof ornament: earth tiers with pennant",
+  "set": "building"
+ },
+ "table_set": {
+  "tris": 3072,
+  "bytes": 242608,
+  "set": "furniture",
+  "pieces": [
+   "m0",
+   "m1",
+   "m2",
+   "m3",
+   "m4",
+   "m5",
+   "m6",
+   "m7",
+   "m8",
+   "m9",
+   "m10",
+   "m11",
+   "m12",
+   "m13",
+   "m14",
+   "m15"
+  ],
+  "notes": "modular set of 16 meshes (m0..m15) picked by the neighbour mask"
+ },
+ "counter_center_set": {
+  "tris": 3328,
+  "bytes": 255368,
+  "set": "furniture",
+  "pieces": [
+   "m0",
+   "m1",
+   "m2",
+   "m3",
+   "m4",
+   "m5",
+   "m6",
+   "m7",
+   "m8",
+   "m9",
+   "m10",
+   "m11",
+   "m12",
+   "m13",
+   "m14",
+   "m15"
+  ],
+  "notes": "modular set of 16 meshes (m0..m15) picked by the neighbour mask"
+ },
+ "counter_mart_set": {
+  "tris": 3680,
+  "bytes": 282052,
+  "set": "furniture",
+  "pieces": [
+   "m0",
+   "m1",
+   "m2",
+   "m3",
+   "m4",
+   "m5",
+   "m6",
+   "m7",
+   "m8",
+   "m9",
+   "m10",
+   "m11",
+   "m12",
+   "m13",
+   "m14",
+   "m15"
+  ],
+  "notes": "modular set of 16 meshes (m0..m15) picked by the neighbour mask"
+ },
+ "bench_set": {
+  "tris": 928,
+  "bytes": 70676,
+  "set": "furniture",
+  "pieces": [
+   "m0",
+   "m1",
+   "m2",
+   "m3"
+  ],
+  "notes": "modular set of 4 meshes (m0..m3) picked by the neighbour mask"
+ },
+ "desk_set": {
+  "tris": 3072,
+  "bytes": 242652,
+  "set": "furniture",
+  "pieces": [
+   "m0",
+   "m1",
+   "m2",
+   "m3",
+   "m4",
+   "m5",
+   "m6",
+   "m7",
+   "m8",
+   "m9",
+   "m10",
+   "m11",
+   "m12",
+   "m13",
+   "m14",
+   "m15"
+  ],
+  "notes": "modular set of 16 meshes (m0..m15) picked by the neighbour mask"
  }
 }

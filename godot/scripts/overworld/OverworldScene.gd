@@ -131,8 +131,12 @@ func _setup_camera() -> void:
 	_camera.near = 0.5
 	_camera.far = 200.0
 	var pitch := deg_to_rad(WorldData.CAM_PITCH_DEG)
+	var dist := CAM_DIST
+	for a in OS.get_cmdline_user_args():   # --cam_dist=N : closer inspection shots of props (screenshots only)
+		if a.begins_with("--cam_dist="):
+			dist = float(a.substr("--cam_dist=".length()))
 	_camera.transform = Transform3D.IDENTITY
-	_camera.position = Vector3(0.0, sin(pitch) * CAM_DIST, cos(pitch) * CAM_DIST)
+	_camera.position = Vector3(0.0, sin(pitch) * dist, cos(pitch) * dist)
 	_camera.rotation = Vector3(-pitch, 0.0, 0.0)
 	_camera.current = true
 	_sun.shadow_enabled = false
