@@ -388,7 +388,7 @@ func _articuno_binoculars(_h: Dictionary) -> void:
 	await Story.say("Route15UpstairsBinocularsText")
 	Story.cry("ARTICUNO")
 	var box := Story.mon_popup("ARTICUNO", Rect2i(110, 24, 100, 96))
-	await Story.wait_button(90)
+	await Story.wait_button(60 * 60 * 10)  # DisplayMonFrontSpriteInBox waits for A/B (no timeout)
 	Story.close_box(box)
 
 # ================================================================= FUCHSIA CITY
