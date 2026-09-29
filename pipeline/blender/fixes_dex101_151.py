@@ -319,10 +319,10 @@ def _bone_mon(d, look, mar):
         put(d, 'body', 0, e(32, 46, bw, bh, 'br', rd=8.4), e(32, 53.5, 9, 6.6, 'br', rd=8.4))
         paint(d, spot('body', 32, 47.5, 6.2, 7.5, 'cr', frontOnly=True))
     else:
-        bh, bw, hy, hs, legtop = 12.5, 11.4, 22.5, 0.9, 45
-        put(d, 'body', 0, e(32, 37.5, bw, bh, 'br', rd=9.2), e(32, 46, 10.6, 7.6, 'br', rd=8.8))
-        paint(d, spot('body', 32, 38.5, 7.2, 9.0, 'cr', frontOnly=True))
-        paint(d, band('body', [25.5, 34, 29, 35.4, 32, 35.6, 35, 35.4, 38.5, 34], 0.8, 'brd', frontOnly=True))
+        bh, bw, hy, hs, legtop = 12.5, 11.4, 19.5, 0.9, 42
+        put(d, 'body', 0, e(32, 34.5, bw, bh, 'br', rd=9.2), e(32, 43, 10.6, 7.6, 'br', rd=8.8))
+        paint(d, spot('body', 32, 35.5, 7.2, 9.0, 'cr', frontOnly=True))
+        paint(d, band('body', [25.5, 31, 29, 32.4, 32, 32.6, 35, 32.4, 38.5, 31], 0.8, 'brd', frontOnly=True))
     fr = 8.6 * hs                  # face half-width
     put(d, 'head', -2.5,
         e(32, hy, fr + 0.6, 7.8 * hs, 'br', rd=8.2 * hs), e(32, hy + 5 * hs, 5.0 * hs, 3.4 * hs, 'br', rd=4.4 * hs, dd=-4.6 * hs),
@@ -338,7 +338,7 @@ def _bone_mon(d, look, mar):
         hx = 32 + sx * 6.2 * hs
         put(d, 'horn' + s, -1.5, cap(hx, hy - 11 * hs, hx + sx * (3.6 if not mar else 5.0), hy - (20.5 if not mar else 21.5) * hs,
                                      3.0, 0.7, 'sk', d1=1, d2=1))
-    top = 41.5 if not mar else 31.5
+    top = 41.5 if not mar else 28.5
     put(d, 'armR', -1.0, cap(32 + bw - 0.6, top, 32 + bw + 5.5, top + 8.5, 3.2 if not mar else 3.9, 2.8 if not mar else 3.3, 'br', d1=-1, d2=-2))
     put(d, 'handR', -2.5, e(32 + bw + 6.1, top + 10.0, 3.3, 3.1, 'br', rd=3.1))
     ax = 32 - bw
@@ -512,7 +512,7 @@ def chansey(d, look):
 def tangela(d, look):
     pal = {'bl': '#5470c8', 'bld': '#3a52a8', 'bll': '#7d9ae2', 'red': '#e8626c', 'dark': '#14142a'}
     new(d, pal)
-    c = (32, 31.5)
+    c = (32, 35.5)
     put(d, 'body', 0, e(c[0], c[1], 15.0, 15.0, 'bl', rd=14.0))
     A = [[(-85, 12), (-75, 36), (-50, 56), (-15, 66), (25, 60), (58, 42), (82, 16)],
          [(-88, -12), (-78, -36), (-52, -52), (-22, -62), (14, -60), (46, -48), (78, -30)],
@@ -531,15 +531,15 @@ def tangela(d, look):
         (ps_a if i % 2 == 0 else ps_b).extend(_rope(r, c, 16.6, 5.0, 'bll' if i % 3 else 'bld', w2=4.6, step=14.0))
     put(d, 'coilA', 0, *ps_a)
     put(d, 'coilB', 0, *ps_b)
-    tend = [[(19, 20), (12, 15), (9, 8), (13, 5)], [(46, 17), (52, 12), (51, 6)], [(15.5, 34), (9, 33.5), (6, 38)],
-            [(49, 36), (55, 34), (57, 29)], [(29, 16), (28, 9), (33, 5)]]
+    tend = [[(19, 24), (12, 19), (9, 12), (13, 9)], [(46, 21), (52, 16), (51, 10)], [(15.5, 38), (9, 37.5), (6, 42)],
+            [(49, 40), (55, 38), (57, 33)], [(29, 20), (28, 13), (33, 9)]]
     for i, pts in enumerate(tend):
         flat = [q for p in pts for q in p]
         put(d, 'vine%d' % i, -1.0 - i % 2, stroke(flat, 4.4, 'bl' if i % 2 else 'bld', w2=2.0, d1=-8, d2=-8 - (i % 3) * 2))
     for s, sx in (('L', -1), ('R', 1)):
-        put(d, 'foot' + s, 1.0, e(32 + sx * 7.2, 56.6, 5.0, 4.4, 'red', rd=4.6, dd=-1), e(32 + sx * 7.8, 59.4, 5.6, 2.2, 'red', rd=4.6, dd=-2.5))
-    paint(d, spot('body', 32, 32.6, 10.6, 5.0, 'dark', frontOnly=True),
-          eye(27.2, 32.4, 3.0, iris='#2a2a48'), eye(36.8, 32.4, 3.0, iris='#2a2a48'))
+        put(d, 'foot' + s, 1.0, e(32 + sx * 7.2, 55.6, 5.2, 4.8, 'red', rd=4.6, dd=-1), e(32 + sx * 7.8, 59.0, 5.8, 2.6, 'red', rd=4.6, dd=-2.5))
+    paint(d, spot('body', 32, 36.6, 10.6, 5.0, 'dark', frontOnly=True),
+          eye(27.2, 36.4, 3.0, iris='#2a2a48'), eye(36.8, 36.4, 3.0, iris='#2a2a48'))
 
 
 @fix('KANGASKHAN')
@@ -1065,7 +1065,7 @@ def _eeveelution(d, kind):
             put(d, 'ear' + s, -6, e(32 + sx * 8.2, 19, 4.4, 9.8, 'ear', rd=2.6, rot=sx * 14))
             paint(d, spot('ear' + s, 32 + sx * 6.6, 20.4, 1.9, 6.0, 'tip', rot=sx * 14, frontOnly=True), spot('ear' + s, 32 + sx * 11.4, 10.4, 2.6, 2.6, 'tip'))
         elif kind == 'jolteon':
-            put(d, 'ear' + s, -6, cap(ex - sx * 1.2, 25, 32 + sx * 12.6, 3.2, 4.8, 0.8, 'ear'))
+            put(d, 'ear' + s, -6, cap(ex - sx * 1.2, 25, 32 + sx * 11.6, 6.4, 4.4, 0.8, 'ear'))
         elif kind == 'flareon':
             put(d, 'ear' + s, -6, cap(ex - sx * 0.6, 24, 32 + sx * 11.4, 8.4, 5.0, 1.4, 'ear'))
             paint(d, spot('ear' + s, 32 + sx * 9.2, 17, 1.8, 4.6, 'cr', rot=sx * 22, frontOnly=True))
@@ -1097,9 +1097,9 @@ def _eeveelution(d, kind):
             smooth_plate([38, 24, 32, 16, 34, 7, 39, 12, 43, 5, 45, 14, 42, 24], 'fin2', T=1.4, dd=27), stroke([38.5, 22, 39, 10], 1.4, 'fin3', d1=27, d2=27))
     # back ridge
     if kind == 'jolteon':
-        put(d, 'spikes', 2, *[cap(32 + sx, 35.5, 32 + sx * 1.6, 27 - (k % 2) * 2, 4.4, 0.8, 'br', d1=dz, d2=dz + 1.5)
-                             for k, dz in enumerate((0, 6, 12, 18, 24)) for sx in (-4.0, 4.0)] +
-            [cap(32, 34.4, 32, 24.4, 4.6, 0.8, 'br', d1=dz, d2=dz + 1.5) for dz in (3, 9, 15, 21)])
+        put(d, 'spikes', 2, *[cap(32 + sx, 35.5, 32 + sx * 1.7, 28.4 - (k % 2) * 1.6, 3.8, 0.8, 'br', d1=dz, d2=dz + 1.5)
+                             for k, dz in enumerate((2, 10, 18, 26)) for sx in (-4.2, 4.2)] +
+            [cap(32, 34.6, 32, 26.4, 4.0, 0.8, 'br', d1=dz, d2=dz + 1.5) for dz in (6, 14, 22)])
     elif kind == 'vaporeon':
         put(d, 'ridge', 2, *[cap(32, 35.6, 32, 28.6, 3.4, 0.7, 'fin3', d1=dz, d2=dz + 2.4) for dz in (2, 7, 12, 17, 22)])
     elif kind == 'flareon':
@@ -1133,7 +1133,7 @@ def porygon(d, look):
     new(d, pal)
     put(d, 'body', 0, plate([16, 33, 32, 29, 48, 33, 50, 47, 32, 51, 14, 47], 'pk', T=8.0, round=0.5))
     put(d, 'chest', -6, plate([19, 37, 32, 34, 45, 37, 46, 47, 32, 50, 18, 47], 'bl', T=5.0))
-    put(d, 'tail', 12, plate([42, 28, 56, 14, 60, 20, 49, 36], 'bl', T=3.6, dd=12), plate([50, 22, 58, 12, 60, 16, 55, 24], 'bll', T=3.0, dd=14))
+    put(d, 'tail', 6, plate([38, 32, 55, 15, 60, 21, 48, 38], 'bl', T=4.2, dd=6), plate([49, 22, 58, 12, 60, 16, 54, 25], 'bll', T=3.4, dd=8))
     put(d, 'head', -6, plate([20, 14, 32, 8, 44, 14, 44, 27, 32, 32, 20, 27], 'pk', T=9.0), plate([21, 14, 32, 8, 43, 14, 32, 18], 'pkl', T=9.0, dd=0.2))
     put(d, 'beak', -8, cap(32, 24, 32, 26, 7.4, 3.6, 'bl', d1=-9, d2=-22), cap(32, 24, 32, 26, 6.6, 6.0, 'bld', d1=-9, d2=-10))
     for s, sx in (('L', -1), ('R', 1)):
