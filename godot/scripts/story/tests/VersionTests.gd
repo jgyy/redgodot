@@ -504,6 +504,30 @@ static func _yellow_story(t: TestSuite) -> void:
 	t.check(battles.size() == 1 and battles[0].get("trainer_class") == "ROCKET" and int(battles[0].get("party_index")) == int(GameData.versions_data["jessieJames"]["MtMoonB2F"]),
 		"YELLOW: JESSIE & JAMES battle (ROCKET party %s)" % str(GameData.versions_data["jessieJames"]["MtMoonB2F"]))
 	t.check(not host.is_actor_shown("MTMOONB2F_JESSIE") and Story.flag("EVENT_BEAT_JESSIE_JAMES_MTMOONB2F"), "YELLOW: J&J blast off after losing")
+	# --- NPCs that react to PIKACHU's friendship
+	GameState.pikachu_happiness = 120
+	host.load_map("Museum2F", Vector2i(9, 5), "up")
+	ui.said.clear()
+	host.talk("MUSEUM2F_HIKER")
+	t.check(ui.said_has("too attached"), "YELLOW Museum: the hiker sees PIKACHU is attached to you (friendship > 100)")
+	GameState.pikachu_happiness = 40
+	ui.said.clear()
+	host.talk("MUSEUM2F_HIKER")
+	t.check(ui.said_has("untamed"), "YELLOW Museum: the hiker asks for an untamed PIKACHU")
+	host.load_map("CeladonMansion1F", Vector2i(3, 5), "up")
+	GameState.pikachu_happiness = 230
+	ui.said.clear()
+	host.talk("CELADONMANSION1F_GRANNY")
+	t.check(ui.said_has("adorable PIKACHU") and ui.said_has("fantastic duo"), "YELLOW Celadon Mansion: granny praises a devoted PIKACHU")
+	GameState.pikachu_happiness = 20
+	ui.said.clear()
+	host.talk("CELADONMANSION1F_GRANNY")
+	t.check(ui.said_has("hasn't been tamed"), "YELLOW Celadon Mansion: granny scolds for a cold PIKACHU")
+	host.load_map("PokemonFanClub", Vector2i(5, 4), "up")
+	ui.said.clear()
+	host.talk("POKEMONFANCLUB_CLEFAIRY_FAN")
+	t.check(ui.said.size() == 1 and Story.flag("EVENT_SEEL_FAN_BOAST") and not host.is_actor_shown("POKEMONFANCLUB_PIKACHU_FAN"),
+		"YELLOW Fan Club: the CLEFAIRY fan replaces the PIKACHU fan")
 	# --- Chansey by the Pokemon Center counter
 	host.load_map("ViridianPokecenter", Vector2i(4, 4), "up")
 	t.check(host.is_actor_shown("VIRIDIANPOKECENTER_CHANSEY"), "YELLOW: CHANSEY in the Viridian POKeMON CENTER")

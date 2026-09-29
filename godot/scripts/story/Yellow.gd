@@ -32,6 +32,12 @@ func register() -> void:
 		var pre: String = str(m).to_upper()
 		Story.def_map(m, {"talk": {pre + "_CHANSEY": _cry_text.bind("CHANSEY", "CHANSEY: Chaaan sey!")}})
 	Story.def_map("CopycatsHouse1F", {"talk": {"COPYCATSHOUSE1F_CHANSEY": _cry_text.bind("CHANSEY", "CopycatsHouse1FChanseyText")}})
+	Story.def_map("PokemonFanClub", {"talk": {"POKEMONFANCLUB_CLEFAIRY_FAN": _clefairy_fan,
+		"POKEMONFANCLUB_CLEFAIRY": _cry_text.bind("CLEFAIRY", "PokemonFanClubClefairyText")}})
+	Story.def_map("CeruleanCity", {"talk": {"CERULEANCITY_ELECTRODE": _electrode}})
+	# RED's NPCs whose lines change with a PIKACHU in the party (pokeyellow scripts/Museum2F.asm, CeladonMansion1F.asm)
+	Story.def_map("Museum2F", {"talk": {"MUSEUM2F_HIKER": _museum_hiker}})
+	Story.def_map("CeladonMansion1F", {"talk": {"CELADONMANSION1F_GRANNY": _mansion_granny}})
 	for m in JJ_MAPS.keys():
 		var spec: Array = JJ_MAPS[m]
 		Story.def_map(m, {"talk": {spec[0]: _jessie_james.bind(m), spec[1]: _jessie_james.bind(m)},
@@ -158,6 +164,62 @@ func _jenny(_o: Dictionary) -> void:
 func _cry_text(_o: Dictionary, sp: String, text: String) -> void:
 	Story.cry(sp)
 	await Story.say(text)
+
+# ---------------------------------------------------------------- PIKACHU-aware NPCs and Yellow-only scenery
+## RED / BLUE: these handlers are registered too (they replace the plain-text default), so fall back to it there.
+func _default(o: Dictionary) -> void:
+	for line in DialogueText.for_obj(o):
+		await Story.say(str(line))
+
+func _clefairy_fan(_o: Dictionary) -> void:
+	if Story.flag("EVENT_PIKACHU_FAN_BOAST"):
+		await Story.say("PokemonFanClubClefairyFanBetterText")
+		Story.clear("EVENT_PIKACHU_FAN_BOAST")
+	else:
+		await Story.say("PokemonFanClubClefairyFanNormalText")
+		Story.setf("EVENT_SEEL_FAN_BOAST")
+
+func _electrode(_o: Dictionary) -> void:
+	Story.cry("ELECTRODE")
+	var lines := ["CeruleanCityElectrodeTookASnoozeText", "CeruleanCityElectrodeIsLoafingAroundText", "CeruleanCityElectrodeTurnedAwayText",
+		"CeruleanCityElectrodeIgnoredOrdersText"]
+	await Story.say(lines[randi() % lines.size()])
+
+## The Museum's hiker wants a PIKACHU: text 1 while yours isn't fond of you yet (<= 100), text 2 once it clings to you.
+func _museum_hiker(o: Dictionary) -> void:
+	if not GameState.is_yellow():
+		await _default(o)
+		return
+	if PikachuBuddy.buddy() == null:
+		await Story.say("Museum2FHikerText")
+	elif GameState.pikachu_happiness > 100:
+		await Story.say("Museum2FPikachuText2")
+	else:
+		await Story.say("Museum2FPikachuText1")
+
+## Celadon Mansion's granny compliments your PIKACHU according to how tame it is.
+func _mansion_granny(o: Dictionary) -> void:
+	if not GameState.is_yellow():
+		await _default(o)
+		return
+	if PikachuBuddy.buddy() == null:
+		await Story.say("CeladonMansion1Text2")
+		return
+	await Story.say("CeladonMansion1Text6")
+	var h := GameState.pikachu_happiness
+	if h < 50:
+		await Story.say("CeladonMansion1Text7")
+		await Story.say("CeladonMansion1Text8")
+	elif h < 100:
+		await Story.say("CeladonMansion1Text9")
+	elif h < 150:
+		await Story.say("CeladonMansion1Text10")
+	elif h < 200:
+		await Story.say("CeladonMansion1Text11")
+	else:
+		await Story.say("CeladonMansion1Text12")
+		if h >= 251:
+			Story.cry("PIKACHU")
 
 # ---------------------------------------------------------------- JESSIE & JAMES
 func _jj_flag(map_name: String) -> String:

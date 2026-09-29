@@ -360,6 +360,9 @@ def object_overlay(map_names, species):
                 diff['sprite'] = SPRITE_ALIAS.get(yo['sprite'], yo['sprite'])
             if diff:
                 patch[t] = diff
+        for o in add:
+            if o['text'].endswith('_ELECTRODE'):   # Yellow draws it with the POKe BALL sprite; here it is the POKeMON itself
+                o['sprite'] = 'mon:ELECTRODE'
         for t in rk:
             if t not in yk:
                 remove.append(t)
