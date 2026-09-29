@@ -962,6 +962,8 @@ func in_safari() -> bool:
 	return flag("EVENT_IN_SAFARI_ZONE") and GameState.safari_steps >= 0
 
 func _run_battle(enc: Dictionary) -> String:
+	if str(enc.get("kind", "wild")) == "trainer":
+		GameState.flags.erase(EncounterSystem.GLITCH_FLAG)   # a trainer's name overwrites the Old Man glitch's name buffer
 	var r := "win"
 	if battle_override.is_valid():
 		r = str(await battle_override.call(enc))

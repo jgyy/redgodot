@@ -481,8 +481,50 @@ static func _status(t: TestSuite) -> void:
 			hi = maxi(hi, b.e.v["confused"])
 	t.check(lo >= 2 and hi <= 5, "confusion lasts 2-5 turns (%d..%d)" % [lo, hi])
 
+# ---------------------------------------------------------------- the Old Man glitch and MISSINGNO.
+static func _missingno(t: TestSuite) -> void:
+	var saved_flags := GameState.flags.duplicate()
+	var saved_cell := GameState.player_cell
+	var saved_bag := GameState.bag.duplicate()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 11
+	GameState.flags.erase(EncounterSystem.GLITCH_FLAG)
+	GameState.player_cell = Vector2i(19, 9)
+	var none := 0
+	for i in 300:
+		if EncounterSystem.roll("CinnabarIsland", true, rng).get("species", "") == "MISSINGNO":
+			none += 1
+	t.check(none == 0, "no MISSINGNO. before the Old Man's demo")
+	GameState.flags[EncounterSystem.GLITCH_FLAG] = true
+	var found := 0
+	for i in 600:
+		if EncounterSystem.roll("CinnabarIsland", true, rng).get("species", "") == "MISSINGNO":
+			found += 1
+	t.check(found > 20, "after the Old Man's demo, surfing Cinnabar's east coast meets MISSINGNO. (%d/600)" % found)
+	var on_land := 0
+	for i in 300:
+		if EncounterSystem.roll("CinnabarIsland", false, rng).get("species", "") == "MISSINGNO":
+			on_land += 1
+	GameState.player_cell = Vector2i(4, 9)
+	var west := 0
+	for i in 300:
+		if EncounterSystem.roll("CinnabarIsland", true, rng).get("species", "") == "MISSINGNO":
+			west += 1
+	t.check(on_land == 0 and west == 0, "the glitch needs the east shore and water")
+	BattleEngine.ensure_glitch_species()
+	GameState.bag = {"POTION": 1, "ANTIDOTE": 2, "REPEL": 3, "POKE_BALL": 4, "ESCAPE_ROPE": 5, "REVIVE": 6}
+	GameState.party = [GameState.PartyMon.new("PIKACHU", 30)]
+	var mm := GameState.PartyMon.new("MISSINGNO", 80)
+	BattleEngine.new({"kind": "wild", "enemy_party": [mm], "seed": 1})
+	t.check(GameState.bag["REVIVE"] == 134 and GameState.bag["ESCAPE_ROPE"] == 5, "MISSINGNO. item glitch: the 6th item stack gains 128")
+	GameState.flags = saved_flags
+	GameState.player_cell = saved_cell
+	GameState.bag = saved_bag
+	GameData.species.erase("MISSINGNO")   # the glitch species is added on demand: keep the Pokedex at 151 for later tests
+
 # ---------------------------------------------------------------- everything else the audit lists
 static func _misc(t: TestSuite) -> void:
+	_missingno(t)
 	# stat stages use pret's ratio table
 	t.check(BattleEngine.STAGE == [25, 28, 33, 40, 50, 66, 100, 150, 200, 250, 300, 350, 400], "stat stage multipliers: 25/100 .. 400/100")
 	# the SPEED tie is a coin flip; faster moves first; QUICK ATTACK beats speed

@@ -387,6 +387,7 @@ static func catch_demo() -> void:
 	GameState.player_name = "OLD MAN"
 	await Story.wild_battle("WEEDLE", 5, {"demo": true, "no_blackout": true, "trainer_name": "OLD MAN"})
 	GameState.player_name = saved_name
+	GameState.flags[EncounterSystem.GLITCH_FLAG] = true   # leaves "OLD MAN" in the name buffer: the Old Man glitch is armed
 
 func _mart_enter() -> Callable:
 	if Story.flag("EVENT_OAK_GOT_PARCEL") or Story.bag_has("OAKS_PARCEL"):

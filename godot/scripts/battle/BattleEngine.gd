@@ -73,6 +73,11 @@ func _init(opts: Dictionary) -> void:
 			break
 	trainer_items = (o.get("trainer_items", []) as Array).duplicate()
 	safari = o.get("safari", false)
+	if wild and not e.party.is_empty() and e.party[0].species_id == "MISSINGNO":
+		# the MISSINGNO. item glitch: meeting it turns the 6th item stack into 128 + n
+		var keys := GameState.bag.keys()
+		if keys.size() >= 6:
+			GameState.bag[keys[5]] = int(GameState.bag[keys[5]]) + 128
 	if o.has("seed"):
 		rng.seed = int(o["seed"])
 	else:
