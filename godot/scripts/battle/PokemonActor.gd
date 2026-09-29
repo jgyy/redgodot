@@ -38,6 +38,7 @@ func setup(sid: String) -> void:
 		model = _fallback_model(sid)
 	add_child(model)
 	Toon.apply(model)
+	Toon.set_param(model, "use_vertex_ao", 1.0)   # the glbs carry baked ambient occlusion in COLOR_0
 	_anim = _find_anim_player(model)
 	AnimUtil.fix_looping(_anim)
 	play("Idle")
