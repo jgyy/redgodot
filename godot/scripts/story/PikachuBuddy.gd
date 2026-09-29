@@ -111,6 +111,30 @@ static func mood(m: GameState.PartyMon, map_name: String, in_grass: bool, rng: R
 		lines.append([n + " seems to like PALLET TOWN.", "heart"])
 	return lines[rng.randi_range(0, lines.size() - 1)]
 
+## PIKACHU shows how it feels with an emote bubble over its head and a cry (pokeyellow pikachu_emotions.asm): `where` is an
+## event name. Called by Story hooks; does nothing outside YELLOW, without the buddy, or while it is down.
+static func react(where: String) -> void:
+	if not GameState.is_yellow() or not alive():
+		return
+	var t := tier()
+	var kind := ""
+	match where:
+		"heal":
+			kind = "heart" if t >= 2 else "..."
+		"gym":
+			kind = "!" if t >= 2 else "..."
+		"tower":
+			kind = "..."
+		"badge":
+			kind = "heart" if t >= 2 else "!"
+		"enter":
+			kind = ("heart" if t >= 3 else ("?" if t == 2 else "...")) if randf() < 0.18 else ""
+	if kind == "":
+		return
+	Story.hq("emote", ["FOLLOWER", kind])
+	if kind != "...":
+		Audio.cry("PIKACHU")
+
 ## Text for the trainer card / summary: how PIKACHU feels (Yellow shows it as a face; here it is a word).
 static func mood_word() -> String:
 	return TIER_NAMES[tier()]

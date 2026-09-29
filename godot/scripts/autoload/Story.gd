@@ -1014,6 +1014,7 @@ func award_badge(badge: String, text: String = "") -> void:
 		GameState.badges.append(badge)
 		GameState.badge_earned.emit(badge)
 	sfx("get_badge")
+	PikachuBuddy.react("badge")
 	music("badge", true)
 	await say(text if text != "" else GameState.player_name + " received the " + badge + "!")
 	map_music()
@@ -1408,6 +1409,7 @@ func nurse_heal(o: Dictionary) -> void:
 		GameState.last_heal_cell = spot
 	face(id, "down")
 	map_music()
+	PikachuBuddy.react("heal")   # YELLOW: PIKACHU is happy to be rested
 	await say(tf("PokemonFightingFitText", "Thank you!\fYour POKéMON are fighting fit!"))
 	await say(tf("PokemonCenterFarewellText", "We hope to see you again!"))
 

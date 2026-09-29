@@ -20,6 +20,14 @@ const CHANSEY_MAPS := ["ViridianPokecenter", "PewterPokecenter", "MtMoonPokecent
 	"IndigoPlateauLobby"]
 
 func register() -> void:
+	# PIKACHU's expressions: it reacts when you walk into a new place
+	Story.global_enter_hooks.append(func(m: String) -> void:
+		if m.ends_with("Gym"):
+			PikachuBuddy.react("gym")
+		elif m.begins_with("PokemonTower"):
+			PikachuBuddy.react("tower")
+		else:
+			PikachuBuddy.react("enter"))
 	Story.def_map("Route24", {"talk": {"ROUTE24_COOLTRAINER_M4": _damian}})
 	Story.def_map("CeruleanTradeHouse", {"talk": {
 		"CERULEANMELANIESHOUSE_MELANIE": _melanie,

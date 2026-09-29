@@ -537,6 +537,22 @@ static func _yellow_story(t: TestSuite) -> void:
 	host.talk("POKEMONFANCLUB_CLEFAIRY_FAN")
 	t.check(ui.said.size() == 1 and Story.flag("EVENT_SEEL_FAN_BOAST") and not host.is_actor_shown("POKEMONFANCLUB_PIKACHU_FAN"),
 		"YELLOW Fan Club: the CLEFAIRY fan replaces the PIKACHU fan")
+	# --- PIKACHU's expressions
+	GameState.pikachu_happiness = 200
+	GameState.party[0].hp = maxi(1, GameState.party[0].hp)
+	host.calls.clear()
+	PikachuBuddy.react("gym")
+	PikachuBuddy.react("heal")
+	t.check(host.calls.has("emote:FOLLOWER:!") and host.calls.has("emote:FOLLOWER:heart"), "YELLOW: a fond PIKACHU shows '!' at a gym and a heart after healing")
+	GameState.pikachu_happiness = 10
+	host.calls.clear()
+	PikachuBuddy.react("heal")
+	t.check(host.calls.has("emote:FOLLOWER:..."), "YELLOW: a cold PIKACHU only sulks ('...')")
+	GameState.set_version("RED")
+	host.calls.clear()
+	PikachuBuddy.react("heal")
+	t.check(host.calls.is_empty(), "RED / BLUE: no PIKACHU reactions")
+	GameState.set_version("YELLOW")
 	# --- Chansey by the Pokemon Center counter
 	host.load_map("ViridianPokecenter", Vector2i(4, 4), "up")
 	t.check(host.is_actor_shown("VIRIDIANPOKECENTER_CHANSEY"), "YELLOW: CHANSEY in the Viridian POKeMON CENTER")
