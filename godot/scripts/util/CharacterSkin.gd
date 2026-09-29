@@ -19,6 +19,10 @@ const DEFAULTS := {
 	"mat_pants": "#80808a", "mat_shoes": "#606068", "mat_hat": "#909090",
 }
 
+## Clips baked by pipeline/blender/char_anim.py: Idle, Walk (one full 2-step gait per 16-frame cell, so it stays
+## seamless when restarted every step), Run, Talk, Wave, Cheer -- all loop.
+const LOOPING_EXTRA := ["Talk", "Wave", "Cheer", "Surf"]
+
 const SLOT_FIELD := {
 	"mat_skin": "skin", "mat_hair": "hair", "mat_top": "shirt",
 	"mat_pants": "pants", "mat_shoes": "shoes", "mat_hat": "hat",
@@ -45,14 +49,43 @@ static func instantiate(sprite_key: String, toon: bool = true) -> Node3D:
 		return Node3D.new()
 	if tinted:
 		apply(model, GameData.cast.get(sprite_key, {}))
+	elif fit_bounds:
+		_fit_bounds(model)
 	if toon:
 		Toon.apply(model, 1.3, 0.02)
 		# chibi faces are big spheres: keep them out of the darkest bands (upstream's
 		# character sprites are mostly flat skin with a darker lower edge)
 		Toon.set_param(model, "ramp_bias", 0.22)
 		Toon.set_param(model, "ramp_strength", 0.7)
-	AnimUtil.fix_looping(AnimUtil.find_player(model))
+	var ap := AnimUtil.find_player(model)
+	AnimUtil.fix_looping(ap)
+	if ap:
+		# the character pipeline's extra looping clips (AnimUtil only knows Idle/Walk/Run)
+		for clip in LOOPING_EXTRA:
+			if ap.has_animation(clip):
+				ap.get_animation(clip).loop_mode = Animation.LOOP_LINEAR
 	return model
+
+## Callers that size a model by its bounding box (OwActor._fit_height) would shrink every character with
+## tall spiky hair, a chef's toque or a mohawk and enlarge children to adult height.  The generated meshes
+## therefore report a body-based AABB: at least REF_TOP_M tall (a standard adult incl. ordinary hair / hat), at
+## most MAX_TOP_M; anything taller is still drawn (extra_cull_margin keeps it from being culled).
+const REF_TOP_M := 1.53
+const MAX_TOP_M := 1.66
+static var fit_bounds := true
+
+static func _fit_bounds(model: Node) -> void:
+	for item in _find_mesh_instances(model):
+		var inst: MeshInstance3D = item
+		var mesh := inst.mesh as ArrayMesh
+		if mesh == null:
+			continue
+		if not mesh.has_meta("true_top"):
+			mesh.set_meta("true_top", mesh.get_aabb().end.y)
+			var a: AABB = mesh.get_aabb()
+			var top := clampf(a.end.y, REF_TOP_M, MAX_TOP_M)
+			mesh.custom_aabb = AABB(a.position, Vector3(a.size.x, top - a.position.y, a.size.z))
+		inst.extra_cull_margin = maxf(0.0, float(mesh.get_meta("true_top")) - (mesh.custom_aabb.end.y))
 
 ## The generated model file key for a sprite key ("" if none): exact file first, then
 ## the manifest's alias table (sprite keys that share an archetype model).
