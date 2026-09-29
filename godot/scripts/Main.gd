@@ -113,6 +113,17 @@ func _setup_scene(scene: String, args: Dictionary) -> void:
 				if a.begins_with("--screenshot="):
 					lab_out = a.substr("--screenshot=".length())
 			await lab.run(args, lab_out)
+		"vfx_sheet":
+			# scripts/tools/VfxSheet.gd: contact sheet of --moves at several --ts inside one battle scene
+			args["state"] = "idle"
+			await _setup_battle(args)
+			var sheet: Node = load("res://scripts/tools/VfxSheet.gd").new()
+			add_child(sheet)
+			var sheet_out := "/tmp/vfx_sheet.png"
+			for a in OS.get_cmdline_user_args():
+				if a.begins_with("--screenshot="):
+					sheet_out = a.substr("--screenshot=".length())
+			await sheet.run(SceneRouter.current_battle(), args, sheet_out)
 		"battle":
 			await _setup_battle(args)
 		"dialogue":

@@ -3,7 +3,7 @@
   "origin": "centred",
   "size": "~1 m nominal",
   "front": "Godot +Z",
-  "colour": "applied per particle in Godot (BattleVfx.gd), except poke_ball"
+  "colour": "tint applied per particle in Godot (BattleVfx.gd) x the baked COLOR_0 shading, except poke_ball"
  },
  "vfx": {
   "dot": {
@@ -12,15 +12,15 @@
   },
   "flame": {
    "file": "flame.glb",
-   "tris": 252
+   "tris": 532
   },
   "spark": {
    "file": "spark.glb",
-   "tris": 48
+   "tris": 108
   },
   "star": {
    "file": "star.glb",
-   "tris": 36
+   "tris": 38
   },
   "ring": {
    "file": "ring.glb",
@@ -32,11 +32,11 @@
   },
   "leaf": {
    "file": "leaf.glb",
-   "tris": 76
+   "tris": 112
   },
   "snow": {
    "file": "snow.glb",
-   "tris": 44
+   "tris": 500
   },
   "rock": {
    "file": "rock.glb",
@@ -52,7 +52,7 @@
   },
   "coin": {
    "file": "coin.glb",
-   "tris": 76
+   "tris": 232
   },
   "seed": {
    "file": "seed.glb",
@@ -72,15 +72,15 @@
   },
   "shard": {
    "file": "shard.glb",
-   "tris": 12
+   "tris": 24
   },
   "heart": {
    "file": "heart.glb",
-   "tris": 92
+   "tris": 110
   },
   "impact": {
    "file": "impact.glb",
-   "tris": 60
+   "tris": 62
   },
   "claw": {
    "file": "claw.glb",
@@ -93,6 +93,10 @@
   "drop": {
    "file": "drop.glb",
    "tris": 192
+  },
+  "arrow": {
+   "file": "arrow.glb",
+   "tris": 26
   },
   "poke_ball": {
    "file": "poke_ball.glb",

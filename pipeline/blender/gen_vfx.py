@@ -8,8 +8,12 @@ use (impact burst, claw crescent, fist, water drop, poke ball).
 Output: godot/assets/models/vfx/<name>.glb + manifest.json. Each mesh is centred on
 the origin with a ~1 m nominal size (BattleVfx.gd scales it to upstream's pixel size
 at the effect's depth) and faces the camera along +Z in Godot (Blender -Y). Colour is
-applied per particle in Godot (unshaded override), except poke_ball which keeps its
-named materials (ball_top / ball_bottom / ball_band / ball_button).
+applied per particle in Godot (unshaded override, multiplied with the mesh's baked vertex colours),
+except poke_ball which keeps its named materials (ball_top / ball_bottom / ball_band / ball_button).
+
+Every prop carries a baked light-to-dark gradient in its COLOR_0 vertex colours (paint() below): bright
+cores / lit faces, darker rims / shadowed faces, so a flat-tinted particle still reads as a rounded, lit
+object under the game's unshaded material. Shapes are bevelled or puffed rather than flat cut-outs.
 """
 import json
 import math
@@ -58,6 +62,78 @@ def finish(bm, name, mats, smooth=True):
     return ob
 
 
+
+
+# ------------------------------------------------------------------ vertex-colour painting
+def paint(bm, fn):
+    """fn(co, normal, face) -> brightness 0..1, written to the COLOR_0 layer (grey; the tint comes from Godot)."""
+    layer = bm.loops.layers.color.get('Col') or bm.loops.layers.color.new('Col')
+    bm.normal_update()
+    for f in bm.faces:
+        for l in f.loops:
+            v = max(0.0, min(1.0, fn(l.vert.co, l.vert.normal, f)))
+            l[layer] = (v, v, v, 1.0)
+
+
+def paint_radial(lo=0.62, hi=1.0, r=0.5, axis=None):
+    """Bright in the middle, darker toward the rim."""
+    def fn(co, n, f):
+        d = math.sqrt(co.x * co.x + co.z * co.z) if axis is None else abs(co[axis])
+        return lo + (hi - lo) * (1.0 - min(1.0, d / r))
+    return fn
+
+
+def paint_lit(lo=0.5, hi=1.0, light=(0.35, -0.6, 0.72)):
+    """Flat-shaded faces lit from the upper front (Blender -Y is toward the camera)."""
+    L = Vector(light).normalized()
+
+    def fn(co, n, f):
+        return lo + (hi - lo) * max(0.0, f.normal.dot(L))
+    return fn
+
+
+def paint_height(lo=0.7, hi=1.0, z0=-0.5, z1=0.5):
+    """Bright at the top of the shape (Blender +Z), darker at the bottom."""
+    def fn(co, n, f):
+        return lo + (hi - lo) * max(0.0, min(1.0, (co.z - z0) / (z1 - z0)))
+    return fn
+
+
+def teardrop(bm, r, height, cx=0.0, cz=0.0, bend=0.0, seg=14, rings=10, pow_=1.15, sy=1.0):
+    """Round bottom, pointed top; the tip leans sideways by `bend`."""
+    res = bmesh.ops.create_uvsphere(bm, u_segments=seg, v_segments=rings, radius=0.5)
+    for v in res['verts']:
+        z = v.co.z / 0.5
+        if z > 0:
+            k = (1 - z) ** pow_
+            v.co.x *= k
+            v.co.y *= k
+            v.co.z = z * 0.5 * height
+        v.co.x = v.co.x * r * 2 + cx + bend * max(0.0, v.co.z) ** 2 * 2.0
+        v.co.y *= r * 2 * sy
+        v.co.z = v.co.z * (r * 2 if v.co.z < 0 else 1.0) + cz
+    return res['verts']
+
+
+def puffy_outline(bm, pts, depth, apex, mi=0):
+    """A flat outline with a raised centre (a soft gem / pillow): front fan to an apex vertex, flat back."""
+    front = [bm.verts.new((x, -depth / 2, z)) for x, z in pts]
+    back = [bm.verts.new((x, depth / 2, z)) for x, z in pts]
+    cx = sum(x for x, _ in pts) / len(pts)
+    cz = sum(z for _, z in pts) / len(pts)
+    ap = bm.verts.new((cx, -depth / 2 - apex, cz))
+    n = len(pts)
+    for i in range(n):
+        j = (i + 1) % n
+        f = bm.faces.new((front[i], front[j], ap))
+        f.material_index = mi
+        f = bm.faces.new((front[i], back[i], back[j], front[j]))
+        f.material_index = mi
+    f = bm.faces.new(list(reversed(back)))
+    f.material_index = mi
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
+
+
 # Blender coords: X right, Z up, -Y toward the camera (== Godot +Z)
 def extrude_poly(bm, pts, depth, mi=0):
     """Flat polygon in the XZ plane (facing -Y), extruded along Y."""
@@ -96,35 +172,30 @@ def s_dot(bm):
 
 
 def s_flame(bm):
-    # upstream flame: round bottom, stretched pointed top (height 2.6x radius)
-    res = bmesh.ops.create_uvsphere(bm, u_segments=14, v_segments=10, radius=0.5)
-    for v in res['verts']:
-        z = v.co.z / 0.5
-        if z > 0:
-            k = (1 - z) ** 1.15
-            v.co.x *= k
-            v.co.y *= k
-            v.co.z = z * 0.5 * 1.9
-        v.co.x += 0.06 * math.sin(v.co.z * 9)
-        v.co.z -= 0.2
+    # a tongue of flame: round belly, pointed swaying tip, two small licks at its sides
+    teardrop(bm, 0.36, 1.9, cx=0.0, cz=-0.2, bend=0.35, pow_=1.15)
+    teardrop(bm, 0.13, 1.5, cx=-0.24, cz=-0.24, bend=-0.5, seg=10, rings=8)
+    teardrop(bm, 0.11, 1.3, cx=0.25, cz=-0.26, bend=0.6, seg=10, rings=8)
 
 
 def s_spark(bm):
+    # four-pointed glint: long vertical/horizontal needles with pinched waists, hot little core
     for rot in (0, math.pi / 2):
-        pts = [(0, 0.55), (0.08, 0.08), (0.55, 0), (0.08, -0.08), (0, -0.55), (-0.08, -0.08), (-0.55, 0), (-0.08, 0.08)]
+        pts = [(0, 0.56), (0.07, 0.10), (0.56, 0), (0.07, -0.10), (0, -0.56), (-0.07, -0.10), (-0.56, 0), (-0.07, 0.10)]
         pts = [(x * math.cos(rot) - z * math.sin(rot), x * math.sin(rot) + z * math.cos(rot)) for x, z in pts]
-        extrude_poly(bm, pts, 0.06)
+        extrude_poly(bm, pts, 0.05)
         break
-    ico(bm, 0.12, 1)
+    ico(bm, 0.13, 2)
 
 
 def s_star(bm):
+    # five-point gem star with a raised centre
     pts = []
     for i in range(10):
         a = math.pi / 2 + i * math.pi / 5
         r = 0.5 if i % 2 == 0 else 0.21
         pts.append((math.cos(a) * r, math.sin(a) * r))
-    extrude_poly(bm, pts, 0.14)
+    puffy_outline(bm, pts, 0.10, 0.09)
 
 
 def s_ring(bm):
@@ -149,26 +220,53 @@ def s_bubble(bm):
 
 
 def s_leaf(bm):
-    pts = []
-    n = 16
+    # a curled leaf: folded along its midrib, tip bent toward the camera, thin shell so it reads from both sides
+    n = 14
+    rows = []
+    for i in range(n + 1):
+        u = i / n
+        z = -0.5 + u
+        w = math.sin(u * math.pi) ** 0.75 * 0.24 * (1.0 - 0.25 * u)
+        bend = -0.09 * (u ** 2)              # toward the camera (-Y)
+        rows.append((z, w, bend))
+    front = []
+    back = []
+    for z, w, bend in rows:
+        L = bm.verts.new((-w, bend, z))
+        M = bm.verts.new((0, bend - 0.045, z))
+        R = bm.verts.new((w, bend, z))
+        front.append((L, M, R))
+        L2 = bm.verts.new((-w, bend + 0.018, z))
+        M2 = bm.verts.new((0, bend - 0.03, z))
+        R2 = bm.verts.new((w, bend + 0.018, z))
+        back.append((L2, M2, R2))
     for i in range(n):
-        a = 2 * math.pi * i / n
-        x = math.sin(a) * 0.22 * (1 - abs(math.cos(a)) ** 2.5)
-        z = -math.cos(a) * 0.5
-        pts.append((x, z))
-    extrude_poly(bm, pts, 0.04)
-    # midrib
-    cyl(bm, 0.02, 0.02, 0.9, seg=5, mat_=Matrix.Translation((0, -0.03, 0)) @ Matrix.Rotation(math.pi / 2, 4, 'X') @ Matrix.Rotation(math.pi / 2, 4, 'X'))
+        a, b = front[i], front[i + 1]
+        bm.faces.new((a[0], a[1], b[1], b[0]))
+        bm.faces.new((a[1], a[2], b[2], b[1]))
+        a, b = back[i], back[i + 1]
+        bm.faces.new((a[1], a[0], b[0], b[1]))
+        bm.faces.new((a[2], a[1], b[1], b[2]))
+    bmesh.ops.remove_doubles(bm, verts=bm.verts[:], dist=1e-5)
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
 
 
 def s_snow(bm):
-    # six-armed snowflake (upstream 'snow': a plus with diagonal ticks)
-    pts = []
-    for i in range(12):
-        a = math.pi / 2 + i * math.pi / 6
-        r = 0.5 if i % 2 == 0 else 0.1
-        pts.append((math.cos(a) * r, math.sin(a) * r))
-    extrude_poly(bm, pts, 0.08)
+    # six-armed snow crystal: arms with two pairs of barbs
+    def bar(cx, cz, length, ang, wdt=0.05):
+        c, sn = math.cos(ang), math.sin(ang)
+        hl, hw = length / 2, wdt / 2
+        pts = [(-hl, -hw), (hl, -hw), (hl + hw, 0), (hl, hw), (-hl, hw)]
+        extrude_poly(bm, [(cx + x * c - z * sn, cz + x * sn + z * c) for x, z in pts], 0.05)
+    for k in range(6):
+        a = math.pi / 2 + k * math.pi / 3
+        ca, sa = math.cos(a), math.sin(a)
+        bar(ca * 0.25, sa * 0.25, 0.5, a)
+        for t, ln in ((0.3, 0.2), (0.16, 0.14)):
+            for sgn in (-1, 1):
+                ba = a + sgn * math.radians(55)
+                bar(ca * t + math.cos(ba) * ln / 2, sa * t + math.sin(ba) * ln / 2, ln, ba, 0.04)
+    ico(bm, 0.07, 1)
 
 
 def s_rock(bm):
@@ -190,7 +288,10 @@ def s_z(bm):
 
 
 def s_coin(bm):
-    cyl(bm, 0.5, 0.5, 0.12, seg=20, mat_=Matrix.Rotation(math.pi / 2, 4, 'X'))
+    # disc with a raised rim and a shallow dish inside
+    cyl(bm, 0.5, 0.5, 0.10, seg=24, mat_=Matrix.Rotation(math.pi / 2, 4, 'X'))
+    cyl(bm, 0.5, 0.5, 0.15, seg=24, mat_=Matrix.Rotation(math.pi / 2, 4, 'X'), caps=False)
+    cyl(bm, 0.36, 0.36, 0.14, seg=24, mat_=Matrix.Rotation(math.pi / 2, 4, 'X'))
 
 
 def s_seed(bm):
@@ -219,29 +320,31 @@ def s_egg(bm):
 
 
 def s_shard(bm):
-    top = cyl(bm, 0.2, 0.0, 0.6, seg=6, mat_=Matrix.Translation((0, 0, 0.2)), caps=False)
-    bot = cyl(bm, 0.2, 0.0, 0.3, seg=6, mat_=Matrix.Translation((0, 0, -0.25)) @ Matrix.Rotation(math.pi, 4, 'X'), caps=False)
+    # ice crystal: hexagonal prism capped by two pyramids, flat-shaded facets
+    cyl(bm, 0.2, 0.2, 0.34, seg=6, mat_=Matrix.Translation((0, 0, 0)) @ Matrix.Rotation(0, 4, 'X'), caps=False)
+    cyl(bm, 0.2, 0.0, 0.3, seg=6, mat_=Matrix.Translation((0, 0, 0.32)), caps=False)
+    cyl(bm, 0.2, 0.0, 0.3, seg=6, mat_=Matrix.Translation((0, 0, -0.32)) @ Matrix.Rotation(math.pi, 4, 'X'), caps=False)
     bmesh.ops.remove_doubles(bm, verts=bm.verts[:], dist=1e-3)
-    _ = (top, bot)
 
 
 def s_heart(bm):
     pts = []
-    for i in range(24):
-        t = 2 * math.pi * i / 24
+    for i in range(28):
+        t = 2 * math.pi * i / 28
         x = 16 * math.sin(t) ** 3
         z = 13 * math.cos(t) - 5 * math.cos(2 * t) - 2 * math.cos(3 * t) - math.cos(4 * t)
         pts.append((x / 34, z / 34 + 0.05))
-    extrude_poly(bm, pts, 0.18)
+    puffy_outline(bm, pts, 0.14, 0.12)
 
 
 def s_impact(bm):
+    # comic burst: 16 points of uneven length
+    radii = [0.5, 0.20, 0.42, 0.19, 0.5, 0.22, 0.38, 0.18, 0.48, 0.21, 0.44, 0.2, 0.5, 0.19, 0.4, 0.22]
     pts = []
     for i in range(16):
         a = math.pi / 2 + i * math.pi / 8
-        r = 0.5 if i % 2 == 0 else 0.2
-        pts.append((math.cos(a) * r, math.sin(a) * r))
-    extrude_poly(bm, pts, 0.05)
+        pts.append((math.cos(a) * radii[i], math.sin(a) * radii[i]))
+    puffy_outline(bm, pts, 0.04, 0.03)
 
 
 def s_claw(bm):
@@ -272,14 +375,13 @@ def s_fist(bm):
 
 
 def s_drop(bm):
-    res = bmesh.ops.create_uvsphere(bm, u_segments=12, v_segments=9, radius=0.35)
-    for v in res['verts']:
-        z = v.co.z / 0.35
-        if z > 0:
-            k = (1 - z) ** 1.3
-            v.co.x *= k
-            v.co.y *= k
-            v.co.z = z * 0.35 * 2.2
+    teardrop(bm, 0.35, 1.54, cz=0.0, seg=12, rings=9, pow_=1.3)
+
+
+def s_arrow(bm):
+    # chevron arrow pointing up (+Z), for stat changes
+    pts = [(-0.11, -0.5), (0.11, -0.5), (0.11, 0.02), (0.38, 0.02), (0.0, 0.5), (-0.38, 0.02), (-0.11, 0.02)]
+    puffy_outline(bm, pts, 0.07, 0.06)
 
 
 def s_pokeball(bm):
@@ -296,8 +398,43 @@ SHAPES = [
     ('dot', s_dot), ('flame', s_flame), ('spark', s_spark), ('star', s_star), ('ring', s_ring), ('bubble', s_bubble),
     ('leaf', s_leaf), ('snow', s_snow), ('rock', s_rock), ('note', s_note), ('z', s_z), ('coin', s_coin), ('seed', s_seed),
     ('needle', s_needle), ('bone', s_bone), ('egg', s_egg), ('shard', s_shard), ('heart', s_heart), ('impact', s_impact),
-    ('claw', s_claw), ('fist', s_fist), ('drop', s_drop), ('poke_ball', s_pokeball),
+    ('claw', s_claw), ('fist', s_fist), ('drop', s_drop), ('arrow', s_arrow), ('poke_ball', s_pokeball),
 ]
+
+# baked shading per shape (see paint()); shapes not listed use a soft radial gradient
+_side = lambda co, n, f: 0.62 + 0.38 * (0.5 + 0.5 * (-n.y))
+
+
+def _bubble_paint(co, n, f):
+    # rim light: facing the camera (normal -Y) is dim, grazing edges bright, like a soap film
+    return 0.5 + 0.5 * (1.0 - abs(n.y)) ** 1.5
+
+
+PAINT = {
+    'dot': paint_radial(0.6, 1.0, 0.5),
+    'flame': paint_height(0.62, 1.0, -0.4, 0.9),
+    'spark': paint_radial(0.7, 1.0, 0.56),
+    'star': paint_radial(0.6, 1.0, 0.5),
+    'ring': paint_radial(0.75, 1.0, 0.6, axis=1),
+    'bubble': _bubble_paint,
+    'leaf': lambda co, n, f: 0.7 + 0.3 * (0.5 + 0.5 * n.x * 2.0) if abs(co.x) > 0.002 else 1.0,
+    'snow': paint_radial(0.75, 1.0, 0.5),
+    'rock': paint_lit(0.5, 1.0),
+    'note': paint_lit(0.65, 1.0),
+    'z': paint_radial(0.7, 1.0, 0.45),
+    'coin': lambda co, n, f: 1.0 if (math.hypot(co.x, co.z) > 0.42 or abs(n.y) < 0.6) else 0.72,
+    'seed': paint_lit(0.55, 1.0),
+    'needle': paint_radial(0.7, 1.0, 0.4, axis=0),
+    'bone': paint_lit(0.72, 1.0),
+    'egg': paint_lit(0.62, 1.0),
+    'shard': paint_lit(0.55, 1.0),
+    'heart': paint_radial(0.68, 1.0, 0.5),
+    'impact': paint_radial(0.72, 1.0, 0.5),
+    'claw': paint_radial(0.85, 1.0, 0.6),
+    'fist': paint_lit(0.6, 1.0),
+    'drop': paint_height(0.55, 1.0, -0.35, 0.6),
+    'arrow': paint_height(0.6, 1.0, -0.5, 0.5),
+}
 
 
 def main():
@@ -306,7 +443,7 @@ def main():
         if f.endswith('.glb'):
             os.remove(os.path.join(OUT_DIR, f))
     manifest = {'conventions': {'origin': 'centred', 'size': '~1 m nominal', 'front': 'Godot +Z',
-                                'colour': 'applied per particle in Godot (BattleVfx.gd), except poke_ball'}, 'vfx': {}}
+                                'colour': 'tint applied per particle in Godot (BattleVfx.gd) x the baked COLOR_0 shading, except poke_ball'}, 'vfx': {}}
     for name, fn in SHAPES:
         reset()
         bm = bmesh.new()
@@ -316,11 +453,14 @@ def main():
                     mat('ball_band', '#1b1a2e', rough=0.6), mat('ball_button', '#f8f8f8', rough=0.2)]
         else:
             mats = [mat('vfx', '#ffffff', emit=1.0)]
-        smooth = name in ('dot', 'bubble', 'egg', 'seed', 'flame', 'drop', 'poke_ball', 'fist', 'ring')
+        smooth = name in ('dot', 'bubble', 'egg', 'seed', 'flame', 'drop', 'poke_ball', 'fist', 'ring', 'leaf', 'heart', 'star', 'arrow')
+        if name in PAINT:
+            paint(bm, PAINT[name])
         ob = finish(bm, name, mats, smooth)
         tris = sum(len(p.vertices) - 2 for p in ob.data.polygons)
         path = os.path.join(OUT_DIR, name + '.glb')
-        bpy.ops.export_scene.gltf(filepath=path, export_format='GLB', export_yup=True, export_animations=False)
+        bpy.ops.export_scene.gltf(filepath=path, export_format='GLB', export_yup=True, export_animations=False,
+                                  export_vertex_color='ACTIVE' if name in PAINT else 'MATERIAL')
         manifest['vfx'][name] = {'file': name + '.glb', 'tris': tris}
         print('vfx %-10s tris=%d' % (name, tris))
     with open(os.path.join(OUT_DIR, 'manifest.json'), 'w') as fh:
