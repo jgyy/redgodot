@@ -1,6 +1,6 @@
 extends Node3D
 ## The opening, ported from upstream's intro.js (a parody of Red's intro):
-##  1. "LEVY ST. GAMES presents" (frames 0-329): the shooting star, the mark
+##  1. the opening title card (frames 0-329): the shooting star, the mark
 ##     blooming out of it, the wordmark wipe, GAMES / presents / VIBE CODED
 ##     credit - a 2D title card, drawn by IntroOverlay with upstream's code.
 ##  2. The letterboxed battle (frames 330-695): CLAUDE vs CHATGPT on a night

@@ -151,6 +151,13 @@ func _setup_scene(scene: String, args: Dictionary) -> void:
 				Story.info_box(func() -> Array: return [Story.money_str(), Story.coin_str()])
 			else:
 				Story.spawn(Story.mart, [Story.pokedata.get("marts", {}).get("ViridianMartClerkText", [])], "mart")
+		"wtp":
+			var host := CanvasLayer.new()
+			host.layer = 100
+			add_child(host)
+			var wp := WtpScreen.new()
+			host.add_child(wp)
+			wp.open()
 		_:
 			if MENU_SCENES.has(scene):
 				GameState.new_game(args.get("player", "CHARMANDER"))
@@ -231,7 +238,7 @@ func _setup_battle(args: Dictionary) -> void:
 		return
 	await get_tree().process_frame
 	var o := {}
-	for k in ["text", "move", "attacker"]:
+	for k in ["text", "move", "attacker", "snap", "tkind"]:
 		if args.has(k):
 			o[k] = args[k]
 	if args.has("enemy_hp"):

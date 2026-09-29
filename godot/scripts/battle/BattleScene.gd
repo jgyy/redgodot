@@ -1174,15 +1174,26 @@ func ball_throw(item: String, shakes: int, caught: bool) -> void:
 	scale_k["e"] = 1.0
 	set_tint("e", Color.WHITE, 0.0)
 	var gy := stage.world_to_px(ground_world("e")).y - 6.0
+	# the ball drops under gravity and bounces on the ground with energy loss until it comes to rest
 	var y := ty
-	for i in 12:
-		y = ty + (gy - ty) * (i / 11.0)
-		_ball_at(item, Vector2(tx, y), 0.0)
+	var vy := 0.0
+	var rolled := 0.0
+	for i in 70:
+		vy += 0.42
+		y += vy
+		if y >= gy:
+			y = gy
+			if vy > 1.4:
+				_sfx("hit_weak")
+				vy = -vy * 0.48
+				rolled += 0.9
+			else:
+				vy = 0.0
+		_ball_at(item, Vector2(tx + rolled * (1.0 - exp(-i * 0.12)) * 2.0, y), rolled * i * 0.05)
 		await tick
-	for bnc in 2:
-		for i in 8:
-			_ball_at(item, Vector2(tx, gy - sin(i / 7.0 * PI) * (6 - bnc * 3)), 0.0)
-			await tick
+		if vy == 0.0 and y >= gy and i > 12:
+			break
+	tx += rolled * 2.0
 	await wait(20)
 	for k in mini(3, shakes):
 		for i in 16:
@@ -1209,6 +1220,16 @@ func ball_throw(item: String, shakes: int, caught: bool) -> void:
 # ------------------------------------------------------------------ transitions & evolution
 func transition_in() -> void:
 	_sfx("battle_start")
+	var snap: Variant = encounter.get("_snapshot")
+	if snap is Texture2D:
+		var kind: String = str(encounter.get("transition", "wild" if encounter.get("kind", "wild") == "wild" else "trainer"))
+		var tr := BattleTransition.new(snap, kind)
+		add_child(tr)
+		hud.fade = 1.0   # the battle underneath stays hidden until the wipe has covered the screen
+		for i in int(BattleTransition.FRAMES.get(kind, 62)):
+			tr.set_frame(i)
+			await tick
+		tr.queue_free()
 	# the battle scene fades in from the transition's black
 	for i in 10:
 		hud.fade = 1.0 - i / 10.0
@@ -1349,6 +1370,13 @@ func pose(state: String, o: Dictionary) -> void:
 			hud.menu = {"kind": "moves", "moves": engine.move_list(engine.p), "sel": 0}
 	for i in 2:
 		_step()
+	if state == "transition":   # --snap=<png of the overworld> --tkind=wild|trainer|boss --vfx_t=<frame 0..1>
+		var img := Image.load_from_file(str(o.get("snap", "")))
+		var kind := str(o.get("tkind", "wild"))
+		if img:
+			var tr := BattleTransition.new(ImageTexture.create_from_image(img), kind)
+			add_child(tr)
+			tr.set_frame(float(o.get("vfx_t", 0.5)) * float(BattleTransition.FRAMES.get(kind, 62)))
 	if state == "vfx":
 		await _pose_vfx(str(o.get("move", "TACKLE")), str(o.get("attacker", "p")), float(o.get("vfx_t", 0.55)))
 

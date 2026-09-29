@@ -57,7 +57,7 @@ identically via the standalone binary:
 
 ```sh
 # via the standalone executable (any environment that can reach blender.org)
-blender --background --python pipeline/blender/gen_pokemon.py -- --all
+blender --background --python pipeline/blender/gen_rigged_pokemon.py -- --all --jobs 1
 blender --background --python pipeline/blender/gen_characters.py
 blender --background --python pipeline/blender/gen_tiles.py
 blender --background --python pipeline/blender/gen_vfx.py
@@ -65,7 +65,8 @@ blender --background --python pipeline/blender/gen_vfx.py
 # via pip-installed bpy (what generated the assets in this repo; no `blender`
 # binary needed at all — `import bpy` inside plain python3 IS headless Blender)
 pip install bpy   # ~375MB, official Blender Foundation package
-python3 pipeline/blender/gen_pokemon.py -- --all
+python3 pipeline/blender/gen_rigged_pokemon.py -- --all --jobs 4
+python3 pipeline/blender/gen_objprops.py          # ground items + emote bubbles
 python3 pipeline/blender/gen_characters.py
 python3 pipeline/blender/gen_tiles.py
 python3 pipeline/blender/gen_vfx.py
@@ -84,80 +85,41 @@ gracefully falls back to a simple colored primitive for anything the pipeline
 hasn't generated yet, so the game is always playable even for parts of the
 pipeline still in progress.
 
-### Pokemon & character models
+### Pokemon models (public GLBs, rigged + animated here)
 
-One command regenerates every Pokemon (151 + MISSINGNO., ~5 min with 3 workers on 4 cores):
+The Pokémon meshes and textures are the openly published
+[`Pokemon-3D-api/assets`](https://github.com/Pokemon-3D-api/assets) models (MIT; `models/opt/regular/<dex>.glb`,
+originally Sketchfab uploads). They are Draco-compressed, mostly unrigged and posed inconsistently, so
+`gen_rigged_pokemon.py` turns them into game-ready assets with headless Blender:
 
 ```sh
-python3 pipeline/blender/gen_pokemon.py -- --all --jobs 3
-python3 pipeline/blender/gen_characters.py                       # 60 cast sprites + humanoid.glb (~2 min)
-# single species while iterating (--noanim = geometry only, ~3 s per species):
-python3 pipeline/blender/gen_pokemon.py -- --only PIKACHU,ONIX [--noanim]
-# checks: every glb has the six clips, Idle/Walk loop seamlessly (last key == first key), no popping keys
-python3 pipeline/blender/check_pokemon_anims.py
-python3 pipeline/blender/verify_glb.py godot/assets/models/pokemon --anims Idle,Walk,Attack,Hurt,Faint,Special
-# contact sheets vs upstream's sprites -> docs/gallery/{pokemon-151-3d,characters-3d}[-back].png
+git clone --depth 1 https://github.com/Pokemon-3D-api/assets.git pipeline/_assets     # or set SRC_ASSETS=<clone>
+python3 pipeline/blender/gen_rigged_pokemon.py -- --all --jobs 4                      # 151 + MISSINGNO., ~1.5 min on 4 cores
+python3 pipeline/blender/gen_rigged_pokemon.py -- --only PIKACHU,CHARIZARD           # while iterating
+python3 pipeline/blender/verify_glb.py godot/assets/models/pokemon --require-skin --anims Idle,Walk,Run,Attack,Special,Hurt,Faint,Victory,Sleep,Roar,Dodge,Spin,Hop,Charge,Taunt,Spawn,Hover,Talk
+# contact sheets -> docs/gallery/{pokemon-151-3d,characters-3d}[-back].png
 UPSTREAM=/path/to/pokemon-claude-red GODOT_BIN=/opt/godot/godot4 pipeline/scripts/model_sheets.sh
 ```
 
-(MISSINGNO.'s look is upstream's `glitchSprite()` output. It is read from
-`pipeline/data/missingno_{front,back}.png`, baked from upstream once, so no upstream checkout is needed; set
-`UPSTREAM=/path/to/pokemon-claude-red` to re-bake it through `pipeline/scripts/bake_monsprites.js`. Everything
-else reads `pipeline/extracted/*.json` and `pipeline/data/species_looks.json`.)
+Steps per species (all in `gen_rigged_pokemon.py`):
 
-**Pokemon: from sprite definition to model** (`gen_pokemon.py` orchestrates; `monparts.py`, `monfield.py`,
-`monsdf.py`, `monraster.py`, `monrig.py`, `monanim.py`, `species_fixes.py`, `glbtools.py`):
+1. **Import + clean** - Blender decodes Draco; the rest pose is baked into fresh meshes, helper spheres, bone shapes and
+   inverted-hull "outline" shells are dropped (the cel shader draws its own outline), tiled UVs are folded into 0..1.
+2. **Normalise** - feet on the ground, centred, facing +Z (glTF/Godot), scaled to the Pokedex height, decimated to at most
+   14k triangles, textures capped at 512 px. `pipeline/data/pokemon_model_overrides.json` fixes the odd model (Pikachu's axes,
+   Rapidash's flame masks, T-posed arms that get lowered).
+3. **Rig** - 17 bones fitted to each mesh's own proportions (upright vs horizontal body plan, head slab, tail cluster,
+   feet/hands found from the vertex cloud): Root, Hips, Spine, Chest, Neck, Head, Tail1-3 and four 2-bone limbs. Smooth
+   inverse-distance skin weights, 4 influences per vertex.
+4. **Animate** - 18 clips baked at 30 fps, expressed as world-axis rotations/translations per bone so they work on every
+   skeleton: `Idle Walk Run Attack Special Hurt Faint Victory Sleep Roar Dodge Spin Hop Charge Taunt Spawn Hover Talk`.
+   `Idle Walk Run Sleep Charge Taunt Hover Talk` loop seamlessly (last key == first key).
+5. **Export** - glb (JPEG textures, extracted by Godot's importer next to the glb like the character atlases) and an updated
+   `manifest.json` (`height_m`, `px_height` used to size battlers like upstream's 64 px sprites, tris, bones).
 
-- *Research first.* `pipeline/data/species_looks.json` holds, for all 151 species, the researched look (from
-  Bulbapedia / Pokemon Fandom / PokemonDB descriptions, sources listed per species): body plan, official
-  main/secondary/accent colours, identifying features, gait, attack and special style, weight, surface (fur /
-  scale / rock / skin / plant / smooth), plus optional overrides (`view`, `face`, `chains`, `roles`, `pal`,
-  `flutter`). It drives the surface micro-texture, the animation archetype and the rig hints; the manifest records
-  `palette_delta_e` (CIE-Lab distance between the closest of the sprite's three biggest colours and the researched
-  official main colour: it flags species to eyeball, e.g. Gastly whose gas is lighter than its dark core, but the
-  sprite palettes were judged faithful) and an advisory `missing_features` list; a `pal` map in
-  `species_looks.json` recolours a palette that is off. `species_fixes.py` then patches the sprite's part list where the 3D result
-  would be anatomically off or unappealing (a helper API: add/drop/scale/thicken/duplicate groups; e.g. Jynx's
-  mane, Hitmonlee's head, the turtles' shells, Charizard's neck, Poliwag's tail, Gyarados' mouth).
-- *Geometry.* The parts live in upstream's own 64x64 sprite space (Blender X = x-32, Z = 60-y, Y = depth, front
-  = -Y = Godot +Z), so everything lines up with the sprite pixel-for-pixel. Every part is a signed-distance field
-  (ellipsoids, tapered capsules, strokes, bevelled plates; slender plates get a round cross-section). All art groups
-  share ONE grid (0.26 sprite px): groups are smooth-unioned into a single watertight surface with filleted
-  joints (shoulders, necks, tail roots), while sibling limbs (left/right legs, ears, arms) use a hard minimum so
-  they never web together. The surface is polygonised with surface nets (sparse numpy), snapped to the field,
-  decimated (5-11k triangles), and lit with smooth normals taken from the field gradient. Depth still comes from
-  paint order (`solve_depth`); belly plates, cheeks and other lens-shaped groups lying on a host group become texture
-  decals instead of geometry.
-- *Ambient occlusion.* AO is marched through the same field per vertex and exported as vertex colour (`COLOR_0`);
-  `toon.gdshader` blends occluded areas toward its darkest cel step (`use_vertex_ao`, off by default so every other
-  model is unchanged; `PokemonActor` switches it on).
-- *Texture.* One anti-aliased atlas per species, `<SPECIES>_tex.webp` next to the glb (referenced by uri, so
-  Godot imports it once instead of extracting a second copy): for every group a FRONT and a BACK layer (front:
-  parts + `on:` spots/stripes + decals + eyes/mouths, back: `backOnly` parts, no `face` parts) rasterised
-  3x3-supersampled at 5 texels per sprite px, with continuous (not pixel-snapped) glossy eyes, per-archetype fur /
-  scale / rock / plant micro-detail and a subtle top-light / underside-shade gradient. Triangles are assigned to
-  the group whose field they lie on (neighbour-majority filtered) and UV-mapped by planar sprite projection into
-  that group's layer.
-- *Rig and skinning.* One bone per art group in a parent tree (head under body, ears under head, feet under legs
-  ...) plus chains where it matters: tails, necks, tentacles and serpent bodies (3-10 bones), and two-bone legs, arms,
-  wings and long ears. Skin weights are blended from the group fields (a vertex near a neighbouring group's
-  surface is partly skinned to it) and smoothed over the mesh, max 4 influences; chain bones share weight by
-  geodesic distance along the part.
-- *Animation* (`monanim.py`, baked at 30 fps from smooth closed-form motion, no coarse linear keys): `Idle` (2 s
-  loop) breathes / hovers / slithers; `Walk` (16 frames = 0.533 s = one full stride, i.e. TWO overworld cells of
-  0.267 s) is archetype-specific: biped alternating steps with counter-rotating shoulders, roll and foot lift,
-  quadruped diagonal gait with spine pitch, serpent / fish travelling waves, wing flapping with body bob, floaters,
-  squash-and-stretch hops, caterpillar inching, crab scuttle; feet are planted while the torso bobs and tails, ears,
-  necks and leaves follow through with phase lag. `Attack` (anticipation, strike, follow-through; tackle / charge /
-  bite / headbutt / punch / slash / tail whip / rear up / beam / slam / peck / coil / psychic), `Hurt` (recoil + damped
-  spring), `Faint` (topples onto the floor, holds the last frame), `Special` (spin / roar / pulse / dance / shake /
-  hop). Idle and Walk have last key == first key. `PokemonActor` cross-fades between clips (0.12 s).
-- *Scale.* Model height = Pokedex height; `manifest.json` also records `px_height` (height in sprite pixels) so
-  `PokemonActor.use_sprite_scale(frame_m)` sizes models exactly like upstream's battle sprites (64 px frame).
-- *Size.* glb: quantised vertex colour / weights (`glbtools.py`), lossy WebP atlas: ~50 MB for all 152 models.
-- *Shading* happens in Godot: `godot/assets/shaders/toon.gdshader` (upstream's 5-step hue-shifted ramp from
-  gfx.js `shade()`, screen-space upper-left light, `tint`/`flash`/`fade`/`ramp_bias` uniforms, baked AO) +
-  `outline.gdshader` (inverted hull), applied by `Toon.apply(node)`; both run in the Compatibility renderer.
+MISSINGNO. has no public model: `pipeline/data/MISSINGNO_source.glb` (the glitch slab built earlier from upstream's
+`glitchSprite()` output) goes through the same rig + animation step.
+
 
 **Characters** (`gen_characters.py`): every humanoid `cast.json` entry (head style
 cap/spiky/short/long/bald/hat/beanie/bun/pony, body normal/coat/dress/shorts/swim,

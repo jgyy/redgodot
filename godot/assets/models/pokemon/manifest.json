@@ -169,7 +169,7 @@
    "tris": 5404,
    "bones": 17,
    "file": "CHARMELEON.glb",
-   "bytes": 529176,
+   "bytes": 529172,
    "status": "generated"
   },
   "BLASTOISE": {
@@ -286,7 +286,7 @@
    "tris": 3910,
    "bones": 17,
    "file": "PRIMEAPE.glb",
-   "bytes": 484732,
+   "bytes": 485692,
    "status": "generated"
   },
   "POLIWHIRL": {
@@ -295,7 +295,7 @@
    "tris": 4562,
    "bones": 17,
    "file": "POLIWHIRL.glb",
-   "bytes": 497920,
+   "bytes": 498480,
    "status": "generated"
   },
   "ALAKAZAM": {
@@ -376,7 +376,7 @@
    "tris": 6110,
    "bones": 17,
    "file": "HYPNO.glb",
-   "bytes": 554588,
+   "bytes": 555280,
    "status": "generated"
   },
   "ELECTRODE": {
@@ -394,7 +394,7 @@
    "tris": 5034,
    "bones": 17,
    "file": "MAROWAK.glb",
-   "bytes": 502216,
+   "bytes": 502764,
    "status": "generated"
   },
   "KOFFING": {
@@ -619,7 +619,7 @@
    "tris": 4658,
    "bones": 17,
    "file": "PSYDUCK.glb",
-   "bytes": 498276,
+   "bytes": 498420,
    "status": "generated"
   },
   "GROWLITHE": {
@@ -637,7 +637,7 @@
    "tris": 4906,
    "bones": 17,
    "file": "POLIWRATH.glb",
-   "bytes": 514416,
+   "bytes": 514688,
    "status": "generated"
   },
   "MACHOP": {
@@ -646,7 +646,7 @@
    "tris": 4666,
    "bones": 17,
    "file": "MACHOP.glb",
-   "bytes": 485184,
+   "bytes": 484496,
    "status": "generated"
   },
   "WEEPINBELL": {
@@ -736,7 +736,7 @@
    "tris": 9492,
    "bones": 17,
    "file": "HITMONLEE.glb",
-   "bytes": 676268,
+   "bytes": 676272,
    "status": "generated"
   },
   "WEEZING": {
@@ -772,7 +772,7 @@
    "tris": 4994,
    "bones": 17,
    "file": "MR_MIME.glb",
-   "bytes": 509584,
+   "bytes": 509728,
    "status": "generated"
   },
   "MAGMAR": {
@@ -907,7 +907,7 @@
    "tris": 4941,
    "bones": 17,
    "file": "NIDOQUEEN.glb",
-   "bytes": 512908,
+   "bytes": 512628,
    "status": "generated"
   },
   "CLEFAIRY": {
@@ -961,7 +961,7 @@
    "tris": 4922,
    "bones": 17,
    "file": "GOLDUCK.glb",
-   "bytes": 559644,
+   "bytes": 560332,
    "status": "generated"
   },
   "ARCANINE": {
@@ -988,7 +988,7 @@
    "tris": 5526,
    "bones": 17,
    "file": "MACHOKE.glb",
-   "bytes": 524524,
+   "bytes": 525600,
    "status": "generated"
   },
   "VICTREEBEL": {
@@ -1078,7 +1078,7 @@
    "tris": 5726,
    "bones": 17,
    "file": "HITMONCHAN.glb",
-   "bytes": 529608,
+   "bytes": 530300,
    "status": "generated"
   },
   "RHYHORN": {
@@ -1096,7 +1096,7 @@
    "tris": 6406,
    "bones": 17,
    "file": "KANGASKHAN.glb",
-   "bytes": 580868,
+   "bytes": 582116,
    "status": "generated"
   },
   "SEAKING": {
@@ -1186,7 +1186,7 @@
    "tris": 4680,
    "bones": 17,
    "file": "CHARMANDER.glb",
-   "bytes": 498160,
+   "bytes": 498440,
    "status": "generated"
   },
   "WARTORTLE": {
@@ -1294,7 +1294,7 @@
    "tris": 5652,
    "bones": 17,
    "file": "MEOWTH.glb",
-   "bytes": 558320,
+   "bytes": 559424,
    "status": "generated"
   },
   "MANKEY": {
@@ -1303,7 +1303,7 @@
    "tris": 4334,
    "bones": 17,
    "file": "MANKEY.glb",
-   "bytes": 493208,
+   "bytes": 493344,
    "status": "generated"
   },
   "POLIWAG": {
@@ -1330,7 +1330,7 @@
    "tris": 5751,
    "bones": 17,
    "file": "MACHAMP.glb",
-   "bytes": 560104,
+   "bytes": 560252,
    "status": "generated"
   },
   "TENTACOOL": {
@@ -1393,7 +1393,7 @@
    "tris": 9440,
    "bones": 17,
    "file": "DROWZEE.glb",
-   "bytes": 661572,
+   "bytes": 662984,
    "status": "generated"
   },
   "VOLTORB": {
@@ -1411,7 +1411,7 @@
    "tris": 4934,
    "bones": 17,
    "file": "CUBONE.glb",
-   "bytes": 483296,
+   "bytes": 483408,
    "status": "generated"
   },
   "LICKITUNG": {
@@ -1429,7 +1429,7 @@
    "tris": 5104,
    "bones": 17,
    "file": "RHYDON.glb",
-   "bytes": 532232,
+   "bytes": 532104,
    "status": "generated"
   },
   "HORSEA": {
@@ -1456,7 +1456,7 @@
    "tris": 10856,
    "bones": 17,
    "file": "JYNX.glb",
-   "bytes": 741284,
+   "bytes": 741160,
    "status": "generated"
   },
   "TAUROS": {

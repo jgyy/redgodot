@@ -41,6 +41,11 @@ jobs:
       - name: Install Xvfb + Mesa software renderer
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends xvfb libgl1-mesa-dri
 
+      - name: Verify Pokémon glbs (rigged, 18 clips each)
+        run: |
+          python3 pipeline/blender/verify_glb.py godot/assets/models/pokemon --require-skin --min-kb 20 \
+            --anims Idle,Walk,Run,Attack,Special,Hurt,Faint,Victory,Sleep,Roar,Dodge,Spin,Hop,Charge,Taunt,Spawn,Hover,Talk
+
       - name: Import project
         run: timeout 20m /opt/godot/godot4 --headless --path godot --import
 
@@ -65,6 +70,7 @@ jobs:
           for scene in title intro overworld battle start_menu party summary bag pokedex trainer_card town_map options dialogue; do
             shot "$scene" --scene="$scene" --wait=1.5
           done
+          shot wtp-quiz --scene=wtp --wait=1.5
           shot pallet-town --scene=overworld --map=PalletTown --pc=10,9 --wait=1.5
           shot battle-flamethrower --scene=battle --wait=0.3 --player=CHARIZARD --player_level=50 \
             --enemy=BLASTOISE --level=50 --env=grass --state=vfx --move=FLAMETHROWER --vfx_t=0.4

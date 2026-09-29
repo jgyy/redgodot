@@ -2,8 +2,7 @@ class_name TitleOverlay
 extends PxCanvas
 ## The 2D layer of upstream's title.js over the 3D diorama: the logo.js
 ## POKéMON / CLAUDE RED logo (baked by bake_ui.js) bobbing at y 12/44,
-## the blinking PRESS START, the "VIBE CODED WITH CLAUDE OPUS 5.5" credit and
-## the control hints, plus a full-screen fade used by the menu flow.
+## the blinking PRESS START and the control hints, plus a full-screen fade used by the menu flow.
 
 const LOGO_BIG: Texture2D = preload("res://assets/ui/title_logo_big.png")
 const LOGO_RED: Texture2D = preload("res://assets/ui/title_logo_red.png")
@@ -19,7 +18,6 @@ func _draw() -> void:
 	if not hide_hints and (t / 30) % 2 == 0:
 		var tx := "PRESS START"
 		Px.text_outlined(self, tx, 160 - Px.measure(tx) / 2.0, 164, Color("#fff8e0"), Color("#301818"))
-	Px.small(self, "VIBE CODED WITH CLAUDE OPUS 5.5", 4, 174, Color("#e8a080"), Color("#101a18"))
 	var help := "ARROWS OR CLICK  Z:A  X:B  ENTER:START"
 	if not hide_hints:
 		Px.small(self, help, 316 - Px.measure_small(help), 174, Color("#8090a8"), Color("#101a18"))

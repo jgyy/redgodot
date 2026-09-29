@@ -39,6 +39,10 @@ var _start_menu: StartMenu
 var _dialogue: DialogueBox
 var _fade_layer: CanvasLayer
 var _fade_rect: ColorRect
+var _fade_mat: ShaderMaterial
+const TRANSITION_SHADER := preload("res://assets/shaders/transition.gdshader")
+## Wipe used by the next fade_out/fade_in pair (see transition.gdshader modes); reset to a plain fade afterwards.
+var transition_style := 0
 var _amb_layer: CanvasLayer
 var _amb_rect: ColorRect
 var _amb_mat: ShaderMaterial
@@ -62,6 +66,8 @@ var _exit_redirect: Array = []   # [to_map, warp_index] for every exit warp of t
 var _shake := 0.0
 var _shake_t := 0.0
 var ow_fx: OwFx
+var debris: Debris
+var fireflies: Fireflies
 # camera: critically damped follow with the player's velocity fed forward (no lag at a steady pace, no overshoot
 # when it stops), snapped on warps and map changes
 const CAM_OMEGA := 22.0
@@ -89,6 +95,11 @@ func _ready() -> void:
 	_build_ambient()
 	ow_fx = OwFx.new()
 	add_child(ow_fx)
+	debris = Debris.new()
+	add_child(debris)
+	ow_fx.debris = debris
+	fireflies = Fireflies.new()
+	add_child(fireflies)
 	player = OwActor.new()
 	player.name = "Player"
 	add_child(player)
@@ -199,6 +210,9 @@ func _build_fade() -> void:
 	_fade_rect.color = Color(0, 0, 0, 0)
 	_fade_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_fade_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_fade_mat = ShaderMaterial.new()
+	_fade_mat.shader = TRANSITION_SHADER
+	_fade_rect.material = _fade_mat
 	_fade_layer.add_child(_fade_rect)
 	_flash_rect = ColorRect.new()
 	_flash_rect.color = Color(1, 1, 1, 0)
@@ -291,7 +305,17 @@ func _process(dt: float) -> void:
 	_update_camera(dt)
 	_update_follower_visibility()
 
+func _update_fireflies() -> void:
+	if fireflies == null or player == null or _map_loader == null:
+		return
+	fireflies.center = player.global_position
+	var m := _map_loader
+	# night, outdoors, away from towns' streets (grass routes, forests, the safari zone)
+	var wild: bool = m.outdoor and (m.map_name.begins_with("Route") or "Forest" in m.map_name or "Safari" in m.map_name or "Town" in m.map_name)
+	fireflies.set_active(wild and GameState.time_period() == "night" and GameState.options.get("day_night", true))
+
 func _update_camera(dt: float) -> void:
+	_update_fireflies()
 	if player == null:
 		return
 	var target := player.position + Vector3(0.0, 0.0, 0.5 - OwActor.FOOT_Z)
@@ -471,6 +495,8 @@ func _on_player_step(_a: OwActor) -> void:
 		return
 	if player.scripted:
 		return
+	if _spinner_continue():
+		return
 	if _pending_land:
 		_pending_land = false
 		var st0 := _story()
@@ -489,6 +515,33 @@ func _on_player_step(_a: OwActor) -> void:
 		var res := EncounterSystem.roll(m.map_name, on_water, _rng)
 		if not res.is_empty():
 			SceneRouter.start_battle({"kind": "wild", "species": res["species"], "level": res["level"]})
+
+## Spinner tiles (Rocket Hideout B2F/B3F, Viridian Gym; upstream fieldmoves.js afterStep): an arrow tile keeps sliding
+## you at double speed in its direction until a spinner_stop tile or a wall ends the ride.
+var _spinning := false
+
+func _spinner_continue() -> bool:
+	var lbl := cell_label(player.cell)
+	var d := ""
+	if lbl.begins_with("spinner_") and lbl != "spinner_stop":
+		d = lbl.substr(8)
+	elif _spinning and lbl != "spinner_stop":
+		d = player.facing
+	if d != "" and bool(can_move(player, d).get("ok", false)):
+		if not _spinning:
+			ow_fx.dust(OwActor.cell_pos(player.cell), 3, 1.2)
+		_spinning = true
+		var from := player.cell
+		_set_ground_fx(player, from + OwActor.DIRS[d])
+		player.start_move(d, 2.0, false, true)
+		_was_moving = true
+		_follower_follow(from, 2.0, false, true)
+		return true
+	_spinning = false
+	return false
+
+func is_spinning() -> bool:
+	return _spinning
 
 func _do_warp(wi: int) -> void:
 	if _busy or wi < 0:
@@ -517,11 +570,12 @@ func _do_warp(wi: int) -> void:
 		player.visible = false
 		follower.visible = false
 		await get_tree().create_timer(4.0 * FRAME).timeout
-	await fade_out(10)
+	transition_style = style_for_map(to, entering_door)
+	await fade_out(14 if transition_style != 0 else 10)
 	player.visible = true
 	_load_map(to, dcell, dir)
 	_arrived_dir = dir
-	await fade_in(10)
+	await fade_in(14 if transition_style != 0 else 10)
 	var m := _map_loader
 	if m.is_door_tile(dcell) or (m.outdoor and m.is_warp_tile(dcell) and m.passable(dcell + Vector2i(0, 1))):
 		if can_move(player, "down").get("ok", false):
@@ -714,6 +768,11 @@ func move_actor(id: String, path: String) -> void:
 			continue
 		var from := a.cell
 		var more := idx < path.length() - 1
+		if a.sprite == "boulder":   # Strength: rock chips + dust kicked up as it grinds along
+			var bp := OwActor.cell_pos(from)
+			debris.ground_y = bp.y
+			debris.chips(bp + Vector3(0, 0.1, 0), 6, 0.8)
+			ow_fx.dust(bp, 4, 1.4)
 		a.start_move(d, 1.0, false, more)
 		if a == player:
 			_follower_follow(from, 1.0, false, more)
@@ -783,35 +842,102 @@ func warp_to(map_name: String, cell: Vector2i, facing: String = "") -> void:
 	await fade_in(10)
 	_busy = false
 
+## Picks the wipe for a warp: doors close in on the player (iris), caves dissolve into pixels, towers/dungeons
+## use blinds, big buildings a diagonal wipe, everything else a plain fade.
+static func style_for_map(map_name: String, entering_door: bool) -> int:
+	var n := map_name.to_lower()
+	if "cave" in n or "tunnel" in n or "mountain" in n or "hideout" in n:
+		return 4
+	if "tower" in n or "mansion" in n or "silph" in n or "ssanne" in n:
+		return 2
+	if "gym" in n or "lab" in n or "league" in n or "indigo" in n or "lorelei" in n or "bruno" in n or "agatha" in n or "lance" in n:
+		return 3
+	if entering_door:
+		return 1
+	return 0
+
+func _player_uv() -> Vector2:
+	var cam := get_viewport().get_camera_3d()
+	if cam == null or player == null:
+		return Vector2(0.5, 0.5)
+	var sz := get_viewport().get_visible_rect().size
+	var p := cam.unproject_position(player.global_position + Vector3(0, 0.5, 0))
+	return Vector2(clampf(p.x / sz.x, 0.0, 1.0), clampf(p.y / sz.y, 0.0, 1.0))
+
+func _apply_transition_style() -> void:
+	_fade_mat.set_shader_parameter("mode", transition_style)
+	_fade_mat.set_shader_parameter("center", _player_uv())
+	var sz := get_viewport().get_visible_rect().size
+	_fade_mat.set_shader_parameter("aspect", sz.x / maxf(1.0, sz.y))
+
 func fade_out(frames: int = 10) -> void:
+	_apply_transition_style()
 	var tw := create_tween()
 	tw.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	tw.tween_property(_fade_rect, "color:a", 1.0, frames * FRAME)
 	await tw.finished
 
 func fade_in(frames: int = 10) -> void:
+	_apply_transition_style()
 	var tw := create_tween()
 	tw.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	tw.tween_property(_fade_rect, "color:a", 0.0, frames * FRAME)
 	await tw.finished
+	transition_style = 0
 
 ## Emote bubble ("!", "?", "...", "heart") above an actor for ~1 s.
 func emote(id: String, kind: String = "!") -> void:
 	var a := get_actor(id) as OwActor
 	if a == null:
 		return
+	var l := _emote_node(kind)
+	a.add_child(l)
+	# pops up with an overshoot, bobs while it hangs there, then shrinks away
+	l.scale = Vector3.ONE * 0.01
+	var tw := create_tween()
+	tw.tween_property(l, "scale", Vector3.ONE * 1.15, 10.0 * FRAME).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.tween_property(l, "scale", Vector3.ONE, 5.0 * FRAME)
+	await get_tree().create_timer(50.0 * FRAME).timeout
+	var tw2 := create_tween()
+	tw2.tween_property(l, "scale", Vector3.ONE * 0.01, 8.0 * FRAME)
+	await tw2.finished
+	l.queue_free()
+
+const EMOTE_MESHES := {"!": "emote_exclaim", "?": "emote_question", "heart": "emote_heart", "...": "emote_dots"}
+
+## 3D speech-bubble glyph (exclaim / question / heart / dots) above an actor; falls back to a text label.
+func _emote_node(kind: String) -> Node3D:
+	var holder := Node3D.new()
+	holder.position = Vector3(0, WorldData.px_h(26.0), 0)
+	var path := "res://assets/models/world/%s.glb" % EMOTE_MESHES.get(kind, "")
+	if EMOTE_MESHES.has(kind) and ResourceLoader.exists(path):
+		var inst: Node = (load(path) as PackedScene).instantiate()
+		var mi := TileKit._find_mesh(inst)
+		if mi:
+			var m := MeshInstance3D.new()
+			m.mesh = mi.mesh
+			var mat := StandardMaterial3D.new()
+			mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+			mat.vertex_color_use_as_albedo = true
+			mat.no_depth_test = true
+			mat.render_priority = 5
+			mat.billboard_mode = BaseMaterial3D.BILLBOARD_FIXED_Y
+			m.material_override = mat
+			m.scale = Vector3(1.0, 1.0, 1.0) * 0.9
+			holder.add_child(m)
+			inst.free()
+			return holder
+		inst.free()
 	var l := Label3D.new()
-	l.text = {"heart": "♥", "...": "…"}.get(kind, kind)
+	l.text = kind
 	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	l.no_depth_test = true
 	l.font_size = 64
 	l.outline_size = 12
 	l.modulate = Color(0.1, 0.1, 0.15)
 	l.outline_modulate = Color(1, 1, 1)
-	l.position = Vector3(0, WorldData.px_h(30.0), 0)
-	a.add_child(l)
-	await get_tree().create_timer(60.0 * FRAME).timeout
-	l.queue_free()
+	holder.add_child(l)
+	return holder
 
 ## BFS over passable, unoccupied cells; returns an upstream "UDLR" path or "" (also "" when from == to).
 func path_to(from: Vector2i, to: Vector2i) -> String:
@@ -941,6 +1067,14 @@ func ship_departs() -> void:
 
 ## Small field effects: "cut" (a tree is cut down), "purified_zone" (Pokémon Tower).
 func fx(kind: String, cell: Vector2i) -> void:
+	var at := OwActor.cell_pos(cell)
+	debris.ground_y = at.y
+	if kind == "cut":
+		debris.leaves(at + Vector3(0, 0.4, 0), 18)
+		ow_fx.grass(at + Vector3(0, 0.1, 0), 6)
+		return
+	if kind == "purified_zone":
+		ow_fx.sparkle(at + Vector3(0, 0.3, 0), 8, Color(0.85, 0.8, 1.0))
 	var l := Label3D.new()
 	l.text = {"cut": "✂", "purified_zone": "✦"}.get(kind, "*")
 	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED

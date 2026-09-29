@@ -108,6 +108,10 @@ func start_battle(encounter: Dictionary) -> void:
 		whiteout()
 
 func _open_battle(enc: Dictionary) -> void:
+	if _root and not enc.has("_snapshot"):
+		var snap := BattleTransition.snapshot(_root.get_viewport())
+		if snap:
+			enc["_snapshot"] = snap
 	_return_state = {"map": GameState.current_map, "cell": GameState.player_cell, "facing": GameState.player_facing}
 	if in_battle():
 		_battle.queue_free()

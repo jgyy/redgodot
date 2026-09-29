@@ -172,6 +172,7 @@ def build_one(sid, src_path, height_m, ov, out_path):
 
     # -- 3. rig ------------------------------------------------------------------------------------------------
     plan = fit_skeleton(V)
+    plan['droop'] = float(ov.get('droop', 0.0))   # T-posed source models get their arms lowered in every clip
     arm = make_armature(plan)
     weights = skin_weights(V, plan)
     for b in BONES[1:]:
@@ -353,7 +354,7 @@ def fit_skeleton(V):
             parent['%s%s_Upper' % (pre, side)] = 'Chest' if pre == 'F' else 'Hips'
             parent['%s%s_Lower' % (pre, side)] = '%s%s_Upper' % (pre, side)
     return {'bones': bones, 'parent': parent, 'kind': 'horizontal' if horizontal else 'upright', 'H': H,
-            'xw': xw, 'L': L}
+            'xw': xw, 'L': L, 'droop': 0.0}
 
 
 def make_armature(plan):
@@ -448,8 +449,10 @@ def _tail(P, u, amp, cycles=1.0, lag=0.6, pitch=0.0):
         P.rot(b, rx=pitch, rz=amp * (i + 1) / 3 * math.sin(TAU * cycles * u - lag * i))
 
 
-def clip_pose(name, u, H, xw):
+def clip_pose(name, u, H, xw, droop=0.0):
     P = Pose(H, xw)
+    if droop:
+        P.side('F', ry=droop)
     s = math.sin(TAU * u)
     if name == 'Idle':
         P.move('Root', dz=0.006 * s)
@@ -630,9 +633,9 @@ def write_clip(arm, name, H, plan):
     w = C.ActionWriter(arm, name, n)
     for f in range(n + 1):
         u = f / n
-        P = clip_pose(name, u, H, plan['xw'])
+        P = clip_pose(name, u, H, plan['xw'], plan['droop'])
         if name in LOOPING and f == n:   # last frame == first frame
-            P = clip_pose(name, 0.0, H, plan['xw'])
+            P = clip_pose(name, 0.0, H, plan['xw'], plan['droop'])
         for b in BONES:
             r = P.r.get(b)
             q = Euler([math.radians(a) for a in r], 'XYZ').to_quaternion() if r else None

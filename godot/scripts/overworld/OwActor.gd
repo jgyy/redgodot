@@ -88,6 +88,13 @@ static func cell_pos(c: Vector2i) -> Vector3:
 	return Vector3(c.x + 0.5, 0.0, c.y + FOOT_Z)
 
 const OBJECT_SPRITES := ["poke_ball", "boulder", "pokedex", "clipboard", "paper", "fossil", "old_amber"]
+## Every ground object has a 3D model (pipeline/blender/gen_world.py, gen_objprops.py); the atlas cards are a fallback.
+const OBJECT_MESHES := {
+	"poke_ball": "res://assets/models/world/pokeball.glb", "boulder": "res://assets/models/world/boulder.glb",
+	"pokedex": "res://assets/models/world/pokedex.glb", "clipboard": "res://assets/models/world/clipboard.glb",
+	"paper": "res://assets/models/world/paper.glb", "fossil": "res://assets/models/world/fossil.glb",
+	"old_amber": "res://assets/models/world/old_amber.glb",
+}
 const CREATURE_DEFAULT := {"bird": "PIDGEY", "fairy": "CLEFAIRY", "seel": "SEEL", "snorlax": "SNORLAX", "monster": "NIDORAN_M"}
 
 ## upstream objsprites.js speciesFromLabel: the longest species name found in a text label
@@ -149,11 +156,10 @@ func setup(sprite_key: String, px_height: float = CHAR_PX, o: Dictionary = {}) -
 	add_child(_shadow)
 	face(facing, true)
 
-## Items on the map: 3D Poké Ball / boulder (pipeline/blender/gen_world.py), other objects as a standing
-## sprite card of upstream's object art.
+## Items on the map: 3D Poké Ball, boulder, Pokédex, clipboard, paper, fossil and Old Amber (pipeline/blender).
 func _setup_object(key: String) -> void:
 	is_object = true
-	var mesh_path: String = {"poke_ball": "res://assets/models/world/pokeball.glb", "boulder": "res://assets/models/world/boulder.glb"}.get(key, "")
+	var mesh_path: String = OBJECT_MESHES.get(key, "")
 	_model = Node3D.new()
 	_model.name = "Object"
 	add_child(_model)
