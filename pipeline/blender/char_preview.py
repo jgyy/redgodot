@@ -1,101 +1,105 @@
-"""Tiny numpy z-buffer preview of Parts (debug only; the truth is the Godot render).
+"""Quick look-dev renders of the generated geometry (Blender Cycles on the CPU, no GPU / display needed).
 
-  from char_preview import preview
-  preview(parts, atlas, '/tmp/x.png', views=('front','side','back'))
+  import char_preview as PV
+  PV.render(items, '/tmp/x.png', views=[(0, 8), (90, 8), (180, 8)], size=360)
+  PV.render(items, '/tmp/head.png', views=[(0, 0), (35, 5), (90, 0)], size=420, focus=(0, 0, 21.5), span=5.0)
+
+items: list of (V, F, colors) with colors either an (n,3) per-vertex array (linear 0..1) or one rgb triple;
+optionally a 4th element N (n,3) of smooth vertex normals.  The truth is the Godot render; this only gives
+fast, honest shape feedback while iterating on the generators.
 """
+import math
+
 import numpy as np
-from PIL import Image
-
-import char_geo as G
 
 
-def part_colors(atlas, part, ao=None):
-    c = atlas.cells[part.cell]
-    if c.kind == 'detail':
-        arr = c.fn()
-        col = np.tile(arr.reshape(-1, 3).mean(0), (len(part.V), 1))
-        if part.uv is not None:
-            h, w = arr.shape[:2]
-            ix = np.clip((part.uv[:, 0] * (w - 1)).round().astype(int), 0, w - 1)
-            iy = np.clip(((1 - part.uv[:, 1]) * (h - 1)).round().astype(int), 0, h - 1)
-            col = arr[iy, ix]
-        return col
-    a = np.ones(len(part.V)) if ao is None else ao
-    A = a.reshape(-1, 1)
-    Gg = part.g.reshape(-1, 1)
-    return c.fn(A, Gg).reshape(-1, 3)
+def _mesh_obj(name, V, F, col, N=None):
+    import bpy
+    me = bpy.data.meshes.new(name)
+    me.from_pydata([tuple(map(float, v)) for v in V], [], [tuple(int(i) for i in f) for f in F])
+    me.update()
+    me.polygons.foreach_set('use_smooth', [True] * len(me.polygons))
+    if N is not None:
+        try:
+            me.normals_split_custom_set_from_vertices([tuple(map(float, n)) for n in N])
+        except Exception:
+            pass
+    col = np.asarray(col, float)
+    at = me.color_attributes.new('Col', 'FLOAT_COLOR', 'POINT')
+    cc = np.tile(col, (len(V), 1)) if col.ndim == 1 else col
+    rgba = np.concatenate([cc, np.ones((len(V), 1))], 1)
+    at.data.foreach_set('color', rgba.astype(np.float32).reshape(-1))
+    ob = bpy.data.objects.new(name, me)
+    bpy.context.scene.collection.objects.link(ob)
+    mat = bpy.data.materials.new(name)
+    mat.use_nodes = True
+    nt = mat.node_tree
+    for n in list(nt.nodes):
+        nt.nodes.remove(n)
+    out = nt.nodes.new('ShaderNodeOutputMaterial')
+    bs = nt.nodes.new('ShaderNodeBsdfPrincipled')
+    vc = nt.nodes.new('ShaderNodeVertexColor')
+    vc.layer_name = 'Col'
+    nt.links.new(vc.outputs['Color'], bs.inputs['Base Color'])
+    bs.inputs['Roughness'].default_value = 0.75
+    nt.links.new(bs.outputs['BSDF'], out.inputs['Surface'])
+    me.materials.append(mat)
+    return ob
 
 
-def render_view(items, size=520, yaw=0.0, pitch=8.0, light=(-0.45, -0.6, 0.65), bg=(0.87, 0.91, 0.95)):
-    """items: list of (V, F, colors(n,3), normals(n,3))."""
-    import math
-    cy, sy = math.cos(math.radians(yaw)), math.sin(math.radians(yaw))
-    cp, sp = math.cos(math.radians(pitch)), math.sin(math.radians(pitch))
-    Ry = np.array([[cy, -sy, 0], [sy, cy, 0], [0, 0, 1]])           # yaw about Z
-    Rp = np.array([[1, 0, 0], [0, cp, -sp], [0, sp, cp]])             # pitch about X
-    R = Rp @ Ry
-    allv = np.vstack([it[0] for it in items]) @ R.T
+def render(items, path, views=((0, 8), (90, 8), (180, 8)), size=360, focus=None, span=None, samples=12, bg=(0.87, 0.91, 0.95)):
+    import bpy
+    from mathutils import Vector
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    sc = bpy.context.scene
+    sc.render.engine = 'CYCLES'
+    sc.cycles.samples = samples
+    sc.cycles.device = 'CPU'
+    sc.cycles.use_denoising = False
+    sc.render.resolution_x = sc.render.resolution_y = size
+    sc.render.film_transparent = False
+    sc.render.image_settings.file_format = 'PNG'
+    w = bpy.data.worlds.new('w')
+    sc.world = w
+    w.use_nodes = True
+    bgn = w.node_tree.nodes['Background']
+    bgn.inputs['Color'].default_value = (bg[0], bg[1], bg[2], 1)
+    bgn.inputs['Strength'].default_value = 0.85
+    sc.view_settings.view_transform = 'Standard'
+    objs = [_mesh_obj('m%d' % i, it[0], it[1], it[2], it[3] if len(it) > 3 else None) for i, it in enumerate(items)]
+    allv = np.vstack([it[0] for it in items])
     lo, hi = allv.min(0), allv.max(0)
-    span = max(hi[0] - lo[0], hi[2] - lo[2])
-    scale = size * 0.92 / span
-    cx, cz = (lo[0] + hi[0]) / 2, (lo[2] + hi[2]) / 2
-    W = Hh = size
-    zbuf = np.full((Hh, W), -1e9)
-    img = np.tile(np.array(bg)[None, None, :], (Hh, W, 1))
-    L = np.array(light)
-    L = L / np.linalg.norm(L)
-    Lr = R @ L
-    for V, F, col, N in items:
-        P = V @ R.T
-        Nn = N @ R.T
-        # camera looks along +Y (front of the figure is -Y): depth = -y (nearer = smaller y)
-        sx = (P[:, 0] - cx) * scale + W / 2
-        sz = Hh / 2 - (P[:, 2] - cz) * scale
-        dep = -P[:, 1]
-        lam = np.clip(Nn @ (-Lr * np.array([1, -1, 1])), -1, 1)
-        for f in F:
-            a, b, c = f
-            x0, x1, x2 = sx[a], sx[b], sx[c]
-            y0, y1, y2 = sz[a], sz[b], sz[c]
-            area = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0)
-            if area >= 0:    # back face (screen-space winding)
-                continue
-            xmin, xmax = int(max(0, np.floor(min(x0, x1, x2)))), int(min(W - 1, np.ceil(max(x0, x1, x2))))
-            ymin, ymax = int(max(0, np.floor(min(y0, y1, y2)))), int(min(Hh - 1, np.ceil(max(y0, y1, y2))))
-            if xmax < xmin or ymax < ymin:
-                continue
-            xs = np.arange(xmin, xmax + 1) + 0.5
-            ys = np.arange(ymin, ymax + 1) + 0.5
-            X, Y = np.meshgrid(xs, ys)
-            w0 = ((x1 - X) * (y2 - Y) - (x2 - X) * (y1 - Y)) / area
-            w1 = ((x2 - X) * (y0 - Y) - (x0 - X) * (y2 - Y)) / area
-            w2 = 1 - w0 - w1
-            m = (w0 >= 0) & (w1 >= 0) & (w2 >= 0)
-            if not m.any():
-                continue
-            d = w0 * dep[a] + w1 * dep[b] + w2 * dep[c]
-            zb = zbuf[ymin:ymax + 1, xmin:xmax + 1]
-            m &= d > zb
-            if not m.any():
-                continue
-            colr = (w0[..., None] * col[a] + w1[..., None] * col[b] + w2[..., None] * col[c])
-            lm = w0 * lam[a] + w1 * lam[b] + w2 * lam[c]
-            # cel steps like the toon shader
-            band = np.where(lm > 0.62, 1.12, np.where(lm > 0.32, 1.0, np.where(lm > 0.08, 0.86, 0.72)))
-            sub = img[ymin:ymax + 1, xmin:xmax + 1]
-            sub[m] = np.clip(colr[m] * band[m][:, None], 0, 1)
-            zb[m] = d[m]
-    return img
-
-
-def preview(parts, atlas, path, views=(0, 90, 180), size=460, ao_map=None):
-    items = []
-    for p in parts:
-        if len(p.V) == 0:
-            continue
-        N = G.vertex_normals(p.V, p.F)
-        ao = None if ao_map is None else ao_map.get(id(p))
-        items.append((p.V, p.F, part_colors(atlas, p, ao), N))
-    tiles = [render_view(items, size, yaw=v) for v in views]
-    out = np.hstack(tiles)
-    Image.fromarray((out * 255).astype(np.uint8)).save(path)
+    c = (lo + hi) / 2 if focus is None else np.asarray(focus, float)
+    sp = max(hi[2] - lo[2], hi[0] - lo[0]) * 1.06 if span is None else span
+    cam_d = bpy.data.cameras.new('cam')
+    cam_d.type = 'ORTHO'
+    cam_d.ortho_scale = sp
+    cam = bpy.data.objects.new('cam', cam_d)
+    sc.collection.objects.link(cam)
+    sc.camera = cam
+    sun = bpy.data.lights.new('sun', 'SUN')
+    sun.energy = 2.6
+    sun.angle = math.radians(25)
+    so = bpy.data.objects.new('sun', sun)
+    sc.collection.objects.link(so)
+    tiles = []
+    import tempfile
+    import os
+    from PIL import Image
+    for yaw, pitch in views:
+        # camera orbits the figure: yaw 0 = looking at the front (figure faces -Y so the camera sits at -Y)
+        yy, pp = math.radians(yaw), math.radians(pitch)
+        d = 60.0
+        pos = Vector(c.tolist()) + Vector((d * math.sin(yy) * math.cos(pp), -d * math.cos(yy) * math.cos(pp), d * math.sin(pp)))
+        cam.location = pos
+        look = (Vector(c) - pos).normalized()
+        cam.rotation_euler = look.to_track_quat('-Z', 'Y').to_euler()
+        # key light from the camera's upper left
+        kd = Vector((math.sin(yy - 0.7) * 0.6, -math.cos(yy - 0.7) * 0.6, 0.75))
+        so.rotation_euler = (-kd).to_track_quat('-Z', 'Y').to_euler()
+        tmp = os.path.join(tempfile.gettempdir(), 'pv_%d.png' % os.getpid())
+        sc.render.filepath = tmp
+        bpy.ops.render.render(write_still=True)
+        tiles.append(np.asarray(Image.open(tmp).convert('RGB')))
+    Image.fromarray(np.hstack(tiles)).save(path)
+    return path

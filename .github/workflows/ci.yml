@@ -53,6 +53,9 @@ jobs:
           python3 pipeline/blender/verify_glb.py godot/assets/models/player --prefix head_ --require-skin --min-kb 20 \
             --anims Idle,Walk,Run,Talk,Wave,Cheer,Nod,Shake,Think,Laugh,Bow,Point,Sleep,Surprised,Salute,Stretch,Dance,Sad,Shiver
 
+      - name: Check the character clipping report (nothing pokes through at rest, animated penetrations within budget)
+        run: python3 pipeline/blender/check_clipping_report.py
+
       - name: Import project
         run: timeout 20m /opt/godot/godot4 --headless --path godot --import
 

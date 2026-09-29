@@ -1,559 +1,703 @@
-"""Accessories: belts, pokeballs, ties, scarves, capes, backpacks, glasses, facial hair, hats."""
+"""Hats, facial hair, glasses and body accessories (belts, ties, scarves, packs, capes ...)."""
 import math
 
 import numpy as np
 
+import char_anat as AN
+import char_face as FC
 import char_geo as G
-import char_paint as PT
-import char_body as B
-import char_outfit as O
 import char_hair as H
+import char_outfit as O
+import char_paint as PT
+import char_shell as SH
 
 
-# ----------------------------------------------------------------------------- decals
-def torso_decal(ctx, cell, z, a, w, h, dr=0.3, name='decal', e=2.4):
-    """Flat picture patch on the torso surface (uv = planar)."""
-    P = ctx.P
-    nu, nv = 9, 9
-    pts = np.zeros((nu, nv, 3))
-    uv = np.zeros((nu, nv, 2))
-    for i in range(nu):
-        for j in range(nv):
-            u = i / (nu - 1)
-            v = j / (nv - 1)
-            zz = z + (v - 0.5) * h
-            aa = a + (u - 0.5) * w
-            pts[i, j] = B.torso_pt(P, zz, aa, dr, e)
-            uv[i, j] = (u, v)
-    p = G.surface_grid(pts, cell, name, uv=uv, outward_from=(0, 0.15, z))
-    p.ao_gain = 0.0
-    B.torso_weights(ctx, p)
+# ----------------------------------------------------------------------------- head rings
+class Rings:
+    """Head cross-sections (ellipse round the skull at any height) for building hats that hug it."""
+
+    def __init__(self, ctx, face=None):
+        self.ctx = ctx
+        self.P = ctx.P
+        self.HS = AN.HeadShape(ctx.P, face or ctx.look.get('face', {}))
+        self.u = self.HS.u
+
+    def ellipse(self, z, gap=0.0):
+        """(cx, cy, rx, ry) of the head at world height z, or None above the skull."""
+        HS = self.HS
+        r = HS.rows
+        zr = z - self.P.chin
+        if zr >= r[-1, 0] - 1e-3:
+            return None
+        hw = float(np.interp(zr, r[:, 0], r[:, 1])) * self.u
+        fy = float(np.interp(zr, r[:, 0], r[:, 2])) * self.u
+        by = float(np.interp(zr, r[:, 0], r[:, 3])) * self.u
+        return 0.0, (fy + by) / 2, hw + gap, (by - fy) / 2 + gap
+
+    def rim_z(self, az, kind):
+        u, chin = self.u, self.P.chin
+        a = np.abs(np.asarray(az, float))
+        tab = {'cap': [2.05, 1.95, 1.82, 1.62, 1.5], 'beanie': [1.88, 1.82, 1.25, 1.0, 0.95], 'band': [1.9, 1.85, 1.82, 1.8, 1.8]}[kind]
+        return chin + np.interp(a, [0, 60, 95, 150, 180], tab) * u
+
+
+def ring_points(cx, cy, rx, ry, z, seg, expo=2.0):
+    ang = np.linspace(0, 2 * math.pi, seg, endpoint=False)
+    s, c = np.sin(ang), np.cos(ang)
+    x = cx + rx * np.sign(s) * np.abs(s) ** (2 / expo)
+    y = cy - ry * np.sign(c) * np.abs(c) ** (2 / expo)
+    return np.stack([x, y, np.full(seg, z)], 1)
+
+
+def hat_solid(ctx, RG, z0, z1, gap0, gap1, n_z, thick, cell, name, seg=32, rim_fn=None, g=None, bulge=0.0, top_close=True, tilt=0.0):
+    """Hat body: rings stacked from z0 to z1 that follow the head plus a gap profile (gap0 -> gap1); rim_fn(az) lowers the front / back edge."""
+    zs = np.linspace(z0, z1, n_z)
+    ang = np.linspace(0, 2 * math.pi, seg, endpoint=False)
+    az_deg = np.degrees(ang)
+    az_deg = np.where(az_deg > 180, az_deg - 360, az_deg)
+    rows = []
+    top = RG.P.head_top
+    for k, z in enumerate(zs):
+        f = k / (n_z - 1)
+        gap = gap0 + (gap1 - gap0) * f + bulge * math.sin(math.pi * f)
+        el = RG.ellipse(min(z, top - 0.02), gap)
+        if el is None:
+            el = (0, 0.2, 0.1, 0.1)
+        cx, cy, rx, ry = el
+        if z > top - 0.05:
+            # above the skull: dome closing
+            q = (z - (top - 0.05)) / max(z1 - (top - 0.05), 1e-3)
+            rx *= max(1 - q * q, 0.02)
+            ry *= max(1 - q * q, 0.02)
+        pts = ring_points(cx, cy, rx, ry, z, seg)
+        if rim_fn is not None:
+            low = rim_fn(az_deg) - z0
+            pts[:, 2] = pts[:, 2] - np.clip(low * (1 - f) ** 2, -5, 5)
+        rows.append(pts)
+    Pg = np.array(rows)                                 # (n_z, seg, 3) -> want (seg, n_z)
+    Pg = np.transpose(Pg, (1, 0, 2))
+    gg = np.tile(np.linspace(0, 1, n_z)[None, :], (seg, 1)) if g is None else g
+    p = G.solid_surface(Pg, thick, cell=cell, name=name, wrap_u=True, g=gg, offset=0.5, outward_from=(0, 0.2, z0 - 3), inner='rim')
     return p
-
-
-def emblem(ctx, e):
-    P = ctx.P
-    kind = e.get('type', 'R')
-    if kind == 'R':
-        cell = ctx.detail('emblem', PT.detail_letter_R(ctx.col(e.get('bg'), '#2a2a34'), ctx.col(e.get('color'), '#e04040')), 32, 32)
-    elif kind == 'cross':
-        cell = ctx.detail('emblem', PT.detail_cross(ctx.col(e.get('bg'), '#f4f4f8'), ctx.col(e.get('color'), '#e03848')), 32, 32)
-    elif kind == 'ball':
-        cell = ctx.detail('emblem', PT.detail_pokeball(ctx.col(e.get('bg'), '#d8383a')), 32, 32)
-    else:
-        cell = ctx.detail('emblem', PT.detail_badge(ctx.col(e.get('bg'), '#e8c84a'), ctx.col(e.get('color'), '#b89020')), 32, 32)
-    z = P.chest + e.get('dz', -0.2)
-    ctx.add(torso_decal(ctx, cell, z, e.get('a', 0.0), e.get('w', 0.75), e.get('h', 3.0), dr=e.get('dr', 0.32), name='emblem'))
-
-
-# ----------------------------------------------------------------------------- torso accessories
-def belt(ctx, b):
-    P = ctx.P
-    z = P.hip + b.get('dz', 0.95)
-    cell = ctx.ramp('belt', 'cloth', ctx.col(b.get('color'), '#3a2a22'))
-    dr = b.get('dr', 0.2)
-    ctx.add(O.band_ring(ctx, z, b.get('h', 0.62), dr, 0.24, cell, name='belt'))
-    bk = ctx.ramp('buckle', 'metal', ctx.col(b.get('buckle'), '#d8b840'))
-    p = G.superellipsoid(B.torso_pt(P, z, 0.0, dr + 0.22), (0.62, 0.16, 0.5), 3.2, seg=12, rings=8, cell=bk, name='buckle')
-    p.g[:] = 0.5
-    B.torso_weights(ctx, p)
-    ctx.add(p)
-    n = b.get('balls', 0)
-    if n:
-        ballcell = ctx.ramp('pball', 'ball', '#e04040')
-        btn = ctx.ramp('pbtn', 'flat', '#f4f4f8')
-        spots = [0.95, -0.95, 1.25][:n]
-        for a in spots:
-            c = B.torso_pt(P, z - 0.15, a, dr + 0.7)
-            ball(ctx, c, 0.78, ballcell, btn, 'hips')
-
-
-def ball(ctx, c, r, cell, btn, bone):
-    sph = G.ellipsoid(c, (r, r, r), seg=14, rings=10, cell=cell, name='ball')
-    sph.g = np.clip((sph.V[:, 2] - c[2]) / (2 * r) + 0.5, 0, 1)
-    ctx.add(sph, bone)
-    b = G.ellipsoid(c + np.array([0, -r * 0.93, r * 0.02]), (r * 0.26, r * 0.13, r * 0.26), seg=10, rings=6, cell=btn, name='ballbtn')
-    b.g[:] = 0.5
-    ctx.add(b, bone)
-
-
-def tie(ctx, t):
-    P = ctx.P
-    cell = ctx.ramp('tie', 'cloth', ctx.col(t.get('color'), 'accent'))
-    z0, z1 = P.chest - 0.9 + t.get('dz', 0.0), P.neck_base - 0.05
-    ctx.add(O.plate_on_torso(ctx, z0, z1, lambda z: -0.16 - 0.07 * (z - z0) / (z1 - z0) - 0.05 * (1 - (z - z0) / (z1 - z0)) * 0 - 0.0, lambda z: 0.16 + 0.07 * (z - z0) / (z1 - z0),
-                             dr=0.3, thick=0.18, cell=cell, name='tie', n_z=6, n_a=4))
-    knot = G.ellipsoid(B.torso_pt(P, z1 - 0.15, 0.0, 0.34), (0.46, 0.3, 0.42), seg=10, rings=6, cell=cell, name='tieknot')
-    knot.g[:] = 0.5
-    B.torso_weights(ctx, knot)
-    ctx.add(knot)
-
-
-def bowtie(ctx, t):
-    P = ctx.P
-    cell = ctx.ramp('tie', 'cloth', ctx.col(t.get('color'), 'accent'))
-    z = P.neck_base - 0.05
-    for s in (1, -1):
-        w = G.ellipsoid(B.torso_pt(P, z, s * 0.2, 0.4), (0.7, 0.3, 0.5), seg=10, rings=6, cell=cell, name='bow', rot=G.rot_y(-s * 15))
-        w.g[:] = 0.5
-        B.torso_weights(ctx, w)
-        ctx.add(w)
-
-
-def scarf(ctx, s):
-    P = ctx.P
-    cell = ctx.ramp('scarf', 'cloth', ctx.col(s.get('color'), 'accent'), stripes=[(a, b, ctx.col(c)) for a, b, c in s.get('stripes', [])] or None)
-    z = P.neck_base + 0.4
-    prof = [(1.75, z - 0.55), (2.3, z - 0.35), (2.5, z + 0.05), (2.3, z + 0.55), (1.8, z + 0.75), (1.6, z + 0.6)]
-    ring = G.lathe(prof, seg=22, center=(0, 0.05, 0), scale=(1.0, 0.95), cell=cell, name='scarf')
-    ring.g[:] = 0.5
-    B.torso_weights(ctx, ring)
-    ring.w = {'neck': np.ones(len(ring.V)) * 0.5, 'chest': np.ones(len(ring.V)) * 0.5}
-    ctx.add(ring)
-    if s.get('tail', True):
-        pts = [np.array([1.2, 2.6, z - 0.4]), np.array([1.6, 3.4, z - 2.0]), np.array([1.8, 3.6, z - 4.0]), np.array([2.0, 3.4, z - 5.6])]
-        names = H.add_chain_bones(ctx, 'scarf', [tuple(p) for p in pts], parent='chest')
-        tl = G.loft(np.array(G.catmull(np.array(pts), 9)), np.array([[0.9, 0.35]] * 9) * np.linspace(1, 0.85, 9)[:, None], seg=8, cell=cell, name='scarftail', caps=(0.5, 0.3), ref=(1, 0, 0))
-        tl.g = np.clip((tl.V[:, 2] - pts[-1][2]) / (pts[0][2] - pts[-1][2]), 0, 1)
-        H.weight_chain(tl, pts, names, root_bone='chest', hw=0.8)
-        ctx.add(tl)
-        ctx.anim_hints['hair_back'] = ctx.anim_hints.get('hair_back', []) + names
-
-
-def necklace(ctx, n):
-    P = ctx.P
-    z = P.neck_base - 0.4
-    cell = ctx.ramp('chain', 'metal', ctx.col(n.get('color'), '#d8c060'))
-    ang = np.linspace(-1.35, 1.35, 12)
-    pts = np.array([B.torso_pt(P, z - 1.3 * (math.cos(a * 0.95)) ** 2 * 0 - 0.9 * (1 - math.cos(a * 0.8)) * 0 - 0.7 * math.sin(abs(a) * 0.35) * 0 - 0.9 * (a / 1.35) ** 2 * -1 * 0, a, 0.08) for a in ang])
-    # V-shaped chain: higher at the sides, hanging in the middle
-    pts = np.array([B.torso_pt(P, z + 0.9 * (abs(a) / 1.35) ** 1.3 - 0.4, a, 0.12) for a in ang])
-    ch = G.loft(pts, np.full((len(pts), 2), 0.11), seg=5, cell=cell, name='chain', caps=(0.5, 0.5), ref=(0, 1, 0))
-    ch.g[:] = 0.5
-    B.torso_weights(ctx, ch)
-    ctx.add(ch)
-    pc = ctx.detail('pendant', PT.detail_badge(ctx.col(n.get('pendant_bg'), '#f4f4f8'), ctx.col(n.get('pendant'), '#2a2a3a'), star=False), 24, 24)
-    ctx.add(torso_decal(ctx, pc, z - 0.35, 0.0, 0.5, 1.0, dr=0.22, name='pendant'))
-
-
-def backpack(ctx, b):
-    P = ctx.P
-    cell = ctx.ramp('bag', 'cloth', ctx.col(b.get('color'), 'bag'), top=1.06, bottom=0.9)
-    dark = ctx.ramp('bagd', 'cloth', ctx.shade(ctx.col(b.get('color'), 'bag'), -0.22), top=1.04, bottom=0.92)
-    sz = b.get('size', 1.0)
-    c = np.array([0, P.torso_ry(P.chest) + 1.6 * sz, P.chest - 0.3])
-    body = G.superellipsoid(c, (2.9 * sz * P.sw ** 0.5, 1.7 * sz, 3.0 * sz), 3.4, seg=18, rings=12, cell=cell, name='pack')
-    body.g = np.clip((body.V[:, 2] - (c[2] - 3.0 * sz)) / (6.0 * sz), 0, 1)
-    ctx.add(body, 'chest')
-    flap = G.superellipsoid(c + np.array([0, 0.25, 1.9 * sz]), (2.95 * sz * P.sw ** 0.5, 1.7 * sz, 1.2 * sz), 3.4, seg=16, rings=8, cell=dark, name='packflap')
-    flap.g[:] = 0.5
-    ctx.add(flap, 'chest')
-    if b.get('roll'):
-        rl = G.loft(np.array([[-3.0, c[1] + 0.3, c[2] - 3.3], [3.0, c[1] + 0.3, c[2] - 3.3]]), [[0.9, 0.9], [0.9, 0.9]], seg=10, cell=ctx.ramp('roll', 'cloth', ctx.col(b['roll'])), name='roll', ref=(0, 1, 0))
-        ctx.add(rl, 'chest')
-    for s in (1, -1):
-        pts = [np.array([s * 2.1, c[1] - 0.3, P.shoulder + 0.4]), np.array([s * 2.7, -1.1, P.shoulder + 0.35]), np.array([s * 3.05, -2.05, P.chest + 0.6]),
-               np.array([s * 2.7, -2.6, P.waist + 0.8]), np.array([s * 2.5, 0.2, P.waist - 0.3])]
-        pts = [np.array([s * 2.0, c[1] - 0.2, P.shoulder + 0.2]), np.array([s * 2.5, 0.0, P.shoulder + 0.35]), np.array([s * 2.75, -1.6, P.shoulder - 0.3]),
-               np.array([s * 2.55, -2.35, P.chest - 0.6]), np.array([s * 2.35, -2.45, P.waist + 0.2])]
-        st = G.loft(G.catmull(np.array(pts), 12), np.array([[0.5, 0.15]] * 12), seg=6, cell=dark, name='strap', caps=(0.5, 0.5), ref=(0, 0, 1))
-        st.g[:] = 0.5
-        ctx.add(st, 'chest')
-
-
-def cape(ctx, cp):
-    P = ctx.P
-    outer = ctx.ramp('cape', 'cloth', ctx.col(cp.get('color'), 'accent'), hem=ctx.col(cp.get('hem')) if cp.get('hem') else None, hem_w=0.06)
-    z_top = P.neck_base + 0.1
-    z_bot = cp.get('bottom', P.knee - 0.5)
-    nu, nv = 15, 10
-    us = np.linspace(-1, 1, nu)
-    vs = np.linspace(0, 1, nv)
-    grid = np.zeros((nu, nv, 3))
-    for i, u in enumerate(us):
-        for j, v in enumerate(vs):
-            z = z_top + (z_bot - z_top) * v
-            half = 2.9 + 1.7 * v + 2.6 * v * v
-            x = u * half
-            y = P.torso_ry(min(max(z, P.hip), P.shoulder)) + 0.9 + 0.6 * v + 0.7 * v * v * (1 - u * u) + 1.4 * (1 - abs(u)) ** 2 * 0
-            y += 0.45 * (u * u) * (1 - v)
-            grid[i, j] = (x, y, z - 0.5 * (u * u) * v * 0.6)
-    g = np.tile((1 - vs)[None, :], (nu, 1)).reshape(-1)
-    pts = [(0, 3.0, z_top), (0, 3.6, (z_top + z_bot) / 2), (0, 4.6, z_bot)]
-    names = H.add_chain_bones(ctx, 'cape', pts, parent='chest')
-    sh = G.solid_surface(grid, 0.34, cell=outer, name='cape', g=g, offset=0.5, outward_from=(0, -20, (z_top + z_bot) / 2) if False else (0, 0.0, (z_top + z_bot) / 2))
-    H.weight_chain(sh, pts, names, root_bone='chest', hw=1.0)
-    ctx.add(sh)
-    ctx.anim_hints['hair_back'] = ctx.anim_hints.get('hair_back', []) + names
-    # standing collar
-    zc = P.neck_base + 0.3
-    col = ctx.ramp('capecollar', 'cloth', ctx.col(cp.get('collar') or cp.get('color'), 'accent'))
-    cb = G.lathe([(1.7, zc - 0.5), (2.6, zc - 0.2), (2.9, zc + 0.9), (2.5, zc + 1.8), (2.2, zc + 1.85)], seg=22, center=(0, 0.25, 0), scale=(1.0, 0.95), cell=col, name='capecollar')
-    cb.g[:] = 0.5
-    B.torso_weights(ctx, cb)
-    ctx.add(cb)
-
-
-def suspenders(ctx, s):
-    P = ctx.P
-    cell = ctx.ramp('suspenders', 'cloth', ctx.col(s.get('color'), 'accent'))
-    for sg in (1, -1):
-        pl = O.plate_on_torso(ctx, P.hip + 0.4, P.shoulder + 0.35, sg * 0.50, sg * 0.86, dr=0.3, thick=0.16, cell=cell, name='strap', n_z=9, n_a=3)
-        ctx.add(pl)
-        if s.get('clip', True):
-            cc = ctx.ramp('clip', 'metal', '#d8d8dc')
-            b = G.ellipsoid(B.torso_pt(P, P.hip + 0.5, sg * 0.68, 0.36), (0.35, 0.16, 0.3), seg=8, rings=5, cell=cc, name='clip')
-            b.g[:] = 0.5
-            B.torso_weights(ctx, b)
-            ctx.add(b)
-
-
-def wristbands(ctx, w):
-    cell = ctx.ramp('wrist', 'cloth', ctx.col(w.get('color'), '#2a2a2a'))
-    for s in (1, -1):
-        ctx.add(O._arm_ring(ctx, s, 0.93, 0.12, 0.7, cell))
-        if w.get('spikes'):
-            pass
-
-
-def pokedex(ctx, d):
-    pass
-
-
-# ----------------------------------------------------------------------------- face accessories
-def _ellipse_pts(az, el, haz, hel, n=14):
-    a = np.linspace(0, 2 * math.pi, n + 1)
-    return [(az + haz * math.cos(t), el + hel * math.sin(t)) for t in a]
-
-
-def glasses(ctx, g):
-    H_ = ctx.head
-    kind = g.get('type', 'round')
-    frame = ctx.ramp('frame', 'flat', ctx.col(g.get('color'), '#2a2a3a'))
-    eaz = ctx.look.get('face', {}).get('eye_az', 19.0)
-    eel = ctx.look.get('face', {}).get('eye_el', -5.0)
-    if kind == 'shades':
-        lens = ctx.ramp('lens', 'flat', ctx.col(g.get('lens'), '#15151c'))
-        for s in (1, -1):
-            H.__dict__  # noqa
-            B.face_patch(ctx, s * eaz, eel + 0.5, 10.5, 9.0, lens, 'lens', n_rad=3, off=0.55, bone='head')
-            B.face_tube(ctx, _ellipse_pts(s * eaz, eel + 0.5, 10.8, 9.3, 16), 0.17, frame, 'rim', off=0.5, seg=5)
-        B.face_tube(ctx, [(-eaz + 8.5, eel + 3), (0, eel + 3.5), (eaz - 8.5, eel + 3)], 0.16, frame, 'bridge', off=0.5, seg=5)
-    else:
-        rx, ry = (10.5, 11.5) if kind == 'round' else (11.0, 9.0)
-        for s in (1, -1):
-            B.face_tube(ctx, _ellipse_pts(s * eaz, eel + 0.5, rx, ry, 18), 0.21, frame, 'rim', off=0.55, seg=6)
-        B.face_tube(ctx, [(-eaz + rx, eel + 3), (0, eel + 3.8), (eaz - rx, eel + 3)], 0.17, frame, 'bridge', off=0.5, seg=5)
-    for s in (1, -1):
-        B.face_tube(ctx, [(s * (eaz + 10.0), eel + 3.5), (s * 55, eel + 3.5), (s * 84, eel + 1.5)], 0.14, frame, 'temple', off=0.45, seg=5)
-
-
-def moustache(ctx, m):
-    col = ctx.ramp('stache', 'hair', ctx.col(m.get('color'), 'beard'))
-    kind = m.get('type', 'normal')
-    th = {'thin': 0.32, 'normal': 0.55, 'bushy': 0.8, 'handle': 0.42}[kind]
-    ln = {'thin': 9, 'normal': 11, 'bushy': 14, 'handle': 16}[kind]
-    for s in (1, -1):
-        pts = [(s * 0.5, -25.0), (s * ln * 0.45, -26.0), (s * ln * 0.85, -30.0 - (2 if kind == 'handle' else 0)), (s * ln, -33.0 + (5 if kind == 'handle' else 0))]
-        p = B.face_tube(ctx, pts, th, col, 'stache', off=th * 0.45, seg=8, taper=[1.0, 1.0, 0.8, 0.3])
-        p.g[:] = 0.5
-        p.ao_gain = 0.4
-
-
-def beard(ctx, b):
-    H_ = ctx.head
-    col = ctx.ramp('beard', 'hair', ctx.col(b.get('color'), 'beard'))
-    kind = b.get('type', 'full')
-    nu, nv = 25, 8
-    if kind == 'full':
-        az = np.linspace(-98, 98, nu)
-        top = np.interp(np.abs(az), [0, 20, 40, 65, 85, 98], [-40, -38, -28, -12, 8, 14])
-        bot = np.interp(np.abs(az), [0, 30, 60, 90, 98], [-84, -80, -66, -30, -8])
-        th = 0.75
-    elif kind == 'goatee':
-        az = np.linspace(-26, 26, nu)
-        top = np.interp(np.abs(az), [0, 14, 26], [-41, -44, -52])
-        bot = np.interp(np.abs(az), [0, 14, 26], [-74, -70, -62])
-        th = 0.7
-    elif kind == 'chin':                  # long white chin beard
-        az = np.linspace(-34, 34, nu)
-        top = np.interp(np.abs(az), [0, 20, 34], [-40, -42, -52])
-        bot = np.interp(np.abs(az), [0, 20, 34], [-84, -80, -68])
-        th = 0.8
-    else:
-        return
-    v = np.linspace(0, 1, nv)
-    EL = top[:, None] + (bot - top)[:, None] * v[None, :]
-    AZ = np.repeat(az[:, None], nv, 1)
-    pts = H_.surf(AZ, EL, 0.0)
-    full = float(b.get('fullness', 1.0))
-    # thin at the sideburn / upper edge, fat under the chin, rolled edge at the bottom
-    prof = 0.28 + (th * 1.5 * full - 0.28) * G.smoothstep(0.0, 0.55, v)
-    prof = prof * (0.45 + 0.55 * G.smoothstep(1.0, 0.82, v))
-    edge_fade = 0.55 + 0.45 * np.clip(np.cos(np.radians(AZ) * 90.0 / max(np.abs(az).max(), 1.0)), 0.0, 1.0) ** 0.5
-    body = prof[None, :] * edge_fade * (1 + 0.10 * np.sin(AZ * 0.5))
-    p = G.solid_surface(pts, 0.0, cell=col, name='beard', g=(1 - v)[None, :].repeat(nu, 0).reshape(-1) * 0.8 + 0.1, thick_fn=lambda _P: body,
-                        offset=0.4, outward_from=H_.c, inner='rim')
-    p.ao_gain = 0.4
-    ctx.add(p, 'head')
-    if kind == 'chin' or b.get('tuft'):
-        c0 = H_.surf(0, -82, 0.4)
-        pts2 = [c0, c0 + np.array([0, -0.5, -1.4]), c0 + np.array([0, -0.6, -2.8]), c0 + np.array([0, -0.4, -3.9])]
-        tl = G.loft(np.array(G.catmull(np.array(pts2), 8)), np.array([[1.2, 0.9], [1.3, 0.95], [0.95, 0.8], [0.15, 0.15]])[np.linspace(0, 3, 8).round().astype(int)], seg=8, cell=col, name='beardtuft', caps=(0.5, 0.3), ref=(1, 0, 0))
-        tl.g[:] = 0.3
-        ctx.add(tl, 'head')
 
 
 # ----------------------------------------------------------------------------- hats
-CAP_RIM = [(0, 71), (40, 73), (80, 79), (110, 85), (180, 88)]
-BEANIE_RIM = [(0, 66), (40, 68), (80, 84), (110, 100), (180, 108)]
+def build_hat(ctx, h):
+    fn = HATS[h['type']]
+    RG = Rings(ctx)
+    ctx.rings = RG
+    fn(ctx, RG, h)
 
 
-def hat_cap(ctx, h):
+def hat_cell(ctx, h, key='color', default='hat', name='hat'):
+    return O.cloth_cell(ctx, name, h.get(key), default)
+
+
+def hat_cap(ctx, RG, h):
+    """Baseball-style cap: skull-hugging crown (front panel in its own colour), stitched seams, button, visor."""
+    u = RG.u
     P = ctx.P
-    H_ = ctx.head
-    body = ctx.ramp('hat', 'cloth', ctx.col(h.get('color'), 'hat'), top=1.06, bottom=0.94)
-    pan = ctx.ramp('hatk', 'cloth', ctx.col(h.get('panel'), 'hatk'), top=1.06, bottom=0.94)
-    brimc = ctx.ramp('brim', 'cloth', ctx.col(h.get('brim') or h.get('color'), 'hat'), top=1.05, bottom=0.9)
-    thick = 0.85
-    rim = h.get('rim') or CAP_RIM
-    sh = H.shell(ctx, 'cap', rim, thick=thick, volume=0.5, cell=body, ridges=0, ridge_amp=0.0, lip=thick * 0.9, offset=0.6)
-    ctx.add(sh, 'head')
-    # front panel
-    if pan != body or h.get('panel_seam', True):
-        fp = H.shell(ctx, 'panel', lambda az: np.interp(np.abs(az), [0, 45], [rim[0][1] - 0.4, rim[1][1] - 0.4]), az_range=(-46, 46), nu=16, nv=10, thick=thick + 0.12,
-                     volume=0.55, cell=pan, ridges=0, ridge_amp=0.0, wrap=False, lip=thick * 0.9, offset=0.6)
-        ctx.add(fp, 'head')
-    # crown button
-    bt = G.ellipsoid(H_.surf(0, 89, thick + 0.75), (0.55, 0.55, 0.42), seg=10, rings=6, cell=pan if pan != body else body, name='hatbutton')
-    bt.g[:] = 0.5
-    ctx.add(bt, 'head')
-    # seams (thin ridges at the panel borders)
-    # brim
-    length = h.get('brim_len', 3.6)
-    width = 58
-    nu, nv = 17, 8
-    azs = np.linspace(-width, width, nu)
-    sv = np.linspace(0, 1, nv)
-    grid = np.zeros((nu, nv, 3))
-    for i, a in enumerate(azs):
-        el0 = 90 - np.interp(abs(a), [c[0] for c in rim], [c[1] for c in rim]) + 2
-        base = H_.surf(a, el0, thick + 0.15)
-        dirn = G.nrm(np.array([math.sin(math.radians(a)) * 0.75, -math.cos(math.radians(a)), 0.0]))
-        ext = length * (0.55 + 0.45 * math.cos(math.radians(a) * 90 / width)) if False else length * (math.cos(math.radians(a) * 1.35)) ** 0.6
-        for j, s in enumerate(sv):
-            drop = h.get('curve', 0.75) * (a / width) ** 2 * s * 1.2 + 0.25 * s * s
-            grid[i, j] = base + dirn * ext * s + np.array([0, 0, -drop + 0.5 * s * (1 - s)])
-    bg = np.tile(sv[None, :], (nu, 1)).reshape(-1)
-    br = G.solid_surface(grid, 0.34, cell=brimc, name='brim', g=bg, offset=0.5, outward_from=(0, 0, P.head_c[2] - 10))
-    ctx.add(br, 'head')
-    logo = h.get('logo')
-    if logo:
-        if logo == 'ball':
-            lc = ctx.detail('hatlogo', PT.detail_pokeball(ctx.col(h.get('panel'), 'hatk'), ctx.col(h.get('logo_top'), '#e04040')), 32, 32)
-        elif logo == 'R':
-            lc = ctx.detail('hatlogo', PT.detail_letter_R(ctx.col(h.get('color'), 'hat'), ctx.col(h.get('logo_color'), '#e04040')), 32, 32)
-        elif logo == 'badge':
-            lc = ctx.detail('hatlogo', PT.detail_badge(ctx.col(h.get('logo_color'), '#e8c84a'), ctx.col(h.get('logo_edge'), '#a88018')), 32, 32)
-        else:
-            lc = ctx.detail('hatlogo', PT.detail_cross(ctx.col(h.get('color'), 'hat'), '#f4f4f8'), 32, 32)
-        p = B.face_patch(ctx, 0, 28, 17, 17, lc, 'hatlogo', n_rad=4, off=0.05, base=thick + 0.32, bone='head')
+    cell = hat_cell(ctx, h)
+    pcell = O.cloth_cell(ctx, 'hatpanel', h.get('panel'), 'hatk') if h.get('panel') else cell
+    z_lo = RG.rim_z(0, 'cap') - 0.05
+    ctx.hat_rim = lambda az: RG.rim_z(az, 'cap') + 0.05
+    thick = 0.16
+    # crown as shell of the head so it follows every bump: cut = above rim(az)
+    B = ctx.body
+    rel = B.V - ctx.headref.hc if hasattr(ctx, 'headref') else B.V - H.HeadRef(ctx).hc
+    az = np.degrees(np.arctan2(rel[:, 0], -rel[:, 1]))
+    rim = RG.rim_z(az, 'cap')
+    cut = np.minimum(B.V[:, 2] - rim, B.headw - 0.5)
+    el = np.degrees(np.arctan2(rel[:, 2], np.hypot(rel[:, 0], rel[:, 1])))
+    crown = np.clip(np.sin(np.radians(np.clip(el, 0, 90))), 0, 1)
+    th = thick + 0.05 * crown + 0.02 * np.clip(1 - np.abs(az) / 60, 0, 1)
+    g = 0.4 + 0.5 * (1 - crown)
+    if h.get('panel') and h.get('panel') != 'hat':
+        front = 1.0 - np.abs(az) / 52.0                     # front panel = |az| < 52 deg
+        p1 = SH.shell_from_body(ctx, np.minimum(cut, front), th, pcell, 'cap_front', g=g, rim=0.02, cover=False)
+        p2 = SH.shell_from_body(ctx, np.minimum(cut, -front), th, cell, 'cap_back', g=g, rim=0.02, cover=False)
+        for pp in (p1, p2):
+            if pp is not None:
+                ctx.add(pp, 'head')
+    else:
+        p = SH.shell_from_body(ctx, cut, th, cell, 'cap', g=g, rim=0.02, cover=False)
+        ctx.add(p, 'head')
+    # button on top
+    top = np.array([0, 0.18 * u, P.head_top + thick + 0.05])
+    ctx.add(O.stud(top, np.array([0, 0, 1.0]), 0.16, cell, 'cap_button', h=0.8), 'head')
+    # visor
+    bl = h.get('brim_len', 3.2) * 0.2
+    brim_cell = O.cloth_cell(ctx, 'brim', h.get('brim'), 'hat') if h.get('brim') not in (None, 'hat') else cell
+    az_s = np.linspace(-78, 78, 15)
+    rs = np.linspace(0, 1, 6)
+    z_rim = RG.rim_z(0, 'cap')
+    grid = np.zeros((len(az_s), len(rs), 3))
+    for i, a in enumerate(az_s):
+        zr = RG.rim_z(a, 'cap') - 0.02
+        el_ = RG.ellipse(zr, thick + 0.02)
+        cx, cy, rx, ry = el_
+        ar = math.radians(a)
+        base = np.array([cx + rx * math.sin(ar), cy - ry * math.cos(ar), zr])
+        outv = np.array([math.sin(ar) * 0.75, -math.cos(ar), 0.0])
+        outv = outv / np.linalg.norm(outv)
+        wlen = bl * (1.0 - 0.28 * (abs(a) / 78.0) ** 2)
+        for j, r_ in enumerate(rs):
+            drop = -0.25 * (r_ ** 1.6) * wlen + 0.18 * (r_ ** 3) * wlen * 0 - 0.08 * r_ * wlen
+            grid[i, j] = base + outv * (r_ * wlen) + np.array([0, 0, drop + 0.05 * (1 - r_)])
+    part = G.solid_surface(grid, 0.07, cell=brim_cell, name='visor', wrap_u=False, g=np.tile(np.linspace(0.3, 0.9, len(rs))[None, :], (len(az_s), 1)),
+                           offset=0.5, outward_from=(0, 0.2, z_rim + 3), inner='full')
+    ctx.add(part, 'head')
+    logo(ctx, RG, h, z_rim)
 
 
-def hat_beanie(ctx, h):
-    """Knit cap / swim cap: snug shell, ribbed cuff, optional pompom."""
-    H_ = ctx.head
-    body = ctx.ramp('hat', 'cloth', ctx.col(h.get('color'), 'hat'), top=1.06, bottom=0.94, stripes=[(a, b, ctx.col(c)) for a, b, c in h.get('stripes', [])] or None)
-    rim = h.get('rim') or BEANIE_RIM
-    thick = h.get('thick', 0.9)
-    sh = H.shell(ctx, 'beanie', rim, thick=thick, volume=h.get('volume', 0.45), cell=body, ridges=h.get('ridges', 0), ridge_amp=0.06 if h.get('ridges') else 0.0,
-                 lip=thick * 0.9, offset=0.6)
-    ctx.add(sh, 'head')
+def logo(ctx, RG, h, z_rim):
+    lg = h.get('logo')
+    if not lg:
+        return
+    HR = ctx.headref
+    hat_col = ctx.col(h.get('panel') if h.get('panel') not in (None, 'hat') else h.get('color'), 'hat')
+    if lg == 'ball':
+        painter = PT.detail_pokeball(bg=hat_col, top=ctx.col(h.get('logo_color'), '#e04040') if h.get('logo_color') else '#e04040')
+    elif lg == 'R':
+        painter = PT.detail_letter_R(bg=hat_col, fg=ctx.col(h.get('logo_color'), '#e04040'))
+    elif lg == 'badge':
+        painter = PT.detail_badge(bg=ctx.col(h.get('badge_color') or h.get('logo_color'), '#e8c84a'), fg='#b89020')
+    else:
+        return
+    cell = ctx.detail('hatlogo', painter, 32, 32)
+    pts = np.zeros((7, 7, 3))
+    uv = np.zeros((7, 7, 2))
+    zc = RG.rim_z(0, 'cap') + 0.72
+    for i, x in enumerate(np.linspace(-0.42, 0.42, 7)):
+        for j, z in enumerate(np.linspace(-0.42, 0.42, 7)):
+            pts[i, j] = (x, -3.0, zc + z)
+            uv[i, j] = (i / 6.0, j / 6.0)
+    # cast onto the hat surface (body ray + hat thickness)
+    flat, nrm = FC.lift_to_skin(ctx, pts.reshape(-1, 3), 0.235)
+    part = FC.grid_part(flat.reshape(7, 7, 3), cell, 'logo', uv=uv, bone='head', out_from=(0, 3, zc))
+    part.ao_gain = 0.0
+    ctx.add(part)
+
+
+def hat_beanie(ctx, RG, h):
+    """Snug knit cap: covers the crown down to the brow / over the ears, with a folded cuff."""
+    P = ctx.P
+    cell = hat_cell(ctx, h)
+    ctx.hat_rim = lambda az: RG.rim_z(az, 'beanie') + 0.05
+    B = ctx.body
+    rel = B.V - ctx.headref.hc
+    az = np.degrees(np.arctan2(rel[:, 0], -rel[:, 1]))
+    rim = RG.rim_z(az, 'beanie')
+    cut = np.minimum(B.V[:, 2] - rim, B.headw - 0.5)
+    th = np.full(len(B.V), 0.2) + 0.03 * SH._noise(B.V * 2.0, 4)
+    p = SH.shell_from_body(ctx, cut, th, cell, 'beanie', g=np.clip((B.V[:, 2] - P.chin) / 3.3, 0, 1), rim=0.02, cover=False)
+    ctx.add(p, 'head')
     if h.get('cuff', True):
-        cuff = ctx.ramp('hatcuff', 'cloth', ctx.col(h.get('cuff_color') or h.get('color'), 'hat'), top=1.08, bottom=0.92)
-        az = np.linspace(-180, 180, 40, endpoint=False)
-        edge = np.interp(np.abs(az), [c[0] for c in rim], [c[1] for c in rim])
-        nv = 4
-        v = np.linspace(-0.09, 0.02, nv)
-        TH = edge[:, None] + v[None, :] * 100.0 * 0 + np.array([-9, -4, 1, 5])[None, :]
-        AZ = az[:, None].repeat(nv, 1)
-        P_ = H_.pt(H.dirs_from(AZ, TH))
-        cf = G.solid_surface(P_, 0.0, cell=cuff, name='hatcuff', wrap_u=True, g=np.tile(np.linspace(0, 1, nv)[None, :], (40, 1)).reshape(-1),
-                             thick_fn=lambda _P: 1.25 + 0 * _P[..., 0], offset=0.5, outward_from=H_.c, inner='rim')
-        ctx.add(cf, 'head')
+        cc = O.cloth_cell(ctx, 'beaniecuff', h.get('color'), 'hat')
+        c2 = np.minimum(cut, rim + 0.55 - B.V[:, 2])
+        q = SH.shell_from_body(ctx, c2, th + 0.06, cc, 'cuff', g=np.full(len(B.V), 0.5), rim=0.02, cover=False)
+        if q is not None:
+            ctx.add(q, 'head')
     if h.get('tails'):
-        _band_tails(ctx, body, h.get('tail_el', 24))
-    if h.get('pompom'):
-        pc = ctx.ramp('pompom', 'cloth', ctx.col(h['pompom']))
-        pp = G.ellipsoid(H_.surf(0, 88, thick + 1.6), (1.4, 1.4, 1.3), seg=12, rings=8, cell=pc, name='pompom')
-        pp.g[:] = 0.5
-        ctx.add(pp, 'head')
+        pass
 
 
-def _dome(ctx, name, cell, z0, r_base, r_top, h_crown, seg=28, scale=(1.0, 0.96), wob=0.0, flat_top=0.0, bulge=0.0):
-    prof = [(0.0, z0 + h_crown)]
-    n = 10
-    for k in range(1, n + 1):
-        a = k / n * math.pi / 2
-        r = r_top * math.sin(a) + 0.0
-        z = z0 + h_crown * math.cos(a) * (1 - flat_top)
-        prof.append((r, z))
-    prof.append((r_base, z0 + 0.0))
-    prof = prof[::-1]
-    p = G.lathe(prof, seg=seg, center=(0, 0.25, 0), scale=scale, cell=cell, name=name)
-    return p
-
-
-def hat_wide(ctx, h):
-    """Straw / ranger / bucket hat: dome crown that clears the hair, hat band, wide (drooping) brim."""
+def hat_wide(ctx, RG, h):
+    """Wide-brimmed hat (fisher / hiker / safari / sun hat): rounded crown, hat band, drooping brim."""
     P = ctx.P
-    hc = P.head_c[2]
-    cell = ctx.ramp('hat', 'cloth', ctx.col(h.get('color'), 'hat'), top=1.06, bottom=0.94)
-    band = ctx.ramp('hatband', 'cloth', ctx.col(h.get('band'), '#8a3a2a'))
-    z0 = hc + h.get('z', 1.5)
-    rb = h.get('brim_r', 9.2)
-    rc = h.get('crown_r', 6.9)
-    crown = h.get('crown', 4.8)
-    droop = h.get('droop', 0.5)
-    dome = [(rc * math.sin(t) ** 0.85, z0 + 0.5 + (crown - 0.5) * math.cos(t) ** 0.8) for t in np.linspace(0, math.pi / 2, 8)]
-    prof = dome + [(rc, z0), (rc + 0.8, z0 - 0.05), (rb - 1.4, z0 - 0.1 - droop * 0.3), (rb, z0 - 0.25 - droop), (rb - 0.25, z0 - 0.6 - droop),
-                   (rb - 1.4, z0 - 0.45 - droop * 0.3), (rc + 0.5, z0 - 0.4), (rc - 0.4, z0 - 0.4), (0.0, z0 - 0.4)]
-    hat = G.lathe(prof[::-1], seg=30, center=(0, 0.25, 0), scale=(1.0, 0.95), cell=cell, name='hat',
-                  wobble=lambda a, z: 1 + h.get('wobble', 0.0) * np.sin(a * 6) * G.smoothstep(z0 - 0.2, z0 - 1.2, z))
-    hat.g = np.clip((hat.V[:, 2] - (z0 - 1.5)) / 6.0, 0, 1)
-    ctx.add(hat, 'head')
-    bd = G.lathe([(rc - 0.1, z0 + 0.1), (rc + 0.3, z0 + 0.25), (rc + 0.32, z0 + 1.15), (rc + 0.1, z0 + 1.5), (rc - 0.25, z0 + 1.5)], seg=30, center=(0, 0.25, 0), scale=(1.0, 0.95),
-                 cell=band, name='hatband')
-    bd.g[:] = 0.5
-    ctx.add(bd, 'head')
+    u = RG.u
+    cell = hat_cell(ctx, h)
+    z_rim = P.chin + (h.get('z', 1.5) * 0.36 + 1.55) * u
+    crown_h = h.get('crown', 5.4) * 0.19 * u
+    z_top = P.head_top + crown_h * 0.42
+    zs = np.linspace(z_rim, z_top, 9)
+    seg = 36
+    rows = []
+    for k, z in enumerate(zs):
+        f = k / (len(zs) - 1)
+        el = RG.ellipse(min(z, P.head_top - 0.04), 0.14 + 0.05 * f)
+        cx, cy, rx, ry = el
+        if z > P.head_top - 0.04:
+            q = (z - (P.head_top - 0.04)) / max(z_top - (P.head_top - 0.04), 1e-3)
+            k_ = math.sqrt(max(1 - q ** 2, 0.0))
+            rx, ry = rx * (0.55 + 0.45 * k_), ry * (0.55 + 0.45 * k_)
+        rows.append(ring_points(cx, cy, rx * (1.0 + 0.06 * math.sin(math.pi * f)), ry * (1.0 + 0.06 * math.sin(math.pi * f)), z, seg, expo=2.2))
+    Pg = np.transpose(np.array(rows), (1, 0, 2))
+    # close the crown with a cap of rings shrinking to the centre
+    cap_rows = []
+    last = np.array(rows[-1])
+    cen = last.mean(0)
+    for f in (0.55, 0.25, 0.02):
+        cap_rows.append(cen + (last - cen) * f + np.array([0, 0, 0.05 * (1 - f)]))
+    Pg = np.concatenate([Pg, np.transpose(np.array(cap_rows), (1, 0, 2))], 1)
+    g = np.tile(np.linspace(0.2, 0.9, Pg.shape[1])[None, :], (seg, 1))
+    ctx.add(G.solid_surface(Pg, 0.09, cell=cell, name='crown', wrap_u=True, g=g, offset=0.5, outward_from=(0, 0.2, z_rim - 4), inner='rim'), 'head')
+    # band
+    if h.get('band'):
+        bc = O.cloth_cell(ctx, 'hatband', h['band'], 'accent')
+        rowsb = []
+        for z in np.linspace(z_rim + 0.05, z_rim + 0.5, 4):
+            cx, cy, rx, ry = RG.ellipse(z, 0.2)
+            rowsb.append(ring_points(cx, cy, rx, ry, z, seg, 2.2))
+        Pb = np.transpose(np.array(rowsb), (1, 0, 2))
+        ctx.add(G.solid_surface(Pb, 0.05, cell=bc, name='band', wrap_u=True, offset=0.5, outward_from=(0, 0.2, z_rim - 4), inner='rim'), 'head')
+    # brim
+    brim_out = max((h.get('brim_r', 8.6) - 6.0) * 0.34, 0.5) * u
+    droop = h.get('droop', 0.4) * 0.35
+    cx, cy, rx, ry = RG.ellipse(z_rim + 0.02, 0.2)
+    ang = np.linspace(0, 2 * math.pi, seg, endpoint=False)
+    rr = np.linspace(0, 1, 6)
+    grid = np.zeros((seg, len(rr), 3))
+    for i, a in enumerate(ang):
+        base = np.array([cx + rx * math.sin(a), cy - ry * math.cos(a), z_rim + 0.02])
+        outv = np.array([math.sin(a) * rx, -math.cos(a) * ry, 0.0])
+        outv = outv / np.linalg.norm(outv)
+        for j, r_ in enumerate(rr):
+            grid[i, j] = base + outv * brim_out * r_ - np.array([0, 0, droop * r_ ** 1.8 * brim_out + 0.08 * r_])
+    ctx.add(G.solid_surface(grid, 0.08, cell=cell, name='brim', wrap_u=True, g=np.tile(np.linspace(0.3, 0.8, len(rr))[None, :], (seg, 1)), offset=0.5,
+                            outward_from=(0, 0.2, z_rim - 4), inner='full'), 'head')
 
 
-def hat_sailor(ctx, h):
-    """Sailor cap / captain's cap: flat round white top, band, optional peak and badge."""
+def hat_sailor(ctx, RG, h):
+    """Sailor / captain's cap: flat round top, band, optional peak and badge."""
     P = ctx.P
-    hc = P.head_c[2]
-    cell = ctx.ramp('hat', 'cloth', ctx.col(h.get('color'), 'hat'), top=1.06, bottom=0.94)
-    band = ctx.ramp('hatband', 'cloth', ctx.col(h.get('band'), '#2a2a3a'))
-    z0 = hc + 1.9
-    rc = 6.95
-    top = h.get('top_r', 7.6)
-    H_ = h.get('height', 4.7)
-    prof = [(0.0, z0 + H_), (top * 0.6, z0 + H_), (top, z0 + H_ - 0.35), (top + 0.1, z0 + H_ - 1.0), (rc + 0.15, z0 + H_ - 2.2), (rc, z0 + 1.0), (rc, z0 - 0.3),
-            (rc - 0.5, z0 - 0.35), (0.0, z0 - 0.35)]
-    hat = G.lathe(prof[::-1], seg=30, center=(0, 0.25, 0), scale=(1.0, 0.95), cell=cell, name='hat')
-    hat.g = np.clip((hat.V[:, 2] - (z0 - 0.3)) / (H_ + 0.3), 0, 1)
-    ctx.add(hat, 'head')
-    bd = G.lathe([(rc - 0.1, z0 - 0.35), (rc + 0.35, z0 - 0.3), (rc + 0.4, z0 + 0.95), (rc + 0.2, z0 + 1.05), (rc - 0.2, z0 + 1.05)], seg=30, center=(0, 0.25, 0), scale=(1.0, 0.95), cell=band, name='hatband')
-    bd.g[:] = 0.5
-    ctx.add(bd, 'head')
+    u = RG.u
+    cell = hat_cell(ctx, h)
+    z_rim = P.chin + 1.98 * u
+    ctx.hat_rim = lambda az: np.full_like(np.asarray(az, float), z_rim + 0.05)
+    seg = 32
+    zs = np.linspace(z_rim, P.head_top + 0.35, 8)
+    rows = []
+    for k, z in enumerate(zs):
+        f = k / (len(zs) - 1)
+        el = RG.ellipse(min(z, P.head_top - 0.04), 0.18 + 0.22 * f)
+        cx, cy, rx, ry = el
+        rows.append(ring_points(cx, cy, rx * (1 + 0.1 * f), ry * (1 + 0.1 * f), z, seg))
+    last = np.array(rows[-1])
+    cen = last.mean(0)
+    for f in (0.6, 0.25, 0.02):
+        rows.append(cen + (last - cen) * f + np.array([0, 0, 0.02]))
+    Pg = np.transpose(np.array(rows), (1, 0, 2))
+    ctx.add(G.solid_surface(Pg, 0.1, cell=cell, name='sailor', wrap_u=True, g=np.tile(np.linspace(0.2, 0.9, Pg.shape[1])[None, :], (seg, 1)),
+                            offset=0.5, outward_from=(0, 0.2, z_rim - 4), inner='rim'), 'head')
+    bc = O.cloth_cell(ctx, 'hatband', h.get('band'), 'accent')
+    rowsb = []
+    for z in np.linspace(z_rim, z_rim + 0.5, 4):
+        cx, cy, rx, ry = RG.ellipse(z, 0.2)
+        rowsb.append(ring_points(cx, cy, rx, ry, z, seg))
+    ctx.add(G.solid_surface(np.transpose(np.array(rowsb), (1, 0, 2)), 0.06, cell=bc, name='band', wrap_u=True, offset=0.5,
+                            outward_from=(0, 0.2, z_rim - 4), inner='rim'), 'head')
     if h.get('peak'):
-        pk = ctx.ramp('peak', 'cloth', ctx.col(h.get('peak_color'), '#1a1a22'), top=1.1, bottom=0.9)
-        nu, nv = 13, 6
-        azs = np.linspace(-62, 62, nu)
-        sv = np.linspace(0, 1, nv)
-        grid = np.zeros((nu, nv, 3))
-        for i, a in enumerate(azs):
-            base = np.array([math.sin(math.radians(a)) * rc * 0.98, 0.25 - math.cos(math.radians(a)) * rc * 0.93, z0 + 0.2])
-            dirn = G.nrm(np.array([math.sin(math.radians(a)) * 0.6, -math.cos(math.radians(a)), 0.0]))
-            ext = 3.0 * math.cos(math.radians(a) * 1.3) ** 0.6
-            for j, s in enumerate(sv):
-                grid[i, j] = base + dirn * ext * s + np.array([0, 0, -0.4 * s - 0.4 * (a / 62) ** 2 * s])
-        ctx.add(G.solid_surface(grid, 0.3, cell=pk, name='peak', g=np.tile(sv[None, :], (nu, 1)).reshape(-1), offset=0.5, outward_from=(0, 0, z0 - 8)), 'head')
+        hat_cap_visor(ctx, RG, z_rim, cell)
     if h.get('badge'):
-        bc = ctx.detail('hatbadge', PT.detail_badge(ctx.col(h.get('badge_color'), '#e8c84a'), ctx.col(h.get('badge_edge'), '#a88018')), 24, 24)
-        nu, nv = 9, 9
-        pts = np.zeros((nu, nv, 3))
-        uv = np.zeros((nu, nv, 2))
-        for i in range(nu):
-            for j in range(nv):
-                u, v = i / (nu - 1), j / (nv - 1)
-                a = math.radians((u - 0.5) * 34)
-                pts[i, j] = np.array([math.sin(a) * (rc + 0.5), 0.25 - math.cos(a) * (rc + 0.5) * 0.95, z0 + 0.1 + v * 1.3])
-                uv[i, j] = (u, v)
-        b = G.surface_grid(pts, bc, 'badge', uv=uv, outward_from=(0, 0.25, z0))
-        b.ao_gain = 0
-        ctx.add(b, 'head')
+        lc = ctx.ramp('badge', 'metal', ctx.col(h.get('badge_color'), '#e8c84a'))
+        c = np.array([0, RG.ellipse(z_rim + 0.3, 0.3)[1] - RG.ellipse(z_rim + 0.3, 0.3)[3] - 0.03, z_rim + 0.3])
+        ctx.add(O.stud(c, np.array([0, -1.0, 0.2]), 0.3, lc, 'badge', h=0.4), 'head')
 
 
-def hat_chef(ctx, h):
+def hat_cap_visor(ctx, RG, z_rim, cell):
+    az_s = np.linspace(-70, 70, 13)
+    rs = np.linspace(0, 1, 5)
+    grid = np.zeros((len(az_s), len(rs), 3))
+    for i, a in enumerate(az_s):
+        cx, cy, rx, ry = RG.ellipse(z_rim, 0.2)
+        ar = math.radians(a)
+        base = np.array([cx + rx * math.sin(ar), cy - ry * math.cos(ar), z_rim])
+        outv = np.array([math.sin(ar) * 0.6, -math.cos(ar), 0.0])
+        outv /= np.linalg.norm(outv)
+        for j, r_ in enumerate(rs):
+            grid[i, j] = base + outv * 0.6 * r_ - np.array([0, 0, 0.12 * r_])
+    ctx.add(G.solid_surface(grid, 0.06, cell='brim' if 'brim' in ctx.atlas.cells else cell, name='peak', g=np.tile(np.linspace(0.3, 0.9, 5)[None, :], (13, 1)),
+                            offset=0.5, outward_from=(0, 0.2, z_rim + 3), inner='full'), 'head')
+
+
+def hat_chef(ctx, RG, h):
+    """Tall puffed chef's hat."""
     P = ctx.P
-    hc = P.head_c[2]
-    cell = ctx.ramp('hat', 'cloth', ctx.col(h.get('color'), '#f4f4f8'), top=1.06, bottom=0.92)
-    z0 = hc + 2.6
-    rc = 6.9
-    prof = [(0.0, z0 + 7.6), (3.0, z0 + 7.5), (5.6, z0 + 6.6), (7.0, z0 + 5.0), (7.6, z0 + 3.6), (7.4, z0 + 2.3), (6.6, z0 + 1.5), (rc, z0 + 0.9), (rc, z0 - 0.3), (rc - 0.5, z0 - 0.35), (0.0, z0 - 0.35)]
-    hat = G.lathe(prof[::-1], seg=32, center=(0, 0.3, 0), scale=(1.0, 0.98), cell=cell, name='chefhat',
-                  wobble=lambda a, z: 1 + 0.05 * np.sin(a * 7 + z * 0.8) * G.smoothstep(z0 + 1.0, z0 + 4.0, z))
-    hat.g = np.clip((hat.V[:, 2] - z0) / 8.0, 0, 1)
-    ctx.add(hat, 'head')
+    u = RG.u
+    cell = hat_cell(ctx, h)
+    z_rim = P.chin + 2.1 * u
+    ctx.hat_rim = lambda az: np.full_like(np.asarray(az, float), z_rim + 0.05)
+    seg = 32
+    rows = []
+    z_top = P.head_top + 2.2 * u
+    zs = np.linspace(z_rim, z_top, 12)
+    for k, z in enumerate(zs):
+        f = k / (len(zs) - 1)
+        cx, cy, rx, ry = RG.ellipse(z_rim + 0.1, 0.2)
+        puff = 1.0 + 0.45 * math.sin(min(f * 1.4, 1.0) * math.pi * 0.62) ** 1.2
+        if f > 0.82:
+            puff *= math.sqrt(max(1 - ((f - 0.82) / 0.18) ** 2, 0.0)) * 0.55 + 0.45
+        rows.append(ring_points(cx, cy, rx * puff, ry * puff, z, seg))
+    last = np.array(rows[-1])
+    cen = last.mean(0)
+    for f in (0.6, 0.25, 0.02):
+        rows.append(cen + (last - cen) * f)
+    Pg = np.transpose(np.array(rows), (1, 0, 2))
+    ctx.add(G.solid_surface(Pg, 0.09, cell=cell, name='chef', wrap_u=True, g=np.tile(np.linspace(0.2, 0.9, Pg.shape[1])[None, :], (seg, 1)), offset=0.5,
+                            outward_from=(0, 0.2, z_rim - 4), inner='rim'), 'head')
 
 
-def hat_nurse(ctx, h):
+def hat_nurse(ctx, RG, h):
+    """Small flat nurse's cap pinned on top of the hair, with a cross."""
     P = ctx.P
-    H_ = ctx.head
-    cell = ctx.ramp('hat', 'cloth', ctx.col(h.get('color'), '#f4f4f8'), top=1.06, bottom=0.94)
-    c = H_.surf(0, 58, 0.5)
-    cap = G.superellipsoid(c + np.array([0, -0.6, 0.4]), (3.5, 2.5, 1.0), 3.0, seg=18, rings=10, cell=cell, name='nursecap', rot=G.rot_x(-18))
-    cap.g = np.clip((cap.V[:, 2] - (c[2] - 1)) / 2.5, 0, 1)
-    ctx.add(cap, 'head')
-    cc = ctx.detail('nursecross', PT.detail_cross('#f4f4f8', ctx.col(h.get('cross'), '#e03848')), 24, 24)
-    nu = nv = 7
-    pts = np.zeros((nu, nv, 3))
-    uv = np.zeros((nu, nv, 2))
-    R_ = G.rot_x(-18)
-    for i in range(nu):
-        for j in range(nv):
-            u, v = i / (nu - 1), j / (nv - 1)
-            p = np.array([(u - 0.5) * 2.4, -2.5 * 0.86 - 0.35, 1.0 * 0.4 + (v - 0.5) * 1.5])
-            pts[i, j] = p @ R_.T + c + np.array([0, -0.6, 0.4]) + np.array([0, -0.08, 0.0])
-            uv[i, j] = (u, v)
-    x = G.surface_grid(pts, cc, 'cross', uv=uv, outward_from=c)
-    x.ao_gain = 0
-    ctx.add(x, 'head')
+    u = RG.u
+    cell = hat_cell(ctx, h)
+    c = np.array([0, 0.05 * u, P.head_top - 0.28])
+    body = H.ellipsoid_part(c + np.array([0, -0.55 * u, 0.12]), (0.95 * u, 0.42 * u, 0.2 * u), name='nursecap', cell=cell, seg=20, rings=8)
+    ctx.add(body, 'head')
+    xc = ctx.detail('cross', PT.detail_cross(bg=ctx.col(h.get('color'), 'accent'), fg=ctx.col(h.get('cross'), '#e03848')), 32, 32)
+    pts = np.zeros((5, 5, 3))
+    uv = np.zeros((5, 5, 2))
+    for i, x in enumerate(np.linspace(-0.3, 0.3, 5)):
+        for j, z in enumerate(np.linspace(-0.09, 0.09, 5)):
+            pts[i, j] = (x, c[1] - 0.55 * u - 0.36 * u - 0.03, c[2] + 0.14 + z * 0)
+            uv[i, j] = (i / 4.0, j / 4.0)
+    ctx.add(FC.grid_part(pts, xc, 'nurse_cross', uv=uv, bone='head', out_from=(0, 3, c[2])), 'head')
 
 
-def _band_tails(ctx, cell, el):
-    H_ = ctx.head
-    b0 = H_.surf(180, el, 1.0)
-    for s in (1, -1):
-        pts2 = [b0, b0 + np.array([s * 0.8, 1.2, -0.6]), b0 + np.array([s * 1.6, 2.4, -3.0]), b0 + np.array([s * 2.0, 2.6, -5.6])]
-        nm = 'band_%s' % ('L' if s > 0 else 'R')
-        names = H.add_chain_bones(ctx, nm, [tuple(p) for p in [pts2[0], pts2[2], pts2[3]]])
-        tl = G.loft(G.catmull(np.array(pts2), 9), np.array([[0.85, 0.2], [0.95, 0.2], [0.9, 0.18], [0.85, 0.16], [0.8, 0.16], [0.75, 0.15], [0.7, 0.15], [0.6, 0.14], [0.5, 0.12]]),
-                    seg=6, cell=cell, name='bandtail', caps=(0.5, 0.2), ref=(1, 0, 0))
-        tl.g = np.clip(1 - (tl.V[:, 2] - pts2[-1][2]) / max(pts2[0][2] - pts2[-1][2], 1e-3), 0, 1) * 0.5 + 0.3
-        H.weight_chain(tl, [pts2[0], pts2[2], pts2[3]], names, hw=0.9)
-        ctx.add(tl)
-        ctx.anim_hints['hair_tail'] = ctx.anim_hints.get('hair_tail', []) + names
-
-
-def hat_headband(ctx, h):
-    """Headband around the forehead with knot + trailing tails (ninja / bandana)."""
+def hat_headband(ctx, RG, h):
+    """Headband round the forehead (Daisy) / ninja band with a metal plate and tails (Koga)."""
     P = ctx.P
-    H_ = ctx.head
-    cell = ctx.ramp('hat', 'cloth', ctx.col(h.get('color'), 'hat'), top=1.06, bottom=0.94)
-    el = h.get('el', 20)
-    az = np.linspace(-180, 180, 44, endpoint=False)
-    hgt = h.get('h', 12)
-    ELS = np.array([el - hgt / 2, el - hgt / 4, el + hgt / 4, el + hgt / 2])
-    AZ = az[:, None].repeat(4, 1)
-    EL = np.tile(ELS[None, :], (44, 1))
-    pts = H_.surf(AZ, EL, 0.0)
-    th = np.array([0.5, 1.15, 1.15, 0.5])[None, :].repeat(44, 0) + 0.3
-    band = G.solid_surface(pts, 0.0, cell=cell, name='headband', wrap_u=True, g=np.tile(np.linspace(0, 1, 4)[None, :], (44, 1)).reshape(-1),
-                           thick_fn=lambda _P: th, offset=0.45, outward_from=H_.c, inner='rim')
-    ctx.add(band, 'head')
-    if h.get('tails', True):
-        _band_tails(ctx, cell, el)
+    u = RG.u
+    cell = hat_cell(ctx, h)
+    z = P.chin + 2.0 * u
+    hh = h.get('h', 7) * 0.05
+    seg = 32
+    rows = []
+    for zz in np.linspace(z - hh / 2, z + hh / 2, 4):
+        cx, cy, rx, ry = RG.ellipse(zz, 0.08)
+        rows.append(ring_points(cx, cy, rx, ry, zz, seg))
+    Pg = np.transpose(np.array(rows), (1, 0, 2))
+    ctx.add(G.solid_surface(Pg, 0.08, cell=cell, name='headband', wrap_u=True, offset=0.5, outward_from=(0, 0.2, z - 4), inner='rim'), 'head')
     if h.get('plate'):
-        pc = ctx.ramp('plate', 'metal', '#c8ccd8')
-        pl = G.superellipsoid(H_.surf(0, el, 1.4), (2.2, 0.3, 1.5), 3.0, seg=14, rings=8, cell=pc, name='plate')
-        pl.g[:] = 0.5
-        ctx.add(pl, 'head')
+        mc = ctx.ramp('plate', 'metal', '#c8c8d0')
+        cx, cy, rx, ry = RG.ellipse(z, 0.12)
+        ctx.add(O.stud(np.array([0, cy - ry - 0.02, z]), np.array([0, -1.0, 0]), 0.42, mc, 'plate', h=0.25), 'head')
+    if h.get('tails', True) and h.get('type') == 'headband' and h.get('plate') is not None:
+        cx, cy, rx, ry = RG.ellipse(z, 0.1)
+        base = np.array([0, cy + ry, z])
+        pts = np.array([base, base + [0.25, 0.5, -0.4], base + [0.45, 1.2, -1.3], base + [0.7, 1.8, -2.3]])
+        for sd in (1, -1):
+            pp = pts * np.array([sd, 1, 1])
+            path = G.catmull(pp, 8)
+            wd = np.linspace(0.16, 0.12, 8)
+            p = G.loft(path, np.stack([wd, wd * 0.3], 1), seg=6, cell=cell, name='band_tail', caps=(0.3, 0.3), ref=(1, 0, 0))
+            names = H.add_bones(ctx, 'band_%s' % ('L' if sd > 0 else 'R'), pp)
+            H.chain_weights(p, pp, names, root='head', hw=0.5)
+            ctx.add(p)
+            ctx.anim_hints.setdefault('hair_twin', []).extend(names)
 
 
 HATS = {'cap': hat_cap, 'beanie': hat_beanie, 'wide': hat_wide, 'sailor': hat_sailor, 'chef': hat_chef, 'nurse': hat_nurse, 'headband': hat_headband}
 
 
-def build_hat(ctx, h):
-    HATS[h.get('type', 'cap')](ctx, h)
+# ----------------------------------------------------------------------------- facial hair / glasses
+def moustache(ctx, m):
+    HR = ctx.headref
+    u = HR.u
+    P = ctx.P
+    HS = AN.HeadShape(P, ctx.look.get('face', {}))
+    col = ctx.ramp('beardc', 'hair', ctx.col(m.get('color'), 'beard'))
+    kind = m.get('type', 'normal')
+    big = 1.35 if kind == 'bushy' else 1.0
+    nz = HS.z('nose') - 0.12 * u
+    mz = HS.z('mouth')
+    zc = mz + 0.2 * u
+    for sd in (1, -1):
+        n = 7
+        s = np.linspace(0, 1, n)
+        x = sd * (0.03 + 0.55 * s) * u
+        z = zc + 0.03 * u - 0.32 * u * s ** 1.6 * (1 if kind != 'bushy' else 0.85) + 0.12 * u * math.sin(math.pi * 0.5) * (1 - s) * 0.4
+        pts = np.stack([x, np.full(n, -3.0), z], 1)
+        pts, nrm = FC.lift_to_skin(ctx, pts, 0.08 * big)
+        pts[:, 1] -= 0.04 * big * (1 - s)
+        w = 0.24 * u * big * (1 - 0.7 * s ** 2) + 0.03
+        p = FC.ribbon(pts, nrm, w, col, 'moustache', bone='head', sag=0.2 + 0.4 * big)
+        ctx.add(p)
+
+
+def beard(ctx, b):
+    HR = ctx.headref
+    u = HR.u
+    P = ctx.P
+    B = ctx.body
+    HS = AN.HeadShape(P, ctx.look.get('face', {}))
+    col = ctx.ramp('beardc', 'hair', ctx.col(b.get('color'), 'beard'))
+    kind = b.get('type', 'full')
+    V = B.V
+    x, y, z = V[:, 0], V[:, 1], V[:, 2]
+    mz = HS.z('mouth')
+    front = np.clip((HR.hc[1] - y) / (0.8 * u) + 0.4, -1, 1)              # >0 on the front half of the head
+    if kind == 'full':
+        top = mz + 0.25 * u + 0.75 * u * np.clip(np.abs(x) / (0.95 * u), 0, 1) ** 1.6
+        cut = np.minimum.reduce([B.headw + B.trunk * 0 - 0.5, top - z, front + 0.1, z - (P.chin - 0.55 * u)])
+        th = 0.12 + 0.05 * (1 - np.clip(np.abs(x) / u, 0, 1))
+        # sculpt a fuller chin: thickness grows toward the chin tip
+        th = th + 0.12 * np.exp(-((z - P.chin - 0.1 * u) / (0.5 * u)) ** 2) * np.clip(front + 0.2, 0, 1)
+    elif kind == 'goatee':
+        top = mz + 0.02 * u
+        cut = np.minimum.reduce([B.headw - 0.5, top - z, 0.42 * u - np.abs(x), front + 0.2, z - (P.chin - 0.35 * u)])
+        th = 0.12 + 0.1 * np.exp(-((z - P.chin - 0.05 * u) / (0.4 * u)) ** 2)
+    else:                          # 'chin': short beard under the lip, optional pointed tuft
+        top = mz - 0.12 * u
+        cut = np.minimum.reduce([B.headw - 0.5, top - z, 0.62 * u - np.abs(x), front + 0.2, z - (P.chin - 0.5 * u)])
+        th = 0.13 + 0.12 * np.exp(-((z - P.chin - 0.05 * u) / (0.45 * u)) ** 2)
+    p = SH.shell_from_body(ctx, cut, th, col, 'beard', g=np.clip(0.3 + 0.6 * (V[:, 2] - P.chin) / (2.0 * u), 0, 1), rim=0.02, cover=False)
+    if p is not None:
+        ctx.add(p, 'head')
+    if b.get('tuft') or kind == 'chin':
+        pts = np.array([[0, HS.face_y(0, P.chin + 0.25 * u) - 0.12, P.chin + 0.3 * u], [0, HS.face_y(0, P.chin + 0.25 * u) - 0.2, P.chin - 0.1 * u],
+                        [0, HS.face_y(0, P.chin + 0.25 * u) - 0.05, P.chin - 0.5 * u], [0, HS.face_y(0, P.chin + 0.25 * u) + 0.1, P.chin - 0.9 * u]])
+        path = G.catmull(pts, 7)
+        wd = np.linspace(0.42, 0.06, 7) * u
+        tuft = G.loft(path, np.stack([wd, wd * 0.8], 1), seg=6, cell=col, name='beard_tuft', caps=(0.2, 0.9), ref=(1, 0, 0))
+        ctx.add(tuft, 'head')
+
+
+def glasses(ctx, g):
+    HS = AN.HeadShape(ctx.P, ctx.look.get('face', {}))
+    P = ctx.P
+    u = HS.u
+    eg = AN.eye_geom(P, ctx.look.get('face', {}), HS)
+    col = ctx.ramp('frame', 'flat', ctx.col(g.get('color'), '#2a2a3a'))
+    kind = g.get('type', 'round')
+    wide = HS.wide
+    for sd in (1, -1):
+        e = eg[sd]
+        ex, ez = e['ex'], e['ez']
+        y = HS.face_y(ex, ez) - 0.28 * u
+        n = 24
+        a = np.linspace(0, 2 * math.pi, n, endpoint=False)
+        if kind == 'square':
+            rx, rz, ex_ = 0.42 * u, 0.3 * u, 6.0
+            cs, sn = np.cos(a), np.sin(a)
+            xx = rx * np.sign(cs) * np.abs(cs) ** (2 / ex_)
+            zz = rz * np.sign(sn) * np.abs(sn) ** (2 / ex_)
+        elif kind == 'shades':
+            xx = 0.5 * u * np.cos(a)
+            zz = 0.34 * u * np.sin(a) * (0.8 + 0.2 * np.cos(a * 0))
+        else:
+            xx = 0.44 * u * np.cos(a)
+            zz = 0.44 * u * np.sin(a)
+        ring = np.stack([ex + xx, np.full(n, y), ez - 0.02 * u + zz], 1)
+        # rims sit on the face: cast each point onto the skin, then lift
+        ring, nrm = FC.lift_to_skin(ctx, ring, 0.22)
+        ring = np.vstack([ring, ring[:1]])
+        w = 0.028 * u if kind != 'shades' else 0.05 * u
+        path = ring
+        p = G.loft(path, np.full((len(path), 2), w), seg=6, cell=col, name='rim', caps=(None, None), ref=(0, 0, 1))
+        ctx.add(p, 'head')
+        if kind == 'shades':
+            lens = ctx.ramp('lens', 'flat', ctx.col(g.get('lens'), '#15151c'))
+            ctr = ring[:-1].mean(0)
+            pts = np.zeros((n, 3, 3))
+            for i in range(n):
+                for j, f in enumerate((0.0, 0.5, 1.0)):
+                    pts[i, j] = ctr + (ring[i] - ctr) * f + np.array([0, 0.005, 0])
+            lp = FC.grid_part(pts, lens, 'lens', bone='head', out_from=ctr + np.array([0, 3, 0]))
+            lp.ao_gain = 0.0
+            ctx.add(lp)
+        # temple arm back to the ear
+        ear = np.array([sd * (1.0 * u * wide + 0.08), 0.05 * u, HS.z('ear') + 0.25 * u])
+        start = ring[0 if sd > 0 else n // 2]
+        outer = ring[n // 2 if sd > 0 else 0]
+        arm = np.array([outer, (outer + ear) / 2 + np.array([sd * 0.05, 0.0, 0.0]), ear])
+        ctx.add(G.loft(G.catmull(arm, 6), np.full((6, 2), 0.045 * u), seg=6, cell=col, name='temple', caps=(0.3, 0.3), ref=(0, 0, 1)), 'head')
+    # bridge
+    e = eg[1]
+    y = HS.face_y(0, e['ez']) - 0.3 * u
+    br = np.array([[0.42 * u, y, e['ez'] + 0.05 * u], [0.0, y - 0.03, e['ez'] + 0.12 * u], [-0.42 * u, y, e['ez'] + 0.05 * u]])
+    ctx.add(G.loft(G.catmull(br, 6), np.full((6, 2), 0.045 * u), seg=6, cell=col, name='bridge', caps=(0.3, 0.3), ref=(0, 0, 1)), 'head')
+
+
+# ----------------------------------------------------------------------------- body extras
+def _lift_line(ctx, xs, zs, off):
+    """Points on the front of the body, `off` above the garment that covers them."""
+    pts = np.stack([xs, np.full(len(xs), -3.0), zs], 1)
+    return FC.lift_to_skin(ctx, pts, off, layer=True)
+
+
+def belt(ctx, b):
+    P, B = ctx.P, ctx.body
+    col = O.cloth_cell(ctx, 'belt', b.get('color'), 'accent')
+    z0 = P.waist - 0.2 + 0.35 * b.get('dz', 0.0)
+    h = 0.5 * b.get('h', 1.0)
+    z = B.V[:, 2]
+    c = np.minimum(B.trunk + B.w.get('hips', 0) * 0.3 - 0.3, h / 2 - np.abs(z - z0))
+    top_t = 0.05
+    ctx.add(SH.shell_from_body(ctx, c, B.layer + top_t, col, 'belt', g=np.clip((z - (z0 - h / 2)) / h, 0, 1), cover=False))
+    bk = ctx.ramp('buckle', 'metal', ctx.col(b.get('buckle'), '#c8c8d0'))
+    pts, nrm = _lift_line(ctx, np.array([0.0]), np.array([z0]), top_t + 0.05)
+    box = G.box_round(pts[0] + nrm[0] * 0.02, (0.34, 0.06, h * 0.5), r=0.05, cell=bk, name='buckle')
+    box.set_bone('spine')
+    ctx.add(box)
+    balls = b.get('balls', 0)
+    for k in range(balls):
+        sx = 1 if k % 2 == 0 else -1
+        p, n = _lift_line(ctx, np.array([sx * (1.1 + 0.55 * (k // 2))]), np.array([z0 - 0.05]), top_t + 0.1)
+        bc = ctx.ramp('ball', 'ball', '#e04040')
+        ball = H.ellipsoid_part(p[0], (0.2, 0.2, 0.2), name='ball', cell=bc)
+        ctx.add(ball, 'spine')
+
+
+def emblem(ctx, e):
+    P = ctx.P
+    kind = e.get('type', 'badge')
+    if kind == 'R':
+        painter = PT.detail_letter_R(bg=ctx.col(e.get('bg'), 'shirt'), fg=ctx.col(e.get('color'), '#e04040'))
+    else:
+        painter = PT.detail_badge(bg=ctx.col(e.get('bg'), '#f4f4f8'), fg=ctx.col(e.get('color'), '#e8c84a'))
+    cell = ctx.detail('emblem', painter, 32, 32)
+    zc = O.map_z(P, 9.7 + e.get('dz', 0.0) + 1.1)
+    w = 0.55 * (e.get('h', 3.0) * 0.5 + 0.3)
+    nx, nz = 7, 7
+    pts = np.zeros((nx, nz, 3))
+    uv = np.zeros((nx, nz, 2))
+    xoff = e.get('x', 0.0)
+    for i, x in enumerate(np.linspace(-w, w, nx)):
+        for j, z in enumerate(np.linspace(-w, w, nz)):
+            pts[i, j] = (xoff + x, -3.0, zc + z)
+            uv[i, j] = (i / (nx - 1), j / (nz - 1))
+    flat, nrm = FC.lift_to_skin(ctx, pts.reshape(-1, 3), 0.03, layer=True)
+    part = FC.grid_part(flat.reshape(nx, nz, 3), cell, 'emblem', uv=uv, bone='chest', out_from=(0, 3, zc))
+    part.ao_gain = 0.0
+    ctx.add(part)
+
+
+def tie(ctx, t):
+    P = ctx.P
+    col = O.cloth_cell(ctx, 'tie', t.get('color'), 'accent')
+    z_top = P.neck_base - 0.15
+    z_bot = O.map_z(P, 8.6)
+    n = 9
+    zs = np.linspace(z_top, z_bot, n)
+    w = np.interp(zs, [z_bot, z_top - 0.9, z_top - 0.2, z_top], [0.34, 0.19, 0.24, 0.16])
+    pts, nrm = _lift_line(ctx, np.zeros(n), zs, 0.05)
+    ctx.add(FC.ribbon(pts, nrm, w * 1.7, col, 'tie', bone='chest', sag=0.3, g=np.linspace(0, 1, n)))
+    knot = H.ellipsoid_part(pts[0] + nrm[0] * 0.03, (0.19, 0.14, 0.17), name='knot', cell=col, seg=10, rings=6)
+    ctx.add(knot, 'chest')
+
+
+def bowtie(ctx, t):
+    P = ctx.P
+    col = O.cloth_cell(ctx, 'bowtie', t.get('color'), 'accent')
+    z = P.neck_base - 0.05
+    p, n = _lift_line(ctx, np.array([0.0]), np.array([z]), 0.06)
+    c = p[0]
+    ctx.add(H.ellipsoid_part(c, (0.12, 0.1, 0.1), name='knot', cell=col, seg=8, rings=5), 'chest')
+    for sd in (1, -1):
+        w = H.ellipsoid_part(c + np.array([sd * 0.3, 0.0, 0.0]), (0.24, 0.07, 0.15), name='bow', cell=col, seg=10, rings=6)
+        ctx.add(w, 'chest')
+
+
+def scarf(ctx, s):
+    P, B = ctx.P, ctx.body
+    col = O.cloth_cell(ctx, 'scarf', s.get('color'), 'accent')
+    z = B.V[:, 2]
+    top = P.neck_base + 0.85 * P.s
+    neckw = B.w.get('neck', np.zeros(len(z)))
+    c = np.minimum.reduce([neckw + B.trunk * (z > P.neck_base - 0.2) - 0.35, top - z, z - (P.neck_base - 0.35)])
+    ctx.add(SH.shell_from_body(ctx, c, B.layer + 0.13, col, 'scarf', g=np.clip((z - P.neck_base) / 1.2, 0, 1), cover=False))
+    if s.get('tail'):
+        # tail hanging from the knot at the front-left, with follow-through bones
+        p0 = np.array([0.55, -1.15, P.neck_base - 0.1])
+        pts = np.array([p0, p0 + [0.2, -0.2, -0.9], p0 + [0.3, -0.25, -2.0], p0 + [0.3, -0.2, -3.0]])
+        path = G.catmull(pts, 9)
+        wd = np.linspace(0.42, 0.34, 9)
+        p = G.loft(path, np.stack([wd, np.full(9, 0.06)], 1), seg=8, cell=col, name='scarf_tail', caps=(0.3, 0.3), ref=(1, 0, 0), e=4.0)
+        names = H.add_bones(ctx, 'scarf', pts, parent='chest')
+        H.chain_weights(p, pts, names, root='chest', hw=0.6)
+        ctx.add(p)
+        ctx.anim_hints.setdefault('hair_back', []).extend([])
+
+
+def necklace(ctx, n):
+    P = ctx.P
+    col = ctx.ramp('chain', 'metal', ctx.col(n.get('color'), '#d8c060'))
+    seg = 20
+    a = np.linspace(-math.radians(75), math.radians(75), seg)
+    pts = []
+    for ang in a:
+        r = 1.0 + 0.0
+        x = 1.05 * math.sin(ang)
+        zc = P.neck_base - 0.05 - 0.6 * (1 - abs(math.cos(ang)) ** 0.3)
+        pts.append((x, -3.0, zc - 0.55 * (math.cos(ang)) * 0.9 - 0.15))
+    pts = np.array(pts)
+    lifted, nrm = FC.lift_to_skin(ctx, pts, 0.09)
+    p = G.loft(lifted, np.full((seg, 2), 0.028), seg=5, cell=col, name='chain', caps=(0.5, 0.5), ref=(0, 1, 0))
+    ctx.add(p, 'chest')
+    if n.get('pendant'):
+        pc = O.cloth_cell(ctx, 'pendant', n.get('pendant'), 'accent')
+        c = lifted[seg // 2] + nrm[seg // 2] * 0.03
+        disc = H.ellipsoid_part(c + np.array([0, -0.02, -0.25]), (0.22, 0.05, 0.22), name='pendant', cell=pc, seg=14, rings=6)
+        ctx.add(disc, 'chest')
+
+
+def suspenders(ctx, s):
+    P = ctx.P
+    col = O.cloth_cell(ctx, 'susp', s.get('color'), 'accent')
+    for sd in (1, -1):
+        zs = np.linspace(O.map_z(P, 7.6), P.shoulder_top + 0.15, 11)
+        xs = sd * np.interp(zs, [zs[0], P.chest, zs[-1]], [1.35, 1.35, 1.7])
+        pts, nrm = _lift_line(ctx, xs, zs, 0.05)
+        ctx.add(FC.ribbon(pts, nrm, 0.34, col, 'suspender', bone='chest', sag=0.2))
+
+
+def wristbands(ctx, w):
+    B = ctx.body
+    col = O.cloth_cell(ctx, 'wristband', w.get('color'), 'accent')
+    for sd in (1, -1):
+        c = np.minimum.reduce([B.arm[sd] - 0.5, B.arm_t[sd] - 0.53, 0.6 - B.arm_t[sd]])
+        ctx.add(SH.shell_from_body(ctx, c, B.layer + 0.05, col, 'wristband', g=np.full(len(B.V), 0.5), cover=False))
+
+
+def backpack(ctx, bk):
+    P = ctx.P
+    s = bk.get('size', 1.0)
+    col = O.cloth_cell(ctx, 'bag', bk.get('color'), 'bag')
+    cz = O.map_z(P, 9.3)
+    c = np.array([0.0, P.chest * 0 + 1.55 * P.ls + 0.75 * s, cz])
+    box = G.box_round(c, (1.65 * P.ls * s, 0.72 * s, 2.0 * P.s * s), r=0.32, cell=col, name='backpack')
+    box.set_bone('chest')
+    ctx.add(box)
+    flap = G.box_round(c + np.array([0, 0.28 * s, 0.9 * s]), (1.5 * P.ls * s, 0.56 * s, 1.0 * P.s * s), r=0.25, cell=col, name='bag_flap')
+    flap.set_bone('chest')
+    ctx.add(flap)
+    for sd in (1, -1):
+        zs = np.linspace(P.shoulder_top + 0.1, cz - 1.3, 8)
+        xs = np.full(8, sd * 1.35 * P.ls)
+        pts, nrm = _lift_line(ctx, xs, zs, 0.05)
+        ctx.add(FC.ribbon(pts, nrm, 0.36, col, 'strap', bone='chest', sag=0.15))
+    if bk.get('roll'):
+        rc = ctx.ramp('roll', 'cloth', ctx.col(bk['roll']))
+        ctx.add(H.torus(c + np.array([0, 0.5 * s, -2.1 * s]), np.array([1.0, 0, 0]), 0.55 * s, 0.42 * s, cell=rc, name='roll'), 'chest')
+
+
+def cape(ctx, cp):
+    P, B = ctx.P, ctx.body
+    col = O.cloth_cell(ctx, 'cape', cp.get('color'), 'accent', hem=cp.get('hem'))
+    z_top = P.shoulder_top - 0.1
+    z_bot = P.lift + 2.0
+    n_c, n_r = 15, 10
+    Pg = np.zeros((n_c, n_r, 3))
+    for i, a in enumerate(np.linspace(-1, 1, n_c)):
+        for j, f in enumerate(np.linspace(0, 1, n_r)):
+            z = z_top + (z_bot - z_top) * f
+            x = a * (2.6 * P.ls + 1.8 * f)
+            back = float(O.envelope_radii(ctx, z, np.array([math.pi]), cy=0.1)[0])
+            y = 0.1 + max(back, 1.6) + 0.22 + 0.35 * f + 0.25 * (a ** 2) * (1 - f)
+            Pg[i, j] = (x, y, z)
+    g = np.tile(np.linspace(1, 0, n_r)[None, :], (n_c, 1))
+    part = G.solid_surface(Pg, 0.08, cell=col, name='cape', g=g, offset=0.5, outward_from=(0, -3, P.chest), inner='full')
+    pts = np.array([Pg[n_c // 2, k] for k in (0, 3, 5, 7, 9)])
+    names = H.add_bones(ctx, 'cape', pts, parent='chest')
+    H.chain_weights(part, pts, names, root='chest', hw=1.0)
+    ctx.add(part)
+    ctx.anim_hints.setdefault('hair_back', []).extend(names)
+    if cp.get('collar'):
+        cc = O.cloth_cell(ctx, 'capecollar', cp['collar'], 'accent')
+        z = B.V[:, 2]
+        neckw = B.w.get('neck', np.zeros(len(z)))
+        c = np.minimum.reduce([neckw + B.trunk * (z > P.neck_base - 0.2) - 0.35, P.neck_base + 1.0 - z, z - (P.neck_base - 0.2)])
+        ctx.add(SH.shell_from_body(ctx, c, B.layer + 0.06, cc, 'capecollar', g=np.full(len(z), 0.5), cover=False))

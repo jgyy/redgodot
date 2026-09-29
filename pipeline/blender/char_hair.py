@@ -1,457 +1,611 @@
-"""Hair styles: a thick shell hugging the skull (hairline shaped per style) plus lofted locks,
-spikes, tails and buns.  All parts are rigid to the head unless they belong to a secondary
-hair bone chain (ponytail, pigtails, long back hair)."""
+"""Hair: a scalp cap shell (cut from the head so it hugs the skull) plus soft tapered locks.
+
+* cap     - the head surface above a hairline curve, pushed out by the hair thickness (no floating, no gaps).
+* locks   - flattened tapered tubes that start inside the cap and follow the head surface before they lift off
+            (fringes, side parts, tufts); tips are rounded, never cones.
+* sheets  - long hair falls as a curtain that drapes over the back / shoulders using the body field, so it never
+            passes through them.
+* tails / buns / loops - gathered hair with a tie; tails and curtains carry secondary bones for follow-through.
+"""
 import math
 
 import numpy as np
 
 import char_geo as G
+import char_shell as SH
+import char_outfit as O
 
 
-def _interp(az, table):
-    xs = [t[0] for t in table]
-    ys = [t[1] for t in table]
-    a = ((np.asarray(az, float) + 180.0) % 360.0) - 180.0
-    return np.interp(np.abs(a), xs, ys)
+# ----------------------------------------------------------------------------- head reference
+class HeadRef:
+    def __init__(self, ctx):
+        self.ctx = ctx
+        P = ctx.P
+        self.P = P
+        self.u = P.head_h / 3.3
+        self.hc = np.array([0.0, 0.18 * self.u, P.chin + 1.85 * self.u])
+        self.B = ctx.body
+
+    def dirv(self, az, el):
+        a, e = np.radians(np.asarray(az, float)), np.radians(np.asarray(el, float))
+        return np.stack([np.sin(a) * np.cos(e), -np.cos(a) * np.cos(e), np.sin(e)], -1)
+
+    def skin(self, az, el):
+        """Skin point seen from the skull centre along (azimuth, elevation) degrees; az 0 = front, + toward +X."""
+        from mathutils import Vector
+        az, el = np.broadcast_arrays(np.asarray(az, float), np.asarray(el, float))
+        d = self.dirv(az, el).reshape(-1, 3)
+        out = np.zeros_like(d)
+        for i, dv in enumerate(d):
+            hit = self.B.tree.ray_cast(Vector(self.hc.tolist()), Vector(dv.tolist()), 9.0)
+            out[i] = np.array(hit[0][:]) if hit[0] is not None else self.hc + dv * 1.3 * self.u
+        return out.reshape(az.shape + (3,))
+
+    def normal(self, pts):
+        import char_sdf as S
+        return S.field_normals(self.B.field, np.asarray(pts).reshape(-1, 3)).reshape(np.asarray(pts).shape)
+
+    def hairline_z(self, az, kind='short', recede=0.0):
+        """World height of the hairline at azimuth az (deg, 0 = front)."""
+        u, chin = self.u, self.P.chin
+        a = np.abs(np.asarray(az, float))
+        if kind == 'long':
+            zs = [2.72, 2.55, 2.1, 1.55, 0.75, 0.2]
+        else:
+            zs = [2.72, 2.55, 2.12, 1.86, 1.25, 0.95]
+        zs = np.array(zs) - np.array([0.0, 0.25, 0.4, 0.15, 0, 0]) * recede
+        z = chin + np.interp(a, [0, 42, 72, 98, 140, 180], zs) * u
+        # a natural hairline is never a ruler line: temples recede, a little irregularity
+        z = z + 0.05 * u * np.sin(np.radians(np.asarray(az, float)) * 5.0 + 1.0) + 0.10 * u * np.exp(-((a - 46) / 16.0) ** 2)
+        return z
 
 
-def dirs_from(az, th):
-    a, t = np.radians(az), np.radians(th)
-    return np.stack([np.sin(t) * np.sin(a), -np.sin(t) * np.cos(a), np.cos(t)], -1)
+def _col_jitter(n, amp, seed):
+    return np.random.default_rng(seed).uniform(-amp, amp, n)
 
 
-def shell(ctx, name, bot, top=None, az_range=(-180, 180), nu=32, nv=10, thick=0.5, volume=0.0,
-          ridges=14, ridge_amp=0.10, cell='hair', wrap=True, lip=0.22, offset=0.5, rim_top=True, seed=1):
-    """Thick hair cap.  bot/top: tables [(|az|, theta_deg)] of the lower / upper edge (top None =>
-    covers the crown pole).  Returns a Part."""
-    H = ctx.head
-    if wrap:
-        az = np.linspace(az_range[0], az_range[1], nu, endpoint=False)
-    else:
-        az = np.linspace(az_range[0], az_range[1], nu)
-    tb = _interp(az, bot) if not callable(bot) else bot(az)
-    tt = np.zeros_like(az) if top is None else (_interp(az, top) if not callable(top) else top(az))
-    v = np.linspace(0, 1, nv)
-    TH = tt[:, None] + (tb - tt)[:, None] * v[None, :]
-    AZ = np.repeat(az[:, None], nv, 1)
-    d = dirs_from(AZ, TH)
-    P = H.pt(d)
-    # crown swirl: ridges radiate from the top
-    rid = 1.0 + ridge_amp * np.sin(np.radians(AZ) * ridges + 1.3 * np.sin(np.radians(AZ) * 3)) * G.smoothstep(0.05, 0.4, v)[None, :]
-    body = lip + (thick - lip) * G.smoothstep(1.0, 0.72, v)
-    if top is not None:
-        body = np.minimum(body, lip + (thick - lip) * G.smoothstep(0.0, 0.28, v))
-    crown = volume * np.exp(-((TH / 38.0) ** 2))
-    th = (body + crown) * rid
-    if not wrap:
-        uu = np.linspace(0, 1, nu)
-        env = 0.3 + 0.7 * G.smoothstep(0.0, 0.22, uu) * G.smoothstep(1.0, 0.78, uu)
-        th = th * env[:, None]
-    g = np.tile(v[None, :], (nu, 1)).reshape(-1)
-    p = G.solid_surface(P, 0.0, cell=cell, name=name, wrap_u=wrap, g=g, thick_fn=lambda _P: th, offset=offset,
-                        outward_from=H.c, inner='rim')
+# ----------------------------------------------------------------------------- clumps sculpted into the scalp
+def bump_centres(ctx, HR, n, height, up, back, seed, jitter=0.3, front_clear=True):
+    """n clump centres spread over the top and back of the skull: (centres (n,3), dirs (n,3), heights (n,))."""
+    rng = np.random.default_rng(seed)
+    k = np.arange(n) + 0.5
+    ph = (k * 2.399963) % (2 * math.pi)                      # golden-angle spiral over the hemisphere
+    el = np.degrees(np.arcsin(1 - (1 - math.sin(math.radians(14))) * (k / n) ** 0.85 * 1.0 - 0.0))
+    el = 14 + 74 * (1 - (k / n) ** 0.9)
+    az = np.degrees(ph) - 180
+    az = az + rng.uniform(-8, 8, n)
+    el = el + rng.uniform(-5, 5, n)
+    keep = ~((np.abs(az) < 34) & (el < 50)) if front_clear else np.ones(n, bool)
+    az, el = az[keep], np.clip(el[keep], 10, 88)
+    pts = HR.skin(az, el)
+    nn = HR.normal(pts)
+    d = nn * 0.5 + np.array([0.0, back, up]) + rng.normal(0, jitter, (len(az), 3))
+    d /= np.linalg.norm(d, axis=1, keepdims=True)
+    hs = height * (0.7 + 0.5 * rng.random(len(az)))
+    return pts, d, hs
+
+
+def bump_offsets(V, centres, dirs, heights, radius=0.6):
+    """Displacement of every vertex by the clump it belongs to (cone-like falloff, the tallest overlapping clump wins so neighbouring
+    clumps keep their own peak and a crease between them)."""
+    d = np.linalg.norm(V[:, None, :] - centres[None, :, :], axis=2)
+    w = np.clip(1.0 - d / radius, 0.0, 1.0) ** 1.3
+    score = w * heights[None, :]
+    j = score.argmax(1)
+    idx = np.arange(len(V))
+    disp = dirs[j] * score[idx, j][:, None]
+    # a little of the runner-up keeps the valleys from being razor sharp
+    score2 = score.copy()
+    score2[idx, j] = 0
+    j2 = score2.argmax(1)
+    disp += 0.35 * dirs[j2] * score2[idx, j2][:, None]
+    return disp
+
+
+# ----------------------------------------------------------------------------- scalp cap
+def scalp_cap(ctx, HR, thick=0.14, kind='short', recede=0.0, volume=0.0, top_rim=None, name='hair_cap', flat_top=None,
+              cell='hair', keep=None, seed=0, bumps=None):
+    B, P = ctx.body, ctx.P
+    V = B.V
+    rel = V - HR.hc
+    az = np.degrees(np.arctan2(rel[:, 0], -rel[:, 1]))
+    zh = HR.hairline_z(az, kind, recede)
+    cut = V[:, 2] - zh
+    cut = np.minimum(cut, B.headw - 0.5)
+    if top_rim is not None:
+        cut = np.minimum(cut, top_rim(az) - V[:, 2])
+    if keep is not None:
+        cut = np.minimum(cut, keep(az, V))
+    el = np.degrees(np.arctan2(rel[:, 2], np.hypot(rel[:, 0], rel[:, 1])))
+    crown = np.clip(np.sin(np.radians(np.clip(el, 0, 90))), 0, 1)
+    th = thick * (0.8 + 0.25 * crown) + volume * crown ** 2 * (1.0 - np.clip(np.abs(az) / 180.0, 0, 1) * 0.3)
+    th = th + 0.02 * SH._noise(V * 2.2, seed)
+    streak = 0.06 * np.sin(np.radians(az) * 9.0 + 3.0 * SH._noise(V, seed + 5)) * (0.4 + 0.6 * crown)     # broad clumps of strands
+    g = 0.3 + 0.5 * (1.0 - crown) + _col_jitter(len(V), 0.03, seed + 1) + streak
+    if flat_top is not None:
+        # military flat top: extra height that is then clamped to a plane
+        th = th + flat_top['extra'] * crown ** 1.5
+    ov = None
+    if bumps is not None:
+        ov = bump_offsets(V, *bumps)
+        g = g + 0.16 * np.clip(np.linalg.norm(ov, axis=1) / max(bumps[2].max(), 1e-6), 0, 1)          # tips of the clumps catch the light
+    p = SH.shell_from_body(ctx, cut, th, cell, name, g=g, rim=0.02, cover=False, offset_vec=ov)
+    if p is not None:
+        p.ao_gain = 0.45
+    if p is not None and flat_top is not None:
+        top = HR.P.head_top + flat_top['plateau']
+        p.V[:, 2] = np.minimum(p.V[:, 2], top)
     return p
 
 
-def lock(ctx, pts_azel, widths, thick, off, name='lock', cell='hair', seg=8, taper_tip=0.9, ref=(1, 0, 0)):
-    """Flat tapered lock hugging the head: points as (az, el, offset) triples."""
-    H = ctx.head
-    a = np.asarray(pts_azel, float)
-    path = H.surf(a[:, 0], a[:, 1], a[:, 2])
-    path = G.catmull(path, 9)
-    t = np.linspace(0, 1, 9)
-    w = np.interp(t, np.linspace(0, 1, len(widths)), widths)
-    th = np.interp(t, np.linspace(0, 1, len(thick)), thick) if hasattr(thick, '__len__') else np.full(9, thick)
-    p = G.loft(path, np.stack([w, th], 1), seg=seg, cell=cell, name=name, caps=(0.6, taper_tip), ref=ref)
-    p.g = np.clip(1 - (p.V[:, 2] - path[:, 2].min()) / max(np.ptp(path[:, 2]), 1e-3), 0, 1) * 0.5 + 0.5
+# ----------------------------------------------------------------------------- locks
+def lock_path(HR, az0, el0, az1, el1, n=8, off0=0.06, off1=0.06, lift=0.0, lift_pow=2.0):
+    """Path from (az0, el0) to (az1, el1) hugging the head, `off` above the skin (interpolated) plus a lift profile."""
+    t = np.linspace(0, 1, n)
+    az = az0 + (az1 - az0) * t
+    el = el0 + (el1 - el0) * t
+    sk = HR.skin(az, el)
+    nn = HR.normal(sk)
+    off = off0 + (off1 - off0) * t + lift * t ** lift_pow
+    return sk + nn * off[:, None], nn
+
+
+def tapered(ctx, path, width, thick, name, cell='hair', seg=6, tip=0.18, g0=0.35, g1=0.85, ref=None, root_bury=0.0):
+    """Flattened tapered tube along `path` with a rounded tip (width across, thick along the surface normal)."""
+    path = np.asarray(path, float)
+    n = len(path)
+    t = np.linspace(0, 1, n)
+    prof = np.sqrt(np.clip(1 - t ** 3.0, 0, 1))
+    prof = tip + (1 - tip) * prof
+    w = width * 0.5 * prof
+    h = thick * 0.5 * prof
+    ref = ref if ref is not None else (0, 0, 1)
+    p = G.loft(path, np.stack([h, w], 1), seg=seg, cell=cell, name=name, caps=(0.0 if root_bury else None, 0.9), ref=ref)
+    p.g = np.clip(g0 + (g1 - g0) * np.clip(G.smoothstep(0, 1, np.linalg.norm(p.V - path[0], axis=1) / max(np.linalg.norm(path[-1] - path[0]), 1e-3)), 0, 1), 0, 1)
     return p
 
 
-def spike(ctx, az, el, length, width, tilt=(0, 0, 0), off=-0.1, name='spike', bend=(0, 0, 0), cell='hair', seg=6, thin=0.55):
-    """Blade-shaped spike growing out of the skull at (az, el): wide across the head's tangent,
-    thin front-to-back, curving by `bend`.  tilt is added to the outward normal."""
-    H = ctx.head
-    base = H.surf(az, el, off)
-    n = H.normal(az, el)
-    d = G.nrm(n + np.asarray(tilt, float))
-    k = 5
-    t = np.linspace(0, 1, k)
-    path = base[None, :] + d[None, :] * (t * length)[:, None] + np.asarray(bend, float)[None, :] * (t ** 2 * length)[:, None]
-    taper = (1 - t) ** 0.85
-    rx = width * 0.5 * taper + 0.04
-    ry = width * 0.5 * thin * taper + 0.04
-    a = math.radians(az)
-    ref = (math.cos(a), math.sin(a), 0.0)
-    p = G.loft(path, np.stack([rx, ry], 1), seg=seg, cell=cell, name=name, caps=(0.0, 0.0), ref=ref)
-    p.g = np.clip(G.smoothstep(0, length, np.linalg.norm(p.V - base, axis=1)), 0, 1) * 0.6 + 0.3
+def add_lock(ctx, HR, az0, el0, az1, el1, width, thick, name='lock', n=7, lift=0.0, off=0.05, seg=6, tip=0.2, g0=0.5, g1=0.85, jit=0.0):
+    path, nn = lock_path(HR, az0, el0, az1, el1, n=n, off0=off, off1=off + 0.02, lift=lift)
+    # bury the root a little inside the cap
+    path[0] = path[0] - nn[0] * 0.03 - nn[0] * 0.0
+    p = tapered(ctx, path, width, thick, name, seg=seg, tip=tip, g0=g0 + jit, g1=g1 + jit, ref=nn[0])
+    p.ao_gain = 0.35
+    ctx.add(p, 'head')
     return p
 
 
-def tail(ctx, pts, radii, name='tail', cell='hair', seg=8, bones=None, hw=0.8):
-    """Free-hanging tapered tube (ponytail / pigtail / curtain lock).  Weights: rigid head at the
-    root blending down a chain of secondary bones (pts are also the bone joints)."""
-    path = G.catmull(np.asarray(pts, float), 10)
-    t = np.linspace(0, 1, 10)
-    r = np.interp(t, np.linspace(0, 1, len(radii)), radii)
-    p = G.loft(path, np.stack([r, r], 1), seg=seg, cell=cell, name=name, caps=(0.5, 0.4), ref=(1, 0, 0))
-    p.g = np.clip(np.linalg.norm(p.V - path[0], axis=1) / max(np.linalg.norm(path[-1] - path[0]), 1e-3), 0, 1)
+def add_tuft(ctx, HR, az, el, length, width, direction, name='tuft', curl=0.25, thick=None, off=0.05, g0=0.3, g1=0.75):
+    """Soft tuft: rises from the scalp along `direction` (unit vector, biased by the local normal), rounded tip."""
+    sk = HR.skin(az, el)
+    nn = HR.normal(sk)
+    d = direction / np.linalg.norm(direction)
+    n = 6
+    pts = [sk - nn * 0.0]
+    cur = sk + nn * off
+    pts.append(cur)
+    for k in range(1, n):
+        s = k / (n - 1)
+        dv = nn * (1 - s) * 0.85 + d * (0.35 + 0.65 * s)
+        dv = dv / np.linalg.norm(dv)
+        dv = dv + np.array([0, 0, -1.0]) * curl * s * s * 0.6            # tips droop a little
+        dv = dv / np.linalg.norm(dv)
+        cur = cur + dv * length / (n - 1)
+        pts.append(cur)
+    pts = np.array(pts)
+    p = tapered(ctx, pts, width, thick or width * 0.62, name, seg=6, tip=0.34, g0=g0, g1=g1, ref=nn)
+    p.ao_gain = 0.35
+    ctx.add(p, 'head')
     return p
 
 
-# ----------------------------------------------------------------------------- styles
-def add_chain_bones(ctx, prefix, pts, parent='head'):
-    """Secondary bone chain along pts; returns bone names."""
+# ----------------------------------------------------------------------------- curtains and tails
+def add_bones(ctx, prefix, pts, parent='head'):
     names = []
     par = parent
     for i in range(len(pts) - 1):
         nm = '%s%d' % (prefix, i + 1)
-        ctx.extra_bones.append((nm, par, tuple(pts[i]), tuple(pts[i + 1])))
+        ctx.extra_bones.append((nm, par, tuple(map(float, pts[i])), tuple(map(float, pts[i + 1]))))
         names.append(nm)
         par = nm
     return names
 
 
-def weight_chain(part, pts, names, root_bone='head', hw=0.7):
-    """Blend head -> chain bones along pts (the part follows the chain from its root)."""
-    bones = [root_bone] + names
-    joints = [np.asarray(pts[0])] + [np.asarray(p) for p in pts]
-    # segment 0 of the chain is head (fixed root): bones = [head, n1, n2, ...] on points [p0-ε, p0, p1, ...]
+def chain_weights(part, pts, names, root='head', hw=0.7, start_below=None):
+    bones = [root] + names
     P = [np.asarray(pts[0]) + np.array([0, 0, 1.0])] + [np.asarray(p) for p in pts]
     G.add_weights(part, G.chain_weights(part.V, P, bones, hw))
     return part
 
 
-def build_hair(ctx, hair):
-    """hair: dict(style=..., color role, ...)."""
-    st = hair.get('style', 'short')
-    color = ctx.col(hair.get('color'), 'hair')
-    ctx.ramp('hair', 'hair', color)
-    fn = STYLES.get(st)
-    if fn is None:
-        raise KeyError('hair style %s' % st)
-    fn(ctx, hair)
-
-
-def _bangs_(ctx, n=5, az_span=32, el0=44, el1=17, sweep=10, wid=1.15, off=(0.8, 0.58, 0.40), asym=0.0, thick=0.38, seed=2, lens=None, side=1):
-    """Swept fringe: a few broad overlapping locks that start in the crown and fall across the forehead."""
+def hair_curtain(ctx, HR, length, az_span=(-118, 118), n_cols=15, n_rows=11, thick=0.13, name='hair_back', cell='hair', seed=0,
+                 bones=True, front_len=None, layer=0.0):
+    """Long hair draped down the back: columns start on the scalp, follow the skull to the nape and fall with gravity
+    outside the body (field-based clearance)."""
+    P, B = ctx.P, ctx.body
+    u = HR.u
+    azs = 180.0 + np.linspace(az_span[0], az_span[1], n_cols)          # columns around the back of the head (az 180 = behind)
+    cols = []
     rng = np.random.default_rng(seed)
-    lens = lens or (1.0, 0.72, 0.92, 0.6, 0.85)
-    for i in range(n):
-        f = (i + 0.5) / n
-        az = -az_span + 2 * az_span * f + asym * 8
-        ln = lens[i % len(lens)]
-        e1 = el0 - (el0 - el1) * ln
-        sw = sweep * side * (0.6 + 0.6 * (f if side > 0 else 1 - f)) * (0.85 + 0.3 * rng.random())
-        w = wid * (0.9 + 0.2 * rng.random())
-        p = lock(ctx, [(az, el0 + 8, off[0]), (az + sw * 0.35, (el0 + e1) / 2 + 3, off[1]), (az + sw, e1, off[2])],
-                 [w, w * 1.05, w * 0.3], [thick, thick, thick * 0.5], 0, name='bang', seg=8, taper_tip=0.9)
-        ctx.add(p, 'head')
-
-
-def hairline(kind='short', part=0.0, drop=5.0, back=126):
-    """Lower hairline (theta from the top, degrees) as a function of signed azimuth: high forehead with a
-    soft swoop lower on the side the fringe falls to, ears free, nape covered."""
-    tab = {'short': [(0, 58), (30, 60), (55, 66), (75, 72), (90, 80), (105, 98), (140, back - 4), (180, back)],
-           'long': [(0, 58), (30, 60), (55, 68), (75, 84), (90, 108), (105, 122), (140, 130), (180, 132)],
-           'bob': [(0, 58), (30, 60), (55, 68), (75, 88), (90, 112), (105, 124), (140, 130), (180, 132)]}[kind]
-    xs = [t[0] for t in tab]
-    ys = [t[1] for t in tab]
-
-    def f(az):
-        az = np.asarray(az, float)
-        th = np.interp(np.abs(az), xs, ys)
-        sw = drop * np.exp(-(((az - part * 20.0) / 24.0) ** 2))
-        return th + sw
-    return f
-
-
-SHORT_BOT = None
-LONG_BOT = None
-CAP_BOT = [(0, 62), (25, 64), (50, 70), (72, 80), (88, 90), (105, 100), (140, 108), (180, 112)]
-
-
-def style_short(ctx, h):
-    bot = h.get('bot') or hairline('short', h.get('part', 0.5), h.get('drop', 5.0))
-    p = shell(ctx, 'hair', bot, top=h.get('top'), thick=h.get('thick', 0.62), volume=h.get('volume', 0.3), ridges=h.get('ridges', 12))
+    z_nape = P.chin + 0.7 * u
+    z_end0 = z_nape - length
+    for a in azs:
+        aa = abs(a - 180.0)                                            # angular distance from straight behind
+        # rows: head surface part, then the drop
+        el_top = 62 - 25 * min(aa / 100.0, 1.0)
+        ns = 5
+        els = np.linspace(el_top, -32, ns)
+        head_part = HR.skin(np.full(ns, a), els)
+        nn = HR.normal(head_part)
+        head_part = head_part + nn * (thick * 0.6 + 0.05 + layer)
+        z_last = head_part[-1, 2]
+        end = z_end0 + (0.4 * u) * (1 - np.cos(np.radians(min(aa, 160)))) * 0.5 - 0.35 * rng.random() * u * (1 if front_len is None else 0)
+        if front_len is not None and aa < 80:
+            end = z_nape - front_len
+        zs = np.linspace(z_last, end, n_rows - ns + 1)[1:]
+        dirv = np.array([math.sin(math.radians(a)), -math.cos(math.radians(a))])
+        ang = np.array([math.radians(a)])
+        rows = list(head_part)
+        prev_r = np.linalg.norm(head_part[-1][:2] - np.array([0.0, 0.1]))
+        for z in zs:
+            r_env = float(O.envelope_radii(ctx, z, ang, margin=0.0, cy=0.1)[0])
+            r = max(r_env, prev_r * 0.985) + thick + 0.3 + layer
+            prev_r = r
+            rows.append(np.array([dirv[0] * r, 0.1 + dirv[1] * r, z]))
+        cols.append(np.array(rows))
+    Pg = np.array(cols)                # (n_cols, n_rows, 3)
+    g = np.tile(np.linspace(0.3, 0.9, Pg.shape[1])[None, :], (Pg.shape[0], 1)) + _col_jitter(Pg.shape[0], 0.05, seed)[:, None]
+    p = G.solid_surface(Pg, thick, cell=cell, name=name, g=g, offset=0.5, outward_from=(0, 0.1, P.chin), inner='full')
     ctx.add(p, 'head')
-    if h.get('bangs', True):
-        _bangs(ctx, n=h.get('bang_n', 5), az_span=h.get('bang_span', 32), el1=h.get('bang_el', 17), sweep=h.get('sweep', 10),
-               asym=h.get('part', 0.0), seed=h.get('seed', 2), side=(1 if h.get('part', 0.5) >= 0 else -1))
-    if h.get('tuft'):
-        ctx.add(spike(ctx, 0, 62, 2.0, 1.2, tilt=(0, -0.5, 0.6), bend=(0, -0.3, 0.3)), 'head')
-    _extras(ctx, h)
-
-
-def style_spiky(ctx, h):
-    """Spiky hair: shell + clumps of curved blades.  h: len, spike_w, sweep_back (crown blades lean back),
-    up (lower blades rise), rows [(theta_from_top, count, length_scale, outward)], fringe (front blades)."""
-    bot = h.get('bot') or hairline('short', 0.0, 0.0)
-    p = shell(ctx, 'hair', bot, top=h.get('top'), thick=h.get('thick', 0.6), volume=h.get('volume', 0.25), ridges=10)
-    ctx.add(p, 'head')
-    if ctx.cover:
-        _extras(ctx, h)
-        return
-    rng = np.random.default_rng(h.get('seed', 5))
-    L = h.get('len', 4.6)
-    W = h.get('spike_w', 3.2)
-    back = h.get('sweep_back', 0.45)
-    up = h.get('up', 0.55)
-    rows = h.get('rows') or [(88, 7, 0.80, 1.0), (62, 7, 1.0, 0.8), (38, 6, 1.05, 0.55), (14, 4, 0.85, 0.2)]
-    for r_i, (th, n, ls, outw) in enumerate(rows):
-        for i in range(n):
-            az = -180 + 360 * (i + 0.5 * (r_i % 2)) / n + rng.uniform(-6, 6)
-            el = 90 - th
-            if abs(az) < 30 and th > 60:
-                continue                      # keep the forehead clear
-            jit = 0.8 + 0.4 * rng.random()
-            a = math.radians(az)
-            radial = np.array([math.sin(a), -math.cos(a), 0.0]) * outw
-            tilt = radial * 0.4 + np.array([0, back, up + 0.35 * (1 - outw)])
-            bend = np.array([0, back * 0.35, 0.35 + 0.2 * (1 - outw)])
-            ctx.add(spike(ctx, az, el, L * ls * jit, W * (0.85 + 0.3 * rng.random()), tilt=tilt, bend=bend), 'head')
-    # forehead fringe: short blades falling over the brow
-    for i, az in enumerate(h.get('fringe_az', (-22, -5, 12, 27))):
-        ln = (3.4, 4.0, 3.6, 3.0)[i % 4] * h.get('fringe_len', 1.0)
-        sgn = 1 if az >= 0 else -1
-        ctx.add(spike(ctx, az, 44, ln, 2.6, tilt=(0.25 * sgn, -0.75, -0.1), bend=(0.1 * sgn, -0.25, -0.5), off=-0.1), 'head')
-    _extras(ctx, h)
-
-
-def style_flat(ctx, h):
-    """Military flat-top / crew cut: dense short spikes on a shell (Surge)."""
-    style_spiky(ctx, {**h, 'len': h.get('len', 2.4), 'spike_w': h.get('spike_w', 2.2), 'sweep_back': 0.05,
-                      'fringe_az': (-26, -9, 9, 26), 'fringe_len': 0.6,
-                      'rows': [(84, 9, 0.7, 1.0), (62, 9, 0.9, 0.7), (40, 7, 1.0, 0.45), (18, 5, 1.05, 0.2), (2, 1, 1.1, 0.0)]})
-
-
-def style_long(ctx, h):
-    """Long hair: shell reaching the nape + curtain down the back + side locks + bangs."""
-    bot = h.get('bot') or hairline('long', h.get('part', 0.5), h.get('drop', 5.0))
-    p = shell(ctx, 'hair', bot, top=h.get('top'), thick=h.get('thick', 0.62), volume=h.get('volume', 0.25), ridges=12)
-    ctx.add(p, 'head')
-    if h.get('bangs', True):
-        _bangs(ctx, n=h.get('bang_n', 5), az_span=h.get('bang_span', 32), el1=h.get('bang_el', 16), sweep=h.get('sweep', 10),
-               asym=h.get('part', 0.0), seed=h.get('seed', 2), side=(1 if h.get('part', 0.5) >= 0 else -1))
-    P = ctx.P
-    H = ctx.head
-    ln = h.get('length', 1.0)
-    z_rim = H.c[2] - 2.6
-    z_bot = max(P.shoulder - 0.4 - (ln - 1.0) * 4.0, P.chest - 2.2)
-    # curtain: grid over azimuth (back half) x height
-    nu, nv = 17, 9
-    azr = np.linspace(-92, 92, nu)
-    s = np.linspace(0, 1, nv)
-    AZ = azr[:, None].repeat(nv, 1)
-    S = s[None, :].repeat(nu, 0)
-    zc = z_rim + (z_bot - z_rim) * S
-    flare = h.get('flare', 0.5)
-    wave = h.get('wave', 0.3)
-    rx = 5.45 + flare * 1.3 * S + wave * np.sin(S * 9 + AZ * 0.08) * 0.35
-    ry = 5.0 + flare * 0.5 * S
-    end_in = 1.0 - 0.28 * S ** 2 * (1 - h.get('blunt', 0.6))      # taper the width toward the tips
-    x = np.sin(np.radians(AZ)) * rx * end_in
-    y = np.cos(np.radians(AZ)) * ry * (0.9 - 0.15 * S) * 1.0
-    y = np.where(np.abs(AZ) < 89, y, y * 0.6)
-    y = y + 0.4
-    pts = np.stack([x, y, zc], -1)
-    # hem: scalloped
-    pts[..., 2] -= (0.5 * np.sin(AZ * 0.35) ** 2 + 0.3 * np.sin(AZ * 0.9)) * S ** 3 * (1.0 if h.get('scallop', True) else 0.0)
-    cur = G.solid_surface(pts, 1.0, cell='hair', name='curtain', flip=False, g=(1 - S).reshape(-1) * 0.9, offset=0.0,
-                          outward_from=(0, 0.3, z_rim), thick_fn=lambda _P: 0.75 + 0.2 * np.sin(AZ * 0.2))
-    b_pts = [(0, 4.4, z_rim + 0.5), (0, 4.9, (z_rim + z_bot) / 2), (0, 5.2, z_bot)]
-    names = add_chain_bones(ctx, 'hair_back', b_pts)
-    weight_chain(cur, b_pts, names)
-    ctx.add(cur, None)
-    ctx.anim_hints['hair_back'] = names
-    # side locks in front of the ears
-    for s_ in (1, -1):
-        pl = lock(ctx, [(s_ * 78, 6, 0.55), (s_ * 87, -8, 0.6), (s_ * 90, -26, 0.62), (s_ * 88, -42, 0.5)],
-                  [1.25, 1.35, 1.1, 0.25], 0.5, 0, name='sidelock', seg=8)
-        ctx.add(pl, 'head')
-    _extras(ctx, h)
-
-
-def style_bob(ctx, h):
-    """Chin-length bob (kids / girls)."""
-    bot = [(0, 55), (25, 57), (50, 64), (72, 80), (88, 104), (105, 118), (140, 122), (180, 124)]
-    p = shell(ctx, 'hair', bot, top=h.get('top'), thick=h.get('thick', 0.7), volume=h.get('volume', 0.25), ridges=12)
-    ctx.add(p, 'head')
-    _bangs(ctx, n=6, az_span=32, el1=h.get('bang_el', 13), sweep=h.get('sweep', 6), seed=h.get('seed', 4))
-    for s_ in (1, -1):
-        ctx.add(lock(ctx, [(s_ * 80, 8, 0.6), (s_ * 90, -10, 0.85), (s_ * 100, -30, 0.95)], [1.5, 1.7, 0.9], 0.6, 0, name='bobside'), 'head')
-    _extras(ctx, h)
-
-
-def style_pony(ctx, h):
-    """Short hair + high ponytail (with tie)."""
-    bot = h.get('bot') or hairline('short', h.get('part', 0.5), h.get('drop', 5.0))
-    p = shell(ctx, 'hair', bot, top=h.get('top'), thick=h.get('thick', 0.6), volume=h.get('volume', 0.3))
-    ctx.add(p, 'head')
-    _bangs(ctx, n=5, az_span=30, el1=h.get('bang_el', 15), sweep=h.get('sweep', 6), seed=h.get('seed', 3))
-    H = ctx.head
-    side = h.get('side', 0)          # -1 / +1 = side ponytail
-    ln = h.get('length', 1.0)
-    if side == 0:
-        b0 = H.surf(180, 36, 0.4)
-        pts = [b0, b0 + np.array([0, 1.2, 0.9]), b0 + np.array([0, 3.0, 0.2]), b0 + np.array([0, 3.9, -2.4 * ln]),
-               b0 + np.array([0, 3.6, -5.2 * ln]), b0 + np.array([0, 3.9, -7.0 * ln])]
-    else:
-        b0 = H.surf(side * 118, 22, 0.4)
-        pts = [b0, b0 + np.array([side * 1.3, 0.5, 0.8]), b0 + np.array([side * 3.0, 0.7, 0.2]), b0 + np.array([side * 4.3, 0.7, -2.2 * ln]),
-               b0 + np.array([side * 4.3, 0.8, -4.6 * ln]), b0 + np.array([side * 4.8, 0.9, -6.2 * ln])]
-    ptail = tail(ctx, pts, [0.9, 1.45, 1.7, 1.45, 0.95, 0.15], name='pony')
-    names = add_chain_bones(ctx, 'hair_tail', [tuple(q) for q in (pts[0], pts[2], pts[3], pts[5])])
-    weight_chain(ptail, [pts[0], pts[2], pts[3], pts[5]], names, hw=0.9)
-    ctx.add(ptail, None)
-    ctx.anim_hints['hair_tail'] = names
-    tie = h.get('tie', 'accent')
-    tcell = ctx.ramp('hairtie', 'flat', ctx.col(tie, 'accent'))
-    band = G.ellipsoid(pts[0] + (pts[1] - pts[0]) * 0.55, (1.55, 1.45, 0.75), seg=12, rings=6, cell=tcell, name='tie', rot=G.align_z(pts[1] - pts[0]) if False else None)
-    band.g[:] = 0.5
-    ctx.add(band, 'head')
-    _extras(ctx, h)
-
-
-def style_twin(ctx, h):
-    """Two pigtails (Lorelei-style twin tails, little girl)."""
-    bot = h.get('bot') or hairline('short', h.get('part', 0.5), h.get('drop', 5.0))
-    p = shell(ctx, 'hair', bot, top=h.get('top'), thick=h.get('thick', 0.6), volume=h.get('volume', 0.3))
-    ctx.add(p, 'head')
-    _bangs(ctx, n=5, az_span=30, el1=h.get('bang_el', 15), sweep=h.get('sweep', 6), seed=h.get('seed', 3))
-    H = ctx.head
-    ln = h.get('length', 1.0)
-    tcell = ctx.ramp('hairtie', 'flat', ctx.col(h.get('tie', 'accent'), 'accent'))
-    for s_ in (1, -1):
-        b0 = H.surf(s_ * 105, 28, 0.35)
-        pts = [b0, b0 + np.array([s_ * 1.2, 0.3, 0.3]), b0 + np.array([s_ * 3.2, 0.5, -1.4 * ln]), b0 + np.array([s_ * 4.0, 0.8, -4.0 * ln]),
-               b0 + np.array([s_ * 3.6, 1.0, -6.4 * ln]), b0 + np.array([s_ * 3.9, 1.0, -8.0 * ln])]
-        ptl = tail(ctx, pts, [0.8, 1.35, 1.45, 1.25, 0.8, 0.12], name='pigtail')
-        sfx = 'L' if s_ > 0 else 'R'
-        names = add_chain_bones(ctx, 'hair_twin%s' % sfx, [tuple(q) for q in (pts[0], pts[2], pts[3], pts[5])])
-        weight_chain(ptl, [pts[0], pts[2], pts[3], pts[5]], names, hw=0.9)
-        ctx.add(ptl, None)
-        ctx.anim_hints.setdefault('hair_twin', []).extend(names)
-        band = G.ellipsoid(b0 + np.array([s_ * 0.9, 0.2, 0.15]), (1.05, 1.2, 1.2), seg=10, rings=6, cell=tcell, name='tie')
-        band.g[:] = 0.5
-        ctx.add(band, 'head')
-    _extras(ctx, h)
-
-
-def style_bun(ctx, h):
-    """Hair swept into a bun (top / back)."""
-    bot = h.get('bot') or [(0, 55), (25, 57), (50, 63), (72, 74), (88, 86), (105, 100), (140, 110), (180, 114)]
-    p = shell(ctx, 'hair', bot, thick=h.get('thick', 0.62), volume=h.get('volume', 0.3), ridges=12)
-    ctx.add(p, 'head')
-    _bangs(ctx, n=h.get('bang_n', 5), az_span=30, el1=h.get('bang_el', 14), sweep=h.get('sweep', 7), seed=h.get('seed', 6))
-    H = ctx.head
-    where = h.get('bun', 'top')
-    r = h.get('bun_r', 2.6)
-    if where == 'top':
-        c = H.surf(150, 62, r * 0.5)
-    else:
-        c = H.surf(180, 34, r * 0.55)
-    b = G.ellipsoid(c, (r, r * 0.95, r * 0.9), seg=14, rings=9, cell='hair', name='bun')
-    b.g = np.clip((b.V[:, 2] - c[2]) / (2 * r) + 0.55, 0, 1)
-    ctx.add(b, 'head')
-    if h.get('bun_band'):
-        tcell = ctx.ramp('hairtie', 'flat', ctx.col(h['bun_band'], 'accent'))
-        base = H.surf(150 if where == 'top' else 180, 60 if where == 'top' else 30, 0.6)
-        bd = G.ellipsoid((base + c) / 2, (r * 0.85, r * 0.8, r * 0.35), seg=12, rings=6, cell=tcell, name='bunband')
-        bd.g[:] = 0.5
-        ctx.add(bd, 'head')
-    _extras(ctx, h)
-
-
-def torus(center, R, r, rot=None, seg=16, ring=8, cell='hair', name='torus'):
-    th = np.linspace(0, 2 * math.pi, ring, endpoint=False)
-    prof = [(R + r * math.cos(t), r * math.sin(t)) for t in th]
-    prof = prof + [prof[0]]
-    p = G.lathe(prof, seg=seg, cell=cell, name=name, close=False)
-    if rot is not None:
-        p.V = p.V @ np.asarray(rot).T
-    p.V = p.V + np.asarray(center, float)
-    p.F = G.orient_outward(p.V, p.F)
+    if bones:
+        mid = Pg[Pg.shape[0] // 2]
+        pts = mid[max(Pg.shape[1] - 6, 0)::2]
+        pts = np.vstack([pts[:1] + np.array([0, 0, 0.0]), pts])
+        pts = pts[:5]
+        names = add_bones(ctx, 'hair_back', pts)
+        chain_weights(p, pts, names, root='head', hw=0.9)
+        ctx.anim_hints.setdefault('hair_back', []).extend(names)
     return p
 
 
-def style_loops(ctx, h):
-    """Nurse Joy: short hair with two big looped side buns."""
-    bot = h.get('bot') or hairline('short', h.get('part', 0.5), h.get('drop', 5.0))
-    p = shell(ctx, 'hair', bot, top=h.get('top'), thick=h.get('thick', 0.6), volume=h.get('volume', 0.3))
+def hair_tail(ctx, HR, root_az, root_el, length, radius, name='hair_tail', sideways=0.0, back=0.5, drop=1.0, cell='hair', tie=None,
+              bones=True, curl=0.0, seed=0, prefix='hair_tail'):
+    """Ponytail / pigtail: tube from a point on the skull, out and down, tapered, with a tie ring at its root."""
+    P = ctx.P
+    u = HR.u
+    sk = HR.skin(root_az, root_el)
+    nn = HR.normal(sk)
+    n = 8
+    pts = [sk + nn * 0.01, sk + nn * 0.05]
+    cur = sk + nn * 0.05
+    d0 = nn * 0.5 + np.array([sideways, back, -0.1])
+    d0 /= np.linalg.norm(d0)
+    step = length / (n - 1)
+    dvec = d0
+    for k in range(1, n):
+        s = k / (n - 1)
+        g_ = np.array([0, 0, -1.0]) * (0.35 + 1.8 * s ** 1.1) * drop
+        dvec = dvec * (1 - 0.3 * s) + g_ * (0.3 * s + 0.3)
+        dvec = dvec / np.linalg.norm(dvec)
+        cur = cur + dvec * step
+        pts.append(cur)
+    pts = np.array(pts)
+    path = G.catmull(pts, 12)
+    t = np.linspace(0, 1, len(path))
+    r = radius * (0.72 + 0.55 * np.sin(np.pi * np.clip(t * 1.05, 0, 1)) ** 0.8) * (1 - 0.65 * t ** 2.2)
+    r[0] = radius * 0.75
+    p = G.loft(path, np.stack([r, r * 0.92], 1), seg=8, cell=cell, name=name, caps=(0.4, 0.55), ref=(1, 0, 0))
+    p.g = np.clip(G.smoothstep(0, 1, np.linalg.norm(p.V - path[0], axis=1) / max(np.linalg.norm(path[-1] - path[0]), 1e-3)) * 0.6 + 0.3, 0, 1)
     ctx.add(p, 'head')
-    _bangs(ctx, n=5, az_span=30, el1=h.get('bang_el', 15), sweep=h.get('sweep', 7), seed=h.get('seed', 3))
-    Hh = ctx.head
-    for s_ in (1, -1):
-        c = Hh.surf(s_ * 104, 26, 0.0) + np.array([s_ * 2.0, 0.4, -0.2])
-        lp = torus(c, 2.0, 1.15, rot=G.rot_y(90) @ G.rot_z(0), seg=18, ring=8, name='loop')
-        lp.g = np.clip((lp.V[:, 2] - c[2]) / 6.0 + 0.5, 0, 1)
-        ctx.add(lp, 'head')
-        core = G.ellipsoid(c + np.array([s_ * 0.3, 0, 0]), (0.8, 1.9, 1.9), seg=10, rings=6, cell='hair', name='loopcore')
-        core.g[:] = 0.4
-        ctx.add(core, 'head')
-    _extras(ctx, h)
+    if bones:
+        jp = pts[1:][::2][:5]
+        if len(jp) >= 2:
+            names = add_bones(ctx, prefix, jp)
+            chain_weights(p, jp, names, root='head', hw=0.55)
+            ctx.anim_hints.setdefault('hair_tail' if 'twin' not in prefix else 'hair_twin', []).extend(names)
+    if tie:
+        tc = ctx.ramp('hairtie', 'flat', ctx.col(tie))
+        ring = torus(pts[2], path[3] - path[2], radius * 0.95, radius * 0.24, cell=tc, name='tie')
+        ctx.add(ring, 'head')
+    return p, pts
 
 
-def style_bald(ctx, h):
-    """Bald on top with a fringe of hair round the sides / back (horseshoe from ear to ear)."""
-    top = [(0, 88), (60, 88), (95, 82), (130, 84), (180, 84)]
-    bot = [(0, 100), (60, 100), (95, 106), (130, 116), (180, 120)]
-    p = shell(ctx, 'hair', bot, top=top, az_range=(68, 292), nu=24, nv=6, wrap=False, thick=h.get('thick', 0.62), volume=0.0,
-              ridges=16, lip=0.3, ridge_amp=0.14)
+def torus(center, axis, R, r, seg=14, ring=6, cell='hair', name='torus'):
+    axis = np.asarray(axis, float)
+    axis = axis / np.linalg.norm(axis)
+    a = np.cross(axis, [0, 0, 1.0])
+    if np.linalg.norm(a) < 1e-3:
+        a = np.cross(axis, [1.0, 0, 0])
+    a /= np.linalg.norm(a)
+    b = np.cross(axis, a)
+    th = np.linspace(0, 2 * math.pi, seg, endpoint=False)
+    ph = np.linspace(0, 2 * math.pi, ring, endpoint=False)
+    TH, PH = np.meshgrid(th, ph, indexing='ij')
+    rad = R + r * np.cos(PH)
+    Pt = (np.asarray(center)[None, None, :] + rad[..., None] * (np.cos(TH)[..., None] * a + np.sin(TH)[..., None] * b) + (r * np.sin(PH))[..., None] * axis)
+    F = G.grid_tris(seg, ring, wrap_u=True, wrap_v=True)
+    p = G.Part(name, Pt.reshape(-1, 3), F, cell, g=np.full(seg * ring, 0.5))
+    if (np.cross(p.V[p.F[:, 1]] - p.V[p.F[:, 0]], p.V[p.F[:, 2]] - p.V[p.F[:, 0]]) * (p.V[p.F[:, 0]] - np.asarray(center))).sum() < 0:
+        p.F = p.F[:, ::-1].copy()
+    return p
+
+
+def hair_bun(ctx, HR, az, el, radius, name='bun', cell='hair', band=None, squash=0.85):
+    sk = HR.skin(az, el)
+    nn = HR.normal(sk)
+    c = sk + nn * (radius * 0.72)
+    p = ellipsoid_part(c, (radius, radius * squash, radius * 0.9), name=name, cell=cell, seg=14, rings=9)
+    p.g = np.clip(0.3 + 0.5 * (p.V[:, 2] - c[2]) / radius * -0.5 + 0.4, 0, 1)
     ctx.add(p, 'head')
-    _extras(ctx, h)
+    if band:
+        bc = ctx.ramp('hairtie', 'flat', ctx.col(band))
+        ctx.add(torus(c - nn * radius * 0.45, nn, radius * 0.72, radius * 0.16, cell=bc, name='bun_band'), 'head')
+    return p
 
 
-def style_bald_full(ctx, h):
-    """Completely bald (shine handled by the toon shader)."""
-    _extras(ctx, h)
+def ellipsoid_part(c, r, seg=14, rings=9, name='ell', cell='hair'):
+    th = np.linspace(0, math.pi, rings + 1)
+    ph = np.linspace(0, 2 * math.pi, seg, endpoint=False)
+    PH, TH = np.meshgrid(ph, th, indexing='ij')
+    Pt = np.asarray(c) + np.stack([r[0] * np.sin(TH) * np.cos(PH), r[1] * np.sin(TH) * np.sin(PH), r[2] * np.cos(TH)], -1)
+    return _grid_out(Pt, name, cell, c)
 
 
-def style_tuft(ctx, h):
-    """Balding top with a small comb-over tuft (balding_guy) over a horseshoe."""
-    style_bald(ctx, h)
-    for i, az in enumerate((-18, 0, 18)):
-        ctx.add(spike(ctx, az, 62, 2.4, 1.0, tilt=(0.1 * (az / 18), -0.2, 0.0), bend=(0.2 * np.sign(az) if az else 0.1, -0.2, -0.2)), 'head')
+def _grid_out(Pt, name, cell, centre):
+    nu, nv = Pt.shape[:2]
+    F = G.grid_tris(nu, nv, wrap_u=True)
+    V = Pt.reshape(-1, 3)
+    a, b, c_ = V[F[:, 0]], V[F[:, 1]], V[F[:, 2]]
+    ok = np.linalg.norm(np.cross(b - a, c_ - a), axis=1) > 1e-8
+    F = F[ok]
+    p = G.Part(name, V, F, cell, g=np.full(len(V), 0.5))
+    a, b, c_ = p.V[p.F[:, 0]], p.V[p.F[:, 1]], p.V[p.F[:, 2]]
+    if (np.cross(b - a, c_ - a) * ((a + b + c_) / 3 - np.asarray(centre))).sum() < 0:
+        p.F = p.F[:, ::-1].copy()
+    return p
 
 
-def style_long_pony(ctx, h):
-    """Bruno: black spiky hair pulled back into a long thick ponytail."""
-    style_spiky(ctx, {**h, 'len': h.get('len', 2.2), 'rows': [(76, 9, 0.7, 1.0), (52, 8, 0.9, 0.6), (26, 5, 0.9, 0.3)], 'fringe_len': 0.8})
-    H = ctx.head
-    b0 = H.surf(180, 30, 0.4)
-    pts = [b0, b0 + np.array([0, 2.0, -0.6]), b0 + np.array([0, 3.2, -3.2]), b0 + np.array([0, 3.4, -6.0]), b0 + np.array([0, 3.0, -9.0])]
-    ptail = tail(ctx, pts, [1.0, 1.7, 1.75, 1.3, 0.2], name='pony')
-    names = add_chain_bones(ctx, 'hair_tail', [tuple(q) for q in (pts[0], pts[2], pts[3], pts[4])])
-    weight_chain(ptail, [pts[0], pts[2], pts[3], pts[4]], names, hw=0.9)
-    ctx.add(ptail, None)
-    ctx.anim_hints['hair_tail'] = names
+# ----------------------------------------------------------------------------- styles
+def _th(h, default=0.14):
+    return h.get('thick', 0.55) / 0.55 * default
 
 
-def style_mohawk(ctx, h):
-    """Rocker: tall punk spikes on top."""
-    style_spiky(ctx, {**h, 'len': h.get('len', 5.6), 'spike_w': 2.4, 'sweep_back': 0.25,
-                      'rows': [(80, 8, 0.5, 1.0), (58, 8, 0.85, 0.7), (36, 6, 1.1, 0.45), (14, 4, 1.25, 0.15)], 'fringe_len': 1.1})
+def style_bald(ctx, HR, h):
+    """Bald; with `sides` a thin band of hair round the ears and the back of the head (old men)."""
+    if h.get('sides'):
+        p = scalp_cap(ctx, HR, thick=0.11, kind='short', name='hair_sides',
+                      keep=lambda az, V: np.minimum(np.abs(az) - 62.0, (HR.P.chin + 2.1 * HR.u) - V[:, 2]))
+        if p is not None:
+            ctx.add(p, 'head')
 
 
-def style_none(ctx, h):
-    _extras(ctx, h)
+def _add_cap(ctx, HR, h, **kw):
+    top_rim = getattr(ctx, 'hat_rim', None) if ctx.cover else None
+    p = scalp_cap(ctx, HR, top_rim=top_rim, **kw)
+    if p is not None:
+        ctx.add(p, 'head')
+    return p
 
 
-def _bangs(ctx, *a, **k):
+def style_short(ctx, HR, h):
+    """Short cut with a side part: cap + a sweep of fringe locks falling from the parting."""
+    _add_cap(ctx, HR, h, thick=_th(h, 0.15), volume=h.get('volume', 0.08), kind='short', recede=h.get('recede', 0.0), seed=h.get('seed', 1))
     if ctx.cover:
         return
-    _bangs_(ctx, *a, **k)
+    part = h.get('part', 0.4)
+    side = 1 if part >= 0 else -1
+    n = h.get('bang_n', 4)
+    rng = np.random.default_rng(h.get('seed', 2))
+    u = HR.u
+    # locks combed from the parting line over the forehead
+    for i in range(n):
+        f = (i + 0.5) / n
+        az0 = side * (-30 + 70 * f) * (1.0 if abs(part) > 0.05 else 0.0) + (0 if abs(part) > 0.05 else (f - 0.5) * 70)
+        az0 = (f - 0.5) * 64
+        el0 = 47 + 4 * math.sin(f * 3)
+        az1 = az0 + side * (14 + 10 * (1 - f)) * (0.4 + abs(part))
+        el1 = 29 - 4 * f + rng.uniform(-2, 2)
+        add_lock(ctx, HR, az0, el0, az1, el1, width=0.58 * u, thick=0.16 * u, name='fringe', n=6, lift=0.05, off=0.09, jit=rng.uniform(-0.05, 0.05))
+    # sideburn / temple locks
+    for sd in (1, -1):
+        add_lock(ctx, HR, sd * 75, 36, sd * 84, 6, width=0.5 * u, thick=0.14 * u, name='temple', n=5, off=0.08)
 
 
-def _extras(ctx, h):
-    """Side burns / eyebrow tufts etc. requested by the look."""
-    H = ctx.head
-    if h.get('sideburns'):
-        for s_ in (1, -1):
-            sb = lock(ctx, [(s_ * 80, 0, 0.35), (s_ * 84, -14, 0.36), (s_ * 80, -24, 0.32)], [0.9, 1.0, 0.6], 0.3, 0, name='sideburn')
-            ctx.add(sb, 'head')
+def style_spiky(ctx, HR, h, flat=False):
+    """Tousled swept-up hair: the scalp cap is sculpted into overlapping soft clumps that rise and sweep back (no cones), a few short
+    tufts break the silhouette and a fringe falls over the brow."""
+    u = HR.u
+    rng = np.random.default_rng(h.get('seed', 5))
+    ln = h.get('len', 3.8)
+    height = (0.42 + 0.11 * (ln - 2.5)) * u
+    back = h.get('sweep_back', 0.45)
+    up = h.get('up', 0.55) + 0.5
+    n = h.get('clumps', 46)
+    bumps = None
+    if not ctx.cover:
+        cen, dirs, hs = bump_centres(ctx, HR, n, height, up, back, h.get('seed', 5))
+        bumps = (cen, dirs, hs, 0.5 * u)
+    _add_cap(ctx, HR, h, thick=_th(h, 0.15), volume=h.get('volume', 0.04), kind='short', seed=h.get('seed', 3), bumps=bumps)
+    if ctx.cover:
+        return
+    # a few short tufts on the outline
+    L = height * 1.05
+    for i in range(10):
+        az = -180 + 360 * (i + 0.5) / 10 + rng.uniform(-10, 10)
+        if abs(az) < 40:
+            continue
+        el = 30 + rng.uniform(0, 30)
+        a = math.radians(az)
+        d = np.array([math.sin(a) * 0.7, -math.cos(a) * 0.7 + back * 0.5, up * 0.9])
+        add_tuft(ctx, HR, az, el, L * (0.8 + 0.4 * rng.random()), 0.5 * u, d, name='tuft', curl=0.25, g0=0.32, g1=0.8)
+    # forehead fringe: short soft locks falling over the brow
+    for i, az in enumerate(h.get('fringe_az', (-24, -7, 10, 26))):
+        sgn = 1 if az >= 0 else -1
+        add_lock(ctx, HR, az, 50, az + sgn * 10, 33 - 2 * i % 3, width=0.5 * u, thick=0.15 * u, name='fringe', n=6, lift=0.1, off=0.09)
+    for sd in (1, -1):
+        add_lock(ctx, HR, sd * 76, 36, sd * 84, 8, width=0.5 * u, thick=0.14 * u, name='temple', n=5, off=0.08)
 
 
-STYLES = {'loops': style_loops, 'short': style_short, 'spiky': style_spiky, 'flat': style_flat, 'long': style_long, 'bob': style_bob,
-          'pony': style_pony, 'twin': style_twin, 'bun': style_bun, 'bald': style_bald, 'bald_full': style_bald_full,
-          'tuft': style_tuft, 'long_pony': style_long_pony, 'mohawk': style_mohawk, 'none': style_none}
+def style_flat(ctx, HR, h):
+    """Flat top (Surge): short crew cut that ends in a flat plateau."""
+    u = HR.u
+    _add_cap(ctx, HR, h, thick=0.14, volume=0.0, kind='short', flat_top={'extra': 0.42, 'plateau': 0.28}, seed=4)
+
+
+def style_mohawk(ctx, HR, h):
+    u = HR.u
+    p = _add_cap(ctx, HR, h, thick=0.1, kind='short', recede=1.0, seed=6,
+                 name='hair_cap')
+    L = (0.55 + 0.13 * (h.get('len', 3.9) - 2.5)) * u
+    # ridge of upright tufts from the forehead over the crown to the nape
+    for i, el in enumerate(np.linspace(70, 5, 9)):
+        az = 0 if i < 4 else 180
+        e_ = el if i < 4 else 20 + i * 6
+        e_ = 66 - i * 4 if i < 5 else 78 - (i - 4) * 14
+        az = 0 if i < 5 else 180
+        add_tuft(ctx, HR, az, e_, L * (1.05 - 0.06 * abs(i - 3)), 0.55 * u, np.array([0, 0.4 if az == 180 else -0.35, 1.0]), name='mohawk', g0=0.3, g1=0.8)
+
+
+def style_long(ctx, HR, h):
+    """Long hair: cap, a curtain down the back, side locks in front of the shoulders and a parted fringe."""
+    u = HR.u
+    P = ctx.P
+    ln = h.get('length', 1.0)
+    _add_cap(ctx, HR, h, thick=_th(h, 0.15), volume=h.get('volume', 0.05), kind='long', seed=h.get('seed', 7))
+    if ctx.cover:
+        return
+    length = (3.6 + 4.6 * ln) * u
+    hair_curtain(ctx, HR, length, thick=0.16, seed=h.get('seed', 7))
+    part = h.get('part', 0.0)
+    side = 1 if part >= 0 else -1
+    n = h.get('bang_n', 5)
+    rng = np.random.default_rng(3)
+    for i in range(n):
+        f = (i + 0.5) / n
+        az0 = (f - 0.5) * 70
+        az1 = az0 + side * 14 * (0.5 + abs(part)) + (f - 0.5) * 30
+        add_lock(ctx, HR, az0, 46, az1, 30 - 3 * abs(f - 0.5) * 4, width=0.6 * u, thick=0.16 * u, name='fringe', n=6, lift=0.05, off=0.09)
+    # front side locks drape over the shoulders on both sides of the face
+    for sd in (1, -1):
+        drape_lock(ctx, HR, sd, length * 0.75, wave=h.get('wave', 0.2))
+
+
+def drape_lock(ctx, HR, sd, length, wave=0.2, name='side_lock'):
+    """A lock in front of the shoulder: starts behind the temple, follows the jaw, falls onto the chest side."""
+    P, B = ctx.P, ctx.body
+    u = HR.u
+    pts = []
+    for k, (az, el, off) in enumerate(((sd * 82, 42, 0.1), (sd * 88, 12, 0.12), (sd * 92, -18, 0.14))):
+        sk = HR.skin(az, el)
+        pts.append(sk + HR.normal(sk) * off)
+    z0 = pts[-1][2]
+    for z in np.linspace(z0 - 0.6, z0 - length, 5):
+        ang = np.array([math.radians(sd * 62)])
+        r = float(O.envelope_radii(ctx, z, ang, cy=-0.1)[0]) + 0.6
+        pts.append(np.array([math.sin(ang[0]) * r, -0.1 - math.cos(ang[0]) * r, z]))
+    path = G.catmull(np.array(pts), 14)
+    t = np.linspace(0, 1, len(path))
+    w = (0.55 + 0.12 * np.sin(t * 6) * wave) * u * (1 - 0.6 * t ** 3)
+    p = G.loft(path, np.stack([w * 0.5, 0.075 * np.ones_like(w) * u * 1.4], 1), seg=6, cell='hair', name=name, caps=(None, 0.9), ref=(0, 1, 0))
+    p.g = np.clip(0.35 + 0.5 * t.repeat(1)[0] * 0 + G.smoothstep(0, 1, (p.V[:, 2] - z0) / (-length)) * 0.5, 0, 1)
+    ctx.add(p, 'head')
+
+
+def style_pony(ctx, HR, h):
+    u = HR.u
+    _add_cap(ctx, HR, h, thick=_th(h, 0.15), volume=h.get('volume', 0.05), kind='short', seed=h.get('seed', 8))
+    if ctx.cover:
+        return
+    ln = h.get('length', 1.0)
+    side = h.get('side', 0)
+    style_fringe(ctx, HR, h)
+    if side:
+        hair_tail(ctx, HR, side * 118, 42, (2.4 + 2.6 * ln) * u, 0.62 * u, sideways=side * 0.7, back=0.1, drop=1.0, tie=h.get('tie', 'accent'))
+    else:
+        hair_tail(ctx, HR, 180, 34, (2.6 + 3.6 * ln) * u, 0.7 * u, sideways=0.0, back=0.9, drop=1.0, tie=h.get('tie', 'accent'))
+
+
+def style_fringe(ctx, HR, h, n=None):
+    u = HR.u
+    part = h.get('part', 0.3)
+    side = 1 if part >= 0 else -1
+    n = n or h.get('bang_n', 4)
+    for i in range(n):
+        f = (i + 0.5) / n
+        az0 = (f - 0.5) * 60
+        az1 = az0 + side * 12
+        add_lock(ctx, HR, az0, 47, az1, 30, width=0.55 * u, thick=0.15 * u, name='fringe', n=6, lift=0.05, off=0.09)
+    for sd in (1, -1):
+        add_lock(ctx, HR, sd * 76, 36, sd * 84, 8, width=0.5 * u, thick=0.14 * u, name='temple', n=5, off=0.08)
+
+
+def style_twin(ctx, HR, h):
+    u = HR.u
+    _add_cap(ctx, HR, h, thick=_th(h, 0.15), kind='short', seed=9)
+    if ctx.cover:
+        return
+    style_fringe(ctx, HR, h, n=5)
+    ln = h.get('length', 1.0)
+    for sd in (1, -1):
+        hair_tail(ctx, HR, sd * 100, 34, (2.2 + 2.0 * ln) * u, 0.58 * u, sideways=sd * 0.9, back=0.05, drop=1.1, tie=h.get('tie', 'accent'),
+                  name='twin_tail', prefix='hair_twin%s' % ('L' if sd > 0 else 'R'))
+
+
+def style_bun(ctx, HR, h):
+    u = HR.u
+    _add_cap(ctx, HR, h, thick=_th(h, 0.15), volume=h.get('volume', 0.05), kind='short', seed=h.get('seed', 10))
+    if ctx.cover:
+        return
+    style_fringe(ctx, HR, h, n=h.get('bang_n', 4))
+    r = h.get('bun_r', 2.5) * 0.3 * u
+    if h.get('bun', 'top') == 'top':
+        hair_bun(ctx, HR, 180, 62, r, band=h.get('bun_band') or h.get('tie'))
+    else:
+        hair_bun(ctx, HR, 180, 24, r, band=h.get('bun_band') or h.get('tie'))
+
+
+def style_loops(ctx, HR, h):
+    """Nurse Joy: two side loops."""
+    u = HR.u
+    _add_cap(ctx, HR, h, thick=_th(h, 0.15), volume=0.08, kind='short', seed=11)
+    style_fringe(ctx, HR, h, n=5)
+    for sd in (1, -1):
+        sk = HR.skin(sd * 98, 24)
+        nn = HR.normal(sk)
+        c = sk + nn * 0.72 * u
+        ctx.add(torus(c, np.array([sd * 0.3, 0.9, 0.0]) + nn * 0.1, 0.6 * u, 0.3 * u, seg=18, ring=8, name='loop'), 'head')
+
+
+def style_tuft(ctx, HR, h):
+    """Balding comb-over: hair only round the sides plus a few strands across the top."""
+    u = HR.u
+    p = scalp_cap(ctx, HR, thick=0.1, kind='short', name='hair_sides',
+                  keep=lambda az, V: np.minimum(np.abs(az) - 58.0, (HR.P.chin + 2.15 * HR.u) - V[:, 2]))
+    if p is not None:
+        ctx.add(p, 'head')
+    for i in range(4):
+        f = i / 3
+        add_lock(ctx, HR, 60 - 100 * f * 0, 62 - 3 * i, -70 + 6 * i * 0, 66 - 3 * i, width=0.22 * u, thick=0.06 * u, name='strand', n=8, off=0.06)
+
+
+def style_long_pony(ctx, HR, h):
+    """Bruno: long spiky hair gathered in a ponytail."""
+    u = HR.u
+    _add_cap(ctx, HR, h, thick=0.14, kind='short', seed=12)
+    style_fringe(ctx, HR, dict(h, part=0.0), n=4)
+    hair_tail(ctx, HR, 180, 30, 5.2 * u, 0.75 * u, back=1.0, drop=1.0, tie='#c8c8d0')
+
+
+STYLES = {'short': style_short, 'spiky': style_spiky, 'flat': style_flat, 'mohawk': style_mohawk, 'long': style_long, 'pony': style_pony,
+          'twin': style_twin, 'bun': style_bun, 'loops': style_loops, 'bald': style_bald, 'tuft': style_tuft, 'long_pony': style_long_pony,
+          'none': lambda ctx, HR, h: None}
+
+
+def build_hair(ctx, hair):
+    st = hair.get('style', 'short')
+    color = ctx.col(hair.get('color'), 'hair')
+    ctx.ramp('hair', 'hair', color)
+    HR = HeadRef(ctx)
+    ctx.headref = HR
+    fn = STYLES[st]
+    fn(ctx, HR, hair)
