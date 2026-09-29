@@ -348,8 +348,8 @@ func _emit_house(b: Dictionary) -> void:
 		_quad([[rx0, zb, hw], [rx1, zb, hw], [rx1, zf, hw], [rx0, zf, hw]], Vector3.UP)
 		# parapet: a raised rim around the roof, in the roof edge's own colour
 		var rim_col := _shade_col(_atlas_col(rx0 + 4.0, roof_top + 3.0, roof_col), 1.12)
-		var t := 1.7
-		var ph := 2.4
+		var t := 1.2
+		var ph := 1.5
 		_solid_box(rx0, zf - t, hw, rx1, zf + 0.6, hw + ph, rim_col)      # front lip
 		_solid_box(rx0, zb, hw, rx0 + t, zf - t, hw + ph, rim_col)         # left
 		_solid_box(rx1 - t, zb, hw, rx1, zf - t, hw + ph, rim_col)         # right
@@ -378,8 +378,8 @@ func _emit_house(b: Dictionary) -> void:
 		_quad([[rx1, zr, hr], [rx0, zr, hr], [rx0, zb2 - e, hw + e], [rx1, zb2 - e, hw + e]], Vector3(0, 1, -1))
 		# eave board (fascia) hanging under the front edge of the roof, and the ridge cap
 		var fas := _shade_col(roof_col, 0.5)
-		_solid([[rx0, zf + e, hw + e], [rx1, zf + e, hw + e], [rx1, zf + e, hw + e - 2.6], [rx0, zf + e, hw + e - 2.6]], Vector3.BACK, fas, 0.95)
-		_solid_box(rx0 - 0.6, zr - 1.9, hr - 0.9, rx1 + 0.6, zr + 1.9, hr + 2.2, _shade_col(roof_col, 1.22))
+		_solid([[rx0, zf + e, hw + e], [rx1, zf + e, hw + e], [rx1, zf + e, hw + e - 1.5], [rx0, zf + e, hw + e - 1.5]], Vector3.BACK, fas, 0.95)
+		_solid_box(rx0 - 0.3, zr - 0.6, hr - 0.4, rx1 + 0.3, zr + 0.6, hr + 0.6, _shade_col(roof_col, 1.32))
 		# chimney: front face is the baked sprite, the rest is real geometry
 		if b.has("chimney"):
 			var c: Array = b.chimney
@@ -394,15 +394,15 @@ func _emit_house(b: Dictionary) -> void:
 			var top := hc + 10.0
 			var brick := _atlas_col(cx + 3.0, cy + 4.0, Color("#a4523c"))
 			_quad([[cx - 1.0, zc, top], [cx + 7.0, zc, top], [cx + 7.0, zc, hc], [cx - 1.0, zc, hc]], Vector3.BACK)
-			var cd := 5.0
+			var cd := 3.2
 			_solid([[cx - 1.0, zc - cd, top], [cx - 1.0, zc, top], [cx - 1.0, zc, hc], [cx - 1.0, zc - cd, hc]], Vector3.LEFT, _shade_col(brick, 1.0), 0.95)
 			_solid([[cx + 7.0, zc, top], [cx + 7.0, zc - cd, top], [cx + 7.0, zc - cd, hc], [cx + 7.0, zc, hc]], Vector3.RIGHT, _shade_col(brick, 0.72))
-			_solid_box(cx - 1.8, zc - cd - 0.8, top - 0.2, cx + 7.8, zc + 0.8, top + 1.5, _shade_col(brick, 0.9))   # stone cap
+			_solid_box(cx - 1.4, zc - cd - 0.4, top - 0.2, cx + 7.4, zc + 0.5, top + 0.9, _shade_col(brick, 0.9))   # stone cap
 			smoke_points.append(px_to_world(cx + 3.0, zc - cd * 0.5, top + 2.0))
-	_emit_house_details(x0, x1, zf, wall_top, hw)
+	_emit_house_details(x0, x1, zf, wall_top, hw, roof_col, String(b.get("type", "house")))
 
 ## Window sills and door steps found from the label grid + the sprite's own pixels.
-func _emit_house_details(x0: float, x1: float, zf: float, wall_top: float, hw: float) -> void:
+func _emit_house_details(x0: float, x1: float, zf: float, wall_top: float, hw: float, roof_col: Color, btype: String) -> void:
 	var legend: Array = bake.get("legend", [])
 	var labels: Array = bake.get("labels", [])
 	var cw := int(bake.get("cw", 0))
@@ -421,37 +421,53 @@ func _emit_house_details(x0: float, x1: float, zf: float, wall_top: float, hw: f
 			var px := float(cx) * 16.0
 			var py := float(cy) * 16.0
 			if li == win and win >= 0:
-				var r := _sill_row(px, py)
-				if r >= 0:
+				var si := _sill_info(px, py)
+				if not si.is_empty():
+					var r: int = si[0]
 					var ht := zf - (py + float(r))
 					if ht > 2.0 and ht <= hw:
 						var sc := _atlas_col(px + 8.0, py + float(r), Color("#f0ece4"))
-						_solid_box(px + 1.0, zf, ht - 1.2, px + 15.0, zf + 2.4, ht + 0.2, _shade_col(sc, 0.98))
+						_solid_box(px + 1.4, zf, ht - 0.9, px + 14.6, zf + 1.3, ht + 0.1, _shade_col(sc, 0.98))
+						if btype == "house":
+							# shutters flank a window only on the building's outer sides (not between two windows)
+							var shut := _shade_col(roof_col, 0.85)
+							var left_free := cx == 0 or int(labels[cy * cw + cx - 1]) != win
+							var right_free := cx == cw - 1 or int(labels[cy * cw + cx + 1]) != win
+							if left_free:
+								_solid_box(px + float(si[1]) - 3.0, zf, ht - 0.6, px + float(si[1]) - 0.8, zf + 0.9, ht + 8.4, shut)
+							if right_free:
+								_solid_box(px + float(si[2]) + 1.8, zf, ht - 0.6, px + float(si[2]) + 4.0, zf + 0.9, ht + 8.4, shut)
 			elif li == door and door >= 0 and absf(py + 16.0 - (zf - 1.0)) <= 1.5:
 				var sc2 := _atlas_col(px + 8.0, py + 15.0, Color("#b8bccb"))
-				_solid_box(px + 2.5, zf, 0.0, px + 13.5, zf + 3.2, 1.8, _shade_col(sc2, 1.0))
+				_solid_box(px + 3.0, zf, 0.0, px + 13.0, zf + 1.8, 1.0, _shade_col(sc2, 1.0))
 
-## Row of a window cell (px) where the sill is painted (a run of white bounded by dark outline), or -1.
-func _sill_row(px: float, py: float) -> int:
+## [row, x_first, x_last] of the sill painted in a window cell (a run of white bounded by dark outline), or [].
+func _sill_info(px: float, py: float) -> Array:
 	if atlas_img == null:
-		return -1
+		return []
 	for r in range(6, 16):
 		var run := 0
 		var best := 0
+		var best_end := 0
 		for x in range(1, 15):
 			var c := _atlas_pix(px + float(x), py + float(r))
-			if c.a > 0.5 and c.r > 0.86 and c.g > 0.86 and c.b > 0.84:
+			if _is_white(c):
 				run += 1
-				best = maxi(best, run)
+				if run > best:
+					best = run
+					best_end = x
 			else:
 				run = 0
 		if best >= 9:
 			var l := _atlas_pix(px, py + float(r))
 			var rr := _atlas_pix(px + 15.0, py + float(r))
 			# the siding highlight also runs edge to edge; a sill stops short of the cell edges
-			if not (l.r > 0.86 and l.g > 0.86 and rr.r > 0.86 and rr.g > 0.86):
-				return r
-	return -1
+			if not (_is_white(l) and _is_white(rr)):
+				return [r, best_end - best + 1, best_end]
+	return []
+
+static func _is_white(c: Color) -> bool:
+	return c.a > 0.5 and c.r > 0.86 and c.g > 0.86 and c.b > 0.84
 
 func _atlas_pix(x: float, z: float) -> Color:
 	var ax := int(x) - int(_cur.get("sx", 0)) + int(_cur.get("ax", 0))

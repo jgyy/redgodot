@@ -346,6 +346,10 @@ func _build_visuals() -> void:
 		world_mat.set_shader_parameter("ao_tex", GroundDetail.ao_texture(bake))
 		world_mat.set_shader_parameter("detail_on", true)
 	obj_mat = wb.make_material(atlas_tex, false)
+	if dtex:
+		obj_mat.set_shader_parameter("detail_tex", dtex)
+		obj_mat.set_shader_parameter("obj_grain", 0.22)
+		obj_mat.set_shader_parameter("detail_on", true)
 	_atlas_img = _readable(atlas_tex)
 	wb.atlas_img = _atlas_img
 	add_child(wb.build_ground(world_mat))

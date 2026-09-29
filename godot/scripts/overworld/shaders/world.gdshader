@@ -28,6 +28,7 @@ uniform bool detail_on = false;
 uniform float ao_amt = 0.20;
 uniform float obj_ao = 0.16;
 uniform float grain_amt = 0.05;
+uniform float obj_grain = 0.0;       // fine material grain over baked objects (walls, roofs, furniture)
 
 varying vec2 p2d;
 varying vec3 wnrm;
@@ -70,7 +71,8 @@ vec3 water_color(vec2 px, float d, bool deep, float t) {
 
 void fragment() {
 	vec4 c = texture(albedo_tex, UV);
-	if (c.a < 0.5) discard;
+	bool solid = !is_ground && COLOR.a < 0.99;     // procedural trim (WorldBuilder._solid): vertex colour, no atlas
+	if (!solid && c.a < 0.5) discard;
 	vec3 col = c.rgb;
 	vec2 pix = floor(p2d);
 	bool in_water = false;
@@ -123,6 +125,10 @@ void fragment() {
 		sh -= 0.28 * clamp(n.x, 0.0, 1.0);
 		sh -= 0.16 * clamp(-n.x, 0.0, 1.0);
 		col *= mix(1.0, sh, face_shading);
+		if (obj_grain > 0.0 && COLOR.a > 0.99) {
+			vec3 d = detail_mod(3, p2d * 1.0);
+			col *= 1.0 + (d.r - 0.5) * 2.0 * obj_grain;
+		}
 		// ambient occlusion: walls and furniture darken toward their foot, soft rise toward the top edge
 		float vert = 1.0 - clamp(abs(n.y), 0.0, 1.0);
 		col *= 1.0 - obj_ao * vert * (1.0 - smoothstep(0.0, 7.0, hpx));

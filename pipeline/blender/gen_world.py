@@ -5,8 +5,12 @@
 Reads pipeline/blender/world_defs.json (written by pipeline/scripts/bake_maps.js from upstream's terrain.js:
 the tree clump layouts for both tree kinds x 6 variants, evaluated with upstream's hash) and builds:
 
-  godot/assets/models/world/tree_<kind><v>.glb   leafy canopy of lit clumps + trunk, vertex-coloured with the
-                                                 exact PAL.leaf / PAL.leaf2 / PAL.trunk ramps
+  godot/assets/models/world/tree_<kind><v>.glb   leafy canopy of lit clumps (+ sunlit tufts) + a rooted, barked trunk,
+                                                 vertex-coloured with the exact PAL.leaf / PAL.leaf2 / PAL.trunk ramps
+  godot/assets/models/world/<prop>.glb           the vertex-colour props of env_props.GAME (signs, picket fences, plants,
+                                                 crates, barrels, gravestones, braziers, statues, bush, flowers, tufts,
+                                                 boulder, Poke Ball ...), built with env_kit.Prop: bevels, ramp-lit faces,
+                                                 baked AO; vertex alpha = detail tile id for prop.gdshader's texture overlay
 
 Units ("sprite units"): 1 = one map cell horizontally; vertically 1 = 16 px of 2D art (Godot scales Y by
 K = tan(camera pitch) so the model projects onto its 2D sprite). Pivot = trunk base (the sprite's bottom
@@ -211,67 +215,6 @@ def finish_mesh(ob, bm):
     me.materials.append(mat)
     for p in me.polygons:
         p.use_smooth = False
-
-
-def ellipsoid(bm, center, rx, ry, rz, subdiv=2, jag=0.0, seed=0):
-    sph = bmesh.ops.create_icosphere(bm, subdivisions=subdiv, radius=1.0)
-    sv = sph['verts']
-    for v in sv:
-        n = v.co.normalized()
-        j = 1.0 + (hash2(int(n.x * 50 + 99), int(n.z * 50 + 99), seed) - 0.5) * jag
-        v.co = Vector((center[0] + n.x * rx * j, center[1] + n.y * ry * j, center[2] + n.z * rz * j))
-    return {f for v in sv for f in v.link_faces}
-
-
-def build_pokeball():
-    """Item ball (objsprites.js ART.ball): 10px across, red top with a highlight, black band, white bottom."""
-    P = {'O': '#1b1a2e', 'R': '#e04848', 'r': '#a82838', 'L': '#ff9a8a', 'W': '#f8f8f8', 'w': '#c8c8d8'}
-    c = {k: hex_rgb(v) for k, v in P.items()}
-    ob = new_mesh_obj('pokeball')
-    bm = bmesh.new()
-    col = vcol_layer(bm)
-    r = 5.0 / 16.0
-    cz = 4.5 / 16.0
-    fs = ellipsoid(bm, (0.0, 0.0, cz), r, r * 0.8, r * 0.8, subdiv=3)
-    for f in fs:
-        m = f.calc_center_median()
-        n = Vector(((m.x) / r, (m.y) / (r * 0.8), (m.z - cz) / (r * 0.8))).normalized()
-        front = n.y < -0.86 and abs(n.z) < 0.4 and abs(n.x) < 0.4
-        if front and n.y < -0.95:
-            k = 'W'
-        elif front:
-            k = 'O'
-        elif abs(n.z) < 0.13:
-            k = 'O'
-        elif n.z > 0:
-            lit = -n.x * 0.55 + n.z * 0.7 - n.y * 0.45
-            k = 'L' if lit > 0.85 else ('r' if lit < 0.1 else 'R')
-        else:
-            lit = -n.x * 0.55 - n.y * 0.45
-            k = 'W' if lit > -0.1 else 'w'
-        set_face_color(bm, f, c[k], col)
-    finish_mesh(ob, bm)
-    return ob
-
-
-def build_boulder():
-    """Strength boulder (objsprites.js ART.boulder): a lumpy rock lit from the top-left, A (light) .. E (dark)."""
-    ramp = [hex_rgb(h) for h in ['#56463c', '#786454', '#a08c78', '#c8b8a4', '#e8dccc']]
-    ob = new_mesh_obj('boulder')
-    bm = bmesh.new()
-    col = vcol_layer(bm)
-    r = 7.5 / 16.0
-    cz = 6.5 / 16.0
-    rng = random.Random(7)
-    fs = ellipsoid(bm, (0.0, 0.0, cz), r, r * 0.72, r * 0.72, subdiv=2, jag=0.25, seed=41)
-    for f in fs:
-        m = f.calc_center_median()
-        n = f.normal
-        lit = -n.x * 0.55 + n.z * 0.7 - n.y * 0.45 + (rng.random() - 0.5) * 0.2
-        idx = 4 if lit > 0.75 else 3 if lit > 0.4 else 2 if lit > 0.0 else 1 if lit > -0.4 else 0
-        set_face_color(bm, f, ramp[idx], col)
-    finish_mesh(ob, bm)
-    return ob
 
 
 def export_static(path):
