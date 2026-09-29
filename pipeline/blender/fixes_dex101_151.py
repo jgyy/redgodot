@@ -80,7 +80,6 @@ def spot(g, x, y, rx, ry, c, **kw):
     """Paint an ellipse onto group g (texture only).  frontOnly=True keeps it off the back."""
     p = {'t': 'spot', 'x': x, 'y': y, 'rx': rx, 'ry': ry, 'c': c, 'on': g}
     p.update(kw)
-    d_ = kw.get('_d')
     return p
 
 
@@ -151,11 +150,21 @@ def claw_tips(d, g, cd, x, y, n, gap, length, r, c='#f4efe0', dd=-2.0, dirx=0.0,
 # ============================================================================ #101 - #110
 @fix('ELECTRODE')
 def electrode(d, look):
-    # sphere with a dark seam; angry eyes are on the white half.  A real black outline ring around the seam.
-    for p in d['parts']:
-        if p.get('g') == 'ball':
-            p['rd'] = 19
-            p['solid'] = True
+    pal = {'white': '#f4f4f4', 'red': '#e83c3c', 'seam': '#2a0c16', 'dark': '#1b1a2e', 'wh2': '#ffffff'}
+    new(d, pal)
+    put(d, 'ball', 0, e(32, 38.5, 19.6, 19.6, 'white', rd=19.6))
+    L = [17, 30, 27, 34, 26.5, 39, 18, 37.5]
+    R = [31, 34, 41, 30, 42, 37.5, 32, 39]
+    sh = lambda pts, dx: [v + dx if i % 2 == 0 else v for i, v in enumerate(pts)]
+    L, R = sh(L, 6.8), sh(R, 6.8)
+    inner = lambda pts: [(v - (sum(pts[0::2]) / 4)) * 0.62 + (sum(pts[0::2]) / 4) if i % 2 == 0 else (v - (sum(pts[1::2]) / 4)) * 0.62 + (sum(pts[1::2]) / 4)
+                         for i, v in enumerate(pts)]
+    paint(d, spot('ball', 32, 68, 40, 28.4, 'red'),
+          band('ball', [10, 43.8, 22, 41.4, 32, 40.6, 42, 41.4, 54, 43.8], 1.7, 'seam'),
+          plate(L, 'dark', on='ball', frontOnly=True), plate(inner(L), 'wh2', on='ball', frontOnly=True),
+          plate(R, 'dark', on='ball', frontOnly=True), plate(inner(R), 'wh2', on='ball', frontOnly=True),
+          eye(30.4, 35.6, 1.5, style='dot'), eye(42.4, 35.6, 1.5, style='dot'),
+          plate([17.5, 45.4, 27.5, 48.8, 37.5, 49.8, 47.5, 48.4, 55.5, 44.6, 50.5, 51, 38.5, 54, 25.5, 52.4], 'seam', on='ball', frontOnly=True))
 
 
 @fix('EXEGGCUTE')
@@ -184,19 +193,16 @@ def exeggcute(d, look):
 
 @fix('EXEGGUTOR')
 def exeggutor(d, look):
-    pal = {'trunk': '#c8a46a', 'trunkd': '#9a7040', 'head': '#f8e070', 'headd': '#e8b840', 'leaf': '#58a848',
-           'leafd': '#3a7c34', 'claw': '#f4eedc', 'base': '#b89058'}
+    pal = {'trunk': '#c8a46a', 'trunkd': '#3a2a1c', 'head': '#f8e070', 'headd': '#e8b840', 'leaf': '#58a848',
+           'leafd': '#3a7c34', 'claw': '#f4eedc', 'base': '#b89058', 'pad': '#f8e890'}
     new(d, pal)
     put(d, 'body', 0, e(32, 51, 11.0, 8.0, 'trunk', rd=8.6), e(32, 37, 7.0, 15, 'trunk', rd=6.4))
-    paint(d, band('body', [27.5, 42, 32, 37.5, 36.5, 42, 32, 46.5, 27.5, 42], 1.3, 'trunkd', frontOnly=True),
-          band('body', [27, 52, 31.5, 47.5, 36, 52, 31.5, 56.5, 27, 52], 1.2, 'trunkd', frontOnly=True),
-          band('body', [32, 51, 36.5, 46.5, 41, 51, 36.5, 55.5, 32, 51], 1.2, 'trunkd', frontOnly=True),
-          band('body', [27.5, 30, 32, 26, 36.5, 30], 1.0, 'trunkd', frontOnly=True))
+    paint(d, *[band('body', [32 - 9.4, y + 2.4, 32, y, 32 + 9.4, y + 2.4], 0.9, 'trunkd') for y in (27, 33, 39, 45, 51, 56)])
     for s, sx in (('L', -1), ('R', 1)):
         x = 32 + sx * 7.5
-        put(d, 'leg' + s, 0.5, cap(x, 53, x + sx * 1.5, 58.4, 5.2, 4.6, 'trunk'))
-        put(d, 'foot' + s, -1.0, e(x + sx * 1.6, 59.2, 6.2, 2.8, 'base', dd=-1.5))
-        toes(d, 'foot' + s, -1.0, x + sx * 1.6, 60.4, 3, 3.6, 1.2, 'claw', dd=-6.0)
+        put(d, 'leg' + s, 0.5, cap(x, 53, x + sx * 1.5, 58.4, 5.6, 5.0, 'trunk'))
+        put(d, 'foot' + s, -1.0, e(x + sx * 1.6, 59.2, 6.4, 2.9, 'base', dd=-1.5), e(x + sx * 1.6, 60.2, 3.4, 1.4, 'pad', rd=2.0, dd=-6.0))
+        claw_tips(d, 'foot' + s, -1.0, x + sx * 1.6, 60.2, 2, 4.2, 1.4, 1.1, 'claw', dd=-6.8, diry=0.3)
         put(d, 'arm' + s, -0.8, cap(32 + sx * 6.6, 34, 32 + sx * 14.5, 44.5, 3.6, 3.0, 'trunk', d1=-1, d2=-3))
         put(d, 'hand' + s, -1.4, e(32 + sx * 15.5, 46.3, 3.6, 3.5, 'trunk', rd=3.4, dd=-3))
     put(d, 'tail', 5, stroke([38, 58, 45, 59, 50, 55], 4.8, 'trunk', w2=1.6, d1=3, d2=9))
@@ -205,13 +211,13 @@ def exeggutor(d, look):
         put(d, g, cd, e(x, y, r, r * 1.03, 'head', rd=r * 0.95))
         put(d, 'stalk' + g[-1], -0.8, cap(32 + (x - 32) * 0.25, 30, x, y + 4.5, 3.6, 4.0, 'trunk', d1=0, d2=-1))
     fronds = [
-        ((29, 10), (17, 1), (3, 9), 9.0), ((35, 10), (47, 0), (61, 9), 9.0),
-        ((25, 19), (10, 12), (1, 24), 8.0), ((39, 19), (54, 11), (63, 24), 8.0),
-        ((32, 8), (32, 0), (35, -1), 7.0),
+        ((29, 10), (17, 1), (3, 9), 6.8), ((35, 10), (47, 0), (61, 9), 6.8),
+        ((25, 19), (10, 12), (1, 24), 6.2), ((39, 19), (54, 11), (63, 24), 6.2),
+        ((32, 8), (32, 0), (35, -1), 5.6),
     ]
     for i, (a, b, c, w) in enumerate(fronds):
         put(d, 'frond%d' % i, 3.0 if i < 4 else 5.0,
-            stroke([a[0], a[1], b[0], b[1], c[0], c[1]], w, 'leaf', w2=1.6, d2=2))
+            stroke([a[0], a[1], b[0], b[1], c[0], c[1]], w, 'leaf', w2=1.2, d2=2))
     paint(d,
           eye(15.6, 23.4, 2.4, iris='#603010'), eye(21.6, 23.4, 2.4, iris='#603010'), mouth(18.6, 29.2, 1.7, 'open'),
           eye(42.4, 23.4, 2.4, style='sad', iris='#603010', flip=True), eye(48.4, 23.4, 2.4, style='sad', iris='#603010'),
@@ -283,31 +289,29 @@ def hitmonchan(d, look):
 
 @fix('LICKITUNG')
 def lickitung(d, look):
-    pal = {'pk': '#f0a0b0', 'pkd': '#d8788c', 'cr': '#f8e0c0', 'tongue': '#e8607c', 'dark': '#2a2030'}
+    pal = {'pk': '#f0a0b0', 'pkd': '#d8788c', 'cr': '#f8e4c0', 'yel': '#e8c458', 'tongue': '#e8607c', 'dark': '#2a2030', 'claw': '#f8f0dc'}
     new(d, pal)
     put(d, 'body', 0, e(32, 45, 13.5, 12.5, 'pk', rd=10.5), e(32, 53, 14.5, 7.5, 'pk', rd=11))
     paint(d, spot('body', 32, 47, 9.6, 9.6, 'cr', frontOnly=True),
-          band('body', [25.5, 44, 28, 42, 30.5, 44, 33, 42, 35.5, 44, 38, 42, 40.5, 44], 0.9, 'pkd', frontOnly=True),
-          band('body', [26, 50, 28.5, 48, 31, 50, 33.5, 48, 36, 50, 38.5, 48, 41, 50], 0.9, 'pkd', frontOnly=True))
-    put(d, 'head', -1.8, e(32, 23.5, 11.6, 10.4, 'pk', rd=10.2), e(32, 29.4, 8.2, 4.6, 'pk', rd=5.8, dd=-5.4),
-        cap(32, 15, 33.5, 7.8, 3.0, 0.7, 'pk', d1=0, d2=0))
+          band('body', [25.5, 44, 28, 42, 30.5, 44, 33, 42, 35.5, 44, 38, 42, 40.5, 44], 0.9, 'yel', frontOnly=True),
+          band('body', [26, 50, 28.5, 48, 31, 50, 33.5, 48, 36, 50, 38.5, 48, 41, 50], 0.9, 'yel', frontOnly=True))
+    put(d, 'head', -1.8, e(32, 26.4, 14.6, 10.4, 'pk', rd=11.0), e(32, 31.6, 10.4, 4.6, 'pk', rd=6.4, dd=-5.0))
     for s, sx in (('L', -1), ('R', 1)):
-        put(d, 'ear' + s, -1.4, e(32 + sx * 11, 19.5, 2.4, 3.0, 'pk', rd=1.8, rot=sx * 20))
         put(d, 'arm' + s, -0.5, cap(32 + sx * 12, 38, 32 + sx * 18.5, 46, 3.4, 3.0, 'pk', d1=-1, d2=-3))
-        put(d, 'hand' + s, -1.5, e(32 + sx * 19.2, 47.5, 3.4, 3.2, 'pk', rd=3.2, dd=-3))
+        put(d, 'hand' + s, -1.5, e(32 + sx * 19.2, 47.5, 3.4, 3.2, 'pk', rd=3.2, dd=-3), cap(32 + sx * 21.4, 47.4, 32 + sx * 23.6, 49.6, 1.1, 0.4, 'claw', dd=-3))
         x = 32 + sx * 8
         put(d, 'leg' + s, 0.3, cap(x, 54, x + sx * 0.4, 58, 4.8, 4.4, 'pk'))
-        put(d, 'foot' + s, -1.0, e(x + sx * 0.6, 59.2, 6.0, 2.7, 'pk', dd=-2.0))
-        toes(d, 'foot' + s, -1.0, x + sx * 0.6, 60.5, 3, 3.5, 1.1, 'cr', dd=-6.0)
-    put(d, 'tongue', -6.5, stroke([32, 31.4, 33.5, 38, 36, 46, 33, 52, 38, 56.5], 5.4, 'tongue', w2=3.2, d1=-2, d2=-4))
-    put(d, 'tail', 4, stroke([40, 57, 47, 58, 51, 53, 52, 48], 3.0, 'pk', w2=1.8, d1=3, d2=9))
-    paint(d, eye(25.6, 21.4, 2.2, iris='#402828'), eye(38.4, 21.4, 2.2, iris='#402828'),
-          spot('head', 32, 29.6, 6.2, 2.4, 'dark', frontOnly=True), spot('head', 32, 30.5, 3.6, 1.4, 'tongue', frontOnly=True),
-          spot('head', 32, 19.6, 0.6, 0.6, 'pkd', frontOnly=True))
+        paint(d, band('leg' + s, [x - 5, 55.4, x + 5, 55.4], 1.0, 'yel'))
+        put(d, 'foot' + s, -1.0, e(x + sx * 0.6, 59.2, 6.0, 2.7, 'pk', dd=-2.0), e(x + sx * 0.6, 60.0, 3.2, 1.5, 'claw', rd=2.0, dd=-6.4))
+    put(d, 'tongue', -6.5, stroke([32, 34.0, 33.5, 40, 36, 46, 33, 52, 38, 56.5], 5.4, 'tongue', w2=3.2, d1=-2, d2=-4))
+    put(d, 'tail', 4, stroke([40, 56, 46, 58, 52, 55, 55, 50], 7.0, 'pk', w2=3.4, d1=3, d2=10))
+    paint(d, eye(23.6, 24.2, 2.1, sclera=False, iris='#40282a'), eye(40.4, 24.2, 2.1, sclera=False, iris='#40282a'),
+          spot('head', 32, 32.6, 6.6, 2.3, 'dark', frontOnly=True), spot('head', 32, 31.4, 7.0, 1.7, 'pk', frontOnly=True),
+          spot('head', 32, 34.0, 3.2, 1.0, 'tongue', frontOnly=True))
 
 
 def _bone_mon(d, look, mar):
-    pal = {'br': '#b47c44' if not mar else '#a06c38', 'brd': '#8a5a30', 'cr': '#f0d8a4', 'sk': '#f2ead8',
+    pal = {'br': '#b47c44' if not mar else '#a06c38', 'brd': '#8a5a30', 'cr': '#f0d8a4' if not mar else '#e6c98c', 'sk': '#f2ead8',
            'skd': '#c8b898', 'sock': '#4a3a34', 'bone': '#f4ecd8', 'claw': '#f8f0e0'}
     new(d, pal)
     if not mar:
@@ -357,16 +361,17 @@ def _bone_mon(d, look, mar):
         x = 32 + sx * (6.2 if not mar else 7.0)
         put(d, 'leg' + s, 0.5, cap(x, legtop, x + sx * 0.3, 58, 4.4 if not mar else 4.8, 3.8 if not mar else 4.0, 'br'))
         put(d, 'foot' + s, -1.0, e(x + sx * 0.4, 59.2, 5.6, 2.5, 'br', dd=-1.8))
-        toes(d, 'foot' + s, -1.0, x + sx * 0.4, 60.6, 3, 3.1, 1.0, 'claw', dd=-5.2)
+        toes(d, 'foot' + s, -1.0, x + sx * 0.4, 60.6, 3 if not mar else 1, 3.1, 1.0 if not mar else 1.5, 'claw', dd=-5.2)
     if not mar:
         put(d, 'tail', 3.5, stroke([38, 55, 44.5, 58, 51, 54.5], 5.0, 'br', w2=1.4, d1=2, d2=8))
     else:
-        put(d, 'tail', 3.5, stroke([39, 51, 47, 57, 55, 55, 58.5, 48], 5.2, 'br', w2=1.2, d1=2, d2=9))
+        put(d, 'tail', 3.5, stroke([39, 51, 47, 57, 55, 55, 58.5, 48], 5.2, 'br', w2=1.2, d1=2, d2=9), cap(55, 55, 57, 60, 1.8, 0.5, 'br', d1=8, d2=9))
 
 
 @fix('CUBONE')
 def cubone(d, look):
     _bone_mon(d, look, False)
+    put(d, 'spikeA', 0, cap(29, 40, 27.6, 32.4, 2.4, 0.6, 'brd', d1=6, d2=7), cap(35, 40, 36.4, 32.4, 2.4, 0.6, 'brd', d1=6, d2=7))
 
 
 @fix('MAROWAK')
@@ -386,36 +391,39 @@ def _craters(d, pts, main, rim, hole, cd=-2.0, r=4.4):
 
 
 def _skull(d, g, x, y, s, bone, dark):
-    paint(d, band(g, [x - 5.6 * s, y + 4.6 * s, x + 5.6 * s, y + 8.2 * s], 1.9 * s, bone, frontOnly=True),
-          band(g, [x + 5.6 * s, y + 4.6 * s, x - 5.6 * s, y + 8.2 * s], 1.9 * s, bone, frontOnly=True),
+    paint(d, band(g, [x - 8.0 * s, y + 2.2 * s, x + 8.0 * s, y + 6.4 * s], 2.4 * s, bone, frontOnly=True),
+          band(g, [x + 8.0 * s, y + 2.2 * s, x - 8.0 * s, y + 6.4 * s], 2.4 * s, bone, frontOnly=True),
           spot(g, x, y, 4.8 * s, 4.2 * s, bone, frontOnly=True),
-          spot(g, x - 1.8 * s, y - 0.4 * s, 1.15 * s, 1.35 * s, dark, frontOnly=True),
-          spot(g, x + 1.8 * s, y - 0.4 * s, 1.15 * s, 1.35 * s, dark, frontOnly=True),
-          spot(g, x, y + 2.0 * s, 0.6 * s, 0.9 * s, dark, frontOnly=True))
+          spot(g, x - 1.8 * s, y - 0.3 * s, 1.15 * s, 1.35 * s, dark, frontOnly=True),
+          spot(g, x + 1.8 * s, y - 0.3 * s, 1.15 * s, 1.35 * s, dark, frontOnly=True),
+          spot(g, x, y + 2.0 * s, 0.6 * s, 0.9 * s, dark, frontOnly=True),
+          band(g, [x - 2.2 * s, y + 3.4 * s, x + 2.2 * s, y + 3.4 * s], 0.7 * s, dark, frontOnly=True))
 
 
 @fix('KOFFING')
 def koffing(d, look):
-    pal = {'pu': '#9a7ec6', 'pud': '#7c5eac', 'rim': '#c0a8e0', 'hole': '#2e1c4c', 'bone': '#f6f0dc', 'dark': '#2a2036'}
+    pal = {'pu': '#9a7ec6', 'pud': '#7c5eac', 'rim': '#c0a8e0', 'hole': '#2e1c4c', 'bone': '#fffbea', 'dark': '#2a2036'}
     new(d, pal)
     put(d, 'body', 0, e(32, 35, 21.5, 21.5, 'pu', rd=21, solid=True))
     _craters(d, [(16.5, 19.5, -1, -1), (46.5, 15.5, 0.55, -1), (56, 40, 1, -0.1), (12, 46, -1, 0.5)], 'pud', 'rim', 'hole')
-    _skull(d, 'body', 31, 44.6, 1.2, 'bone', 'dark')
-    paint(d, eye(24.2, 29.5, 4.4, style='angry', flip=True, iris='#4a3a7c'), eye(39.4, 28.6, 3.6, style='angry', iris='#4a3a7c'),
-          mouth(31.5, 35.6, 5.4, 'fang'))
+    _skull(d, 'body', 31, 43.4, 1.25, 'bone', 'dark')
+    paint(d, eye(24.2, 28.5, 4.4, style='angry', flip=True, iris='#4a3a7c'), eye(39.4, 27.6, 3.6, style='angry', iris='#4a3a7c'),
+          mouth(31.5, 34.6, 5.4, 'fang'))
 
 
 @fix('WEEZING')
 def weezing(d, look):
-    pal = {'pu': '#9a7ec6', 'pud': '#7c5eac', 'rim': '#c0a8e0', 'hole': '#2e1c4c', 'bone': '#f6f0dc', 'dark': '#2a2036'}
+    pal = {'pu': '#9a7ec6', 'pud': '#7c5eac', 'rim': '#c0a8e0', 'hole': '#2e1c4c', 'bone': '#fffbea', 'dark': '#2a2036'}
     new(d, pal)
-    put(d, 'body', 0, e(23.5, 30, 17.5, 17.5, 'pu', rd=16.5, solid=True))
-    put(d, 'headB', -2.5, e(46, 46, 12.5, 12.5, 'pu', rd=12, solid=True))
-    put(d, 'link', -1.0, cap(31, 36, 40, 42, 7.0, 6.4, 'pu'))
+    put(d, 'body', 0, e(23.5, 30, 17.5, 17.5, 'pu', rd=16.5), e(35.6, 39.4, 4.4, 4.4, 'pu', rd=4.4))
+    put(d, 'headB', -2.5, e(46, 46, 12.5, 12.5, 'pu', rd=12))
+    put(d, 'link', -1.0, cap(31, 36, 40, 42, 3.4, 3.2, 'pu'))
     _craters(d, [(9, 14, -1, -1), (28, 10.5, 0.2, -1), (5, 36, -1, 0.3), (57, 38, 1, -0.5), (58, 54, 1, 0.5), (40, 58, 0.2, 1)],
              'pud', 'rim', 'hole')
     _skull(d, 'body', 24, 40.4, 1.05, 'bone', 'dark')
-    paint(d, eye(17.5, 25.6, 3.9, style='angry', flip=True, iris='#4a3a7c'), eye(29.5, 25, 3.2, style='angry', iris='#4a3a7c'),
+    paint(d, spot('headB', 47, 57.6, 3.8, 2.4, 'bone', frontOnly=True), spot('headB', 47, 57.6, 2.0, 1.2, 'pu', frontOnly=True),
+          eye(17.5, 25.6, 3.9, style='angry', flip=True, iris='#4a3a7c'), eye(29.5, 25, 3.2, style='angry', iris='#4a3a7c'),
+          band('body', [12.6, 20.4, 21, 22.4], 2.0, 'dark', frontOnly=True), band('body', [34, 19.4, 26.6, 21.4], 2.0, 'dark', frontOnly=True),
           mouth(23.5, 32.2, 4.4, 'fang'),
           eye(41.5, 43.4, 3.0, style='angry', flip=True, iris='#4a3a7c'), eye(51, 43.2, 2.6, style='angry', iris='#4a3a7c'),
           mouth(46.3, 50.5, 3.4, 'fang'))
@@ -431,7 +439,9 @@ def rhyhorn(d, look):
         put(d, 'spike%d' % i, 0.5, cap(32, 27.4, 32, 19.5 - (i in (1, 2)) * 1.5, 4.0, 0.9, 'grd', d1=dz, d2=dz + 1.2),
             cap(24.5, 29.2, 22.5, 22.4, 2.8, 0.7, 'grd', d1=dz + 1.5, d2=dz + 2), cap(39.5, 29.2, 41.5, 22.4, 2.8, 0.7, 'grd', d1=dz + 1.5, d2=dz + 2))
     put(d, 'head', -12, e(32, 40.5, 11.0, 10.0, 'gr', rd=10.4), e(32, 44.6, 7.6, 5.4, 'gr', rd=6.0, dd=-6.2),
-        cap(32, 42.4, 32, 31.5, 4.4, 0.8, 'horn', d1=-10, d2=-22), e(19.6, 33.5, 2.8, 3.4, 'gr', rd=2.0, rot=-20), e(44.4, 33.5, 2.8, 3.4, 'gr', rd=2.0, rot=20))
+        cap(32, 42.4, 32, 31.5, 4.4, 0.8, 'horn', d1=-10, d2=-22))
+    put(d, 'earL', -11, e(19.6, 33.5, 2.8, 3.4, 'gr', rd=2.0, rot=-20))
+    put(d, 'earR', -11, e(44.4, 33.5, 2.8, 3.4, 'gr', rd=2.0, rot=20))
     paint(d, eye(25.8, 37.6, 2.0, style='angry', flip=True), eye(38.2, 37.6, 2.0, style='angry'),
           spot('head', 29.8, 45.4, 0.8, 0.6, 'dark', frontOnly=True), spot('head', 34.2, 45.4, 0.8, 0.6, 'dark', frontOnly=True),
           band('head', [27, 48.4, 32, 49.6, 37, 48.4], 0.9, 'dark', frontOnly=True))
@@ -439,7 +449,7 @@ def rhyhorn(d, look):
         put(d, nm, dz * 0.1, cap(x, 44, x, 57.8, 6.2, 5.4, 'gr', dd=dz),
             e(x - 2.8, 59.3, 2.0, 1.5, 'horn', rd=1.8, dd=dz - 4.6), e(x, 59.5, 2.0, 1.5, 'horn', rd=1.8, dd=dz - 5.0),
             e(x + 2.8, 59.3, 2.0, 1.5, 'horn', rd=1.8, dd=dz - 4.6))
-    put(d, 'tail', 6, stroke([32, 41, 32, 46, 32, 51, 32, 55], 4.2, 'gr', w2=1.6, d1=34, d2=43))
+    put(d, 'tail', 0, stroke([32, 41, 32, 46, 32, 51, 32, 55], 4.2, 'gr', w2=1.6, d1=32, d2=42))
 
 
 @fix('RHYDON')
@@ -451,13 +461,14 @@ def rhydon(d, look):
     paint(d, spot('body', 32, 40, 9.2, 12.4, 'bel', frontOnly=True),
           *[band('body', [24, 31 + 3.6 * k, 32, 32.4 + 3.6 * k, 40, 31 + 3.6 * k], 0.9, 'beld', frontOnly=True) for k in range(5)])
     put(d, 'head', -2.2, e(32, 19.5, 10.2, 9.2, 'gr', rd=9.4), e(32, 24, 7.0, 5.2, 'gr', rd=6.0, dd=-6.0),
-        cap(32, 23.6, 32, 8.5, 4.0, 0.9, 'horn', d1=-9, d2=-16))
-    paint(d, eye(26.2, 17.4, 2.0, style='angry', flip=True), eye(37.8, 17.4, 2.0, style='angry'),
+        cap(32, 23.6, 32, 8.5, 4.0, 0.9, 'horn', d1=-9, d2=-16), cap(32, 12.6, 32, 6.6, 2.6, 0.6, 'grd', d1=-6, d2=-14))
+    paint(d, eye(26.2, 17.4, 2.1, style='angry', flip=True, sclera=False, iris='#e02828'), eye(37.8, 17.4, 2.1, style='angry', sclera=False, iris='#e02828'),
           spot('head', 30, 24.6, 0.8, 0.6, 'dark', frontOnly=True), spot('head', 34, 24.6, 0.8, 0.6, 'dark', frontOnly=True),
           band('head', [28, 28.4, 32, 29.4, 36, 28.4], 0.9, 'dark', frontOnly=True))
+    put(d, 'fangs', -9, cap(29.2, 27.6, 29.0, 31.6, 1.2, 0.3, 'horn', dd=-8), cap(34.8, 27.6, 35.0, 31.6, 1.2, 0.3, 'horn', dd=-8))
     for s, sx in (('L', -1), ('R', 1)):
         put(d, 'frill' + s, -0.5, cap(32 + sx * 8.6, 15.5, 32 + sx * 13, 8, 3.0, 0.7, 'gr', d1=2, d2=2),
-            cap(32 + sx * 10, 19, 32 + sx * 15.6, 14, 2.6, 0.6, 'gr', d1=2, d2=2))
+            cap(32 + sx * 10, 19, 32 + sx * 15.6, 14, 2.6, 0.6, 'gr', d1=2, d2=2), cap(32 + sx * 9.6, 23.4, 32 + sx * 14.6, 22.6, 2.4, 0.6, 'gr', d1=1, d2=1))
         put(d, 'arm' + s, -0.8, cap(32 + sx * 13, 30, 32 + sx * 17.5, 42, 4.6, 4.0, 'gr', d1=-1, d2=-4))
         put(d, 'hand' + s, -1.6, e(32 + sx * 18.2, 44, 4.0, 3.8, 'gr', rd=3.8, dd=-4))
         claw_tips(d, 'hand' + s, -1.6, 32 + sx * 18.2, 46.5, 3, 2.3, 2.4, 0.8, 'claw', dd=-4, dirx=sx * 0.2)
@@ -467,33 +478,39 @@ def rhydon(d, look):
         claw_tips(d, 'foot' + s, -1.0, x + sx * 1.6, 60.2, 3, 3.6, 1.6, 1.0, 'claw', dd=-7.0, diry=0.4)
     for i, (y, sz) in enumerate(((23, 3.4), (30, 4.0), (38, 4.4), (46, 4.0))):
         put(d, 'spike%d' % i, 7, cap(32, y, 32, y - 6.4 - sz * 0.6, sz, 0.8, 'grd', d1=0, d2=6))
-    put(d, 'tail', 8, stroke([32, 52, 36, 57, 31, 59.5], 9.5, 'gr', w2=2.2, d1=6, d2=26))
+    put(d, 'tail', 0, stroke([32, 52, 36, 57, 31, 59.5], 9.5, 'gr', w2=2.2, d1=5, d2=26))
+    paint(d, band('tail', [33, 53, 35.4, 56], 0.8, 'dark'), band('tail', [35, 56.6, 34, 58.8], 0.8, 'dark'))
 
 
 @fix('CHANSEY')
 def chansey(d, look):
-    pal = {'pk': '#f8b4c4', 'pkd': '#e88ca4', 'cr': '#fbeed8', 'crd': '#e8d2b0', 'egg': '#fffdf8', 'dark': '#2a2030'}
+    pal = {'pk': '#f8b4c4', 'pkd': '#e8849e', 'egg': '#fffdf8', 'dark': '#2a2030'}
     new(d, pal)
     put(d, 'body', 0, e(32, 41, 17.5, 16.5, 'pk', rd=13.5), e(32, 27, 12.6, 11.2, 'pk', rd=10.8))
-    paint(d, spot('body', 32, 48.6, 10.6, 8.6, 'cr', frontOnly=True), band('body', [22.6, 50, 26, 53, 32, 54.8, 38, 53, 41.4, 50], 0.9, 'crd', frontOnly=True))
-    put(d, 'egg', -13.5, e(32, 45.6, 5.4, 6.6, 'egg', rd=4.8))
+    paint(d, spot('body', 32, 48.6, 10.6, 8.6, 'pkd', frontOnly=True))
+    put(d, 'egg', -13.5, e(32, 46.4, 5.4, 6.8, 'egg', rd=4.8))
     for s, sx in (('L', -1), ('R', 1)):
-        put(d, 'tuft' + s, -1.0, cap(32 + sx * 11, 23, 32 + sx * 18.6, 16.5, 3.4, 0.9, 'pk', d1=1.5, d2=1.5),
-            cap(32 + sx * 11.4, 29, 32 + sx * 19.6, 31, 3.2, 0.9, 'pk', d1=1.5, d2=1.5))
+        tufts = []
+        for (y0, x1, y1) in ((21, 20.5, 13), (26.5, 22.6, 24.4), (32, 20.4, 35.6)):
+            bx, by = 32 + sx * 11.2, y0
+            tx, ty = 32 + sx * x1, y1
+            mx, my = bx + (tx - bx) * 0.68, by + (ty - by) * 0.68
+            tufts.append(cap(bx, by, mx, my, 3.2, 2.0, 'pk', d1=1.5, d2=1.5))
+            tufts.append(cap(mx, my, tx, ty, 2.0, 0.6, 'pkd', d1=1.5, d2=1.5))
+        put(d, 'tuft' + s, -1.0, *tufts)
         put(d, 'arm' + s, -1.0, cap(32 + sx * 15, 40, 32 + sx * 19.5, 48, 3.4, 3.0, 'pk', d1=-1, d2=-3))
         put(d, 'hand' + s, -2.0, e(32 + sx * 20.2, 49.6, 3.3, 3.1, 'pk', rd=3.0, dd=-3))
         x = 32 + sx * 9.2
         put(d, 'leg' + s, 0.4, cap(x, 54, x + sx * 0.5, 58.2, 5.2, 4.8, 'pk'))
-        put(d, 'foot' + s, -1.0, e(x + sx * 0.8, 59.3, 6.4, 2.7, 'pk', dd=-2.4))
-    put(d, 'tail', 6, stroke([39, 55, 46, 57, 49, 53], 5.0, 'pk', w2=2.0, d1=5, d2=12))
-    put(d, 'curl', -1.4, e(32, 15.6, 3.0, 3.4, 'pk', rd=2.6, dd=-3))
-    paint(d, eye(26.8, 26.2, 2.3, sclera=False), eye(37.2, 26.2, 2.3, sclera=False), mouth(32, 31.6, 2.0, 'smile'),
+        put(d, 'foot' + s, -1.0, e(x + sx * 0.8, 59.3, 6.4, 2.7, 'pkd', dd=-2.4))
+    put(d, 'tail', 6, stroke([39, 55, 44, 57, 47, 54], 4.4, 'pk', w2=2.2, d1=5, d2=10))
+    paint(d, eye(27.2, 26.2, 1.7, sclera=False), eye(36.8, 26.2, 1.7, sclera=False), mouth(32, 31.6, 2.0, 'smile'),
           spot('body', 24.6, 30.6, 2.3, 1.5, 'pkd', frontOnly=True), spot('body', 39.4, 30.6, 2.3, 1.5, 'pkd', frontOnly=True))
 
 
 @fix('TANGELA')
 def tangela(d, look):
-    pal = {'bl': '#3c62b8', 'bld': '#284694', 'bll': '#6a92dc', 'red': '#e05858', 'dark': '#14142a'}
+    pal = {'bl': '#5470c8', 'bld': '#3a52a8', 'bll': '#7d9ae2', 'red': '#e8626c', 'dark': '#14142a'}
     new(d, pal)
     c = (32, 31.5)
     put(d, 'body', 0, e(c[0], c[1], 15.0, 15.0, 'bl', rd=14.0))
@@ -514,16 +531,13 @@ def tangela(d, look):
         (ps_a if i % 2 == 0 else ps_b).extend(_rope(r, c, 16.6, 5.0, 'bll' if i % 3 else 'bld', w2=4.6, step=14.0))
     put(d, 'coilA', 0, *ps_a)
     put(d, 'coilB', 0, *ps_b)
-    tend = [
-        [(19, 20), (11, 14), (7, 6), (12, 2)], [(46, 17), (53, 11), (52, 4)], [(15.5, 34), (7, 33.5), (3, 39)],
-        [(49, 36), (58, 34), (60, 27)], [(22, 45), (16, 51), (9, 50)], [(41, 46), (48, 52), (55, 50)],
-        [(29, 16), (28, 8), (34, 2.5)],
-    ]
+    tend = [[(19, 20), (12, 15), (9, 8), (13, 5)], [(46, 17), (52, 12), (51, 6)], [(15.5, 34), (9, 33.5), (6, 38)],
+            [(49, 36), (55, 34), (57, 29)], [(29, 16), (28, 9), (33, 5)]]
     for i, pts in enumerate(tend):
         flat = [q for p in pts for q in p]
-        put(d, 'vine%d' % i, -1.0 - i % 2, stroke(flat, 4.6, 'bl' if i % 2 else 'bld', w2=1.8, d1=-8, d2=-8 - (i % 3) * 2))
+        put(d, 'vine%d' % i, -1.0 - i % 2, stroke(flat, 4.4, 'bl' if i % 2 else 'bld', w2=2.0, d1=-8, d2=-8 - (i % 3) * 2))
     for s, sx in (('L', -1), ('R', 1)):
-        put(d, 'foot' + s, 1.0, e(32 + sx * 7.2, 57.6, 5.6, 3.2, 'red', rd=4.4, dd=-1))
+        put(d, 'foot' + s, 1.0, e(32 + sx * 7.2, 56.6, 5.0, 4.4, 'red', rd=4.6, dd=-1), e(32 + sx * 7.8, 59.4, 5.6, 2.2, 'red', rd=4.6, dd=-2.5))
     paint(d, spot('body', 32, 32.6, 10.6, 5.0, 'dark', frontOnly=True),
           eye(27.2, 32.4, 3.0, iris='#2a2a48'), eye(36.8, 32.4, 3.0, iris='#2a2a48'))
 
@@ -555,7 +569,7 @@ def kangaskhan(d, look):
         claw_tips(d, 'foot' + s, -1.0, x + sx * 0.8, 60.2, 3, 3.6, 1.6, 1.0, 'claw', dd=-8.0, diry=0.4)
     for i, (y, sz) in enumerate(((26, 2.8), (32, 3.2), (38, 3.4), (44, 3.2))):
         put(d, 'spike%d' % i, 7, cap(32, y, 32, y - 5.4, sz, 0.7, 'plate', d1=0, d2=4))
-    put(d, 'tail', 8, stroke([34, 51, 38, 57, 34, 60], 12.5, 'br', w2=3.0, d1=6, d2=28))
+    put(d, 'tail', 0, stroke([34, 51, 38, 57, 34, 60], 12.5, 'br', w2=3.0, d1=5, d2=28))
 
 
 @fix('HORSEA')
@@ -578,8 +592,7 @@ def staryu(d, look):
     new(d, pal)
     put(d, 'body', 0, plate(star_pts(32, 34.5, 27, 11.2), 'st', T=4.6))
     put(d, 'ring', -3.5, e(32, 34.5, 9.6, 9.6, 'gold', rd=4.2))
-    put(d, 'core', -6.5, e(32, 34.5, 6.4, 6.4, 'red', rd=5.6), solid=True) if False else \
-        put(d, 'core', -6.5, e(32, 34.5, 6.4, 6.4, 'red', rd=5.6, solid=True))
+    put(d, 'core', -6.5, e(32, 34.5, 6.4, 6.4, 'red', rd=5.6))
     paint(d, spot('core', 30.2, 32.6, 1.5, 1.3, 'shine', frontOnly=True))
 
 
@@ -611,12 +624,12 @@ def goldeen(d, look):
     put(d, 'horn', 0.5, cap(17, 26.5, 12.5, 12, 3.2, 0.7, 'wh'), cap(17, 26.5, 13.4, 17.4, 3.2, 3.0, 'or'))
     _fish_eyes(d, 16.8, 31, 3.0, 5.8)
     put(d, 'lips', -2.5, e(10.6, 35.6, 2.6, 2.2, 'lip', rd=2.2, dd=-0.5))
-    put(d, 'tail', 0.5, smooth_plate([44, 33, 49, 24, 55, 15, 62, 9, 61, 18, 64, 27, 60, 34, 64, 42, 61, 51, 55, 56, 52, 48, 47, 40], 'fin', T=1.2),
+    put(d, 'tail', 0.5, smooth_plate([44, 33, 49, 24, 55, 15, 62, 9, 61, 18, 64, 27, 60, 34, 64, 42, 61, 51, 55, 56, 52, 48, 47, 40], 'fin', T=1.68),
         stroke([45, 34, 52, 24, 60, 14], 2.0, 'or'), stroke([46, 37, 55, 41, 62, 40], 1.8, 'or'), stroke([45, 40, 50, 48, 54, 54], 1.8, 'or'))
-    put(d, 'dorsal', 0.5, smooth_plate([26, 25, 29, 16, 34, 8, 41, 4, 43, 12, 40, 20, 38, 25], 'fin', T=1.0), stroke([32, 22, 36, 9], 1.6, 'or'))
+    put(d, 'dorsal', 0.5, smooth_plate([26, 25, 29, 16, 34, 8, 41, 4, 43, 12, 40, 20, 38, 25], 'fin', T=1.4), stroke([32, 22, 36, 9], 1.6, 'or'))
     for s, sx in (('L', -1), ('R', 1)):
-        put(d, 'pect' + s, sx * 7.0, smooth_plate([26, 36, 22, 41, 17, 48, 22, 51, 28, 48, 33, 42], 'fin', T=0.9))
-    put(d, 'pelv', 0.3, smooth_plate([31, 43, 33, 50, 39, 56, 42, 50, 39, 44], 'fin', T=0.9))
+        put(d, 'pect' + s, sx * 7.0, smooth_plate([26, 36, 22, 41, 17, 48, 22, 51, 28, 48, 33, 42], 'fin', T=1.26))
+    put(d, 'pelv', 0.3, smooth_plate([31, 43, 33, 50, 39, 56, 42, 50, 39, 44], 'fin', T=1.26))
 
 
 @fix('SEAKING')
@@ -630,21 +643,17 @@ def seaking(d, look):
     put(d, 'horn', 0.5, cap(17, 25, 11, 6.5, 3.6, 0.8, 'horn'))
     _fish_eyes(d, 16, 31, 3.3, 6.4, pr=1.9)
     put(d, 'lips', -2.5, e(10.2, 36.2, 3.0, 2.6, 'lip', rd=2.4, dd=-0.5))
-    put(d, 'tail', 0.5, smooth_plate([47, 32, 52, 22, 57, 13, 64, 6, 62, 17, 65, 27, 62, 35, 65, 44, 62, 53, 56, 58, 53, 49, 49, 40], 'fin', T=1.3),
+    put(d, 'tail', 0.5, smooth_plate([47, 32, 52, 22, 57, 13, 64, 6, 62, 17, 65, 27, 62, 35, 65, 44, 62, 53, 56, 58, 53, 49, 49, 40], 'fin', T=1.82),
         stroke([48, 33, 56, 20, 62, 10], 2.2, 'or'), stroke([48, 37, 57, 41, 63, 38], 2.0, 'or'), stroke([48, 41, 53, 50, 56, 56], 2.0, 'or'))
-    put(d, 'dorsal', 0.5, smooth_plate([25, 21, 28, 12, 32, 4, 40, 1, 44, 8, 43, 15, 41, 20], 'fin', T=1.1), stroke([30, 19, 34, 5], 1.8, 'or'), stroke([36, 19, 40, 4], 1.8, 'or'))
+    put(d, 'dorsal', 0.5, smooth_plate([25, 21, 28, 12, 32, 4, 40, 1, 44, 8, 43, 15, 41, 20], 'fin', T=1.54), stroke([30, 19, 34, 5], 1.8, 'or'), stroke([36, 19, 40, 4], 1.8, 'or'))
     for s, sx in (('L', -1), ('R', 1)):
-        put(d, 'pect' + s, sx * 8.0, smooth_plate([26, 37, 22, 43, 17, 51, 23, 54, 30, 50, 35, 43], 'fin', T=1.0))
-    put(d, 'pelv', 0.3, smooth_plate([30, 44, 32, 52, 39, 58, 44, 52, 40, 45], 'fin', T=1.0))
+        put(d, 'pect' + s, sx * 8.0, smooth_plate([26, 37, 22, 43, 17, 51, 23, 54, 30, 50, 35, 43], 'fin', T=1.4))
+    put(d, 'pelv', 0.3, smooth_plate([30, 44, 32, 52, 39, 58, 44, 52, 40, 45], 'fin', T=1.4))
 
 
 def _seahorse(d, big):
-    if big:
-        pal = {'bl': '#4a92d2', 'bld': '#3670b0', 'cr': '#f0e6b8', 'crd': '#c8b880', 'fin': '#f6ecc4', 'fin2': '#e0d094', 'eye': '#fbfbfb',
-               'dark': '#20203a', 'red': '#c83040', 'pupil': '#d8384c'}
-    else:
-        pal = {'bl': '#5aa4e2', 'bld': '#3e84c8', 'cr': '#f0e6b8', 'crd': '#c8b880', 'fin': '#f4eed6', 'fin2': '#e0d094', 'eye': '#fbfbfb',
-               'dark': '#20203a', 'red': '#c83040', 'pupil': '#20203a'}
+    pal = {'bl': '#5aa4e2' if not big else '#4a92d2', 'bld': '#3e84c8', 'cr': '#f0e6b8', 'crd': '#c8b880', 'fin': '#f4eed6', 'fin2': '#e0d094',
+           'eye': '#c83040' if not big else '#20203a', 'dark': '#20203a', 'pupil': '#20203a', 'shine': '#ffffff'}
     new(d, pal)
     k = 1.25 if big else 1.0
     body_pts = [38, 27, 41, 33, 41.5, 40, 39, 47, 40.5, 53, 46, 57.5, 51, 54, 49, 49]
@@ -664,20 +673,31 @@ def _seahorse(d, big):
         off, ey = 5.6 * k, hy - 1.6
         surf = hrd * math.sqrt(max(0.05, 1 - (off / hr) ** 2 - (1.6 / (hr * 0.94)) ** 2))
         ecd = -3 - surf + er * 0.55
-        put(d, 'eye' + s, ecd, e(35 + sx * off, ey, er, er * 1.04, 'eye', rd=er * 0.92))
-        put(d, 'pupil' + s, ecd - er * 0.5, e(35 + sx * (off + er * 0.42), ey + 0.2, er * 0.6, er * 0.66, 'pupil', rd=er * 0.5))
-    n = 5 if big else 4
-    for i in range(n):
-        y = 14 + i * (23.0 / n) * 1.0
-        x = 41.5 + (0 if i else 1)
-        L = (10 if big else 8) - i * 0.4
-        put(d, 'dfin%d' % i, 2.5, cap(x, y, x + L, y - (6.5 if i == 0 else 2.5), 3.4 if big else 3.0, 0.7, 'fin', d1=1, d2=1),
-            cap(x, y + 2, x + L - 1, y + (2.5 if big else 2.0), 2.6, 0.6, 'fin2', d1=1, d2=1))
-    put(d, 'finL', -3, smooth_plate([40, 35, 45, 33, 49, 37, 46, 42, 41, 40], 'fin', T=0.8))
-    put(d, 'finR', 4.5, smooth_plate([40, 35, 45, 33, 49, 37, 46, 42, 41, 40], 'fin', T=0.8))
+        if big:      # narrow black eye with a fin-like brow ridge above it
+            put(d, 'eye' + s, ecd, e(35 + sx * off, ey, er * 0.95, er * 0.62, 'eye', rd=er * 0.8, rot=-sx * 14))
+            put(d, 'brow' + s, ecd - 0.5, cap(35 + sx * (off - 3.2), ey - 3.0, 35 + sx * (off + 2.6), ey - 4.6, 1.8, 0.5, 'fin2', d1=0, d2=0))
+        else:
+            put(d, 'eye' + s, ecd, e(35 + sx * off, ey, er, er * 1.04, 'eye', rd=er * 0.92))
+            put(d, 'pupil' + s, ecd - er * 0.6, e(35 + sx * (off + er * 0.42), ey + 0.2, er * 0.52, er * 0.58, 'pupil', rd=er * 0.5))
     if big:
+        for i, (x0, y0, x1, y1) in enumerate(((43, 20, 50, 13), (44, 30, 52, 27))):
+            put(d, 'dfin%d' % i, 2.5, smooth_plate([x0 - 2, y0 - 2, x0 + 3, y0 - 6, x1 + 2, y1 - 3, x1 + 4, y1 + 4, x0 + 2, y0 + 8, x0 - 2, y0 + 6], 'fin', T=1.4),
+                cap(x1 + 1, y1, x1 + 6, y1 - 6, 2.4, 0.5, 'fin2', d1=1, d2=1))
+        for i in range(4):
+            y = 15 + i * 7.5
+            put(d, 'spine%d' % i, 2.5, cap(41.5, y, 49.5, y - 3.4, 3.0, 0.6, 'fin2', d1=1, d2=1))
         for i, (x, y, tx, ty) in enumerate(((28, 13, 22, 4), (27.5, 17, 20, 11), (28.5, 22, 20, 21))):
             put(d, 'cfin%d' % i, 1.0, cap(x, y, tx, ty, 3.0, 0.7, 'fin2', d1=4, d2=5))
+        for s, sx in (('L', -1), ('R', 1)):
+            put(d, 'pspine' + s, -4 if sx < 0 else 5,
+                cap(40, 35, 46.6, 38.4, 3.0, 0.6, 'fin2', d1=sx * 3, d2=sx * 8), cap(40, 38, 46, 43, 2.6, 0.6, 'fin2', d1=sx * 3, d2=sx * 8))
+    else:
+        put(d, 'dfin', 2.0, smooth_plate([42, 22, 48, 18, 52, 24, 51, 33, 47, 41, 43, 40], 'fin', T=1.26))
+        for s, sx in (('L', -1), ('R', 1)):
+            for i in range(3):
+                put(d, 'cspike%s%d' % (s, i), 1.5, cap(35 + sx * 7.6, 15.5 + i * 4.4, 35 + sx * (12.2 + i * 0.4), 12.5 + i * 5.4, 2.6, 0.6, 'fin2', d1=0, d2=1))
+        put(d, 'finL', -3, smooth_plate([40, 35, 45, 33, 49, 37, 46, 42, 41, 40], 'fin', T=1.12))
+        put(d, 'finR', 4.5, smooth_plate([40, 35, 45, 33, 49, 37, 46, 42, 41, 40], 'fin', T=1.12))
 
 
 @fix('SEADRA')
@@ -687,55 +707,60 @@ def seadra(d, look):
 
 @fix('MR_MIME')
 def mr_mime(d, look):
-    pal = {'skin': '#fbdcd0', 'wh': '#f8f4f2', 'whd': '#e0d8dc', 'pk': '#ee6478', 'bl': '#4a7cd0', 'bld': '#3660b0', 'dark': '#20203a',
-           'eye': '#ffffff'}
+    pal = {'skin': '#fbdcd0', 'wh': '#f8f4f2', 'pnk': '#fbd2d6', 'pk': '#ee4c88', 'bl': '#4a7cd0', 'bld': '#2c48a8', 'dark': '#20203a'}
     new(d, pal)
-    put(d, 'body', 0, e(32, 34, 9.6, 11.6, 'wh', rd=7.8), e(32, 43.5, 8.2, 5.0, 'wh', rd=6.4))
-    paint(d, spot('body', 32, 37.5, 4.2, 4.4, 'pk', frontOnly=True), spot('body', 23.8, 27.6, 3.1, 3.1, 'pk'), spot('body', 40.2, 27.6, 3.1, 3.1, 'pk'))
+    put(d, 'body', 0, e(32, 34, 9.8, 11.8, 'wh', rd=8.0), e(32, 43.5, 8.2, 5.0, 'wh', rd=6.4))
+    paint(d, spot('body', 32, 36.6, 4.4, 4.6, 'pk', frontOnly=True))
     put(d, 'head', -1.6, e(32, 15.5, 10.4, 9.6, 'skin', rd=9.0))
     for s, sx in (('L', -1), ('R', 1)):
-        put(d, 'ear' + s, -1.0, cap(32 + sx * 6.8, 8.6, 32 + sx * 12.2, 0.8, 4.6, 1.2, 'bl', d1=0.5, d2=0.5),
-            e(32 + sx * 8, 8.2, 4.2, 3.6, 'bl', rd=3.2))
-        put(d, 'arm' + s, -0.5, cap(32 + sx * 9.4, 28, 32 + sx * 15.5, 38.5, 3.0, 2.6, 'wh', d1=-1, d2=-3))
-        put(d, 'hand' + s, -1.4, e(32 + sx * 16.4, 40.6, 3.8, 3.7, 'wh', rd=3.4, dd=-3),
-            cap(32 + sx * 15, 42.8, 32 + sx * 14.4, 46.8, 1.3, 0.9, 'wh', dd=-3), cap(32 + sx * 16.8, 43.4, 32 + sx * 17.2, 47.4, 1.3, 0.9, 'wh', dd=-3),
-            cap(32 + sx * 18.6, 42.6, 32 + sx * 20.4, 45.6, 1.2, 0.9, 'wh', dd=-3))
-        x = 32 + sx * 4.6
-        put(d, 'leg' + s, 0.2, cap(x, 46, x + sx * 0.8, 57, 2.9, 2.6, 'wh'))
-        paint(d, spot('leg' + s, x + sx * 0.4, 51.5, 2.5, 2.5, 'pk'))
-        put(d, 'foot' + s, -1.0, e(x + sx * 1.6, 59, 5.4, 2.7, 'bl', dd=-2.2), cap(x + sx * 5, 58.5, x + sx * 8.6, 55.6, 1.9, 1.1, 'bl', dd=-2.2))
+        put(d, 'ear' + s, -1.0, cap(32 + sx * 8.6, 13.6, 32 + sx * 13.4, 3.4, 4.0, 1.2, 'bl', d1=0, d2=0),
+            stroke([32 + sx * 13.4, 3.4, 32 + sx * 15.6, 0.6, 32 + sx * 13, -1.6], 3.2, 'bl', w2=1.6))
+        put(d, 'shoulder' + s, -0.8, e(32 + sx * 9.2, 27, 3.3, 3.3, 'pk', rd=3.2, dd=-1))
+        put(d, 'arm' + s, -0.5, cap(32 + sx * 10.2, 28.6, 32 + sx * 15.6, 38.5, 2.5, 2.2, 'pnk', d1=-1, d2=-3))
+        hx, hy = 32 + sx * 16.4, 40.6
+        put(d, 'hand' + s, -1.4, e(hx, hy, 3.6, 3.5, 'wh', rd=3.3, dd=-3),
+            *[cap(hx + sx * (k - 1) * 1.7, hy + 2.0, hx + sx * ((k - 1) * 2.1 + (k - 1) * 0.3), hy + 6.0, 1.25, 0.9, 'wh', dd=-3) for k in range(3)],
+            *[e(hx + sx * ((k - 1) * 2.1 + (k - 1) * 0.3), hy + 6.2, 1.0, 1.0, 'pk', rd=1.0, dd=-3) for k in range(3)])
+        put(d, 'hip' + s, -0.6, e(32 + sx * 4.8, 44.4, 3.1, 3.1, 'pk', rd=3.0, dd=-1))
+        x = 32 + sx * 4.8
+        put(d, 'leg' + s, 0.2, cap(x, 45.6, x + sx * 0.8, 57, 2.7, 2.5, 'pnk'))
+        put(d, 'patella' + s, -0.8, e(x + sx * 0.4, 51.0, 3.6, 3.2, 'wh', rd=3.4, dd=-1))
+        put(d, 'foot' + s, -1.0, e(x + sx * 1.6, 59, 5.4, 2.7, 'bld', dd=-2.2), cap(x + sx * 5, 58.5, x + sx * 8.8, 55.4, 1.9, 1.1, 'bld', dd=-2.2))
     paint(d, spot('head', 25.2, 19.6, 2.6, 2.6, 'pk', frontOnly=True), spot('head', 38.8, 19.6, 2.6, 2.6, 'pk', frontOnly=True),
           eye(28, 14.2, 3.1, iris='#2a2a48'), eye(36, 14.2, 3.1, iris='#2a2a48'), mouth(32, 22.2, 2.6, 'smile'))
 
 
 @fix('SCYTHER')
 def scyther(d, look):
-    pal = {'gr': '#86c058', 'grd': '#5c9038', 'bel': '#eef0c8', 'blade': '#e8eeee', 'blade2': '#a8bac4', 'wing': '#dcecee',
-           'wing2': '#b4ccd4', 'dark': '#20203a'}
+    pal = {'gr': '#86c058', 'grd': '#5c9038', 'bel': '#f0eec8', 'blade': '#f2f4f0', 'blade2': '#b4c0c4', 'wing': '#f0ead0',
+           'wing2': '#ded6b4', 'dark': '#20203a', 'claw': '#fbfbf4'}
     new(d, pal)
     put(d, 'body', 0, e(32, 32, 7.8, 10, 'gr', rd=6.4), e(32, 42, 6.0, 4.8, 'gr', rd=5.2),
         cap(32, 40, 32, 47, 4.8, 2.6, 'gr', d1=2, d2=14))
     paint(d, spot('body', 32, 32.5, 4.6, 8.0, 'bel', frontOnly=True),
           *[band('body', [28.2, 27.6 + 3.3 * j, 35.8, 27.6 + 3.3 * j], 0.8, 'grd', frontOnly=True) for j in range(4)])
-    put(d, 'neck', -0.4, cap(32, 18.5, 32, 24.5, 3.0, 3.6, 'gr'))
+    put(d, 'neck', -0.4, cap(32, 18.5, 32, 24.5, 3.0, 3.6, 'bel'))
     put(d, 'head', -1.6, e(32, 13, 8.2, 7.4, 'gr', rd=7.0), e(32, 17.6, 4.4, 3.0, 'gr', rd=3.8, dd=-4.6),
-        cap(32, 8.6, 32, -1.0, 4.2, 0.8, 'gr', d1=-1.5, d2=-3))
+        )
+    put(d, 'horns', -1.6, cap(32, 8.0, 32, 0.4, 3.0, 2.0, 'gr', d1=-1.5, d2=-3), cap(27.2, 8.6, 25.4, 2.4, 2.6, 1.6, 'gr', d1=-1, d2=-2), cap(36.8, 8.6, 38.6, 2.4, 2.6, 1.6, 'gr', d1=-1, d2=-2))
     for s, sx in (('L', -1), ('R', 1)):
         put(d, 'cheek' + s, -1.2, cap(32 + sx * 6.6, 15, 32 + sx * 10.4, 21.4, 2.1, 0.9, 'gr', dd=-2))
-    paint(d, eye(27.8, 12.6, 2.8, style='angry', flip=True, iris='#c8283c'), eye(36.2, 12.6, 2.8, style='angry', iris='#c8283c'),
+    paint(d, eye(27.8, 12.8, 2.6, style='angry', flip=True, iris='#c8283c'), eye(36.2, 12.8, 2.6, style='angry', iris='#c8283c'),
           mouth(32, 20.0, 1.8, 'line'))
     blade = [10.6, 30, 15.8, 32.6, 20.2, 40, 21.6, 50, 18.6, 58, 15.6, 61.5, 15.6, 52, 15.2, 44, 12.8, 37, 9.8, 33]
     for s, sx in (('L', -1), ('R', 1)):
         put(d, 'arm' + s, -0.5, cap(32 + sx * 7.2, 25.5, 32 + sx * 11.6, 33, 2.8, 2.4, 'gr', d1=-1, d2=-3))
         pts = curve(blade, 3)
         pts = [(32 + sx * v) if i % 2 == 0 else v for i, v in enumerate(pts)]
-        put(d, 'blade' + s, -3.2, plate(pts, 'blade', T=1.7),
+        put(d, 'blade' + s, -3.2, plate(pts, 'blade', T=2.38),
             stroke([32 + sx * 12.3, 35, 32 + sx * 13.8, 43, 32 + sx * 14, 52], 1.3, 'blade2'))
-        put(d, 'wing' + s, 4.5, plate([32 + sx * 6, 24, 32 + sx * 24, 6, 32 + sx * 30, 14, 32 + sx * 25, 28, 32 + sx * 9, 33], 'wing', T=0.9),
-            plate([32 + sx * 7, 33, 32 + sx * 22, 30, 32 + sx * 27, 41, 32 + sx * 12, 40], 'wing2', T=0.8, dd=0.5))
+        put(d, 'wing' + s, 4.5, plate([32 + sx * 6, 24, 32 + sx * 24, 6, 32 + sx * 30, 14, 32 + sx * 25, 28, 32 + sx * 9, 33], 'wing', T=1.26),
+            plate([32 + sx * 7, 33, 32 + sx * 22, 30, 32 + sx * 27, 41, 32 + sx * 12, 40], 'wing2', T=1.12, dd=0.5))
         x = 32 + sx * 5
-        put(d, 'leg' + s, 0, cap(x, 42, x + sx * 2.2, 50, 2.9, 2.5, 'gr'), cap(x + sx * 2.2, 50, x + sx * 0.8, 58.4, 2.5, 2.0, 'gr'))
-        put(d, 'foot' + s, -0.8, e(x + sx * 0.9, 59.4, 3.8, 1.8, 'gr', dd=-2), toes_claw(x + sx * 0.9, 60.4, 'gr'))
+        put(d, 'leg' + s, 0, cap(x, 42, x + sx * 2.2, 50, 2.9, 2.5, 'gr'), cap(x + sx * 2.2, 50, x + sx * 0.8, 58.4, 2.5, 2.0, 'gr'),
+            cap(x + sx * 1.6, 46.4, x + sx * 3.6, 39.6, 2.4, 0.6, 'grd', d1=-1, d2=-1))
+        put(d, 'foot' + s, -0.8, e(x + sx * 0.9, 59.4, 3.8, 1.8, 'gr', dd=-2),
+            *[cap(x + sx * 0.9 + (k - 1) * 1.3, 60.2, x + sx * 0.9 + (k - 1) * 1.5, 61.6, 0.7, 0.3, 'claw', dd=-5.2) for k in range(3)])
 
 
 def toes_claw(x, y, c):
@@ -744,12 +769,13 @@ def toes_claw(x, y, c):
 
 @fix('JYNX')
 def jynx(d, look):
-    pal = {'hair': '#f6da50', 'haird': '#d6a828', 'face': '#4a2c70', 'lip': '#f0508c', 'lipd': '#c83070',
-           'dress': '#dc3c3c', 'dressd': '#a82828', 'skin': '#7050a8', 'bel': '#f6d8d8', 'dark': '#20203a'}
+    pal = {'hair': '#f6da50', 'haird': '#d6a828', 'face': '#5a3888', 'lip': '#f0508c', 'lipd': '#c83070',
+           'dress': '#dc3c3c', 'dressd': '#a82828', 'skin': '#7050a8', 'wh': '#f6f0f6', 'bel': '#f6d8d8', 'gold': '#f0c040', 'dark': '#20203a'}
     new(d, pal)
     put(d, 'body', 0, e(32, 42, 10.2, 12.6, 'dress', rd=8.2), e(32, 52.5, 13.8, 6.8, 'dress', rd=10.4))
     paint(d, band('body', [26, 46, 25.4, 58], 1.0, 'dressd', frontOnly=True), band('body', [32, 46, 32, 59], 1.0, 'dressd', frontOnly=True),
-          band('body', [38, 46, 38.6, 58], 1.0, 'dressd', frontOnly=True), spot('body', 32, 31.4, 6.4, 2.4, 'bel', frontOnly=True))
+          band('body', [38, 46, 38.6, 58], 1.0, 'dressd', frontOnly=True), spot('body', 32, 31.4, 6.4, 2.4, 'bel', frontOnly=True),
+          spot('body', 28.2, 36.4, 1.9, 1.9, 'gold', frontOnly=True), spot('body', 35.8, 36.4, 1.9, 1.9, 'gold', frontOnly=True))
     put(d, 'hairBk', 3.6, e(32, 30, 10.2, 24, 'hair', rd=5.4), e(32, 12.5, 12.0, 9.6, 'hair', rd=8.6, dd=-0.6))
     put(d, 'head', -1.6, e(32, 21, 9.4, 9.0, 'face', rd=8.4))
     put(d, 'lips', -7.6, e(32, 26.2, 6.2, 3.2, 'lip', rd=3.4), e(32, 24.6, 4.8, 1.6, 'lipd', rd=2.8, dd=-0.5))
@@ -757,12 +783,12 @@ def jynx(d, look):
         cap(39.6, 13, 38.4, 19.4, 2.4, 1.1, 'hair', dd=-1), cap(32, 14, 32, 17.4, 2.8, 1.2, 'hair', dd=-1))
     for s, sx in (('L', -1), ('R', 1)):
         put(d, 'lock' + s, -0.4, cap(32 + sx * 10.6, 17, 32 + sx * 11.4, 47, 3.1, 2.4, 'hair', d1=-2, d2=-2))
-        put(d, 'arm' + s, -2.2, cap(32 + sx * 10.4, 33, 32 + sx * 15, 45.5, 2.9, 2.4, 'skin', d1=-1, d2=-4))
-        put(d, 'hand' + s, -3.0, e(32 + sx * 15.8, 47.4, 2.8, 2.8, 'skin', rd=2.6, dd=-4), cap(32 + sx * 15, 49, 32 + sx * 14.6, 52.2, 1.2, 0.8, 'skin', dd=-4),
-            cap(32 + sx * 17, 49, 32 + sx * 17.8, 52.2, 1.2, 0.8, 'skin', dd=-4))
+        put(d, 'arm' + s, -2.2, cap(32 + sx * 10.4, 33, 32 + sx * 14.6, 44.5, 2.9, 2.5, 'wh', d1=-1, d2=-4))
+        put(d, 'hand' + s, -3.0, e(32 + sx * 15.4, 46.6, 2.9, 2.9, 'skin', rd=2.7, dd=-4),
+            *[cap(32 + sx * (15.4 + (k - 2) * 1.05), 48.0, 32 + sx * (15.4 + (k - 2) * 1.5), 51.6, 0.95, 0.6, 'skin', dd=-4) for k in range(5)])
         put(d, 'foot' + s, -1.0, e(32 + sx * 6, 59.4, 5.2, 2.4, 'skin', dd=-4))
-    paint(d, eye(28, 20.2, 2.5, style='sleepy', iris='#38a070'), eye(36, 20.2, 2.5, style='sleepy', iris='#38a070'),
-          band('head', [24.6, 18, 29.6, 18.6], 0.8, 'dark', frontOnly=True), band('head', [39.4, 18, 34.4, 18.6], 0.8, 'dark', frontOnly=True))
+    paint(d, eye(28, 20.2, 2.9, iris='#38a070'), eye(36, 20.2, 2.9, iris='#38a070'),
+          band('head', [24.6, 17.6, 29.6, 18.2], 0.8, 'dark', frontOnly=True), band('head', [39.4, 17.6, 34.4, 18.2], 0.8, 'dark', frontOnly=True))
 
 
 def _sph(c, R, lon, lat):
@@ -787,62 +813,68 @@ def electabuzz(d, look):
     pal = {'yl': '#f8d43c', 'yld': '#d8a820', 'blk': '#26202c', 'wh': '#ffffff', 'dark': '#26202c', 'bel': '#fbe88a'}
     new(d, pal)
     put(d, 'body', 0, e(32, 32, 11.8, 12.6, 'yl', rd=9.4), e(32, 44, 9.4, 6.0, 'yl', rd=7.6))
-    paint(d, band('body', [22.5, 25.5, 27.5, 28.5, 24.5, 31.5, 30.5, 33.8, 27.5, 36.5, 34, 38.5], 2.0, 'blk', frontOnly=True),
-          band('body', [41.5, 25.5, 36.5, 28.5, 39.5, 31.5, 33.5, 33.8], 2.0, 'blk', frontOnly=True),
-          band('body', [26, 41.5, 32, 44, 38, 41.5], 1.6, 'blk'))
-    put(d, 'head', -1.4, e(32, 13, 9.0, 8.2, 'yl', rd=8.2), e(32, 18.2, 5.2, 3.6, 'yl', rd=4.2, dd=-5.6))
+    paint(d, band('body', [30, 24.5, 36, 28, 28.8, 31.5, 36.4, 35, 29.5, 39.4], 2.6, 'blk', frontOnly=True),
+          band('body', [22, 34, 22.4, 39.5], 1.6, 'blk', frontOnly=True),
+          band('body', [32, 22, 32, 46], 2.8, 'blk', backOnly=True), band('body', [26, 41.5, 32, 44, 38, 41.5], 1.6, 'blk'))
+    put(d, 'head', -1.4, e(32, 13, 9.0, 8.2, 'yl', rd=8.2), e(32, 18.2, 5.2, 3.6, 'yl', rd=4.2, dd=-5.6),
+        *[cap(32 + sx * 2.8, 6.4, 32 + sx * 4.6, -2.6, 2.6, 0.6, 'yl') for sx in (-1, 1)])
     for s, sx in (('L', -1), ('R', 1)):
-        put(d, 'horn' + s, -1.0, stroke([32 + sx * 4.4, 7.4, 32 + sx * 6.6, 1.6, 32 + sx * 5.4, -3.4], 3.2, 'yl', w2=2.0, d1=0, d2=0),
-            stroke([32 + sx * 5.5, -1.0, 32 + sx * 5.2, -4.2], 2.3, 'blk', d1=0, d2=0))
+        put(d, 'ant' + s, -1.0, stroke([32 + sx * 7.6, 8.4, 32 + sx * 10.6, 3.4, 32 + sx * 9.4, -1.4], 2.6, 'yl', w2=2.0),
+            e(32 + sx * 9.2, -2.6, 2.7, 2.7, 'blk', rd=2.6))
         put(d, 'arm' + s, -0.6, cap(32 + sx * 10.4, 24, 32 + sx * 15.4, 36.5, 4.6, 3.8, 'yl', d1=-1, d2=-4))
-        paint(d, band('arm' + s, [32 + sx * 12.6 - 4, 30, 32 + sx * 12.6 + 4, 30], 1.6, 'blk'),
-              band('arm' + s, [32 + sx * 14 - 4, 34, 32 + sx * 14 + 4, 34], 1.6, 'blk'))
+        paint(d, band('arm' + s, [32 + sx * 11.4 - 3, 29, 32 + sx * 12.6 + 1, 30.4], 1.5, 'blk'),
+              band('arm' + s, [32 + sx * 14 - 4, 34, 32 + sx * 14 + 2, 34.4], 1.4, 'blk'))
         put(d, 'hand' + s, -1.8, e(32 + sx * 16.2, 39.2, 3.9, 3.7, 'yl', rd=3.6, dd=-4))
         x = 32 + sx * 6.4
         put(d, 'leg' + s, 0.2, cap(x, 44, x + sx * 0.6, 57.6, 5.4, 4.4, 'yl'))
         paint(d, band('leg' + s, [x - 5, 48, x + 5, 48], 1.5, 'blk'), band('leg' + s, [x - 4.6, 53.6, x + 4.6, 53.6], 1.3, 'blk'))
         put(d, 'foot' + s, -1.0, e(x + sx * 0.7, 59.2, 5.8, 2.8, 'yl', dd=-2.0))
         toes(d, 'foot' + s, -1.0, x + sx * 0.7, 60.5, 3, 3.4, 1.1, 'yl', dd=-6.2)
-    put(d, 'tail', 4, stroke([37, 49, 43, 55, 50, 53, 55, 46], 3.8, 'yl', w2=2.0, d1=4, d2=16),
-        stroke([53, 50, 55.2, 46], 2.4, 'blk', d1=15, d2=16))
-    paint(d, eye(27.6, 12.4, 2.8, style='angry', flip=True), eye(36.4, 12.4, 2.8, style='angry'),
-          band('head', [27, 6.6, 29.5, 8.4, 32, 6.6, 34.5, 8.4, 37, 6.6], 1.2, 'blk', frontOnly=True),
-          mouth(32, 20.6, 2.6, 'fang'))
+    put(d, 'tail', 4, stroke([37, 49, 43, 55, 50, 53, 56, 46], 4.4, 'yl', w2=2.6, d1=4, d2=18))
+    paint(d, band('tail', [40, 50, 43, 55], 1.2, 'blk'), band('tail', [45, 52, 49, 56], 1.2, 'blk'),
+          band('tail', [50, 55, 54, 51], 1.2, 'blk'), band('tail', [54, 51, 57, 47], 1.2, 'blk'))
+    paint(d, eye(27.6, 12.6, 2.3, style='angry', flip=True), eye(36.4, 12.6, 2.3, style='angry'),
+          band('head', [27, 6.4, 32, 9.6, 37, 6.4], 1.4, 'blk', frontOnly=True), mouth(32, 20.6, 2.6, 'fang'))
 
 
 @fix('MAGMAR')
 def magmar(d, look):
-    pal = {'or': '#f6a232', 'orl': '#f8c058', 'red': '#e6481c', 'yel': '#f9dc78', 'bill': '#f4cc50', 'dark': '#3a2820'}
+    pal = {'or': '#ec5a2a', 'red': '#c62c1c', 'yel': '#f9d75a', 'yeld': '#f2b03a', 'bill': '#dcc08a', 'dark': '#2a2226', 'blk': '#26222a'}
     new(d, pal)
     put(d, 'body', 0, e(32, 33.5, 11.8, 12.6, 'or', rd=9.8), e(32, 45, 10.0, 6.6, 'or', rd=8.4))
-    paint(d, spot('body', 32, 36.5, 7.6, 9.4, 'yel', frontOnly=True),
-          band('body', [26, 31, 29, 33, 32, 31, 35, 33, 38, 31], 1.2, 'red', frontOnly=True),
-          band('body', [26, 37, 29, 39, 32, 37, 35, 39, 38, 37], 1.2, 'red', frontOnly=True),
-          band('body', [27, 43, 30, 44.6, 32, 43, 34, 44.6, 37, 43], 1.2, 'red', frontOnly=True))
-    put(d, 'head', -1.4, e(32, 15, 8.8, 8.2, 'or', rd=8.2), e(32, 19.6, 5.8, 3.2, 'bill', rd=4.2, dd=-6.4), e(32, 18.2, 4.6, 1.6, 'bill', rd=3.4, dd=-6.8))
-    for i, (x, ty, tx) in enumerate(((25.2, 3, 21.4), (28.6, 0, 26.6), (32, -3.4, 32), (35.4, 0, 37.4), (38.8, 3, 42.6))):
-        put(d, 'flame%d' % i, -0.8, cap(x, 9.4, tx, ty, 3.0, 0.7, 'red', d1=0, d2=0), cap(x, 9.0, x + (tx - x) * 0.5, ty + 4.8, 1.6, 0.5, 'yel', d1=-1, d2=-1))
+    paint(d, spot('body', 32, 37.6, 8.0, 8.6, 'yel', frontOnly=True),
+          band('body', [26, 33, 29, 35, 32, 33, 35, 35, 38, 33], 1.2, 'yeld', frontOnly=True),
+          band('body', [26, 39, 29, 41, 32, 39, 35, 41, 38, 39], 1.2, 'yeld', frontOnly=True),
+          band('body', [25, 45, 28, 47, 32, 45, 36, 47, 39, 45], 1.4, 'yel', frontOnly=True))
+    put(d, 'collar', -1.0, e(32, 23.2, 7.4, 2.4, 'blk', rd=6.6))
+    put(d, 'head', -1.4, e(32, 15, 8.8, 8.2, 'or', rd=8.2), e(32, 19.8, 5.4, 3.2, 'bill', rd=4.2, dd=-6.4),
+        e(27, 8.4, 2.6, 2.4, 'or', rd=2.4, dd=-3), e(37, 8.4, 2.6, 2.4, 'or', rd=2.4, dd=-3))
     for s, sx in (('L', -1), ('R', 1)):
+        put(d, 'flame' + s, -1.0, cap(32 + sx * 5, 8, 32 + sx * 5.8, -1.4, 3.0, 0.7, 'yel', d1=-3, d2=-3), cap(32 + sx * 5, 7.6, 32 + sx * 4.4, 2.4, 1.6, 0.5, 'yeld', d1=-4, d2=-4))
         put(d, 'arm' + s, -0.6, cap(32 + sx * 10.6, 24.5, 32 + sx * 15.6, 36, 4.4, 3.6, 'red', d1=-1, d2=-4))
-        put(d, 'hand' + s, -1.8, e(32 + sx * 16.4, 38.6, 3.9, 3.7, 'or', rd=3.6, dd=-4))
-        put(d, 'spark' + s, 2.0, cap(32 + sx * 13, 30, 32 + sx * 21, 24, 3.2, 0.7, 'red', d1=2, d2=3), cap(32 + sx * 13, 32, 32 + sx * 20, 30, 2.6, 0.6, 'red', d1=2, d2=3))
+        put(d, 'hand' + s, -1.8, e(32 + sx * 16.4, 38.6, 3.9, 3.7, 'or', rd=3.6, dd=-4),
+            *[cap(32 + sx * (16.4 + (k - 2) * 1.2), 41, 32 + sx * (16.4 + (k - 2) * 1.6), 44, 1.1, 0.4, 'bill', dd=-4) for k in range(5)])
         x = 32 + sx * 6.4
         put(d, 'leg' + s, 0.2, cap(x, 45, x + sx * 0.6, 57.6, 5.4, 4.6, 'or'))
+        put(d, 'ankle' + s, -0.4, e(x + sx * 0.6, 55.6, 5.0, 1.7, 'blk', rd=4.6))
+        paint(d, band('leg' + s, [x - 4, 49, x, 51, x + 4, 49], 1.2, 'yel'))
         put(d, 'foot' + s, -1.0, e(x + sx * 0.7, 59.2, 5.8, 2.8, 'or', dd=-2.0))
-        toes(d, 'foot' + s, -1.0, x + sx * 0.7, 60.5, 3, 3.4, 1.1, 'yel', dd=-6.2)
-    put(d, 'tail', 4, stroke([37, 50, 43, 56, 50, 54, 54, 47], 5.4, 'or', w2=3.0, d1=4, d2=15))
+        toes(d, 'foot' + s, -1.0, x + sx * 0.7, 60.5, 3, 3.4, 1.1, 'bill', dd=-6.2)
+    for i, dz in enumerate((6, 10, 14)):
+        put(d, 'spike%d' % i, 7, cap(32, 26 + i * 6.5, 32, 19.6 + i * 6.5, 3.2, 0.8, 'red', d1=dz, d2=dz + 4))
+    put(d, 'tail', 4, stroke([37, 50, 43, 56, 50, 54, 54, 47], 5.4, 'yel', w2=2.6, d1=4, d2=15))
     put(d, 'tailflame', 6, cap(54, 47.4, 57.4, 36, 4.8, 0.9, 'red', d1=15, d2=16), cap(54, 46.8, 55.6, 40.4, 2.6, 0.6, 'yel', d1=14, d2=14),
         cap(53, 47.6, 49, 40, 3.4, 0.8, 'red', d1=15, d2=16))
-    paint(d, eye(28.2, 13.8, 2.4, style='angry', flip=True, iris='#d02820'), eye(35.8, 13.8, 2.4, style='angry', iris='#d02820'),
+    paint(d, eye(28.2, 13.8, 1.9, style='angry', flip=True, iris='#a02010'), eye(35.8, 13.8, 1.9, style='angry', iris='#a02010'),
           spot('head', 30.4, 19.8, 0.5, 0.5, 'dark', frontOnly=True), spot('head', 33.6, 19.8, 0.5, 0.5, 'dark', frontOnly=True))
 
 
 @fix('PINSIR')
 def pinsir(d, look):
-    pal = {'br': '#a87848', 'brd': '#7c5430', 'tan': '#dcc8a0', 'tand': '#b09868', 'horn': '#ece4d4', 'hornd': '#c0b498',
+    pal = {'br': '#b48c5c', 'brd': '#8a6238', 'tan': '#dcc8a0', 'tand': '#b09868', 'horn': '#efe8d8', 'hornd': '#c0b498',
            'dark': '#2a2020'}
     new(d, pal)
-    put(d, 'body', 0, e(32, 33, 10.8, 12.2, 'br', rd=8.8), e(32, 45, 8.0, 5.6, 'br', rd=6.8))
+    put(d, 'body', 0, e(32, 33, 10.8, 12.2, 'br', rd=8.8), e(32, 45, 8.4, 5.6, 'br', rd=7.0))
     paint(d, spot('body', 32, 35, 6.6, 9.8, 'tan', frontOnly=True),
           *[band('body', [26.4, 28 + 3.4 * j, 32, 29.2 + 3.4 * j, 37.6, 28 + 3.4 * j], 0.9, 'tand', frontOnly=True) for j in range(4)])
     put(d, 'head', -1.4, e(32, 15, 8.4, 7.8, 'br', rd=7.8), e(32, 19.6, 4.4, 3.0, 'br', rd=3.8, dd=-4.8))
@@ -851,21 +883,21 @@ def pinsir(d, look):
             cap(32 + sx * 14.8, 9.4, 32 + sx * 11.2, 9.0, 1.8, 0.4, 'horn', d1=-3, d2=-3), cap(32 + sx * 15.6, 5.6, 32 + sx * 12.0, 6.0, 1.7, 0.4, 'horn', d1=-3, d2=-3),
             cap(32 + sx * 13.8, 1.4, 32 + sx * 10.6, 2.6, 1.5, 0.4, 'horn', d1=-3, d2=-3), cap(32 + sx * 7.4, 13.4, 32 + sx * 10.4, 13.2, 2.2, 0.6, 'horn', d1=-2, d2=-2))
         put(d, 'shoulder' + s, -0.4, cap(32 + sx * 10, 25, 32 + sx * 18, 18.6, 4.6, 0.8, 'brd', d1=0, d2=0), cap(32 + sx * 10.6, 28, 32 + sx * 19.6, 26.4, 3.8, 0.8, 'brd', d1=0, d2=0))
-        put(d, 'arm' + s, -0.6, cap(32 + sx * 9.8, 27.5, 32 + sx * 13.8, 40, 3.2, 2.6, 'br', d1=-1, d2=-4))
-        put(d, 'hand' + s, -1.8, e(32 + sx * 14.4, 41.4, 3.0, 2.8, 'br', rd=2.8, dd=-4))
-        claw_tips(d, 'hand' + s, -1.8, 32 + sx * 14.4, 43.0, 3, 1.9, 2.6, 0.7, 'horn', dd=-4)
+        put(d, 'arm' + s, -0.6, cap(32 + sx * 9.8, 27.5, 32 + sx * 15.2, 43, 2.5, 2.0, 'br', d1=-1, d2=-4))
+        put(d, 'hand' + s, -1.8, e(32 + sx * 15.8, 44.4, 2.9, 2.7, 'br', rd=2.7, dd=-4))
+        claw_tips(d, 'hand' + s, -1.8, 32 + sx * 15.8, 46.0, 3, 1.9, 2.8, 0.7, 'horn', dd=-4)
         x = 32 + sx * 5.6
-        put(d, 'leg' + s, 0.2, cap(x, 43, x + sx * 2.4, 50.4, 4.8, 3.8, 'br'), cap(x + sx * 2.4, 50.4, x + sx * 0.8, 58.2, 3.8, 3.0, 'br'),
-            cap(x + sx * 4, 47.4, x + sx * 6.8, 44.4, 2.4, 0.6, 'brd', d1=-1, d2=-1))
-        put(d, 'foot' + s, -1.0, e(x + sx * 1.0, 59.3, 5.0, 2.5, 'br', dd=-2.0))
-        claw_tips(d, 'foot' + s, -1.0, x + sx * 1.0, 60.3, 2, 3.6, 2.2, 1.0, 'horn', dd=-6.4, diry=0.4)
+        put(d, 'leg' + s, 0.2, cap(x, 44, x + sx * 1.6, 50.8, 5.6, 4.7, 'br'), cap(x + sx * 1.6, 50.8, x + sx * 0.8, 58.2, 4.7, 3.8, 'br'),
+            cap(x + sx * 4, 47.4, x + sx * 6.8, 43.4, 2.6, 0.6, 'brd', d1=-1, d2=-1))
+        put(d, 'foot' + s, -1.0, e(x + sx * 1.0, 59.3, 5.4, 2.6, 'br', dd=-2.0))
+        claw_tips(d, 'foot' + s, -1.0, x + sx * 1.0, 60.3, 3, 3.0, 2.2, 1.0, 'horn', dd=-6.4, diry=0.4)
     paint(d, eye(28.2, 14.2, 2.2, style='angry', flip=True, iris='#20182a'), eye(35.8, 14.2, 2.2, style='angry', iris='#20182a'),
           spot('head', 30.8, 20.2, 0.5, 0.5, 'dark', frontOnly=True), spot('head', 33.2, 20.2, 0.5, 0.5, 'dark', frontOnly=True), mouth(32, 22.4, 2.2, 'line'))
 
 
 @fix('TAUROS')
 def tauros(d, look):
-    pal = {'br': '#c49858', 'brd': '#7c5a3a', 'tan': '#e6cba2', 'horn': '#f0e8d8', 'horn2': '#8c7c6c', 'hoof': '#463c4c', 'dark': '#2a2028'}
+    pal = {'br': '#c49858', 'brd': '#7c5a3a', 'tan': '#d4a870', 'horn': '#a4a6b4', 'horn2': '#7a7c8c', 'hoof': '#66728a', 'dark': '#3a2620', 'bump': '#a8aab6'}
     new(d, pal)
     put(d, 'body', 0, e(32, 36.5, 14, 12.6, 'br', rd=20, dd=10), e(32, 38.5, 13.6, 12.0, 'br', rd=11.5, dd=26), e(32, 29.5, 12.4, 7.6, 'br', rd=11, dd=3))
     paint(d, spot('body', 32, 47.5, 7.5, 3.6, 'tan', frontOnly=True))
@@ -875,19 +907,18 @@ def tauros(d, look):
         ar = math.radians(a)
         tufts.append(cap(32 + 10 * math.cos(ar), 30 + 8.4 * math.sin(ar), 32 + 15.8 * math.cos(ar), 30 + 13.6 * math.sin(ar), 4.2, 0.8, 'brd', d1=0, d2=0))
     put(d, 'tufts', -7.5, *tufts)
-    put(d, 'head', -13, e(32, 37.5, 9.8, 9.2, 'br', rd=9.6), e(32, 43.2, 6.8, 4.8, 'tan', rd=5.6, dd=-6.2),
-        e(22.2, 32.4, 3.2, 2.0, 'br', rd=1.6, rot=-25), e(41.8, 32.4, 3.2, 2.0, 'br', rd=1.6, rot=25))
-    paint(d, eye(26.8, 35.4, 2.3, style='angry', flip=True, iris='#3a2418'), eye(37.2, 35.4, 2.3, style='angry', iris='#3a2418'),
-          spot('head', 29.6, 43.6, 0.9, 0.7, 'dark', frontOnly=True), spot('head', 34.4, 43.6, 0.9, 0.7, 'dark', frontOnly=True),
-          mouth(32, 46.4, 2.4, 'line'))
+    put(d, 'head', -13, e(32, 37.5, 9.8, 9.2, 'br', rd=9.6), e(32, 43.2, 6.8, 4.8, 'br', rd=5.6, dd=-6.2), e(32, 44.0, 3.6, 2.4, 'dark', rd=2.6, dd=-11.4),
+        e(22.2, 32.4, 3.2, 2.0, 'br', rd=1.6, rot=-25), e(41.8, 32.4, 3.2, 2.0, 'br', rd=1.6, rot=25),
+        *[e(32, 28.6 + 2.6 * k, 1.3, 1.1, 'bump', rd=1.2, dd=-8.6) for k in range(3)])
+    paint(d, eye(26.8, 35.4, 2.0, style='angry', flip=True, iris='#3a2418'), eye(37.2, 35.4, 2.0, style='angry', iris='#3a2418'),
+          mouth(32, 46.8, 2.4, 'line'))
     for s, sx in (('L', -1), ('R', 1)):
-        put(d, 'horn' + s, -13, stroke([32 + sx * 8, 33, 32 + sx * 15.4, 31.4, 32 + sx * 19.6, 24, 32 + sx * 16.4, 15.8], 6.4, 'horn', w2=1.2, d1=-1, d2=-2),
-            stroke([32 + sx * 19.6, 24, 32 + sx * 16.4, 15.8], 3.0, 'horn2', w2=1.2, d1=-1.5, d2=-2))
+        put(d, 'horn' + s, -13, stroke([32 + sx * 8, 33, 32 + sx * 15.4, 31.4, 32 + sx * 19.6, 24, 32 + sx * 16.4, 15.8], 6.4, 'horn', w2=1.2, d1=-1, d2=-2))
     for nm, x, dz in (('legFL', 22.5, -5), ('legFR', 41.5, -5), ('legBL', 22, 24), ('legBR', 42, 24)):
         put(d, nm, dz * 0.1, cap(x, 44, x, 57.6, 5.6, 4.9, 'br', dd=dz), e(x, 59.5, 4.2, 2.4, 'hoof', rd=3.8, dd=dz - 0.8))
     for nm, (ex, ey) in (('tailA', (22, 17)), ('tailB', (32, 14)), ('tailC', (42, 17))):
-        put(d, nm, 6, stroke([32, 32, 32 + (ex - 32) * 0.5, 22, ex, ey + 3], 3.0, 'br', w2=2.4, d1=36, d2=38),
-            e(ex, ey, 3.6, 3.6, 'brd', rd=3.4, dd=38))
+        put(d, nm, 0, stroke([32, 32, 32 + (ex - 32) * 0.5, 22, ex, ey + 3], 3.0, 'br', w2=2.4, d1=33, d2=36),
+            e(ex, ey, 3.6, 3.6, 'brd', rd=3.4, dd=36.5))
 
 
 @fix('MAGIKARP')
@@ -904,29 +935,32 @@ def magikarp(d, look):
     put(d, 'lips', -3.5, e(9.2, 40.4, 4.2, 3.6, 'cr', rd=3.6, dd=-0.5), e(9.6, 43.4, 3.6, 2.2, 'cr', rd=2.6, dd=-0.5))
     paint(d, spot('lips', 8.2, 41.6, 1.7, 1.2, 'dark', frontOnly=True))
     _fish_eyes(d, 17, 34, 3.5, 6.4, pr=2.0)
-    put(d, 'tail', 0.5, smooth_plate([46, 37, 51, 30, 57, 22, 63, 18, 62, 28, 64, 37, 60, 46, 56, 54, 51, 47], 'cr', T=1.3),
+    put(d, 'tail', 0.5, smooth_plate([46, 37, 51, 30, 57, 22, 63, 18, 62, 28, 64, 37, 60, 46, 56, 54, 51, 47], 'cr', T=1.82),
         stroke([47, 38, 55, 30, 62, 20], 1.4, 'crd'), stroke([47, 38, 57, 40, 63, 37], 1.3, 'crd'), stroke([47, 39, 53, 46, 57, 53], 1.3, 'crd'))
-    put(d, 'dorsal', 0.5, plate([23, 26, 25, 17, 29, 23, 31, 13, 35, 22, 39, 15, 41, 26], 'cr', T=1.6))
+    put(d, 'dorsal', 0.5, plate([23, 26, 25, 17, 29, 23, 31, 13, 35, 22, 39, 15, 41, 26], 'cr', T=2.24))
     for s, sx in (('L', -1), ('R', 1)):
-        put(d, 'pect' + s, sx * 7.2, smooth_plate([26, 41, 22, 46, 20, 53, 26, 52, 31, 47], 'cr', T=0.9))
+        put(d, 'pect' + s, sx * 7.2, smooth_plate([26, 41, 22, 46, 20, 53, 26, 52, 31, 47], 'cr', T=1.26))
         put(d, 'whisk' + s, sx * 3.0, stroke([12.6, 37.6, 6, 33.4, 3.4, 26, 5, 20], 2.0, 'whisk', w2=0.9, d1=0, d2=sx * 4),
             stroke([12.4, 39.6, 5.4, 44.4, 4.6, 52], 1.8, 'whisk', w2=0.9, d1=0, d2=sx * 4))
-    put(d, 'pelv', 0.3, smooth_plate([35, 46, 37, 53, 43, 55, 44, 49], 'cr', T=0.9))
+    put(d, 'pelv', 0.3, smooth_plate([35, 46, 37, 53, 43, 55, 44, 49], 'cr', T=1.26))
 
 
 @fix('GYARADOS')
 def gyarados(d, look):
-    pal = {'bl': '#3a86c6', 'bld': '#2a64a4', 'bll': '#68a8dc', 'cr': '#f0e4b4', 'crd': '#c8b880', 'fin': '#d4e4f0', 'fang': '#fbf6e8',
-           'mouth': '#a02840', 'eye': '#ffffff', 'dark': '#20203a', 'wh': '#f4f4f4', 'crest': '#e8dca0'}
+    pal = {'bl': '#3a86c6', 'bld': '#2a64a4', 'bll': '#68a8dc', 'cr': '#f0d858', 'crd': '#c8a838', 'fin': '#f4f8fc', 'fang': '#fbf6e8',
+           'mouth': '#a02840', 'dark': '#20203a', 'wh': '#5aa4dc', 'lip': '#f0d858'}
     new(d, pal)
     path = [30, 27, 27, 35, 27.5, 44, 32, 52.5, 41, 57, 49.5, 52.5, 53, 42, 52, 31, 55.5, 21]
     put(d, 'body', 0, stroke(path, 18, 'bl', w2=4.6))
+    paint(d, *[spot('body', x, y, 1.5, 1.5, 'lip', frontOnly=True) for x, y in ((19.6, 36), (19.4, 42), (22, 48.4), (27.5, 53.4), (35, 57.4))],
+          *[spot('body', x, y, 1.5, 1.5, 'lip', frontOnly=True) for x, y in ((59.4, 46), (61, 38), (60, 30))])
     put(d, 'belly', -7.0, stroke([27.4, 30, 25.6, 36, 26, 44, 30.6, 52, 39, 57.6, 47, 53], 9.4, 'cr', w2=4.2), z=0.2)
     paint(d, *[band('belly', [x0, y0, x1, y1], 1.0, 'crd', frontOnly=True) for x0, y0, x1, y1 in
                ((19.5, 33, 31, 34.5), (19.4, 39, 31, 40), (21, 45, 32.6, 46), (25, 50.4, 35.6, 51.6), (32, 54.4, 41, 56))])
     put(d, 'head', -4, e(30, 13.5, 13.4, 10.8, 'bl', rd=11.6), e(30, 20.2, 10.4, 5.4, 'bl', rd=7.8, dd=-9.6),
-        e(30, 28.4, 8.6, 4.0, 'cr', rd=5.6, dd=-6.4))
+        e(30, 28.4, 8.6, 4.0, 'lip', rd=5.6, dd=-6.4))
     paint(d, spot('head', 30, 25.0, 7.0, 3.0, 'mouth', frontOnly=True),
+          band('head', [21.4, 22.6, 26, 23.6, 30, 24.2, 34, 23.6, 38.6, 22.6], 1.4, 'lip', frontOnly=True),
           eye(22.6, 12.0, 3.3, style='angry', flip=True, iris='#d02030'), eye(37.4, 12.0, 3.3, style='angry', iris='#d02030'),
           spot('head', 26.6, 19.0, 0.9, 0.7, 'dark', frontOnly=True), spot('head', 33.4, 19.0, 0.9, 0.7, 'dark', frontOnly=True))
     put(d, 'fangs', -15.5, cap(24.6, 22.8, 24.4, 30, 2.2, 0.4, 'fang'), cap(35.4, 22.8, 35.6, 30, 2.2, 0.4, 'fang'),
@@ -936,32 +970,40 @@ def gyarados(d, look):
     for s, sx in (('L', -1), ('R', 1)):
         pts = curve([sx * 11, 12, sx * 17, 8, sx * 23, 10, sx * 22, 17, sx * 16, 21, sx * 12, 19], 3)
         pts = [(30 + v) if i % 2 == 0 else v for i, v in enumerate(pts)]
-        put(d, 'gill' + s, 1.0, plate(pts, 'fin', T=1.4))
+        put(d, 'gill' + s, 1.0, plate(pts, 'fin', T=1.96))
         put(d, 'whisk' + s, -7.0, stroke([30 + sx * 9.6, 25, 30 + sx * 14, 31, 30 + sx * 13.4, 40], 2.4, 'wh', w2=1.0, d1=-2, d2=-2))
-    put(d, 'tailfin', 0.5, smooth_plate([55.5, 23, 51, 14, 49, 5, 55, 8, 60, 3, 61, 12, 60, 21, 58, 28], 'bll', T=1.4))
-    put(d, 'sidefin', 1.5, smooth_plate([50, 46, 58, 48, 60, 56, 52, 55], 'fin', T=1.0), smooth_plate([26, 47, 19, 50, 18, 57, 25, 54], 'fin', T=1.0))
+    put(d, 'tailfin', 0.5, smooth_plate([55.5, 23, 51, 14, 49, 5, 55, 8, 60, 3, 61, 12, 60, 21, 58, 28], 'bll', T=1.96))
+    for i, (bx, by) in enumerate(((58.6, 50), (60.6, 42), (59.6, 34), (61, 26))):
+        put(d, 'dfin%d' % i, 1.0, smooth_plate([bx - 3, by - 3.5, bx + 3.4, by - 4.5, bx + 8, by, bx + 3.4, by + 4.5, bx - 3, by + 3.5], 'fin', T=1.4))
 
 
 @fix('LAPRAS')
 def lapras(d, look):
-    pal = {'bl': '#58a4de', 'bld': '#3c80bc', 'cr': '#f0ead0', 'crd': '#c8c0a0', 'shl': '#9aa2bc', 'shld': '#7880a0', 'spike': '#ece6d0',
-           'eye': '#ffffff', 'dark': '#20203a'}
+    pal = {'bl': '#58a4de', 'bld': '#3a78b8', 'cr': '#f0ead0', 'crd': '#c8c0a0', 'shl': '#8c94ac', 'shld': '#6c7490', 'kn': '#b2b8ce',
+           'horn': '#ece6d0', 'eye': '#ffffff', 'dark': '#20203a'}
     new(d, pal)
     put(d, 'body', 0, e(34, 46, 18.4, 10.6, 'bl', rd=13.4), e(50, 47, 8, 6, 'bl', rd=8.4))
-    paint(d, spot('body', 30, 53, 13, 3.6, 'cr', frontOnly=True))
+    paint(d, spot('body', 30, 53, 13, 3.8, 'cr', frontOnly=True), spot('body', 22, 50, 1.6, 1.4, 'bld'), spot('body', 27, 47, 1.8, 1.5, 'bld'),
+          spot('body', 15, 47.4, 1.5, 1.3, 'bld'), spot('body', 47, 51, 1.9, 1.5, 'bld'), spot('body', 53, 48, 1.6, 1.3, 'bld'))
     put(d, 'shell', 4.0, e(38, 36, 15.8, 12.4, 'shl', rd=13.4, dd=2))
-    for i, (x, y, tx, ty) in enumerate(((31, 27, 28, 20), (38, 25, 38, 17), (45, 27, 48, 20), (50, 33, 57, 29), (30, 34, 23, 32), (47, 41, 54, 43))):
-        put(d, 'spike%d' % i, 3.0, cap(x, y, tx, ty, 3.6, 0.8, 'spike', d1=2, d2=2))
-    paint(d, spot('shell', 36, 31, 3, 2.4, 'shld'), spot('shell', 44, 36, 3, 2.4, 'shld'), spot('shell', 32, 40, 3, 2.4, 'shld'))
+    knobs = []
+    for (x, y) in ((32, 29), (39, 27), (46, 30), (31, 36), (38, 34), (45, 37), (35, 42), (42, 43), (49, 42), (37, 30.4)):
+        q = 1 - ((x - 38) / 15.8) ** 2 - ((y - 36) / 12.4) ** 2
+        dz = 13.4 * math.sqrt(max(q, 0.02))
+        knobs.append(e(x, y, 2.8, 2.6, 'kn', rd=2.2, dd=2 - dz + 0.3))
+        knobs.append(e(x, y, 2.8, 2.6, 'kn', rd=2.2, dd=2 + dz - 0.3))
+    put(d, 'knobs', 4.0, *knobs)
     put(d, 'neck', -1.5, stroke([24, 42, 18.5, 31, 20.5, 21], 10.5, 'bl', w2=8.2, d1=-1, d2=-2))
     put(d, 'throat', -6.0, stroke([21.2, 39, 16.2, 31, 18.4, 22], 5.6, 'cr', w2=4.4, d1=-1, d2=-1), z=0.2)
-    put(d, 'head', -3.5, e(21, 14.6, 9.0, 7.8, 'bl', rd=8.2), e(20.5, 20, 6.2, 3.6, 'bl', rd=5.0, dd=-6.0),
-        cap(21, 8.4, 19.6, -1.4, 3.0, 0.6, 'spike'), e(30, 12.2, 2.2, 3.2, 'bl', rd=1.6, rot=20), e(12, 12.2, 2.2, 3.2, 'bl', rd=1.6, rot=-20))
-    paint(d, eye(16.4, 14, 3.1, iris='#382860'), eye(25.6, 14, 3.1, iris='#382860'), mouth(20.8, 21.4, 2.6, 'smile'))
-    put(d, 'flipperFL', -11.5, smooth_plate([20, 50, 13, 47.5, 6, 51, 3.5, 57, 10, 60, 18, 57], 'bl', T=2.0))
-    put(d, 'flipperFR', 10.0, smooth_plate([24, 54, 18, 52, 12, 56, 12, 61, 20, 61], 'bl', T=1.8))
-    put(d, 'flipperBL', -11.5, smooth_plate([44, 54, 52, 52.5, 58, 56.5, 56, 61, 47, 61], 'bl', T=2.0))
-    put(d, 'flipperBR', 11.0, smooth_plate([52, 54, 58, 53, 62, 57, 58, 61, 51, 60], 'bl', T=1.8))
+    put(d, 'head', -3.5, e(21, 14.6, 9.0, 7.8, 'bl', rd=8.2), e(20.5, 20, 6.2, 3.6, 'bl', rd=5.0, dd=-6.0))
+    put(d, 'horn', -3.5, cap(21, 8.4, 19.6, 0.4, 2.6, 0.6, 'horn'))
+    for s, sx in (('L', -1), ('R', 1)):
+        put(d, 'ear' + s, -2.0, stroke([21 + sx * 8.2, 11, 21 + sx * 12.6, 8.4, 21 + sx * 13.6, 12.4, 21 + sx * 10.2, 13.6], 2.8, 'bl', w2=2.2))
+    paint(d, eye(16.4, 14, 3.2, iris='#6a4020'), eye(25.6, 14, 3.2, iris='#6a4020'), mouth(20.8, 21.4, 2.6, 'smile'))
+    put(d, 'flipperFL', -11.0, e(19, 57, 9.2, 3.5, 'bl', rd=2.9, rot=-14))
+    put(d, 'flipperFR', 11.5, e(21, 58, 8.0, 3.2, 'bl', rd=2.6, rot=-12))
+    put(d, 'flipperBL', -9.5, e(46, 58, 8.2, 3.3, 'bl', rd=2.7, rot=10))
+    put(d, 'flipperBR', 10.0, e(48, 58.4, 7.6, 3.0, 'bl', rd=2.6, rot=10))
     put(d, 'tail', 6, stroke([54, 46, 60, 48, 63, 43], 7.0, 'bl', w2=2.4, d1=4, d2=6))
 
 
@@ -989,10 +1031,10 @@ def _cones(g, cx, cy, ang0, ang1, n, r0, r1, base_r, c, ry=None, d1=0.0, d2=0.0,
 
 def _eeveelution(d, kind):
     K = {
-        'eevee': dict(br='#c08850', cr='#f2dcb4', tip='#6a4224', ear='#c08850', eye='#503020'),
-        'vaporeon': dict(br='#6cb0e4', cr='#f2f6fc', tip='#3a70b8', ear='#3e78bc', eye='#302858'),
-        'jolteon': dict(br='#f8d838', cr='#f8f4e2', tip='#c8a820', ear='#f8d838', eye='#28202c'),
-        'flareon': dict(br='#f07a2c', cr='#f8dfa2', tip='#d05a18', ear='#f07a2c', eye='#3a2020'),
+        'eevee': dict(br='#c08850', cr='#f2dcb4', tip='#6a4224', ear='#c08850', eye='#7a4c2c', es=2.8),
+        'vaporeon': dict(br='#6cb0e4', cr='#f2f6fc', tip='#3a70b8', ear='#3e78bc', eye='#4a4090', es=2.7),
+        'jolteon': dict(br='#f8d838', cr='#f8f4e2', tip='#c8a820', ear='#f8d838', eye='#5a4a58', es=2.5),
+        'flareon': dict(br='#f07a2c', cr='#f8dfa2', tip='#d05a18', ear='#f07a2c', eye='#6a3020', es=2.7),
     }[kind]
     pal = dict(br=K['br'], cr=K['cr'], tip=K['tip'], ear=K['ear'], dark='#2a2028', fin2='#3a70b8', fin3='#dceaf8')
     new(d, pal)
@@ -1012,7 +1054,7 @@ def _eeveelution(d, kind):
     hr = 9.0 if kind != 'jolteon' else 8.6
     put(d, 'head', -8, e(32, 30.5, hr + 0.8, hr - 0.4, 'br', rd=hr), e(32, 35.4, 4.4, 3.0, 'br', rd=3.4, dd=-7))
     paint(d, spot('head', 32, 34.6, 1.0, 0.7, 'dark', frontOnly=True),
-          eye(27.2, 29.6, 3.2, sclera=False), eye(36.8, 29.6, 3.2, sclera=False),
+          eye(27.2, 29.6, K['es'], sclera=False, iris=K['eye']), eye(36.8, 29.6, K['es'], sclera=False, iris=K['eye']),
           band('head', [29.6, 38.6, 32, 39.6, 34.4, 38.6], 0.8, 'dark', frontOnly=True))
     if kind == 'jolteon':
         for s, sx in (('L', -1), ('R', 1)):
@@ -1021,7 +1063,7 @@ def _eeveelution(d, kind):
         ex = 32 + sx * 8.4
         if kind == 'eevee':
             put(d, 'ear' + s, -6, e(32 + sx * 8.2, 19, 4.4, 9.8, 'ear', rd=2.6, rot=sx * 14))
-            paint(d, spot('ear' + s, 32 + sx * 6.6, 20.4, 1.9, 6.0, 'cr', rot=sx * 14, frontOnly=True), spot('ear' + s, 32 + sx * 11.4, 10.4, 2.6, 2.6, 'tip'))
+            paint(d, spot('ear' + s, 32 + sx * 6.6, 20.4, 1.9, 6.0, 'tip', rot=sx * 14, frontOnly=True), spot('ear' + s, 32 + sx * 11.4, 10.4, 2.6, 2.6, 'tip'))
         elif kind == 'jolteon':
             put(d, 'ear' + s, -6, cap(ex - sx * 1.2, 25, 32 + sx * 12.6, 3.2, 4.8, 0.8, 'ear'))
         elif kind == 'flareon':
@@ -1033,6 +1075,10 @@ def _eeveelution(d, kind):
             put(d, 'ear' + s, -6, plate(pts, 'ear', T=2.0))
             paint(d, band('ear' + s, [32 + sx * 9, 23, 32 + sx * 12.6, 14, 32 + sx * 15.6, 7], 1.8, 'fin3', frontOnly=True),
                   band('ear' + s, [32 + sx * 13.6, 22, 32 + sx * 16.6, 15, 32 + sx * 18.4, 10], 1.3, 'fin3', frontOnly=True))
+    if kind == 'vaporeon':
+        put(d, 'topfin', -7, smooth_plate([27.5, 24, 28.6, 14, 32, 5, 35.4, 14, 36.5, 24], 'ear', T=1.6),
+            *[cap(32 + dx, 22, 32 + dx * 1.1, 10 - abs(dx) * 0.6, 1.4, 0.4, 'fin3', dd=0.2) for dx in (-1.8, 1.8)])
+        paint(d, spot('head', 32, 24.2, 7.6, 2.8, 'tip', frontOnly=True))
     # legs
     thin = 2.7 if slim else 3.5
     for nm, x, cdl in (('legFL', 25.5, -4), ('legFR', 38.5, -4), ('legBL', 25, 15), ('legBR', 39, 15)):
@@ -1082,18 +1128,23 @@ def flareon(d, look):
 
 @fix('PORYGON')
 def porygon(d, look):
-    pal = {'pk': '#f0808e', 'pkd': '#d05a6c', 'bl': '#44a6de', 'bll': '#7cc6f0', 'bld': '#2c80b8', 'eye': '#ffffff', 'dark': '#20203a'}
+    pal = {'pk': '#f0808e', 'pkd': '#d05a6c', 'pkl': '#f8a8b2', 'bl': '#44a6de', 'bll': '#7cc6f0', 'bld': '#2c80b8', 'eye': '#ffffff', 'dark': '#20203a',
+           'nav': '#2848a0'}
     new(d, pal)
-    put(d, 'body', 0, plate([16, 34, 32, 30, 48, 34, 50, 47, 32, 51, 14, 47], 'pk', T=8.0, round=0.5))
-    put(d, 'back', 10, plate([15, 30, 32, 26, 49, 30, 50, 42, 32, 44, 14, 42], 'bl', T=8.0))
+    put(d, 'body', 0, plate([16, 33, 32, 29, 48, 33, 50, 47, 32, 51, 14, 47], 'pk', T=8.0, round=0.5))
+    put(d, 'chest', -6, plate([19, 37, 32, 34, 45, 37, 46, 47, 32, 50, 18, 47], 'bl', T=5.0))
     put(d, 'tail', 12, plate([42, 28, 56, 14, 60, 20, 49, 36], 'bl', T=3.6, dd=12), plate([50, 22, 58, 12, 60, 16, 55, 24], 'bll', T=3.0, dd=14))
-    put(d, 'head', -6, plate([20, 14, 32, 8, 44, 14, 44, 27, 32, 32, 20, 27], 'pk', T=9.0), plate([21, 14, 32, 8, 43, 14, 32, 18], 'bll', T=9.0, dd=0.2))
+    put(d, 'head', -6, plate([20, 14, 32, 8, 44, 14, 44, 27, 32, 32, 20, 27], 'pk', T=9.0), plate([21, 14, 32, 8, 43, 14, 32, 18], 'pkl', T=9.0, dd=0.2))
     put(d, 'beak', -8, cap(32, 24, 32, 26, 7.4, 3.6, 'bl', d1=-9, d2=-22), cap(32, 24, 32, 26, 6.6, 6.0, 'bld', d1=-9, d2=-10))
     for s, sx in (('L', -1), ('R', 1)):
         x = 32 + sx * 6.8
-        put(d, 'leg' + s, 2, plate([x - 3.4, 47, x + 3.4, 47, x + 3.0, 58, x - 3.0, 58], 'pk', T=3.6))
-        put(d, 'foot' + s, 0, e(x + sx * 0.4, 59.2, 4.6, 2.2, 'pkd', rd=3.6, dd=-2.5))
-    paint(d, eye(26.6, 19.6, 3.4, iris='#2848a0'), eye(37.4, 19.6, 3.4, iris='#2848a0'))
+        put(d, 'leg' + s, 2, plate([x - 3.4, 47, x + 3.4, 47, x + 3.0, 57, x - 3.0, 57], 'pk', T=3.6))
+        put(d, 'foot' + s, 0, plate([x - 5, 60, x + 5, 60, x + 3.4, 55.6, x - 3.4, 55.6], 'bl', T=4.4, dd=-2))
+    hexa = lambda cx, cy, r: [round(cx + r * math.cos(math.radians(60 * k + 30)), 3) if i == 0 else round(cy + r * math.sin(math.radians(60 * k + 30)), 3)
+                              for k in range(6) for i in (0, 1)]
+    for cx in (26.8, 37.2):
+        paint(d, plate(hexa(cx, 19.6, 4.3), 'nav', on='head', frontOnly=True), plate(hexa(cx, 19.6, 3.4), 'eye', on='head', frontOnly=True),
+              plate(hexa(cx + 0.2, 19.8, 1.9), 'dark', on='head', frontOnly=True))
 
 
 def _spiral(cx, cy, r0, r1, turns, n=64, a0=0.0):
@@ -1131,10 +1182,10 @@ def _ammonite(d, big):
         surf = 8.4 * S * math.sqrt(max(0.05, 1 - (off / (9.2 * S)) ** 2 - 0.05))
         ecd = -3 - surf + er * 0.55
         put(d, 'eye' + s, ecd, e(24 + sx * off, by - 1.8, er, er * 1.08, 'eye', rd=er * 0.9))
-        put(d, 'pupil' + s, ecd - 1.5, e(24 + sx * off - sx * 0.2, by - 1.4, er * 0.55, er * 0.62, 'dark', rd=er * 0.5))
+        put(d, 'pupil' + s, ecd - er * 0.72, e(24 + sx * off - sx * 0.2, by - 1.4, er * 0.28, er * 0.86, 'dark', rd=er * 0.5))
     if big:
         put(d, 'beak', -6, cap(21.4, by + 5, 21, by + 10.5, 1.9, 0.4, 'beak', d1=-9, d2=-10), cap(26.6, by + 5, 27, by + 10.5, 1.9, 0.4, 'beak', d1=-9, d2=-10))
-    nt = 9 if big else 8
+    nt = 9 if big else 10
     for i in range(nt):
         f = (i - (nt - 1) / 2.0)
         x0 = 24 + f * 2.5 * S
@@ -1157,72 +1208,74 @@ def omastar(d, look):
 
 @fix('KABUTO')
 def kabuto(d, look):
-    pal = {'br': '#b47c3c', 'brd': '#845424', 'brl': '#cc9450', 'tan': '#e6c890', 'dark': '#26202a', 'red': '#ff4a32'}
+    pal = {'br': '#b47c3c', 'brd': '#845424', 'brl': '#cc9450', 'yel': '#f0c848', 'dark': '#26202a', 'red': '#ff4a32', 'dent': '#7a4a1e'}
     new(d, pal)
-    put(d, 'body', 0, e(32, 44, 19.4, 11.8, 'br', rd=15.5, dd=2), e(32, 49.6, 19.6, 4.4, 'brd', rd=15.6, dd=2))
-    paint(d, band('body', [32, 33, 32, 50], 1.3, 'brd', frontOnly=False), band('body', [16.5, 47, 23, 41, 32, 38.2, 41, 41, 47.5, 47], 1.1, 'brd', frontOnly=True),
-          band('body', [19, 44, 26, 38, 32, 36.5], 0.7, 'brd'), band('body', [45, 44, 38, 38, 32, 36.5], 0.7, 'brd'))
-    put(d, 'face', -11, e(32, 50.2, 10.8, 4.6, 'dark', rd=6.4, dd=-2))
-    paint(d, eye(27.6, 49.8, 2.4, style='angry', sclera=False, flip=True, iris='#ff4a32'), eye(36.4, 49.8, 2.4, style='angry', sclera=False, iris='#ff4a32'))
-    for i, (x, dz) in enumerate(((20, -4), (44, -4), (23, 10), (41, 10))):
-        put(d, 'leg%d' % i, 0.5, cap(x, 53, x + (x - 32) * 0.12, 58.8, 3.2, 2.5, 'tan', dd=dz), e(x + (x - 32) * 0.14, 59.6, 2.9, 1.3, 'tan', rd=2.4, dd=dz - 1.2))
+    put(d, 'shell', 0, e(32, 45.4, 19.4, 9.8, 'br', rd=15.5, dd=2), e(32, 50.0, 19.6, 4.0, 'brd', rd=15.6, dd=2))
+    paint(d, band('shell', [32, 36, 32, 50], 1.3, 'brd', frontOnly=False), band('shell', [16.5, 47, 23, 42, 32, 39.6, 41, 42, 47.5, 47], 1.1, 'brd', frontOnly=True),
+          spot('shell', 25, 42, 3.0, 2.0, 'dent'), spot('shell', 39, 42, 3.0, 2.0, 'dent'), eye(25, 42, 1.0, sclera=False), eye(39, 42, 1.0, sclera=False))
+    put(d, 'face', -11, e(32, 50.6, 11.0, 4.4, 'dark', rd=6.4, dd=-2))
+    paint(d, spot('face', 27.6, 50.4, 1.9, 1.6, 'red', frontOnly=True), spot('face', 36.4, 50.4, 1.9, 1.6, 'red', frontOnly=True))
+    for i, (x, dz) in enumerate(((19, -4), (45, -4), (22, 10), (42, 10))):
+        ox = (x - 32) * 0.28
+        put(d, 'leg%d' % i, 0.5, cap(x, 53, x + ox, 60.4, 3.2, 0.7, 'yel', dd=dz))
     put(d, 'tail', 3, stroke([32, 52, 32, 56, 32, 58], 3.0, 'brd', w2=1.4, d1=14, d2=22))
 
 
 @fix('KABUTOPS')
 def kabutops(d, look):
-    pal = {'br': '#b0803e', 'brd': '#7c5228', 'brl': '#cc9452', 'tan': '#eccf98', 'tand': '#c8a468', 'dark': '#241e26', 'blade': '#eef0f2',
-           'blade2': '#a8b6c4', 'red': '#ff4a32'}
+    pal = {'br': '#b0803e', 'brd': '#7c5228', 'brl': '#cc9452', 'gy': '#c6cace', 'gyd': '#9aa0aa', 'dark': '#241e26', 'blade': '#c4cad2',
+           'blade2': '#8c96a4', 'red': '#ff4a32', 'claw': '#a8aeb8'}
     new(d, pal)
     put(d, 'body', 0, e(32, 34, 9.6, 12.4, 'br', rd=8.2), e(32, 46, 8.4, 6.2, 'br', rd=7.4))
-    paint(d, spot('body', 32, 36, 5.4, 9.6, 'tan', frontOnly=True),
-          *[band('body', [27.4, 29 + 3.3 * j, 32, 30.2 + 3.3 * j, 36.6, 29 + 3.3 * j], 0.8, 'tand', frontOnly=True) for j in range(4)])
-    put(d, 'head', -1.6, e(32, 14.6, 8.2, 7.6, 'br', rd=7.6), cap(32, 10, 32, -1.4, 6.0, 0.9, 'br', d1=-1, d2=-2),
-        e(32, 17.2, 6.0, 3.8, 'dark', rd=4.4, dd=-4.4))
-    paint(d, eye(28.4, 15.4, 2.1, style='angry', sclera=False, flip=True, iris='#ff4a32'), eye(35.6, 15.4, 2.1, style='angry', sclera=False, iris='#ff4a32'))
+    paint(d, spot('body', 32, 36, 5.4, 9.6, 'gy', frontOnly=True),
+          *[band('body', [27.4, 29 + 3.3 * j, 32, 30.2 + 3.3 * j, 36.6, 29 + 3.3 * j], 0.8, 'gyd', frontOnly=True) for j in range(4)])
+    put(d, 'head', -1.6, e(32, 14.4, 10.6, 6.6, 'br', rd=8.0), e(32, 17.6, 6.6, 3.6, 'dark', rd=5.0, dd=-4.6),
+        cap(32 - 9.8, 13.6, 32 - 15, 10.4, 3.4, 0.7, 'br', d1=0, d2=0), cap(32 + 9.8, 13.6, 32 + 15, 10.4, 3.4, 0.7, 'br', d1=0, d2=0))
+    paint(d, eye(28.8, 16.2, 1.7, style='angry', sclera=False, flip=True, iris='#ff4a32'), eye(35.2, 16.2, 1.7, style='angry', sclera=False, iris='#ff4a32'),
+          band('head', [24, 11.6, 32, 8.8, 40, 11.6], 0.9, 'brd'))
     blade = [8.4, 27, 13, 27.6, 17.4, 33, 19.6, 41, 18.6, 50, 16, 57, 14, 60.5, 14.6, 52, 14.4, 44, 12.8, 37, 9.4, 32]
     for s, sx in (('L', -1), ('R', 1)):
         put(d, 'arm' + s, -0.5, cap(32 + sx * 8.4, 24, 32 + sx * 11.6, 32, 3.2, 2.8, 'br', d1=-1, d2=-3))
         pts = curve(blade, 3)
         pts = [(32 + sx * v) if i % 2 == 0 else v for i, v in enumerate(pts)]
         put(d, 'blade' + s, -3.2, plate(pts, 'blade', T=1.8), stroke([32 + sx * 13.6, 34, 32 + sx * 15.6, 43, 32 + sx * 15.4, 52], 1.4, 'blade2'))
-        for k in range(4):
-            put(d, 'spike%s%d' % (s, k), 4, cap(32 + sx * (7 + 0.6 * k), 22 + 5.2 * k, 32 + sx * (14 + 0.6 * k), 17 + 5.4 * k - k * 0.6, 3.2 - k * 0.2, 0.7, 'brd', d1=6, d2=6)) if k in (0, 2) else None
+        put(d, 'spike%s' % s, 4, *[cap(32 + sx * (5.4 + 1.2 * k), 22.5 + 8 * k, 32 + sx * (12 + 0.8 * k), 19 + 8 * k, 2.6, 0.7, 'brd', d1=6, d2=6) for k in range(3)])
         x = 32 + sx * 6.4
-        put(d, 'leg' + s, 0.2, cap(x, 44, x + sx * 1.2, 51, 4.8, 4.0, 'br'), cap(x + sx * 1.2, 51, x + sx * 0.4, 58, 4.0, 3.1, 'br'))
-        put(d, 'foot' + s, -1.0, e(x + sx * 0.6, 59.3, 5.2, 2.5, 'br', dd=-2.2))
-        toes(d, 'foot' + s, -1.0, x + sx * 0.6, 60.4, 3, 3.2, 1.1, 'tan', dd=-6.4)
-    put(d, 'tail', 4, stroke([33, 50, 37, 57, 33, 60], 8.0, 'br', w2=2.6, d1=5, d2=24))
+        put(d, 'leg' + s, 0.2, cap(x, 44, x + sx * 1.2, 51, 3.8, 3.2, 'br'), cap(x + sx * 1.2, 51, x + sx * 0.4, 58, 3.2, 2.6, 'br'))
+        put(d, 'foot' + s, -1.0, e(x + sx * 0.6, 59.3, 4.6, 2.3, 'br', dd=-2.2))
+        claw_tips(d, 'foot' + s, -1.0, x + sx * 0.6, 60.3, 2, 3.4, 2.0, 1.2, 'claw', dd=-6.0, diry=0.4)
+    put(d, 'tail', 0, stroke([33, 50, 37, 57, 33, 60], 8.0, 'br', w2=2.6, d1=4, d2=24))
 
 
 @fix('AERODACTYL')
 def aerodactyl(d, look):
-    pal = {'gr': '#b2a6cc', 'grd': '#8a7cae', 'bel': '#d2c8e4', 'mem': '#8c76b8', 'memd': '#6e5a9c', 'tooth': '#f8f4ec', 'dark': '#2a2034', 'red': '#c02838'}
+    pal = {'gr': '#a8b8d2', 'grd': '#8496b6', 'bel': '#cad6e8', 'mem': '#7e64b4', 'memd': '#5f4a94', 'tooth': '#f8f4ec', 'dark': '#2a2034', 'grn': '#2c7a4c'}
     new(d, pal)
     put(d, 'body', 0, e(32, 38.5, 9.8, 11.4, 'gr', rd=8.4), e(32, 49, 8.4, 5.0, 'gr', rd=7.2))
     paint(d, spot('body', 32, 40, 5.6, 8.6, 'bel', frontOnly=True))
+    put(d, 'hump', 4, cap(32, 30, 32, 21.4, 4.6, 0.8, 'grd', d1=6, d2=8))
     put(d, 'neck', -0.6, cap(32, 22, 32, 28, 4.2, 5.0, 'gr'))
     put(d, 'head', -2.5, e(32, 16.6, 8.0, 7.2, 'gr', rd=7.4), cap(32, 19.5, 32, 21.5, 5.0, 3.9, 'gr', d1=-4, d2=-18),
         cap(32, 23.3, 32, 24.3, 3.8, 3.0, 'gr', d1=-4, d2=-15))
-    paint(d, eye(27.4, 15.4, 2.6, style='angry', flip=True, iris='#c02838'), eye(36.6, 15.4, 2.6, style='angry', iris='#c02838'),
+    put(d, 'earL', -2.5, cap(32 - 5.8, 11.6, 32 - 8.8, 5.2, 2.6, 0.6, 'gr', d1=1, d2=2))
+    put(d, 'earR', -2.5, cap(32 + 5.8, 11.6, 32 + 8.8, 5.2, 2.6, 0.6, 'gr', d1=1, d2=2))
+    paint(d, eye(27.4, 15.4, 2.1, style='angry', flip=True, sclera=False, iris='#2c7a4c'), eye(36.6, 15.4, 2.1, style='angry', sclera=False, iris='#2c7a4c'),
           band('head', [30.8, 22.4, 33.2, 22.4], 0.8, 'dark', frontOnly=True))
     put(d, 'teeth', -6, *[cap(32 + sx * 3.4, 22.4, 32 + sx * 3.4, 25.6, 1.2, 0.3, 'tooth', dd=dz) for dz in (-8, -11.5, -15) for sx in (-1, 1)],
         *[cap(32 + sx * 2.8, 25.2, 32 + sx * 2.8, 22.6, 1.0, 0.3, 'tooth', dd=dz - 0.5) for dz in (-9.5, -13) for sx in (-1, 1)])
-    for i, (bx, tx, ty, dz) in enumerate(((27.6, 22, 3.8, 3), (32, 32, 1.4, 4), (36.4, 42, 3.8, 3))):
-        put(d, 'crest%d' % i, 1.5, cap(bx, 11.6, tx, ty, 3.4, 0.7, 'grd', d1=dz, d2=dz + 4))
     wing = [7, -3, 13, -11, 21, -19, 30, -25, 29, -15, 31, -10, 27, -4, 28, 4, 21, 0, 17, 9, 12, 2, 8, 6]
     for s, sx in (('L', -1), ('R', 1)):
         pts = curve(wing, 3)
         pts = [(32 + sx * v) if i % 2 == 0 else v + 30 for i, v in enumerate(pts)]
-        put(d, 'wing' + s, 3.5, plate(pts, 'mem', T=1.1),
+        put(d, 'wing' + s, 3.5, plate(pts, 'mem', T=1.54),
             stroke([32 + sx * 7, 27, 32 + sx * 15, 18, 32 + sx * 23, 10, 32 + sx * 30, 5], 3.2, 'gr', w2=1.6, d1=-0.5, d2=-0.5),
             stroke([32 + sx * 23, 10, 32 + sx * 28, 26], 1.4, 'memd', d1=-0.5, d2=-0.5), stroke([32 + sx * 23, 10, 32 + sx * 21, 30], 1.4, 'memd', d1=-0.5, d2=-0.5))
         x = 32 + sx * 5.8
         put(d, 'leg' + s, 0.2, cap(x, 46, x + sx * 1.0, 52.5, 4.6, 3.6, 'gr'), cap(x + sx * 1.0, 52.5, x + sx * 0.4, 58.2, 3.6, 2.8, 'gr'))
         put(d, 'foot' + s, -1.0, e(x + sx * 0.6, 59.3, 4.6, 2.3, 'gr', dd=-2.0))
-        claw_tips(d, 'foot' + s, -1.0, x + sx * 0.6, 60.3, 3, 2.8, 1.6, 0.9, 'tooth', dd=-5.6, diry=0.4)
-    put(d, 'tail', 6, stroke([32, 50, 32, 56, 32, 51, 32, 45], 5.4, 'gr', w2=2.0, d1=8, d2=32),
-        smooth_plate([32, 36, 36, 45, 32, 53, 28, 45], 'grd', T=1.4, dd=33))
+        claw_tips(d, 'foot' + s, -1.0, x + sx * 0.6, 60.3, 2, 3.2, 1.6, 0.9, 'tooth', dd=-5.6, diry=0.4)
+    put(d, 'tail', 0, stroke([32, 50, 32, 55, 32, 51, 32, 46], 5.4, 'gr', w2=2.0, d1=5, d2=32),
+        smooth_plate([32, 36, 36, 45, 32, 53, 28, 45], 'grd', T=1.96, dd=33))
 
 
 @fix('SNORLAX')
@@ -1232,7 +1285,7 @@ def snorlax(d, look):
     put(d, 'body', 0, e(32, 41, 22.4, 19.2, 'tl', rd=17.4), e(32, 52, 21, 8.6, 'tl', rd=16))
     paint(d, spot('body', 32, 44, 15.4, 13.6, 'cr', frontOnly=True))
     put(d, 'head', -4, e(32, 18.5, 14.0, 11.6, 'tl', rd=11.6))
-    put(d, 'face', -12.6, e(32, 23.4, 10.8, 8.0, 'cr', rd=6.4))
+    put(d, 'cheekmask', -12.6, e(32, 23.4, 10.8, 8.0, 'cr', rd=6.4))
     for s, sx in (('L', -1), ('R', 1)):
         put(d, 'ear' + s, -3, cap(32 + sx * 10.4, 10.4, 32 + sx * 12.8, 1.4, 4.6, 0.9, 'tl', d1=0, d2=0))
         put(d, 'arm' + s, -1.6, cap(32 + sx * 19.5, 34, 32 + sx * 23.4, 49, 7.4, 6.6, 'tl', d1=-2, d2=-5))
@@ -1241,21 +1294,21 @@ def snorlax(d, look):
         put(d, 'foot' + s, -9, e(32 + sx * 12.6, 55.6, 8.2, 5.2, 'cr', rd=6.0, dd=-4), e(32 + sx * 12.6, 55.8, 4.6, 3.0, 'pad', rd=1.4, dd=-8.6))
         claw_tips(d, 'foot' + s, -9, 32 + sx * 12.6, 57.6, 3, 4.0, 2.6, 1.0, 'claw', dd=-5.4, diry=0.3)
     paint(d, eye(26.6, 21.8, 2.6, style='closed'), eye(37.4, 21.8, 2.6, style='closed'),
-          spot('face', 30.4, 25.6, 0.7, 0.6, 'dark', frontOnly=True), spot('face', 33.6, 25.6, 0.7, 0.6, 'dark', frontOnly=True),
+          spot('cheekmask', 30.4, 25.6, 0.7, 0.6, 'dark', frontOnly=True), spot('cheekmask', 33.6, 25.6, 0.7, 0.6, 'dark', frontOnly=True),
           mouth(32, 28.4, 4.6, 'smile'),
-          spot('face', 27.4, 29.6, 1.0, 1.3, 'claw', frontOnly=True), spot('face', 36.6, 29.6, 1.0, 1.3, 'claw', frontOnly=True))
+          spot('cheekmask', 27.4, 29.6, 1.0, 1.3, 'claw', frontOnly=True), spot('cheekmask', 36.6, 29.6, 1.0, 1.3, 'claw', frontOnly=True))
     put(d, 'tail', 8, stroke([38, 54, 44, 55, 48, 51], 6.0, 'tl', w2=2.6, d1=10, d2=16))
 
 
 def _bird(d, kind):
     if kind == 'ARTICUNO':
-        pal = dict(main='#8fcdf0', light='#d4eefa', dark='#4a7cc8', wing='#a4d8f6', tip='#5c8ed4', beak='#8c94a6', leg='#7c86a0', eye='#e03050',
+        pal = dict(main='#8fcdf0', light='#d4eefa', dark='#4a7cc8', wing='#a4d8f6', tip='#5c8ed4', beak='#8c94a6', leg='#7c86a0', eye='#6a4426',
                    crest='#4a7cc8')
     elif kind == 'ZAPDOS':
-        pal = dict(main='#f8d030', light='#fbe888', dark='#c8a018', wing='#f8d030', tip='#26202a', beak='#f0a838', leg='#f0a038', eye='#26202a',
+        pal = dict(main='#f8d030', light='#fbe888', dark='#c8a018', wing='#f8d030', tip='#26202a', beak='#f0a838', leg='#f0a038', eye='#26202a', thigh='#d8b878',
                    crest='#f8d030')
     else:
-        pal = dict(main='#f8c23a', light='#fbe888', dark='#e0601c', wing='#f26a1e', tip='#f9c83a', beak='#e8a050', leg='#e0964a', eye='#26202a',
+        pal = dict(main='#f8c23a', light='#fbe888', dark='#e0601c', wing='#f26a1e', tip='#f9c83a', beak='#e8a050', leg='#a85838', eye='#26202a',
                    crest='#f26a1e')
     pal.update(dark_='#26202a', red='#e03050')
     new(d, pal)
@@ -1283,21 +1336,23 @@ def _bird(d, kind):
     for s, sx in (('L', -1), ('R', 1)):
         pts = curve([v for p in wing for v in (32 + sx * p[0], 30 + p[1])], 3)
         ptsi = curve([v for p in inner for v in (32 + sx * p[0], 30 + p[1])], 3)
-        put(d, 'wing' + s, 3.6, plate(pts, 'wing', T=1.4), plate(ptsi, 'tip' if kind != 'ARTICUNO' else 'light', T=1.5, dd=-0.4))
+        put(d, 'wing' + s, 3.6, plate(pts, 'wing', T=1.96), plate(ptsi, 'tip' if kind != 'ARTICUNO' else 'light', T=2.1, dd=-0.4))
         if kind == 'ZAPDOS':
             paint(d, band('wing' + s, [32 + sx * 12, 22, 32 + sx * 27, 8], 1.8, 'dark_'), band('wing' + s, [32 + sx * 14, 28, 32 + sx * 30, 14], 1.6, 'dark_'))
         x = 32 + sx * 5
         put(d, 'leg' + s, 0.4, cap(x, 48, x + sx * 0.4, 57.4, 2.3, 1.9, 'leg'))
+        if kind == 'ZAPDOS':
+            put(d, 'plume' + s, 0.6, e(x, 48.4, 3.6, 4.6, 'thigh', rd=3.4))
         put(d, 'foot' + s, -1.0, e(x + sx * 0.4, 59.3, 3.4, 1.4, 'leg', dd=-3), cap(x, 59.5, x, 60.2, 1.0, 0.6, 'leg', dd=-8))
         toes(d, 'foot' + s, -1.0, x + sx * 0.4, 60.3, 3, 2.6, 0.9, 'leg', dd=-6.0)
     if kind == 'ARTICUNO':
-        put(d, 'tailA', 6, stroke([31, 44, 29, 52, 27, 58, 25, 61], 6.4, 'dark', w2=1.8, d1=8, d2=26))
-        put(d, 'tailB', 6, stroke([33, 44, 35, 52, 37, 58, 39, 61], 6.4, 'main', w2=1.8, d1=8, d2=26))
+        put(d, 'tailA', 0, stroke([31, 44, 29, 52, 27, 58, 25, 61], 6.4, 'dark', w2=1.8, d1=5, d2=26))
+        put(d, 'tailB', 0, stroke([33, 44, 35, 52, 37, 58, 39, 61], 6.4, 'dark', w2=1.8, d1=5, d2=26))
     elif kind == 'ZAPDOS':
-        put(d, 'tail', 6, *[cap(32 + dx, 46, 32 + dx * 1.6, 56 + h, 3.6, 0.7, 'main', d1=8, d2=24) for dx, h in ((-4, 3), (0, 4), (4, 3))])
+        put(d, 'tail', 0, *[cap(32 + dx, 46, 32 + dx * 1.6, 56 + h, 3.6, 0.7, 'main', d1=5, d2=24) for dx, h in ((-4, 3), (0, 4), (4, 3))])
     else:
-        put(d, 'tailA', 6, stroke([30, 46, 27, 54, 26, 60], 6.8, 'wing', w2=1.6, d1=8, d2=26), stroke([30, 47, 28, 53, 27.4, 57], 3.0, 'tip', d1=8.5, d2=25))
-        put(d, 'tailB', 6, stroke([34, 46, 37, 54, 38, 60], 6.8, 'wing', w2=1.6, d1=8, d2=26), stroke([34, 47, 36, 53, 36.6, 57], 3.0, 'tip', d1=8.5, d2=25))
+        put(d, 'tailA', 0, stroke([30, 46, 27, 54, 26, 60], 6.8, 'wing', w2=1.6, d1=5, d2=26), stroke([30, 47, 28, 53, 27.4, 57], 3.0, 'tip', d1=5.5, d2=25))
+        put(d, 'tailB', 0, stroke([34, 46, 37, 54, 38, 60], 6.8, 'wing', w2=1.6, d1=5, d2=26), stroke([34, 47, 36, 53, 36.6, 57], 3.0, 'tip', d1=5.5, d2=25))
 
 
 @fix('ARTICUNO')
@@ -1317,7 +1372,7 @@ def moltres(d, look):
 
 def _serpent(d, dragonair):
     pal = {'bl': '#5a94e0' if not dragonair else '#6ea0e2', 'bld': '#4074c0', 'wh': '#f4f4fb', 'whd': '#d4d8ea', 'fin': '#f6f6fc', 'orb': '#3a6ee0',
-           'eye': '#ffffff', 'dark': '#20203a', 'horn': '#f6f6fc'}
+           'eye': '#ffffff', 'dark': '#20203a', 'horn': '#f6f6fc', 'pup': '#4a2a8c'}
     new(d, pal)
     if not dragonair:
         path = [31, 25, 30, 33, 36, 40, 41, 47, 35, 54, 25, 54, 20, 58, 12, 55]
@@ -1330,16 +1385,11 @@ def _serpent(d, dragonair):
     hr = 8.6 if not dragonair else 8.2
     put(d, 'head', -3, e(31, 16.5, hr, hr * 0.92, 'bl', rd=hr * 0.92), e(31, 21.4, 4.4, 3.0, 'bl', rd=3.6, dd=-6.4))
     paint(d, mouth(31, 22.8, 2.2, 'smile'), spot('head', 29.8, 21.0, 0.5, 0.4, 'dark', frontOnly=True), spot('head', 32.2, 21.0, 0.5, 0.4, 'dark', frontOnly=True))
-    er = 3.3
+    paint(d, eye(26.4, 15.0, 2.4, sclera=False, iris='#b088ff'), eye(35.6, 15.0, 2.4, sclera=False, iris='#b088ff'))
     for s, sx in (('L', -1), ('R', 1)):
-        off = 5.0
-        surf = hr * 0.92 * math.sqrt(max(0.05, 1 - (off / hr) ** 2 - 0.02))
-        ecd = -3 - surf + er * 0.5
-        put(d, 'eye' + s, ecd, e(31 + sx * off, 14.6, er, er * 1.08, 'eye', rd=er * 0.9))
-        put(d, 'pupil' + s, ecd - 1.3, e(31 + sx * off - sx * 0.1, 14.9, er * 0.56, er * 0.62, 'dark', rd=er * 0.5))
         pts = curve([sx * 6, 14, sx * 11, 10, sx * 15, 5, sx * 14, 13, sx * 10.5, 17], 3)
         pts = [(31 + v) if i % 2 == 0 else v for i, v in enumerate(pts)]
-        put(d, 'fin' + s, -1.0, plate(pts, 'fin', T=1.1))
+        put(d, 'fin' + s, -1.0, plate(pts, 'fin', T=1.54))
     if dragonair:
         put(d, 'horn', -4, cap(31, 9.4, 31, -1.2, 3.4, 0.6, 'horn', d1=-1, d2=-2))
         put(d, 'orbN', -9, e(31, 30, 4.0, 4.0, 'orb', rd=3.8, dd=-2.5))
@@ -1383,7 +1433,7 @@ def dragonite(d, look):
         wing = [7, -2, 13, -9, 19, -17, 24, -22, 22, -13, 25, -8, 20, -3, 21, 3, 14, 1, 10, 6]
         pts = curve(wing, 3)
         pts = [(32 + sx * v) if i % 2 == 0 else v + 30 for i, v in enumerate(pts)]
-        put(d, 'wing' + s, 4.5, plate(pts, 'wing', T=1.3))
+        put(d, 'wing' + s, 4.5, plate(pts, 'wing', T=1.82))
     put(d, 'tail', 6, stroke([36, 52, 41, 58, 36, 60.4, 34, 56], 11, 'or', w2=3.0, d1=6, d2=26))
 
 
@@ -1392,22 +1442,25 @@ def mewtwo(d, look):
     pal = {'gr': '#d2c8de', 'grd': '#b0a2c4', 'pu': '#9866b6', 'pud': '#7a4a9a', 'eye': '#ffffff', 'dark': '#2a1e3a'}
     new(d, pal)
     put(d, 'body', 0, e(32, 33, 9.6, 11.4, 'gr', rd=7.6), e(32, 44.4, 8.2, 6.6, 'gr', rd=7))
-    paint(d, spot('body', 32, 42.6, 6.4, 5.2, 'pu', frontOnly=True), spot('body', 32, 30, 4.4, 3.4, 'grd', frontOnly=True))
+    paint(d, spot('body', 32, 42.6, 6.6, 5.6, 'pu', frontOnly=True), spot('body', 32, 30, 4.4, 3.4, 'grd', frontOnly=True))
     put(d, 'neck', -0.6, cap(32, 21, 32, 25, 3.4, 4.6, 'gr'))
     put(d, 'head', -1.8, e(32, 14, 7.8, 8.6, 'gr', rd=7.4), e(32, 19, 4.4, 3.2, 'gr', rd=3.6, dd=-4.4))
     for s, sx in (('L', -1), ('R', 1)):
-        put(d, 'ear' + s, -1.4, cap(32 + sx * 4.6, 8.2, 32 + sx * 6.6, -2.2, 3.4, 0.7, 'gr', d1=0, d2=0))
+        put(d, 'ear' + s, -1.4, cap(32 + sx * 4.8, 8.4, 32 + sx * 6.2, 1.4, 3.4, 2.4, 'gr', d1=0, d2=0))
         put(d, 'arm' + s, -0.6, cap(32 + sx * 9.6, 26, 32 + sx * 15.8, 35, 3.6, 3.0, 'gr', d1=-1, d2=-4),
             cap(32 + sx * 15.8, 35, 32 + sx * 17.6, 43, 3.0, 2.5, 'gr', d1=-4, d2=-6))
-        put(d, 'hand' + s, -2.6, e(32 + sx * 17.9, 44.6, 2.9, 2.6, 'gr', rd=2.6, dd=-6),
-            cap(32 + sx * 16.6, 46, 32 + sx * 16, 51, 1.3, 0.8, 'gr', dd=-6), cap(32 + sx * 18.2, 46.4, 32 + sx * 18.6, 51.4, 1.3, 0.8, 'gr', dd=-6),
-            cap(32 + sx * 19.6, 45.2, 32 + sx * 21.4, 49.2, 1.2, 0.8, 'gr', dd=-6))
+        hx, hy = 32 + sx * 17.9, 44.6
+        put(d, 'hand' + s, -2.6, e(hx, hy, 2.9, 2.6, 'gr', rd=2.6, dd=-6),
+            cap(hx - sx * 1.4, hy + 1.4, hx - sx * 2.0, hy + 5.0, 1.15, 0.9, 'gr', dd=-6), e(hx - sx * 2.0, hy + 5.6, 1.4, 1.4, 'gr', rd=1.4, dd=-6),
+            cap(hx + sx * 0.4, hy + 1.6, hx + sx * 0.7, hy + 5.4, 1.15, 0.9, 'gr', dd=-6), e(hx + sx * 0.7, hy + 6.0, 1.4, 1.4, 'gr', rd=1.4, dd=-6),
+            cap(hx + sx * 1.8, hy + 0.6, hx + sx * 3.6, hy + 4.0, 1.1, 0.9, 'gr', dd=-6), e(hx + sx * 4.0, hy + 4.6, 1.4, 1.4, 'gr', rd=1.4, dd=-6))
         x = 32 + sx * 6.4
         put(d, 'leg' + s, 0.3, cap(x, 45, x + sx * 1.6, 51.6, 5.4, 4.2, 'gr'), cap(x + sx * 1.6, 51.6, x + sx * 0.6, 58, 4.0, 3.0, 'gr'))
         put(d, 'foot' + s, -1.0, e(x + sx * 0.8, 59.4, 4.8, 2.3, 'gr', dd=-2.4))
-        toes(d, 'foot' + s, -1.0, x + sx * 0.8, 60.5, 3, 3.0, 1.15, 'gr', dd=-6.0)
-    put(d, 'tube', 5, stroke([32, 20, 32, 28, 32, 36], 4.0, 'pu', d1=6, d2=7), e(32, 21, 3.0, 2.0, 'pud', rd=2.6, dd=6))
-    put(d, 'tail', 7, stroke([37, 49, 45, 55, 52, 51, 55, 41], 6.4, 'gr', w2=4.8, d1=6, d2=24), e(55.4, 39.6, 4.6, 5.6, 'pu', rd=4.6, dd=25))
+        toes(d, 'foot' + s, -1.0, x + sx * 0.8, 60.5, 3, 3.0, 1.2, 'gr', dd=-6.0)
+    put(d, 'tube', 0, stroke([32, 20, 32, 28, 32, 36], 4.0, 'pu', d1=6, d2=7), e(32, 21, 3.0, 2.0, 'pud', rd=2.6, dd=6))
+    put(d, 'tail', 0, stroke([37, 49, 42, 54.4, 47, 55], 7.4, 'gr', w2=6.0, d1=5, d2=13),
+        stroke([45, 55, 51, 53, 54.6, 47, 55.8, 41], 6.0, 'pu', w2=2.6, d1=13, d2=23), e(55.8, 39.4, 3.2, 3.8, 'pu', rd=3.2, dd=24))
     paint(d, eye(28.2, 13.4, 2.0, style='angry', flip=True, iris='#7a3ac0'), eye(35.8, 13.4, 2.0, style='angry', iris='#7a3ac0'), mouth(32, 22.0, 1.8, 'line'))
 
 

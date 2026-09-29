@@ -2561,11 +2561,11 @@
    "accent": "#e8c860"
   },
   "features": [
-   "tall palm-tree body with a long trunk neck",
-   "three yellow heads with different faces",
-   "crown of long green leaf fronds",
-   "tan trunk with diamond bark marks",
-   "arms with round hands, clawed feet, short tail"
+   "tall palm-tree body with a long bark-ringed neck",
+   "three round yellow heads with different faces",
+   "crown of long thin green leaves",
+   "light brown body with thin dark rings",
+   "arms with round hands, thick legs with two-toed feet, short tail"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Exeggutor_%28Pok%C3%A9mon%29",
@@ -2587,11 +2587,10 @@
    "accent": "#f8f0e0"
   },
   "features": [
-   "brown lizard-like body with cream belly",
-   "bone skull helmet with two small horns and eye holes",
-   "holds a bone club",
-   "short pointed tail",
-   "three-toed clawed feet"
+   "light brown lizard-like body with cream belly",
+   "mother's skull as a helmet: small horns, eye holes with black eyes",
+   "bone club",
+   "two small spikes on the back, short tail"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Cubone_%28Pok%C3%A9mon%29",
@@ -2613,11 +2612,11 @@
    "accent": "#f8f0e0"
   },
   "features": [
-   "taller muscular brown body with cream belly",
-   "bone skull helmet with two horns",
-   "long bone club held up in one hand",
-   "thin curved tail",
-   "three-toed clawed feet"
+   "brown body with sandy underside",
+   "fused skull helmet",
+   "long bone club",
+   "single claw on each hand and foot",
+   "tail with a protrusion near the end"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Marowak_%28Pok%C3%A9mon%29",
@@ -2641,7 +2640,7 @@
   "features": [
    "egg-shaped brown torso with almond eyes on it (no separate head)",
    "cream segmented springy arms and legs",
-   "three fingers, three clawed toes",
+   "three digits on each hand, three clawed toes",
    "yellow ankle pads"
   ],
   "sources": [
@@ -2690,11 +2689,11 @@
    "accent": "#e05070"
   },
   "features": [
-   "pink chubby body with cream belly",
+   "pink chubby body with cream belly and yellow curved lines",
    "very long pink tongue hanging from the mouth",
-   "small pointed horn and ears on head",
-   "thin tail",
-   "clawed feet"
+   "beady eyes",
+   "thick tail",
+   "thumb-like claw on each hand, one big nail on each foot, yellow knee rings"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Lickitung_%28Pok%C3%A9mon%29",
@@ -2716,11 +2715,10 @@
    "accent": "#f0f0e8"
   },
   "features": [
-   "purple gas-filled ball",
-   "skull and crossbones on the belly",
-   "several tubular craters",
-   "unequal angry eyes",
-   "fanged grin"
+   "spherical purple gas bag with vacant eyes",
+   "wide mouth with two pointed upper teeth",
+   "cream skull-and-crossbones below the face",
+   "several crater-like protrusions"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Koffing_%28Pok%C3%A9mon%29",
@@ -2741,10 +2739,10 @@
    "accent": "#f0f0e8"
   },
   "features": [
-   "two joined purple gas balls, one bigger",
-   "skull and crossbones",
-   "several tubular craters",
-   "each ball has a face"
+   "two purple spherical heads joined by a thin tube with a small sphere in the middle",
+   "left head larger with prominent eyebrows and skull-and-crossbones",
+   "smaller right head with two corner fangs and a ring marking",
+   "crater-like protrusions"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Weezing_%28Pok%C3%A9mon%29",
@@ -2765,7 +2763,7 @@
    "accent": "#605858"
   },
   "features": [
-   "grey armoured rhino",
+   "grey plated rhino",
    "short horn on the snout",
    "rocky spikes along the back",
    "stubby legs with cream toenails",
@@ -2792,10 +2790,10 @@
   },
   "features": [
    "upright grey rhino",
-   "drill-like horn on the snout",
-   "spiked frills on head and back",
-   "cream belly plates",
-   "thick tail, clawed hands and feet"
+   "cream drill horn on the snout and a forward-curving spike on the head",
+   "red eyes, two fangs, spiky cheek ridges",
+   "cream belly, row of back spikes",
+   "long tail with thin black stripes"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Rhydon_%28Pok%C3%A9mon%29",
@@ -2817,11 +2815,10 @@
    "accent": "#f0f0e0"
   },
   "features": [
-   "round pink body",
-   "egg in a belly pouch",
-   "spiky tufts of hair at the sides of the head",
-   "small round arms",
-   "small tail"
+   "round pink body with tiny eyes",
+   "white egg in a dark pink belly pouch",
+   "three hair tufts with dark pink tips on each side of the head",
+   "dark pink feet, small arms, short tail"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Chansey_%28Pok%C3%A9mon%29",
@@ -2843,16 +2840,20 @@
    "accent": "#e05868"
   },
   "features": [
-   "mass of blue vines",
-   "two eyes peeking through the vines",
-   "vine arms",
-   "red-pink feet"
+   "mass of periwinkle-blue vines",
+   "eyes peeking through a gap in the vines",
+   "loose vine tendrils",
+   "pink-red boot-like feet"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Tangela_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Tangela"
   ],
-  "blend": 0.4
+  "blend": 0.4,
+  "roles": {
+   "coilA": "body",
+   "coilB": "body"
+  }
  },
  "KANGASKHAN": {
   "dex": 115,
@@ -2872,7 +2873,7 @@
    "thick black plate on top of head",
    "large cream ears, narrow red eyes",
    "shoulder epaulettes and row of spikes down the back",
-   "baby (light purple) in the belly pouch",
+   "light purple baby in the belly pouch",
    "thick tail, three clawed digits"
   ],
   "sources": [
@@ -2895,11 +2896,11 @@
    "accent": "#f0e0a0"
   },
   "features": [
-   "blue seahorse",
-   "long tube snout",
-   "cream ringed belly",
-   "cream spiny dorsal fin",
-   "curled tail, small side fins"
+   "light-blue seahorse with red eyes",
+   "long tube-shaped snout",
+   "cream ridged belly",
+   "single cream dorsal fin, three spike-fins on each side of the head",
+   "coiled lower body"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Horsea_%28Pok%C3%A9mon%29",
@@ -2921,11 +2922,12 @@
    "accent": "#f0d868"
   },
   "features": [
-   "blue seahorse",
-   "long tube snout",
-   "cream ringed belly",
-   "many cream spines on head and back",
-   "curled tail, side fins"
+   "light-blue seahorse with narrow black eyes",
+   "long tube-shaped snout",
+   "cream rough-scaled belly",
+   "fin-like ridge above each eye, spiny side fins",
+   "pair of dorsal fins with sharp cream tips",
+   "large coiled lower body"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Seadra_%28Pok%C3%A9mon%29",
@@ -3045,11 +3047,11 @@
    "accent": "#4870c8"
   },
   "features": [
-   "white body with pink dots on shoulders, belly and knees",
-   "pale pink face with red cheeks",
-   "two blue curled horn-like ears",
-   "white gloves with three fingers",
-   "blue upturned shoes"
+   "round white body with a magenta spot",
+   "pale pink head with magenta cheeks",
+   "two blue clown-hair growths at the sides of the head",
+   "light pink arms and legs joined by magenta spheres",
+   "white gloves with magenta digit pads, white knee covers, dark blue upturned shoes"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Mr._Mime_%28Pok%C3%A9mon%29",
@@ -3071,11 +3073,11 @@
    "accent": "#c8d8e0"
   },
   "features": [
-   "green mantis with a triangular head and crest",
-   "two long cream scythe blades for arms",
-   "translucent wings",
-   "cream belly plates",
-   "thin legs with claws"
+   "green mantis with three blunt horns on the forehead",
+   "two narrow triangular eyes",
+   "arms ending in large white scythes",
+   "two pairs of cream wings",
+   "large spikes on the thighs, cone feet with three white claws"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Scyther_%28Pok%C3%A9mon%29",
@@ -3097,10 +3099,10 @@
    "accent": "#f0d868"
   },
   "features": [
-   "dark violet face with big pink lips",
-   "long yellow hair with bangs",
-   "red dress",
-   "small purple hands and feet"
+   "purple face with big pink lips and saucer eyes",
+   "long blonde hair with bangs",
+   "red gown with two gold circlets on the chest",
+   "white arms, five-digit purple hands"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Jynx_%28Pok%C3%A9mon%29",
@@ -3122,11 +3124,11 @@
    "accent": "#302820"
   },
   "features": [
-   "yellow humanoid with black stripes",
-   "two black-tipped antennae on head",
-   "black zig-zag stripes on chest",
-   "tail with black tip",
-   "fangs and angry eyes"
+   "yellow tiger-striped humanoid",
+   "V-shaped stripe on the forehead, lightning-bolt stripe on the chest",
+   "two antennae with bulbous tips, two tufts of fur on the head",
+   "two fangs, small eyes",
+   "five digits, three clawed toes, ringed tiger tail"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Electabuzz_%28Pok%C3%A9mon%29",
@@ -3148,11 +3150,11 @@
    "accent": "#f8e090"
   },
   "features": [
-   "orange-red flame body with yellow belly",
-   "duck-like beak",
-   "flame crest on head",
-   "flames on arms and tail tip",
-   "clawed feet"
+   "red body with yellow flame designs on the lower half",
+   "puckered tan beak, two forehead lumps with flames",
+   "red scaly arms, five clawed digits",
+   "black shackles on neck and ankles",
+   "row of red spikes on the back, yellow tail with a flame tip"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Magmar_%28Pok%C3%A9mon%29",
@@ -3174,11 +3176,11 @@
    "accent": "#605040"
   },
   "features": [
-   "brown stag-beetle humanoid",
-   "two huge serrated cream pincer horns",
-   "spiky shoulder plates",
-   "tan belly with rings",
-   "clawed feet"
+   "pale brown stag-beetle humanoid",
+   "two huge spiked white pincer horns",
+   "long thin segmented arms, short thick legs",
+   "three claws on each hand and foot",
+   "spiky shoulder plates"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Pinsir_%28Pok%C3%A9mon%29",
@@ -3200,11 +3202,11 @@
    "accent": "#302820"
   },
   "features": [
-   "brown bull",
-   "dark brown mane",
-   "two curved horns",
-   "three tails with round tips",
-   "dark hooves"
+   "brown bull with a shoulder hump",
+   "thick dark brown mane",
+   "two curved grey horns, three grey bumps on the forehead",
+   "three long tails with round tips",
+   "blue-grey hooves"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Tauros_%28Pok%C3%A9mon%29",
@@ -3253,18 +3255,24 @@
    "accent": "#f8f8f8"
   },
   "features": [
-   "huge blue sea serpent",
-   "open mouth with fangs",
-   "cream belly bands",
-   "spiky crest and gill fins",
-   "forked tail fin",
-   "whiskers"
+   "huge blue sea serpent with a yellow underbelly",
+   "row of yellow spots on each side",
+   "large gaping mouth with four pointed teeth and yellow lips",
+   "three-pointed dark blue crest, white gill fin and barbel each side",
+   "four white dorsal fins, forked tail fin"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Gyarados_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Gyarados"
   ],
-  "view": "front"
+  "view": "front",
+  "roles": {
+   "tailfin": "tail",
+   "dfin0": "other",
+   "dfin1": "other",
+   "dfin2": "other",
+   "dfin3": "other"
+  }
  },
  "LAPRAS": {
   "dex": 131,
@@ -3280,18 +3288,24 @@
    "accent": "#909098"
   },
   "features": [
-   "blue plesiosaur",
-   "long neck with cream throat",
-   "grey shell with cream spikes",
-   "four flippers",
-   "single small horn on head"
+   "blue plesiosaur with darker blue spots",
+   "cream underside",
+   "long neck, large brown eyes, short horn and curled ears",
+   "heavy grey shell covered in blunt knobs",
+   "four flippers, front ones larger"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Lapras_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Lapras"
   ],
   "view": "side",
-  "face": "left"
+  "face": "left",
+  "roles": {
+   "flipperFL": "leg",
+   "flipperFR": "leg",
+   "flipperBL": "leg",
+   "flipperBR": "leg"
+  }
  },
  "DITTO": {
   "dex": 132,
@@ -3331,10 +3345,10 @@
   },
   "features": [
    "brown fox-cat",
-   "cream fluffy neck ruff",
-   "two long ears with dark brown tips",
+   "cream fluffy neck collar",
+   "long pointed ears with dark brown interiors",
    "bushy tail with cream tip",
-   "big dark eyes"
+   "brown eyes, small black nose"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Eevee_%28Pok%C3%A9mon%29",
@@ -3356,11 +3370,11 @@
    "accent": "#f0e0a0"
   },
   "features": [
-   "blue",
-   "fin-like ears",
-   "white spiky neck ruff",
-   "spines along the back",
-   "mermaid tail with fin"
+   "light blue",
+   "dark blue marking around the head",
+   "three fins with cream webbing on the head (two like ears, one on top)",
+   "white fin-like ruff round the neck",
+   "spiky ridge down the spine, mermaid tail"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Vaporeon_%28Pok%C3%A9mon%29",
@@ -3433,10 +3447,9 @@
    "accent": "#302820"
   },
   "features": [
-   "polygonal pink and blue duck",
-   "pink head with blue beak",
-   "blue back and tail",
-   "pink legs"
+   "polyhedral pink head with a blue beak and hexagonal eyes",
+   "pink body with a blue front",
+   "blue triangular feet, blue rectangular prism tail"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Porygon_%28Pok%C3%A9mon%29",
@@ -3458,9 +3471,9 @@
    "accent": "#e0c890"
   },
   "features": [
-   "light-blue body with two big yellow eyes",
-   "spiral cream shell with spikes",
-   "short tentacles"
+   "sky-blue body with ten tentacles",
+   "pale yellow spiral shell",
+   "large saucer-like yellow eyes with slit pupils at the shell rim"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Omanyte_%28Pok%C3%A9mon%29",
@@ -3482,9 +3495,9 @@
    "accent": "#e0c890"
   },
   "features": [
-   "blue body with two big eyes and fang beak",
-   "large spiky spiral shell",
-   "many long tentacles"
+   "sky-blue body with many tentacles and a sharp beak",
+   "large pale yellow spiral shell with sharp spikes",
+   "yellow eyes with slit pupils"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Omastar_%28Pok%C3%A9mon%29",
@@ -3506,9 +3519,9 @@
    "accent": "#e04040"
   },
   "features": [
-   "brown dome shell with ridges",
-   "dark face with red eyes under the shell",
-   "short tan legs"
+   "flat brown horseshoe-crab shell with two dents and tiny black eyes",
+   "black underside with two red spots",
+   "four yellow pointed legs"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Kabuto_%28Pok%C3%A9mon%29",
@@ -3530,10 +3543,11 @@
    "accent": "#d8d8e0"
   },
   "features": [
-   "brown upright fossil with pointed helm head",
-   "dark face with red eyes",
-   "two long white scythe blades",
-   "tan belly, back spikes, thick tail"
+   "brown upright fossil with a flat half-circle head with a point on each side",
+   "small eyes, light grey chest",
+   "two large grey scythe forearms",
+   "ridge with three flat spines each side on the back",
+   "thin legs, two large grey claws, flat pointed tail"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Kabutops_%28Pok%C3%A9mon%29",
@@ -3555,11 +3569,11 @@
    "accent": "#e8d8b0"
   },
   "features": [
-   "purple-grey pterosaur",
-   "big bat-like wings",
-   "long toothy snout",
-   "spiked crest on head",
-   "tail with arrow tip"
+   "light blue-grey pterosaur",
+   "large violet membranous wings",
+   "small pointed ears, narrow dark green eyes, ridged snout",
+   "strong jaw with serrated fangs",
+   "hump ridge with a spike on the back, tail with an arrow tip"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Aerodactyl_%28Pok%C3%A9mon%29",
@@ -3607,10 +3621,9 @@
    "accent": "#2858a8"
   },
   "features": [
-   "light-blue bird",
-   "long streaming tail feathers",
-   "crest of dark blue plumes",
-   "large wings",
+   "light-blue arctic bird with brown eyes",
+   "three-feather dark blue crest and matching long ribbon tail",
+   "bluish-white chest",
    "grey beak and legs"
   ],
   "sources": [
@@ -3633,10 +3646,10 @@
    "accent": "#302820"
   },
   "features": [
-   "yellow spiky bird",
-   "black flight feathers on the wings",
-   "spiky crest and chest",
-   "orange beak and legs"
+   "yellow spiky electric bird",
+   "long pointed beak, spiked feather crest",
+   "tan thighs, thin orange legs",
+   "black-tipped wings"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Zapdos_%28Pok%C3%A9mon%29",
@@ -3658,10 +3671,9 @@
    "accent": "#e03820"
   },
   "features": [
-   "orange-yellow fire bird",
-   "flame wings and tail plumes",
-   "flame crest",
-   "orange beak and legs"
+   "yellow-orange fire bird",
+   "flame crest, flaming wings and tail",
+   "reddish-brown legs"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Moltres_%28Pok%C3%A9mon%29",
@@ -3708,10 +3720,11 @@
    "accent": "#a0c8f0"
   },
   "features": [
-   "longer blue serpent with white belly",
-   "white horn on the forehead",
-   "white wing-fins at the sides of the head",
-   "blue orbs on neck and tail"
+   "longer sky-blue serpent with white belly",
+   "small white horn on the forehead",
+   "white swirled fins at the sides of the head",
+   "three blue orbs on neck and body end",
+   "oval purple eyes"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Dragonair_%28Pok%C3%A9mon%29",
@@ -3760,11 +3773,11 @@
   },
   "features": [
    "pale grey feline humanoid",
-   "two tall ears",
-   "purple belly patch",
-   "long thick tail with purple end",
-   "tube on the back of the neck",
-   "three-fingered hands"
+   "two short blunt ears",
+   "large purple belly patch",
+   "long thick tail with a bulb at the end",
+   "tube from back of skull to spine",
+   "three digits with round tips on hands and feet"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Mewtwo_%28Pok%C3%A9mon%29",
