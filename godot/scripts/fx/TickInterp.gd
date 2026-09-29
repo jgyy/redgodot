@@ -52,7 +52,7 @@ func apply(alpha: float) -> void:
 			continue
 		var n: Node3D = nv
 		if int(d["tick"]) == tick:
-			var t: Transform3D = (d["prev"] as Transform3D).interpolate_with(d["cur"], alpha) if alpha < 1.0 else d["cur"]
+			var t: Transform3D = _blend(d["prev"], d["cur"], alpha) if alpha < 1.0 else d["cur"]
 			if d["world"]:
 				n.global_transform = t
 			else:
@@ -66,6 +66,13 @@ func apply(alpha: float) -> void:
 			d["dirty"] = false
 	for id in dead:
 		_e.erase(id)
+
+## Transform3D.interpolate_with needs invertible bases; a zero-scale pose (an effect that has not popped in yet) just
+## snaps to the nearer end instead of spamming "Basis must be normalized" errors.
+static func _blend(a: Transform3D, b: Transform3D, alpha: float) -> Transform3D:
+	if absf(a.basis.determinant()) < 1e-9 or absf(b.basis.determinant()) < 1e-9:
+		return b if alpha >= 0.5 else a
+	return a.interpolate_with(b, alpha)
 
 ## Show the latest tick pose exactly (screenshots, tests).
 func settle() -> void:

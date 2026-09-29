@@ -1762,8 +1762,10 @@ func _bookshelf_label(c: Vector2i) -> String:
 	var quad: Array = quads[qi]
 	var ts_name := RegEx.create_from_string("([a-z])([A-Z0-9])").sub(str(md.get("tsc", "")), "$1_$2", true).to_upper()
 	for e in BOOKSHELVES:
-		if (e[0] == ts_name or (e[0] == "REDS_HOUSE_1" and str(md.get("ts", "")) == "reds_house")) and quad.has(int(e[1])):
-			return str(e[2])
+		if e[0] == ts_name or (e[0] == "REDS_HOUSE_1" and str(md.get("ts", "")) == "reds_house"):
+			for tid in quad:  # JSON numbers are floats: compare as ints
+				if int(tid) == int(e[1]):
+					return str(e[2])
 	return ""
 
 func _cut_prompt(c: Vector2i) -> void:

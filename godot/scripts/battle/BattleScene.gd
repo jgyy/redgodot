@@ -48,7 +48,7 @@ var flash_color := Color.WHITE
 var darken := 0.0
 var darken_color := Color("#100818")
 var platform_slide := 1.0
-var trainer_x := -1.0   # px x of the enemy trainer (-1 = hidden)
+var trainer_x := -1000.0   # px x of the enemy trainer (<= -1000 = hidden; the slide-in starts at -84, still partly on screen)
 var player_pic_x := -1.0
 
 var _holders := {}     # k -> Node3D (moves with offsets / slide)
@@ -257,8 +257,8 @@ func _apply_visuals() -> void:
 	stage.player_platform.position = Vector3(BattleStage.PLAYER_POS.x, BattleStage.PLAYER_POS.y - 0.14, BattleStage.PLAYER_POS.z) + poff
 	stage.player_anchor.position = BattleStage.PLAYER_POS + poff
 	if _trainer_node:
-		_trainer_node.visible = trainer_x >= 0.0
-		if trainer_x >= 0.0:
+		_trainer_node.visible = trainer_x > -200.0
+		if _trainer_node.visible:
 			_place_on_px(_trainer_node, stage.to_global(BattleStage.ENEMY_POS), trainer_x - 236.0)
 	if _player_trainer:
 		_player_trainer.visible = player_pic_x >= -200.0 and player_pic_x > -999.0 and _player_trainer.get_meta("on", false)
@@ -643,7 +643,7 @@ func intro(b: BattleEngine) -> void:
 		for i in 20:
 			trainer_x += 7.0
 			await tick
-		trainer_x = -1.0
+		trainer_x = -1000.0
 		await msg(b.trainer_name() + " sent out " + _mon("e").display_name() + "!", {"auto": 16})
 		await ball_open("e")
 		hud.boxes["e"] = true
