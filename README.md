@@ -59,13 +59,150 @@ trainer/NPC models in [`characters-3d.png`](docs/gallery/characters-3d.png).
 
 ![All 151 Pokémon in 3D next to their upstream sprites](docs/gallery/pokemon-151-3d.png)
 
+## Visual overhaul: models, animation, effects
+
+A full art pass over every generated asset, all still produced by headless Blender / procedural code (no
+downloaded or hand-sculpted files). Reference for every character and Pokémon was looked up online
+(`pipeline/data/species_looks.json`, `pipeline/data/character_looks.json` record the findings and sources) and
+those notes now *drive* the generators.
+
+| | Before | After |
+|---|---|---|
+| **Pokémon** (12 of 152) | ![](docs/showcase/before-mons.png) | ![](docs/showcase/after-mons.png) |
+| **Trainers / NPCs** | ![](docs/showcase/before-chars.png) | ![](docs/showcase/after-chars.png) |
+| **Town** (Pallet) | ![](docs/showcase/before-pallet.png) | ![](docs/showcase/after-pallet.png) |
+| **Forest** | ![](docs/showcase/before-forest.png) | ![](docs/showcase/after-forest.png) |
+| **Battle + effects** | ![](docs/showcase/before-battle.png) | ![](docs/showcase/after-battle.png) |
+| **Buildings** (Cerulean) | ![](docs/showcase/bld-legacy-cerulean.png) | ![](docs/showcase/bld-new-cerulean.png) |
+| **Buildings** (Pewter) | ![](docs/showcase/bld-legacy-pewter.png) | ![](docs/showcase/bld-new-pewter.png) |
+
+Full galleries: [all 151 + MISSINGNO. next to upstream's sprites](docs/gallery/pokemon-151-3d.png) ·
+[back views](docs/gallery/pokemon-151-3d-back.png) · [60 characters](docs/gallery/characters-3d.png) ·
+[character back views](docs/gallery/characters-3d-back.png) · 109 gameplay frames in `docs/gallery/`.
+
+### Pokémon (151 + MISSINGNO.)
+
+```mermaid
+flowchart LR
+    W["Online lookups\n(WebSearch: shape, colours,\nfeatures, gait)"] --> L["species_looks.json"]
+    U["upstream 2D part lists\n(mons.json, 64×64 sprite space)"] --> F
+    L --> F["species_fixes.py +\nfixes_dex001_050 / 051_100 / 101_151\nadd hands, feet, ears, wings, flames,\nshells, fix proportions"]
+    F --> G["monparts + monfield\nall groups → ONE SDF grid,\nfilleted smooth-union → surface nets"]
+    G --> T["monraster\n3×3 super-sampled atlas, AA edges,\nglossy eyes, fur/scale micro-detail,\nbaked AO → COLOR_0"]
+    G --> R["monrig\nbone tree + tail/neck/ear chains,\nsmooth 4-influence skin weights"]
+    R --> A["monanim\narchetype gaits, 13 attack styles,\nspring hurt, topple faint,\nseamless Idle/Walk loops"]
+    T --> X["glb + WebP atlas"]
+    A --> X
+    X --> S["toon.gdshader\ncel ramp + vertex AO"]
+```
+
+* **Anatomy** – every species was re-authored against its real design: the three starters and their lines (shells,
+  scutes, flame tails, wings, flower buds), Pikachu/Raichu, the Eeveelutions, Gengar, Alakazam, Machamp, the legendary
+  birds, Mewtwo, Mew, … with real hands, toed feet, claws, ears with inner colour, horns and expressions.
+* **Surfaces** – one watertight blended surface instead of stacked balloon tubes, tubes/plates with a minimum
+  thickness, smoothed strokes for tails and serpents; 5–11 k triangles each.
+* **Textures** – super-sampled anti-aliased atlases (no pixel stairs), belly gradients, per-archetype fur / scale /
+  rock / plant micro-detail, glossy irises with glints, baked ambient occlusion so limbs read against bodies.
+* **Skeleton and skinning** – parented bone trees with tail, neck, tentacle and serpent chains and smooth blended
+  weights, so joints bend instead of shearing.
+* **Animation** – `Idle`, `Walk`, `Attack`, `Hurt`, `Faint`, `Special` per archetype: alternating biped steps,
+  diagonal quadruped gait, travelling waves for serpents and fish, flapping wings, hovering floaters, squash-and-stretch
+  hops, crab scuttle; tails/ears follow through; `Idle`/`Walk` are seamless (last key == first key on every channel,
+  checked by `pipeline/blender/check_pokemon_anims.py`).
+
+### Trainers and NPCs (60)
+
+```mermaid
+flowchart LR
+    C["character_looks.json\n(hair, headwear, outfit, face, extras)"] --> K["char_* kit\ntorso · limbs · hands · shoes\n~14 hair styles · hats · outfits"]
+    K --> P["char_paint\n256² atlas per character:\ncloth, hair strands, irises,\nblush, emblems, baked AO"]
+    K --> Q["char_rig + char_anim\nfull humanoid skeleton,\nsmooth weights, 2-bone leg IK"]
+    Q --> Z["Idle · Walk · Run · Talk · Wave · Cheer\n16-frame gait = exactly one cell"]
+```
+
+Every character is now recognisable as themselves: Brock's squint and spikes, Misty's side ponytail, Oak's lab coat
+with lapels, Team Rocket's **R**, the nurse's cap and apron, Blaine's glasses, Lorelei's shades, …
+
+### Environment and buildings
+
+```mermaid
+flowchart TB
+    A["baked 2D atlases\n(upstream terrain painter)"] --> W
+    subgraph Blender
+        E1["env_textures / env_kit\n16 seamless procedural textures"] --> E2["env_tiles · env_props\n13 tiles + 30 props"]
+        E1 --> E3["env_buildings\nwindow, shutter, door, awning,\ngym pillars, dormer, chimney"]
+        E1 --> E4["env_bg · env_bgprops\n15 battle stages + platforms + set dressing"]
+    end
+    subgraph Godot
+        W["WorldBuilder"] --> B["BuildingBuilder\nhip roofs with overhang, modelled shingles,\nridge caps, plinths, trim, sills"]
+        W --> D["GroundDetail\ngrass/pebble/pavement detail,\nwater caustics, contact shadows"]
+        W --> PK["PropKit\nMultiMesh props with tint, lean, wind sway"]
+        E4 --> BS["BattleStage\nworld-space ground shader"]
+    end
+    E2 --> W
+    E3 --> B
+```
+
+Houses, Pokémon Centers, Marts and Gyms are real 3D volumes whose colours are sampled from each building's own baked
+sprite; fences, signs, beds, barrels, statues, braziers, flowers and rocks are 3D props; trees have rooted trunks and
+sway; chimneys smoke. `BLD_LEGACY=1` switches back to the old flat buildings for comparisons.
+
+### Continuous motion
+
+Walking used to drop to `Idle` and restart `Walk` from phase 0 on **every cell**, with no blending, a stepped bob and a
+rigidly attached camera. Now:
+
+```mermaid
+sequenceDiagram
+    participant In as d-pad
+    participant A as OwActor
+    participant P as AnimationPlayer
+    participant C as Camera (critically damped spring)
+    In->>A: hold → (chained steps)
+    A->>P: play Walk (once), crossfade 0.12 s
+    loop every frame, whatever the frame rate
+        A->>A: spend leftover step time moving (no idle frame between cells)
+        A->>P: speed_scale = clip_len × velocity / gait_cells
+        A->>C: target = position + ½ velocity
+    end
+    In->>A: release
+    A->>P: crossfade Walk → Idle (eased stop, exact cell landing)
+    C-->>C: settle with 0 overshoot
+```
+
+Measured with `--scene=motion_lab` (12 chained steps in Pallet Town, simulated d-pad, final assets):
+
+| | Before | After |
+|---|---|---|
+| `Walk` clip starts | 12 | **1** |
+| Min speed (cells/s, nominal 3.75) | 1.5 (stall every cell) | **3.69** |
+| Max speed change / frame | 2.25 | **0.11** |
+| Camera overshoot when stopping | – (rigid) | **0.000** cells |
+| Turning | snapped | ≤ 1.9° / frame, shortest arc |
+
+![Walk strip: player with Charmander following](docs/showcase/walk-strip-player.png)
+
+Other motion changes: ledge hops with crouch / stretch / landing squash and dust puffs, water ripples while surfing,
+grass-blade bursts, footstep dust, follower Pokémon with a continuous bob, blended 60 Hz battle ticks (no stutter on
+90/144 Hz displays), eased send-out / recall / faint / evolution.
+
+### Special effects
+
+Procedural soft-glow, ring, streak and twinkle textures; shockwave rings, radial streaks and ribbon trails; charge-up
+glows before beams and projectiles; stronger impacts (flash, star, ring, sparks, decaying shake) with extra emphasis on
+super-effective / resisted hits; reworked recipes for flamethrower, ember, fire blast, water gun, hydro pump, surf, the
+thunder family, solar beam, hyper beam, ice beam, blizzard, psychic, night shade, earthquake, explosion and the powders;
+status effects (poison, burn, paralysis, sleep, freeze, confusion), stat-up/down arrows with aura, level-up sparkle,
+faint dust and an evolution halo. VFX props are bevelled, shaded meshes (`pipeline/blender/gen_vfx.py`).
+Inspect any of it with `--scene=vfx_sheet`.
+
 ## What's in it
 
 | Area | Status |
 |---|---|
 | **World** | All 223 maps, collision exactly like upstream's `GameMap` (quads → collision tile, pass/grass/water/door/warp lists, ledges, pair collisions, connections). Ground baked by upstream's own terrain painter; buildings, trees, furniture and props are real 3D meshes UV-mapped to upstream's paint, so they read like the sprites from the game camera. Animated water, flowers and tall grass; day/dusk/night with lit windows and light pools; cave darkness, Flash; follower Pokémon; wandering NPCs. |
-| **Pokémon** | 151 + MISSINGNO., generated from upstream's primitive art: one smooth SDF-meshed surface per body group, albedo rasterised from upstream's own sprite definition (front and back), cel shading with upstream's hue-shifted ramp, outlines, Idle/Walk/Attack/Hurt/Faint/Special animations. |
-| **Trainers / NPCs** | 60 chibi models built from upstream's cast definitions (hair, hats, clothes, extras) — Red with cap, jacket and backpack. |
+| **Pokémon** | 151 + MISSINGNO., generated from upstream's primitive art and per-species anatomy fixes researched online: one blended SDF surface per Pokémon with real hands/feet/ears/wings, super-sampled AA albedo + baked AO, cel shading with upstream's hue-shifted ramp, outlines, smooth-skinned rigs with tail/neck chains and archetype-specific Idle/Walk/Attack/Hurt/Faint/Special animations. |
+| **Trainers / NPCs** | 60 chibi models built from upstream's cast definitions and online references (faces, ~14 hair styles, hats, outfits, accessories), full humanoid rigs with IK walk/run cycles plus Talk / Wave / Cheer. |
 | **Battle** | Upstream's Gen-1 engine ported (all 165 move effects, status, stat stages, crits, multi-hit, recharge, trapping, confusion, substitute, transform, trainer AI & items, switching, catching with the shake math, EXP / level-up / move learning, evolution, prize money, ghosts + Silph Scope, Safari Zone, the old man's demo). 15 Blender-built 3D stages, pixel-exact HUD, all 165 moves animated. Battles are overlays, so story scripts continue after them. |
 | **Story** | All upstream map scripts (Pallet → Cerulean Cave) as GDScript coroutines on a port of upstream's `S` scripting API: Oak, starters, rival fights, gyms, Team Rocket, Silph Co., Elite Four, trainers with line of sight, marts, Pokémon Center healing, item balls, hidden items, gifts, trades, field moves, elevators. |
 | **UI** | Upstream's screens ported pixel-for-pixel on a 320×180 canvas with its own hand-drawn font (`Px` kit): title, intro, naming, text box, START menu, party, summary, bag, Pokédex, trainer card, town map (+ Fly picker), options, Bill's PC, mart. Pokémon/characters in menus are live 3D models. |

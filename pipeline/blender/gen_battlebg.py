@@ -27,6 +27,12 @@ import numpy as np  # noqa: E402
 import bpy  # noqa: E402
 import bmesh  # noqa: E402
 import upstream_px as U  # noqa: E402
+import random  # noqa: E402
+from mathutils import Matrix, Vector  # noqa: E402
+import env_kit as K  # noqa: E402
+import env_props as EP  # noqa: E402
+import env_bg as EB  # noqa: E402
+import env_bgprops as BP  # noqa: E402
 
 ROOT = os.path.abspath(os.path.join(HERE, '..', '..'))
 OUT = os.path.join(ROOT, 'godot', 'assets', 'models', 'battle')
@@ -193,7 +199,8 @@ def projected_grid(name, corner_fn, nu, nv, mat, sw=320.0, sh=180.0):
 
 def export(path):
     bpy.ops.export_scene.gltf(filepath=path, export_format='GLB', export_apply=True, export_yup=True,
-                              export_animations=False, export_materials='EXPORT')
+                              export_animations=False, export_materials='EXPORT',
+                              export_vertex_color='NAME', export_vertex_color_name='Col', export_all_vertex_colors=False)
 
 
 # ------------------------------------------------------------------ layout
@@ -397,6 +404,113 @@ def paint_full(fn, h=180):
     return s
 
 
+# ------------------------------------------------------------------ world-space painting support (env_bg.py)
+class _CamG:
+    """Camera helpers for env_bg's world-space painters (floor plane y=0, back wall plane z=-depth)."""
+
+    def _dirs(self):
+        ys, xs = np.mgrid[0:180, 0:320]
+        u, v = (xs + 0.5) * 3.0, (ys + 0.5) * 3.0
+        sx = (u - CAM['w'] / 2) / (CAM['h'] / 2) * _TH
+        sy = (CAM['h'] / 2 - v) / (CAM['h'] / 2) * _TH
+        d = _F[None, None, :] + sx[..., None] * _R[None, None, :] + sy[..., None] * _UP[None, None, :]
+        return d / np.linalg.norm(d, axis=-1, keepdims=True)
+
+    def floor_coords(self):
+        d = self._dirs()
+        with np.errstate(divide='ignore', invalid='ignore'):
+            t = (0.0 - _C[1]) / d[..., 1]
+        valid = (d[..., 1] < -1e-4) & (t > 0)
+        X = _C[0] + d[..., 0] * t
+        D = -(_C[2] + d[..., 2] * t)
+        valid &= (D > 0.4) & (D < 80.0)
+        return np.where(valid, X, 0.0), np.where(valid, D, 1.0), valid
+
+    def wall_coords(self, depth):
+        d = self._dirs()
+        t = depth / (d @ _F)
+        return _C[0] + d[..., 0] * t, _C[1] + d[..., 1] * t
+
+    @staticmethod
+    def to_px(p):
+        return to_px(p)
+
+    @staticmethod
+    def px_scale(dep):
+        return px_scale(dep)
+
+
+CAMG = _CamG()
+LAYOUT = None
+
+
+def in_platform(x, d, pad=1.0):
+    if LAYOUT is None:
+        return False
+    for k in ('enemy', 'player'):
+        c = LAYOUT[k]['center']
+        rx, rz = LAYOUT[k]['rx'] + pad, LAYOUT[k]['rz'] + pad
+        if ((x - c[0]) / rx) ** 2 + ((-d - c[2]) / rz) ** 2 < 1.0:
+            return True
+    return False
+
+
+class Decor:
+    """3D set dressing merged into two objects: lit-by-baking props (tinted with the stage) and glow (never tinted)."""
+
+    def __init__(self, name, seed=1):
+        self.main = K.Prop(name, 'vcol', seed)
+        self.main.vcol_name = 'unlit_decor'
+        self.glow = K.Prop(name + '_glow', 'vcol', seed)
+        self.glow.vcol_name = 'unlit_glow_notint'
+        self.rs = random.Random(seed)
+
+    def put(self, P, x, d, scale=1.0, yaw=0.0, y=0.0, glow=False):
+        M = Matrix.Translation(Vector(B((x, y, -d)))) @ Matrix.Rotation(yaw, 4, 'Z') @ Matrix.Scale(scale, 4)
+        P.transform_all(M)
+        (self.glow if glow else self.main).absorb(P)
+
+    def scatter(self, fn, n, d_range, scale=(0.8, 1.2), pad=1.0, x_frac=1.0, glow=False, max_tries=8):
+        placed = 0
+        tries = 0
+        while placed < n and tries < n * max_tries:
+            tries += 1
+            d = self.rs.uniform(*d_range)
+            x = self.rs.uniform(-1, 1) * 0.544 * d * x_frac
+            if in_platform(x, d, pad):
+                continue
+            self.put(fn(placed), x, d, self.rs.uniform(*scale), self.rs.random() * math.tau, glow=glow)
+            placed += 1
+        return placed
+
+    def line(self, fn, xs, d, jitter=(0.0, 0.0), scale=(1.0, 1.0), glow=False, pad=0.0):
+        for i, x in enumerate(xs):
+            dd = d + self.rs.uniform(*jitter)
+            if in_platform(x, dd, pad):
+                continue
+            self.put(fn(i), x, dd, self.rs.uniform(*scale), self.rs.random() * math.tau, glow=glow)
+
+    def finish(self):
+        for P in (self.main, self.glow):
+            if len(P.bm.faces):
+                P.to_object()
+            else:
+                P.bm.free()
+
+
+def bays(spacing, span=15.0, phase=0.0):
+    n = int(span / spacing)
+    return [phase + (i - n) * spacing for i in range(2 * n + 1)]
+
+
+FLOWER_KINDS = ['flower_red', 'flower_yellow', 'flower_white', 'flower_pink']
+
+
+def flower(i):
+    return EP.PROPS[FLOWER_KINDS[i % 4]][0]('vcol')
+
+
+# ------------------------------------------------------------------ environments
 def env_grass():
     sky = paint_full(lambda s: U.vgrad(s, 0, 60, U.hexc('#6cb0f0'), U.hexc('#d8f0ff'), 6) or U.vgrad(s, 60, 180, U.hexc('#d8f0ff'), U.hexc('#d8f0ff'), 1))
     sky_plane(sky)
@@ -404,8 +518,16 @@ def env_grass():
     hill_prop('unlit_hills_far', 56, 16, 0.02, 1, '#8cb8b8', '#a8d0c8', 48.0)
     hill_prop('unlit_hills_near', 64, 10, 0.035, 4, '#5a9a70', '#78b880', 34.0)
     tree_line('trees', 76, 9, ['#1f5a3a', '#2f7a44', '#4c9a4c'], TREE_D, jitter=1.2)
-    g = paint_full(lambda s: U.paint_ground(s, 60, U.hexc('#7cc05a'), U.hexc('#6cb050'), U.hexc('#9ad870'), 7))
+    cols = (U.hexc('#7cc05a'), U.hexc('#6cb050'), U.hexc('#9ad870'))
+    g = paint_full(lambda s: U.paint_ground(s, 60, cols[0], cols[1], cols[2], 7))
+    EB.grass_blades(CAMG, g, cols, seed=3)
     ground_plane(g, far=TREE_D + 0.8)
+    D = Decor('grass_decor', 5)
+    D.line(lambda i: BP.bush(i), [-15 + i * 1.4 for i in range(22)], TREE_D - 0.6, jitter=(-0.1, 0.6), scale=(0.9, 1.4))
+    D.scatter(flower, 30, (5.0, 11.4), scale=(0.7, 1.1), pad=0.9)
+    D.scatter(lambda i: BP.tuft(i, 0.32), 70, (5.2, 11.6), scale=(0.8, 1.3), pad=0.5)
+    D.scatter(lambda i: BP.rock(i, 0.22, 'boulder'), 6, (5.0, 11.0), scale=(0.7, 1.3), pad=1.0)
+    D.finish()
 
 
 def env_forest():
@@ -414,7 +536,9 @@ def env_forest():
     tree_line('trees_far', 40, 2, ['#0f2a22', '#163a2a', '#1f4e32'], 26.0, jitter=1.0)
     tree_line('trees_mid', 62, 5, ['#15382a', '#1f5034', '#2c6a3e'], 17.0, jitter=1.0)
     tree_line('trees', 80, 7, ['#1a4830', '#27663c', '#3a8446'], TREE_D, jitter=0.8)
-    g = paint_full(lambda s: U.paint_ground(s, 66, U.hexc('#3c7a3e'), U.hexc('#346e38'), U.hexc('#58964c'), 6))
+    cols = (U.hexc('#3c7a3e'), U.hexc('#346e38'), U.hexc('#58964c'))
+    g = paint_full(lambda s: U.paint_ground(s, 66, cols[0], cols[1], cols[2], 6))
+    EB.grass_blades(CAMG, g, cols, seed=4, n=4200, flowers=False, litter=['#6a4a2c', '#8a6a3a', '#4c3a22'])
     ground_plane(g, far=TREE_D + 0.6)
     # light shafts: slanted translucent quads (upstream blends #e8f8b0 at 25% in bayer-dithered bands)
     m = mat_color('unlit_shaft', '#e8f8b0', alpha=0.08)
@@ -428,6 +552,13 @@ def env_forest():
         verts += [a, b, c, e]
         faces.append((i, i + 1, i + 2, i + 3))
     make_obj('unlit_shafts', verts, faces, [m])
+    D = Decor('forest_decor', 6)
+    D.line(lambda i: BP.trunk(4.6, i), bays(3.1, 16.0, 0.4), 11.3, jitter=(-0.5, 0.3), scale=(0.9, 1.5))
+    D.scatter(lambda i: BP.fern(i), 20, (5.4, 11.0), scale=(0.8, 1.3), pad=0.6)
+    D.scatter(lambda i: BP.mushroom(i), 14, (5.5, 11.0), scale=(0.7, 1.2), pad=0.8)
+    D.scatter(lambda i: BP.log(i), 3, (6.0, 10.5), scale=(1.0, 1.4), pad=1.4)
+    D.scatter(lambda i: BP.tuft(i, 0.4), 26, (5.4, 11.0), scale=(0.9, 1.4), pad=0.5)
+    D.finish()
 
 
 def _cave_wall(s):
@@ -443,9 +574,14 @@ def _cave_wall(s):
 def env_cave():
     wall = paint_full(_cave_wall)
     hd = WALL_D
+    EB.wall_strata(CAMG, wall, hd, '#8a7a72', seed=21)
     wall_plane(wall, hd, name='cave_wall')
     cones_hanging('stalactites', 18, 4, (8, 26), (3, 4), ['#5a4a44', '#3a302e'], hd - 1.0)
-    g = paint_full(lambda s: U.paint_ground(s, int(wall_row()) - 2, U.hexc('#5a4a42'), U.hexc('#4e4038'), U.hexc('#6e5c50'), 5))
+    cols = (U.hexc('#5a4a42'), U.hexc('#4e4038'), U.hexc('#6e5c50'))
+    g = paint_full(lambda s: U.paint_ground(s, int(wall_row()) - 2, cols[0], cols[1], cols[2], 5))
+    EB.pebbles(CAMG, g, ('#3a302a', '#6a5a4c', '#8e7a68', '#2a2220'), seed=5, n=300)
+    EB.cracks(CAMG, g, '#2c2420', seed=6, n=22)
+    EB.puddles(CAMG, g, '#3c4a5c', '#6a8aa8', seed=7, n=7)
     ground_plane(g, far=hd)
     # boulders at the foot of the wall
     rock_m = [mat_color('rock_d', '#3a302e'), mat_color('rock_m', '#54443a'), mat_color('rock_l', '#6a5848')]
@@ -470,6 +606,11 @@ def env_cave():
             fm.append(_lit_index((n.x, n.z, -n.y)))
         bm.free()
     make_obj('boulders', verts, faces, rock_m, face_mat=fm)
+    D = Decor('cave_decor', 8)
+    D.line(lambda i: BP.stalagmite(i, 0.9 + (i % 3) * 0.35), bays(2.4, 16.0, 0.3), hd - 0.9, jitter=(-0.5, 0.5), scale=(0.9, 1.5))
+    D.scatter(lambda i: BP.rock(i, 0.2), 10, (4.0, 11.0), scale=(0.7, 1.4), pad=1.0)
+    D.scatter(lambda i: BP.crystal('c' if i % 2 else 'p', i, 0.7), 8, (5.0, 11.8), scale=(0.7, 1.3), pad=1.3, glow=True)
+    D.finish()
 
 
 def _snow_dots(s):
@@ -497,10 +638,20 @@ def _ice_wall(s):
 def env_ice():
     wall = paint_full(lambda s: _ice_wall(s) or _snow_dots(s))
     hd = WALL_D
+    EB.wall_strata(CAMG, wall, hd, '#cfeaff', seed=22)
     wall_plane(wall, hd, name='ice_wall')
     cones_hanging('icicles', 22, 14, (10, 30), (2.5, 4), ['#a8d8f4', '#5a96c6'], hd - 1.0, edge_col='#f0fbff')
-    g = paint_full(lambda s: U.paint_ground(s, int(wall_row()) - 2, U.hexc('#b4d8ee'), U.hexc('#a4cce6'), U.hexc('#eef9ff'), 5) or _snow_dots(s))
+    cols = (U.hexc('#b4d8ee'), U.hexc('#a4cce6'), U.hexc('#eef9ff'))
+    g = paint_full(lambda s: U.paint_ground(s, int(wall_row()) - 2, cols[0], cols[1], cols[2], 5) or _snow_dots(s))
+    EB.cracks(CAMG, g, '#ffffff', seed=9, n=26)
+    EB.cracks(CAMG, g, '#7eb0d8', seed=10, n=16)
+    EB.sparkles(CAMG, g, '#ffffff', seed=11, n=110)
     ground_plane(g, far=hd)
+    D = Decor('ice_decor', 9)
+    D.line(lambda i: BP.ice_shards(i, 1.0 + (i % 3) * 0.45), bays(2.1, 16.0, 0.2), hd - 0.8, jitter=(-0.6, 0.4), scale=(0.9, 1.5))
+    D.scatter(lambda i: BP.snow_mound(i), 12, (5.0, 11.6), scale=(0.8, 1.6), pad=1.1)
+    D.scatter(lambda i: BP.crystal('c', i, 0.6), 6, (5.0, 11.6), scale=(0.7, 1.2), pad=1.2, glow=True)
+    D.finish()
 
 
 def _sea(s, y0, c0='#3a78c8', c1='#1e4a98', hi='#8ac8f8', mid='#6aa8e8', span=74):
@@ -525,11 +676,24 @@ def env_water(beach=False):
 
     def sea(s):
         _sea(s, 58)
+        EB.sea_crests(CAMG, s, 59, '#a8e0ff', '#6aa8e8', '#f4fcff', seed=31)
         if beach:
             U.paint_ground(s, 96, U.hexc('#f0dca0'), U.hexc('#e8d090'), U.hexc('#fff0c0'), 4)
+            EB.sand_ripples(CAMG, s, 96, 180)
+            EB.shore_foam(CAMG, s, 92, 100)
     g = paint_full(sea)
     hd = horizon_depth(57.5)
     ground_plane(g, far=hd, name='sea' if not beach else 'beach', nu=64, nv=60)
+    D = Decor('sea_decor', 10)
+    if beach:
+        D.put(BP.palm(2), -3.1, 4.9, 1.0, 0.4)
+        D.put(BP.palm(5), 4.6, 6.6, 1.15, 2.0)
+        D.scatter(lambda i: BP.shell(i), 14, (2.6, 7.0), scale=(0.9, 1.5), pad=0.6)
+        D.scatter(lambda i: BP.rock(i, 0.3, 'boulder'), 3, (4.5, 7.5), scale=(0.7, 1.1), pad=1.2)
+        D.scatter(lambda i: BP.sea_rock(i, 0.7), 3, (14.0, 24.0), scale=(1.0, 2.0), pad=0.0, x_frac=0.8)
+    else:
+        D.scatter(lambda i: BP.sea_rock(i, 0.8), 5, (14.0, 30.0), scale=(1.0, 2.2), pad=0.0, x_frac=0.9)
+    D.finish()
 
 
 def env_indoor(gym=False):
@@ -547,20 +711,37 @@ def env_indoor(gym=False):
                     c = U.hexc('#c0a878')
                 s.pset(x, y, c)
 
+    hd = WALL_D
+    w = paint_full(wall)
+    if gym:
+        EB.wall_panels(CAMG, w, hd, '#d8cfb8', '#a89870', '#e8dcc0', '#c8b890', seed=31, wain_h=1.2)
+        EB.wall_banners(CAMG, w, hd, ('#d8c8a0', '#8a7448'), seed=32)
+    else:
+        EB.wall_panels(CAMG, w, hd, '#dcd4c4', '#b8a888', '#ece4d2', '#cfc4ae', seed=30)
+    wall_plane(w, hd, name='indoor_wall')
+
     def floor(s):
         y0 = int(wall_row()) - 1
-        for y in range(y0, 180):
-            t = (y - y0) / (132 - y0)
-            for x in range(320):
-                px = (x - 160) / (0.4 + t) + 160
-                tile = (math.floor(px / 24) + math.floor((y - y0) / (6 + t * 10))) % 2
-                s.pset(x, y, U.hexc('#a8b8c8') if tile else U.hexc('#98a8b8'))
-    hd = WALL_D
-    wall_plane(paint_full(wall), hd, name='indoor_wall')
+        if gym:
+            EB.floor_tiles(CAMG, s, y0, '#b0a690', '#9c927c', '#6a6252', tile=1.1, seed=41,
+                           ring=(0.6, 7.2, 3.6, 3.8, '#e8dcc0'))
+        else:
+            EB.floor_tiles(CAMG, s, y0, '#a8b8c8', '#98a8b8', '#6c7c8c', tile=0.95, seed=40)
     ground_plane(paint_full(floor), far=hd, name='indoor_floor')
+    D = Decor('indoor_decor', 11)
+    D.line(lambda i: BP.column(3.9, 0.3, 'stone', i), [-9.6 + 3.2 * i for i in range(7)], hd - 0.55, scale=(1.0, 1.0))
+    D.put(EP.p_plant('vcol'), -0.544 * 6.4 * 0.78, 6.4, 1.5, 0.3)
+    D.put(EP.p_plant('vcol'), 0.544 * 8.4 * 0.86, 8.4, 1.5, 1.0)
+    D.put(EP.p_plant('vcol'), 0.544 * 11.6 * 0.9, 11.6, 1.7, 2.0)
+    D.put(EP.p_plant('vcol'), -0.544 * 11.6 * 0.9, 11.6, 1.7, 4.0)
+    D.put(BP.bench(1), -3.6, 11.5, 1.0, 0.0)
+    D.put(BP.bench(2), 5.4, 11.5, 1.0, 0.0)
+    D.finish()
 
 
 def env_tower():
+    hd = WALL_D
+
     def back(s):
         U.vgrad(s, 0, 180, U.hexc('#1e1630'), U.hexc('#4a3a5a'), 6)
         for y in range(132):
@@ -568,10 +749,27 @@ def env_tower():
                 f = U.N('big').at(x * 0.6 + 40, y * 1.2)
                 if f > 0.6:
                     s.pset(x, y, U.mix(s.get(x, y), U.hexc('#9a8ab8'), (f - 0.6) * 0.8))
-    hd = WALL_D
-    wall_plane(paint_full(back), hd, name='tower_wall')
-    g = paint_full(lambda s: U.paint_ground(s, int(wall_row()) - 2, U.hexc('#4a3e5a'), U.hexc('#40364e'), U.hexc('#5e5070'), 5))
+    w = paint_full(back)
+    EB.wall_stone_arches(CAMG, w, hd, '#4a3e5c', '#221a30', '#b48cff', seed=51)
+    wall_plane(w, hd, name='tower_wall')
+    y0 = int(wall_row()) - 2
+
+    def floor(s):
+        U.paint_ground(s, y0, U.hexc('#4a3e5a'), U.hexc('#40364e'), U.hexc('#5e5070'), 5)
+        EB.floor_slabs(CAMG, s, y0, ('#4a3e5c', '#5e5074', '#3c3250'), '#1e162c', seed=52, size=1.3, glow='#8a5cd8')
+    g = paint_full(floor)
     ground_plane(g, far=hd)
+    D = Decor('tower_decor', 12)
+    D.scatter(lambda i: BP.grave_row(i), 26, (6.5, 11.6), scale=(1.0, 1.5), pad=1.4)
+    for i in range(9):
+        d = D.rs.uniform(4.2, 11.6)
+        x = D.rs.uniform(-1, 1) * 0.544 * d * 0.95
+        if in_platform(x, d, 1.2):
+            continue
+        sc = D.rs.uniform(0.9, 1.4)
+        D.put(BP.candle_cluster(i), x, d, sc, 0.0)
+        D.put(BP.flame(1.0), x, d, sc, 0.0, y=0.36 * sc, glow=True)
+    D.finish()
 
 
 def env_mountain():
@@ -579,11 +777,22 @@ def env_mountain():
     sky_plane(sky)
     hill_prop('unlit_mtn_far', 50, 30, 0.03, 7, '#8a7a70', '#b0a090', 44.0)
     hill_prop('unlit_mtn_near', 68, 18, 0.05, 2, '#a08a70', '#c8b090', 26.0)
-    g = paint_full(lambda s: U.paint_ground(s, 60, U.hexc('#c0a882'), U.hexc('#b09a76'), U.hexc('#d8c4a0'), 6))
+    cols = (U.hexc('#c0a882'), U.hexc('#b09a76'), U.hexc('#d8c4a0'))
+    g = paint_full(lambda s: U.paint_ground(s, 60, cols[0], cols[1], cols[2], 6))
+    EB.pebbles(CAMG, g, ('#6a5842', '#9c8664', '#c8b088', '#5a4a36'), seed=61, n=420)
+    EB.cracks(CAMG, g, '#7a6446', seed=62, n=26)
+    EB.grass_blades(CAMG, g, (U.hexc('#9a9a52'), U.hexc('#88884a'), U.hexc('#b8b468')), seed=63, n=900, flowers=False)
     ground_plane(g, far=TREE_D + 0.8)
+    D = Decor('mountain_decor', 13)
+    D.line(lambda i: BP.spire(i, 3.4 + (i % 3) * 1.1), bays(4.6, 16.0, 0.8), TREE_D - 0.2, jitter=(-0.3, 0.8), scale=(0.9, 1.5))
+    D.scatter(lambda i: BP.rock(i, 0.3, 'cliff'), 12, (3.5, 11.0), scale=(0.7, 1.5), pad=1.1)
+    D.scatter(lambda i: BP.tuft(i, 0.4), 30, (3.0, 11.0), scale=(0.8, 1.4), pad=0.6)
+    D.finish()
 
 
 def env_power():
+    hd = WALL_D
+
     def wall(s):
         for y in range(180):
             for x in range(320):
@@ -601,15 +810,13 @@ def env_power():
         for y in range(74, 80):
             for x in range(320):
                 s.pset(x, y, U.hexc('#e8c020') if ((x + y) >> 2) & 1 else U.hexc('#1a1a1c'))
-    hd = WALL_D
-    wall_plane(paint_full(wall), hd, name='power_wall')
+    w = paint_full(wall)
+    EB.wall_industrial(CAMG, w, hd, '#3a4250', '#161a22', '#ffc628', seed=71)
+    wall_plane(w, hd, name='power_wall')
 
     def floor(s):
         U.paint_ground(s, int(wall_row()) - 2, U.hexc('#4a525e'), U.hexc('#424954'), U.hexc('#6a7482'), 5)
-        for y in range(80, 180):
-            for x in range(320):
-                if (x + (y - 80) * 3) % 64 == 0 or (y - 80) % 14 == 0:
-                    s.pset(x, y, U.hexc('#363c46'))
+        EB.floor_grate(CAMG, s, int(wall_row()) - 2, ('#404856', '#4c5664', '#7a8494'), seed=72)
     ground_plane(paint_full(floor), far=hd, name='power_floor')
     # conduits: real pipes along the wall (upstream paints two at y=18 and y=50)
     for y0, r, cols in [(18, 3, ['#d8a860', '#a87838']), (50, 2, ['#9aa8b8', '#6a7888'])]:
@@ -629,9 +836,17 @@ def env_power():
             fm.append(0 if math.cos(math.pi * 2 * (i + 0.5) / seg) > 0 else 1)
         bm.free()
         make_obj('pipe%d' % y0, verts, faces, [mat_color('pipe_hi%d' % y0, cols[0]), mat_color('pipe_lo%d' % y0, cols[1])], face_mat=fm)
+    D = Decor('power_decor', 14)
+    D.line(lambda i: BP.generator(i), [-9.5, -5.6, -1.8, 5.0, 9.0], hd - 0.9, scale=(1.0, 1.1))
+    D.scatter(lambda i: EP.p_barrel('vcol'), 6, (6.0, 11.5), scale=(1.1, 1.5), pad=1.3)
+    D.scatter(lambda i: BP.cable_coil(i), 4, (5.5, 11.0), scale=(0.9, 1.3), pad=1.3)
+    D.scatter(lambda i: EP.p_crate('vcol'), 5, (6.0, 11.4), scale=(1.0, 1.4), pad=1.3)
+    D.finish()
 
 
 def env_mansion():
+    hd = WALL_D
+
     def wall(s):
         for y in range(180):
             for x in range(320):
@@ -644,27 +859,38 @@ def env_mansion():
                 if burn > 0.6:
                     c = U.mix(c, U.hexc('#1a1210'), min(1, math.floor((burn - 0.6) * 10) / 4))
                 s.pset(x, y, c)
-    hd = WALL_D
-    wall_plane(paint_full(wall), hd, name='mansion_wall')
+    w = paint_full(wall)
+    EB.wall_wallpaper(CAMG, w, hd, '#6a3a3c', '#8a4c50', '#4a3222', seed=81)
+    wall_plane(w, hd, name='mansion_wall')
 
     def floor(s):
         U.paint_ground(s, int(wall_row()) - 2, U.hexc('#6a4e38'), U.hexc('#5e4430'), U.hexc('#8a6a4a'), 6)
-        for y in range(84, 180):
-            if (y - 84) % 9 == 0:
-                for x in range(320):
-                    s.pset(x, y, U.hexc('#46321f'))
+        EB.floor_planks(CAMG, s, int(wall_row()) - 2, ('#6a4c34', '#7c5c40', '#5a4028'), '#2a1a10', seed=82)
     ground_plane(paint_full(floor), far=hd, name='mansion_floor')
+    D = Decor('mansion_decor', 15)
+    D.line(lambda i: BP.candelabra(i), [-8.6, -4.2, 4.6, 8.8], hd - 0.7, scale=(1.5, 1.7))
+    for x in (-8.6, -4.2, 4.6, 8.8):
+        for k in (-0.28, 0.0, 0.28):
+            D.put(BP.flame(1.3), x + k * 1.6, hd - 0.7, 1.6, 0.0, y=1.55, glow=True)
+    D.line(lambda i: BP.urn(i), [-6.4, 2.6, 6.8], hd - 0.6, scale=(1.6, 2.0))
+    D.scatter(lambda i: BP.bench(i), 2, (7.0, 11.0), scale=(1.0, 1.2), pad=1.6)
+    D.finish()
 
 
 def env_elite(tint='#6a4a9a'):
     c = U.hexc(tint)
+    hd = WALL_D
 
     def back(s):
         U.vgrad(s, 0, 180, U.shade(c, -0.55), U.shade(c, -0.1), 6)
-    hd = WALL_D
-    wall_plane(paint_full(back), hd, name='elite_wall')
-    g = paint_full(lambda s: U.paint_ground(s, int(wall_row()) - 2, U.shade(c, -0.35), U.shade(c, -0.42), U.shade(c, -0.15), 5))
-    ground_plane(g, far=hd, name='elite_floor')
+    w = paint_full(back)
+    EB.wall_banners(CAMG, w, hd, ('#5a4a7a', '#d8c8f0'), gold=(232, 190, 92), seed=91)
+    wall_plane(w, hd, name='elite_wall')
+
+    def floor(s):
+        U.paint_ground(s, int(wall_row()) - 2, U.shade(c, -0.35), U.shade(c, -0.42), U.shade(c, -0.15), 5)
+        EB.floor_marble(CAMG, s, int(wall_row()) - 2, '#5a4a7a', '#c8b8ee', seed=92, ring=(0.6, 7.2, 3.6, 3.75, '#e8c85c'))
+    ground_plane(paint_full(floor), far=hd, name='elite_floor')
     mats = [mat_color('pillar_hi', U.shade(c, 0.35)), mat_color('pillar_mid', U.shade(c, 0.2)), mat_color('pillar_lo', U.shade(c, -0.3))]
     verts, faces, fm = [], [], []
     for k in range(8):
@@ -685,19 +911,39 @@ def env_elite(tint='#6a4a9a'):
             nx = math.cos(math.pi * 2 * (i + 0.5) / seg)
             fm.append(0 if nx < -0.3 else (1 if nx < 0.4 else 2))
         make_obj('pillars', verts, faces, mats, face_mat=fm) if k == 7 else None
+    D = Decor('elite_decor', 16)
+    for x in (-9.0, -4.6, 4.8, 9.2):
+        D.put(EP.p_brazier('vcol'), x, hd - 1.2, 1.5, 0.0)
+        D.put(BP.flame(2.2), x, hd - 1.25, 1.5, 0.0, y=0.98, glow=True)
+    D.finish()
 
 
 def env_cavewater(ice=False):
     wall = paint_full(_ice_wall if ice else _cave_wall)
     hd = WALL_D
+    EB.wall_strata(CAMG, wall, hd, '#cfeaff' if ice else '#8a7a72', seed=23)
     wall_plane(wall, hd, name='cw_wall')
     if ice:
         cones_hanging('icicles', 22, 14, (10, 30), (2.5, 4), ['#a8d8f4', '#5a96c6'], hd - 1.0, edge_col='#f0fbff')
     else:
         cones_hanging('stalactites', 18, 4, (8, 26), (3, 4), ['#5a4a44', '#3a302e'], hd - 1.0)
     c0, c1, hl = ('#3a7ab0', '#143866', '#b0e4ff') if ice else ('#24485a', '#0c1c28', '#5a8ca0')
-    g = paint_full(lambda s: _sea(s, int(wall_row()) - 1, c0, c1, hl, hl, 62))
+
+    def sea(s):
+        _sea(s, int(wall_row()) - 1, c0, c1, hl, hl, 62)
+        EB.sea_crests(CAMG, s, int(wall_row()), hl, c0, '#e8f6ff' if ice else '#a8d0e0', seed=33)
+        EB.sparkles(CAMG, s, '#ffffff' if ice else '#b8e0f0', seed=34, n=60, y_min_px=int(wall_row()) + 4)
+    g = paint_full(sea)
     ground_plane(g, far=hd, name='cave_sea')
+    D = Decor('cw_decor', 17)
+    if ice:
+        D.line(lambda i: BP.ice_shards(i, 1.0 + (i % 3) * 0.4), bays(2.6, 16.0, 0.4), hd - 0.8, jitter=(-0.6, 0.4), scale=(0.9, 1.4))
+        D.scatter(lambda i: BP.snow_mound(i), 6, (12.0, 22.0), scale=(1.0, 2.0), pad=0.0, x_frac=0.9)
+    else:
+        D.line(lambda i: BP.stalagmite(i, 0.9 + (i % 3) * 0.3), bays(2.8, 16.0, 0.3), hd - 0.8, jitter=(-0.5, 0.4), scale=(0.9, 1.4))
+        D.scatter(lambda i: BP.crystal('c', i, 0.8), 6, (6.0, 11.8), scale=(0.8, 1.3), pad=1.3, glow=True)
+        D.scatter(lambda i: BP.sea_rock(i, 0.7), 4, (12.0, 22.0), scale=(1.0, 2.0), pad=0.0, x_frac=0.9)
+    D.finish()
 
 
 ENVS = {
@@ -713,38 +959,91 @@ ENVS = {
 def platform(kind):
     cols = [U.hexc(c) for c in U.PLATFORM_COLS[kind]]
     paint_kind = U.PLATFORM_KIND[kind]
-    top = U.paint_platform_top(96, cols, paint_kind)
-    # alpha outside the ellipse (for the water ripple disc)
+    seed = sum(ord(ch) for ch in kind)
+    top = EB.platform_top(128, cols, kind, paint_kind, seed=seed)
+    side = EB.platform_side(kind, cols, seed=seed + 1)
     mt = mat_image('plat_top_' + kind, top, rough=0.95)
-    side_col = cols[0] if paint_kind == 'water' else U.shade(cols[0], -0.25)
-    ms = mat_color('plat_side_' + kind, side_col)
-    seg = 48
+    ms = mat_image('plat_side_' + kind, side, rough=0.95)
+    seg = 64
     h_top = 0.14
     h_bot = -0.06 if paint_kind != 'water' else 0.10
+    lip = 0.02 if paint_kind != 'water' else 0.0
     verts, uvs, faces, fm = [(0.0, h_top, 0.0)], [(0.5, 0.5)], [], []
-    for i in range(seg):
-        a = math.pi * 2 * i / seg
-        x, z = math.cos(a), math.sin(a)
-        verts.append((x, h_top, z))
+
+    def disc_vertex(r, h, a):
+        x, z = math.cos(a) * r, math.sin(a) * r
+        verts.append((x, h, z))
         uvs.append((0.5 + x * 0.5, 0.5 - z * 0.5))
+        return len(verts) - 1
+    # top: centre fan out to r=0.9, a raised lip ring (chamfered) out to the rim
+    ring_in = [disc_vertex(0.9, h_top, 2 * math.pi * i / seg) for i in range(seg)]
+    ring_lip = [disc_vertex(0.95, h_top + lip, 2 * math.pi * i / seg) for i in range(seg)]
+    ring_out = [disc_vertex(1.0, h_top, 2 * math.pi * i / seg) for i in range(seg)]
     for i in range(seg):
         j = (i + 1) % seg
-        faces.append((0, 1 + j, 1 + i))
+        faces.append((0, ring_in[j], ring_in[i]))
         fm.append(0)
-    # side skirt (flares slightly)
-    base = len(verts)
-    for i in range(seg):
-        a = math.pi * 2 * i / seg
-        x, z = math.cos(a), math.sin(a)
-        verts.append((x, h_top, z))
-        uvs.append((0, 0))
-        verts.append((x * 1.03, h_bot, z * 1.03))
-        uvs.append((0, 0))
-    for i in range(seg):
-        j = (i + 1) % seg
-        faces.append((base + 2 * i, base + 2 * j, base + 2 * j + 1, base + 2 * i + 1))
-        fm.append(1)
+        faces.append((ring_in[i], ring_in[j], ring_lip[j], ring_lip[i]))
+        fm.append(0)
+        faces.append((ring_lip[i], ring_lip[j], ring_out[j], ring_out[i]))
+        fm.append(0)
+    # side skirt: four rings, seg+1 columns so the strip texture wraps without a shared seam vertex
+    prof = [(1.0, h_top, 0.0), (1.022, h_top - 0.05, 0.28), (1.018, h_bot + 0.035, 0.8), (1.05, h_bot, 1.0)]
+    cols_idx = []
+    for k, (r, h, v) in enumerate(prof):
+        row = []
+        for i in range(seg + 1):
+            a = 2 * math.pi * i / seg
+            verts.append((math.cos(a) * r, h, math.sin(a) * r))
+            uvs.append((i / seg * 3.0, 1.0 - v))
+            row.append(len(verts) - 1)
+        cols_idx.append(row)
+    for k in range(len(prof) - 1):
+        for i in range(seg):
+            faces.append((cols_idx[k][i], cols_idx[k][i + 1], cols_idx[k + 1][i + 1], cols_idx[k + 1][i]))
+            fm.append(1)
     make_obj('platform_' + kind, verts, faces, [mt, ms], face_mat=fm, uvs=uvs)
+    # set dressing on the rim (unit disc coordinates; the stage scales the platform to its ellipse)
+    D = Decor('plat_' + kind, seed)
+    rs = D.rs
+
+    def at(fn, n, r0, r1, scale, glow=False, yaw_free=True):
+        for _ in range(n):
+            a = rs.random() * math.tau
+            r = rs.uniform(r0, r1)
+            x, z = math.cos(a) * r, math.sin(a) * r
+            P = fn()
+            M = Matrix.Translation(Vector(B((x, h_top + lip * 0.5, z)))) @ Matrix.Rotation(rs.random() * math.tau if yaw_free else 0.0, 4, 'Z') @ Matrix.Scale(rs.uniform(*scale), 4)
+            P.transform_all(M)
+            (D.glow if glow else D.main).absorb(P)
+    if kind in ('grass', 'forest'):
+        at(lambda: BP.tuft(rs.randint(0, 999), 0.16), 15, 0.8, 0.97, (0.7, 1.1))
+        at(lambda: EP.PROPS[FLOWER_KINDS[rs.randint(0, 3)]][0]('vcol'), 5, 0.55, 0.85, (0.35, 0.5))
+    elif kind in ('sand', 'mountain'):
+        at(lambda: BP.shell(rs.randint(0, 99)), 6 if kind == 'sand' else 0, 0.3, 0.9, (0.4, 0.6))
+        at(lambda: BP.rock(rs.randint(0, 99), 0.05, 'boulder'), 8, 0.6, 0.97, (0.6, 1.2))
+    elif kind == 'rock':
+        at(lambda: BP.rock(rs.randint(0, 99), 0.05, 'rock'), 10, 0.55, 0.97, (0.6, 1.3))
+        at(lambda: BP.stalagmite(rs.randint(0, 99), 0.14), 4, 0.86, 0.97, (0.8, 1.2))
+    elif kind == 'ice':
+        at(lambda: BP.ice_shards(rs.randint(0, 99), 0.22), 6, 0.86, 0.98, (0.7, 1.2))
+    elif kind == 'metal':
+        for a in range(10):
+            ang = a * math.tau / 10
+            P = K.Prop('bolt', 'vcol', a)
+            P.cyl(0, 0, 0, 0.035, 0.03, 0.026, 'steel', seg=6, ao=False, bias=1)
+            M = Matrix.Translation(Vector(B((math.cos(ang) * 0.955, h_top + lip, math.sin(ang) * 0.955))))
+            P.transform_all(M)
+            D.main.absorb(P)
+    elif kind == 'tower':
+        for a in range(4):
+            ang = 0.4 + a * math.tau / 4
+            for glow in (False, True):
+                P = BP.candle_cluster(a) if not glow else BP.flame(0.6)
+                M = Matrix.Translation(Vector(B((math.cos(ang) * 0.9, h_top + (0.34 * 0.5 if glow else 0.0) + 0.0, math.sin(ang) * 0.9)))) @ Matrix.Scale(0.5, 4)
+                P.transform_all(M)
+                (D.glow if glow else D.main).absorb(P)
+    D.finish()
 
 
 def main():

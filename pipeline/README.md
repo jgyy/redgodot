@@ -86,52 +86,78 @@ pipeline still in progress.
 
 ### Pokemon & character models
 
-One command regenerates every Pokemon (151 + MISSINGNO., ~2.5 min with 4 workers):
+One command regenerates every Pokemon (151 + MISSINGNO., ~5 min with 3 workers on 4 cores):
 
 ```sh
-UPSTREAM=/path/to/pokemon-claude-red python3 pipeline/blender/gen_pokemon.py -- --all --jobs 4
+python3 pipeline/blender/gen_pokemon.py -- --all --jobs 3
 python3 pipeline/blender/gen_characters.py                       # 60 cast sprites + humanoid.glb (~2 min)
-# single species while iterating:  python3 pipeline/blender/gen_pokemon.py -- --only PIKACHU,ONIX
+# single species while iterating (--noanim = geometry only, ~3 s per species):
+python3 pipeline/blender/gen_pokemon.py -- --only PIKACHU,ONIX [--noanim]
+# checks: every glb has the six clips, Idle/Walk loop seamlessly (last key == first key), no popping keys
+python3 pipeline/blender/check_pokemon_anims.py
+python3 pipeline/blender/verify_glb.py godot/assets/models/pokemon --anims Idle,Walk,Attack,Hurt,Faint,Special
 # contact sheets vs upstream's sprites -> docs/gallery/{pokemon-151-3d,characters-3d}[-back].png
 UPSTREAM=/path/to/pokemon-claude-red GODOT_BIN=/opt/godot/godot4 pipeline/scripts/model_sheets.sh
 ```
 
-(`UPSTREAM` is only needed for MISSINGNO., whose look is upstream's `glitchSprite()`
-output baked through `pipeline/scripts/bake_monsprites.js`; everything else reads
-`pipeline/extracted/*.json`.)
+(MISSINGNO.'s look is upstream's `glitchSprite()` output. It is read from
+`pipeline/data/missingno_{front,back}.png`, baked from upstream once, so no upstream checkout is needed; set
+`UPSTREAM=/path/to/pokemon-claude-red` to re-bake it through `pipeline/scripts/bake_monsprites.js`. Everything
+else reads `pipeline/extracted/*.json` and `pipeline/data/species_looks.json`.)
 
-**How a sprite definition becomes a model** (`gen_pokemon.py`, `monsdf.py`, `monraster.py`):
+**Pokemon: from sprite definition to model** (`gen_pokemon.py` orchestrates; `monparts.py`, `monfield.py`,
+`monsdf.py`, `monraster.py`, `monrig.py`, `monanim.py`, `species_fixes.py`, `glbtools.py`):
 
-- Geometry lives in upstream's own 64x64 sprite space (Blender X = x-32, Z = 60-y,
-  Y = depth, front = -Y = Godot +Z), so every part lines up with the sprite pixel-for-pixel.
-- Each art group (`g`) becomes ONE smooth, watertight surface: its ellipsoids, tapered
-  capsules, strokes and pillowed/bevelled polygon plates are signed-distance fields,
-  smooth-unioned and polygonised with surface nets (pure numpy), lightly smoothed,
-  then decimated (~6k tris per species). Groups stay separate surfaces — upstream
-  draws an inner line between groups, and the outline hull reproduces it where they meet.
-- Depth comes from paint order: groups painted later are pushed just in front of what
-  they overlap (big groups only for most of their overlap, so heads/limbs stay embedded);
-  ellipsoid groups lying over earlier ones (belly plates, cheeks, noses) are flattened
-  into lenses; big shapes that merely touch in 2D (a head resting on a body) get a short
-  "neck" so they don't float apart when seen from behind.
-- Texture: one albedo atlas per species. For every group a FRONT layer (parts, `on:`
-  spots/stripes, eyes, mouths, shines — pokesprite.js's coverage/feature code without its
-  lighting) and a BACK layer (no `face`/`frontOnly`/`belly` parts, `backOnly` parts added,
-  `bz` order) are rasterised at 4 texels/px; UVs are the planar sprite projection
-  (front-facing faces -> front layer, back-facing -> back layer). Eyes and patterns land
-  exactly where the sprite has them.
-- Rig: one bone per art group (face parts parented to `head`); clips `Idle` (breathing,
-  bob, tail wag, wing beat — fliers flap, hoverers float), `Walk`, `Attack` (anticipation +
-  lunge), `Hurt` (knock-back shudder), `Faint` (hop, crumple, sink; holds last frame),
-  `Special` (hop + spin).
-- Scale: model height = Pokedex height; `manifest.json` also records `px_height` (height
-  in sprite pixels) so `PokemonActor.use_sprite_scale(frame_m)` can size models exactly
-  like upstream's battle sprites (all drawn in one 64px frame).
-- Shading happens in Godot: `godot/assets/shaders/toon.gdshader` (upstream's 5-step
-  hue-shifted ramp from gfx.js `shade()`, screen-space upper-left light, `tint`/`flash`/
-  `fade`/`ramp_bias` uniforms) + `outline.gdshader` (inverted hull in upstream's outline
-  colour `mix(shade(c,-0.8), #141220, 0.55)`), applied by `Toon.apply(node)`; both run in
-  the Compatibility renderer.
+- *Research first.* `pipeline/data/species_looks.json` holds, for all 151 species, the researched look (from
+  Bulbapedia / Pokemon Fandom / PokemonDB descriptions, sources listed per species): body plan, official
+  main/secondary/accent colours, identifying features, gait, attack and special style, weight, surface (fur /
+  scale / rock / skin / plant / smooth), plus optional overrides (`view`, `face`, `chains`, `roles`, `pal`,
+  `flutter`). It drives the surface micro-texture, the animation archetype and the rig hints; the manifest records
+  `palette_delta_e` (CIE-Lab distance between the closest of the sprite's three biggest colours and the researched
+  official main colour: it flags species to eyeball, e.g. Gastly whose gas is lighter than its dark core, but the
+  sprite palettes were judged faithful) and an advisory `missing_features` list; a `pal` map in
+  `species_looks.json` recolours a palette that is off. `species_fixes.py` then patches the sprite's part list where the 3D result
+  would be anatomically off or unappealing (a helper API: add/drop/scale/thicken/duplicate groups; e.g. Jynx's
+  mane, Hitmonlee's head, the turtles' shells, Charizard's neck, Poliwag's tail, Gyarados' mouth).
+- *Geometry.* The parts live in upstream's own 64x64 sprite space (Blender X = x-32, Z = 60-y, Y = depth, front
+  = -Y = Godot +Z), so everything lines up with the sprite pixel-for-pixel. Every part is a signed-distance field
+  (ellipsoids, tapered capsules, strokes, bevelled plates; slender plates get a round cross-section). All art groups
+  share ONE grid (0.26 sprite px): groups are smooth-unioned into a single watertight surface with filleted
+  joints (shoulders, necks, tail roots), while sibling limbs (left/right legs, ears, arms) use a hard minimum so
+  they never web together. The surface is polygonised with surface nets (sparse numpy), snapped to the field,
+  decimated (5-11k triangles), and lit with smooth normals taken from the field gradient. Depth still comes from
+  paint order (`solve_depth`); belly plates, cheeks and other lens-shaped groups lying on a host group become texture
+  decals instead of geometry.
+- *Ambient occlusion.* AO is marched through the same field per vertex and exported as vertex colour (`COLOR_0`);
+  `toon.gdshader` blends occluded areas toward its darkest cel step (`use_vertex_ao`, off by default so every other
+  model is unchanged; `PokemonActor` switches it on).
+- *Texture.* One anti-aliased atlas per species, `<SPECIES>_tex.webp` next to the glb (referenced by uri, so
+  Godot imports it once instead of extracting a second copy): for every group a FRONT and a BACK layer (front:
+  parts + `on:` spots/stripes + decals + eyes/mouths, back: `backOnly` parts, no `face` parts) rasterised
+  3x3-supersampled at 5 texels per sprite px, with continuous (not pixel-snapped) glossy eyes, per-archetype fur /
+  scale / rock / plant micro-detail and a subtle top-light / underside-shade gradient. Triangles are assigned to
+  the group whose field they lie on (neighbour-majority filtered) and UV-mapped by planar sprite projection into
+  that group's layer.
+- *Rig and skinning.* One bone per art group in a parent tree (head under body, ears under head, feet under legs
+  ...) plus chains where it matters: tails, necks, tentacles and serpent bodies (3-10 bones), and two-bone legs, arms,
+  wings and long ears. Skin weights are blended from the group fields (a vertex near a neighbouring group's
+  surface is partly skinned to it) and smoothed over the mesh, max 4 influences; chain bones share weight by
+  geodesic distance along the part.
+- *Animation* (`monanim.py`, baked at 30 fps from smooth closed-form motion, no coarse linear keys): `Idle` (2 s
+  loop) breathes / hovers / slithers; `Walk` (16 frames = 0.533 s = one full stride, i.e. TWO overworld cells of
+  0.267 s) is archetype-specific: biped alternating steps with counter-rotating shoulders, roll and foot lift,
+  quadruped diagonal gait with spine pitch, serpent / fish travelling waves, wing flapping with body bob, floaters,
+  squash-and-stretch hops, caterpillar inching, crab scuttle; feet are planted while the torso bobs and tails, ears,
+  necks and leaves follow through with phase lag. `Attack` (anticipation, strike, follow-through; tackle / charge /
+  bite / headbutt / punch / slash / tail whip / rear up / beam / slam / peck / coil / psychic), `Hurt` (recoil + damped
+  spring), `Faint` (topples onto the floor, holds the last frame), `Special` (spin / roar / pulse / dance / shake /
+  hop). Idle and Walk have last key == first key. `PokemonActor` cross-fades between clips (0.12 s).
+- *Scale.* Model height = Pokedex height; `manifest.json` also records `px_height` (height in sprite pixels) so
+  `PokemonActor.use_sprite_scale(frame_m)` sizes models exactly like upstream's battle sprites (64 px frame).
+- *Size.* glb: quantised vertex colour / weights (`glbtools.py`), lossy WebP atlas: ~50 MB for all 152 models.
+- *Shading* happens in Godot: `godot/assets/shaders/toon.gdshader` (upstream's 5-step hue-shifted ramp from
+  gfx.js `shade()`, screen-space upper-left light, `tint`/`flash`/`fade`/`ramp_bias` uniforms, baked AO) +
+  `outline.gdshader` (inverted hull), applied by `Toon.apply(node)`; both run in the Compatibility renderer.
 
 **Characters** (`gen_characters.py`): every humanoid `cast.json` entry (head style
 cap/spiky/short/long/bald/hat/beanie/bun/pony, body normal/coat/dress/shorts/swim,
@@ -143,10 +169,10 @@ skirts/coats — with materials named by palette role (`mat_skin`, `mat_hair`, `
 returns the right model (manifest `aliases`, then the tinted legacy `humanoid.glb`).
 Creature/object sprites (`monster`, `bird`, `poke_ball`, ...) are not built here.
 
-Known limits: parts are rigid per group (no smooth skin weights across groups); a few
-face details can peek out at the silhouette from behind (e.g. Diglett's nose); sprite
-art that is really a side view stays a relief (thin in depth) — it reads correctly from
-the battle camera angles, less so from a pure side view.
+Known limits: sprite art that is really a side view is still a fairly thin relief (species_fixes.py adds depth where
+it matters most); a few face details can peek out at the silhouette from behind (e.g. Diglett's nose); eyes are
+texture decals (crisp, glossy, anti-aliased) rather than modelled eyeballs; the Walk clip is authored for two
+overworld cells, so the overworld should not restart it every cell (let it run, or seek to the cell's phase).
 
 ## Regenerating
 
@@ -241,3 +267,30 @@ exactly like its 2D sprite, but it is real geometry that occludes characters, ca
 shows perspective. `TileKit` draws the Blender trees (chunked MultiMeshes + inverted-hull outline), layered
 tall-grass cards (upstream's sway / rustle timing), animated flowers, brazier flames, barriers and teleport
 pads. All world shaders do their colour maths in sRGB like the 2D game (grade, light pools, cloud shadows).
+
+### Environment models and buildings (`env_*.py`)
+
+`pipeline/blender/env_textures.py` (procedural painted tiles, `pipeline/data/env_tex/`), `env_kit.py` (the bmesh
+`Prop` builder: ramp-lit vertex colours, detail ids in vertex alpha, ink outlines), `env_props.py` / `env_tiles.py`
+(fences, signs, crates, statues, trees, flowers ...), `env_bg.py` / `env_bgprops.py` (battle backdrops) and
+`env_buildings.py` (building parts) are driven by `gen_world.py` / `gen_tiles.py` / `gen_battlebg.py`.
+
+Buildings are real volumes assembled at load time by `godot/scripts/overworld/BuildingBuilder.gd` for every
+`house` block (types house / big / center / gym / mart); `WorldBuilder._emit_house` falls back to the older
+sprite-extruded building whenever a block cannot be sampled (set `BLD_LEGACY=1` to force that path for
+before/after comparisons). The baked atlas supplies only the colours and layout: roof, wall, trim and door colours
+are the modes of the building's own sprite pixels; windows, doors and signs are found from the label grid and the
+sprite's glass pixels.
+
+- GDScript geometry: plinth, corner posts and a frieze on the walls, a hip roof with a real overhang, fascia,
+  modelled shingle rows (lip + riser), hip caps and ridge cap, the Center's Poké Ball emblem re-drawn as a disc
+  on the slope, flat roofs with parapet, coping and cornice, sign boards (the sprite's lettering as a texture) with
+  side pins. Solid faces carry a procedural material id in vertex alpha (`0.04 * id`, decoded in `world.gdshader`
+  `bld_pattern`: 1/2 shingle rows, 3 clapboard, 4 brick, 5 ashlar, 6 concrete panels, 7 plaster) laid on the 2D
+  art's pixel grid, plus baked AO in the vertex colours.
+- Blender parts (`assets/models/world/bld_*.glb`, generated by `gen_world.py`): `window`, `window_big`
+  (frame, mullions, sill, lintel, recessed gradient glass with reflection), `shutter`, `door` (frame, steps,
+  hinges, bell), `glassdoor`, `awning`, `porch`, `pillar`, `lamp`, `dormer`, `chimney`, `acunit`. Tintable
+  slots are vertex alpha ids 11-15 (wall / roof / trim / door / shutter) on a grey ramp; `BuildingBuilder._part`
+  recolours them per building and bakes the instance into the building's single mesh. Fixed-colour parts
+  (glass, steel, lamp glow) use alpha 1.

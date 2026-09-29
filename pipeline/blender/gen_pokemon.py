@@ -3,9 +3,12 @@
 Usage (headless Blender via the bpy wheel, or `blender --background --python ... --`):
   python3 pipeline/blender/gen_pokemon.py -- --all            # all 151 (+ MISSINGNO)
   python3 pipeline/blender/gen_pokemon.py -- --only PIKACHU,CHARIZARD
-  python3 pipeline/blender/gen_pokemon.py -- --all --jobs 4   # parallel worker processes
+  python3 pipeline/blender/gen_pokemon.py -- --all --jobs 3   # parallel worker processes
+  add --noanim for a quick geometry-only export, --out DIR to write elsewhere.
 
-Input : pipeline/extracted/mons.json (upstream src/data/mons/*.js), pokedata.json
+Input : pipeline/extracted/mons.json (upstream src/data/mons/*.js), pokedata.json,
+        pipeline/data/species_looks.json (researched look of every species: archetype, gait,
+        official colours, key features), pipeline/blender/species_fixes.py (per-species patches)
 Output: godot/assets/models/pokemon/<SPECIES>.glb + manifest.json
 
 How a 2D definition becomes a model
@@ -13,20 +16,22 @@ How a 2D definition becomes a model
 * Geometry lives in upstream's own 64x64 sprite space (x right, y down, ground ~ y 60)
   plus a depth axis, so every part lines up exactly with the sprite.
   Blender: X = x - 32, Z = 60 - y, Y = depth (front = -Y = glTF/Godot +Z).
-* Each art group (`g`) is ONE smooth watertight surface: its ellipsoids, tapered
-  capsules, strokes and bevelled polygon plates are signed-distance fields,
-  smooth-unioned and polygonised with surface nets (monsdf.py), then decimated.
-  Groups keep their own surface (upstream draws an inner line between groups) and
-  get their own bone.
-* Depth: paint order (z, then array order) becomes front-to-back placement: each
-  group is pushed just far enough forward/back to be in front of / behind the groups
-  it overlaps (solve_depth).
-* Texture: an albedo atlas holds, per group, a front and a back layer rasterised
-  from the definition itself (monraster.py -- pokesprite.js's coverage/feature code
-  minus its lighting): palette colours, spots, stripes, eyes, mouths, shines.  UVs
-  are the planar sprite projection, front layer on front-facing faces and the
-  back layer (no face parts, backOnly parts) on back-facing ones -- so eyes and
-  patterns land exactly where the sprite has them.
+* species_fixes.py first patches the definition where the sprite is anatomically off or
+  unappealing (extra limbs, thicker necks, better ears, ...), driven by species_looks.json.
+* Each art group (`g`) is a smooth-union SDF of its ellipsoids, tapered capsules, strokes
+  and bevelled polygon plates (monparts.py).  All groups share one grid and are smooth-unioned
+  into ONE watertight surface with filleted joints; sibling limbs (left/right legs...) are joined
+  with a hard min so they never web (monfield.py).  The surface is polygonised with surface
+  nets, snapped to the field, decimated, and given smooth normals from the field gradient.
+* Ambient occlusion is marched through the same field and exported as vertex colour (COLOR_0);
+  the toon shader multiplies it in (`use_vertex_ao`).
+* Depth: paint order (z, then array order) becomes front-to-back placement (solve_depth).
+* Texture: an anti-aliased albedo atlas (3x3 supersampled, 5 texels per sprite pixel) holds per
+  group a front and a back layer rasterised from the definition itself (monraster.py): palette
+  colours, spots, stripes, eyes, mouths, shines, plus subtle fur / scale / rock micro detail.
+* Rig: one bone per art group arranged in a parent tree, plus secondary chains along tails, necks
+  and serpent bodies; skin weights blend smoothly where groups meet (monrig.py).
+* Animation: archetype-specific gaits, idles, attacks, hurt/faint/special clips (monanim.py).
 * Lighting / outline happen in Godot (assets/shaders/toon.gdshader).
 """
 import json
@@ -45,523 +50,197 @@ import bpy  # noqa: E402
 import bmesh  # noqa: E402
 from mathutils import Vector  # noqa: E402
 import common as C  # noqa: E402
-import monsdf as SD  # noqa: E402
+import monfield as MF  # noqa: E402
+import monparts as MP  # noqa: E402
 import monraster as RS  # noqa: E402
+import monrig as RG  # noqa: E402
+import glbtools as GT  # noqa: E402
+
+try:
+    import species_fixes as FX  # noqa: E402
+except ImportError:          # pragma: no cover
+    FX = None
 
 ROOT = os.path.abspath(os.path.join(HERE, '..', '..'))
 EXTRACTED = os.path.join(ROOT, 'pipeline', 'extracted')
+DATA_DIR = os.path.join(ROOT, 'pipeline', 'data')
 OUT_DIR = os.path.join(ROOT, 'godot', 'assets', 'models', 'pokemon')
 
-SOLID_TYPES = ('e', 'c', 'p', 'l')
-FEATURE_TYPES = ('eye', 'mouth', 'shine')
-TEX_S = 4.0            # atlas texels per sprite pixel
-ATLAS_W = 1024
-TRI_BUDGET = 6000      # per species (before the minimum-per-group floor)
+FEATURE_TYPES = MP.FEATURE_TYPES
+TEX_S = 5.0            # atlas texels per sprite pixel (final)
+TEX_SS = 3             # supersampling factor per axis for anti-aliasing
+GRID_H = 0.26          # SDF grid spacing in sprite px
+MIN_TRIS, MAX_TRIS = 5000, 11000
+AO_STRENGTH = 0.9
+GRAD_AMP = 0.16        # top-to-bottom albedo gradient (+8% at the top, -8% at the bottom of the model)
+TEX_WEBP_Q = 95        # lossy WebP quality of the atlas (smooth palette art: keeps glb + texture small)
 
 
-# ============================================================================ parts
-def resolve_color(c, pal):
-    return RS.col(c, pal)
+def load_looks():
+    p = os.path.join(DATA_DIR, 'species_looks.json')
+    if os.path.exists(p):
+        return json.load(open(p))
+    return {}
 
 
-def fnum(p, k, d=0.0):
-    v = p.get(k, d)
-    try:
-        return float(v if v is not None else d)
-    except (TypeError, ValueError):
-        return d
-
-
-class Part:
-    """One solid primitive with an SDF and an analytic half-thickness footprint."""
-
-    def __init__(self, p, order, gname, color):
-        self.p = p
-        self.t = p['t']
-        self.order = order
-        self.z = fnum(p, 'z', 0.0)
-        self.key = self.z * 1000 + order          # upstream's z-buffer key
-        self.g = gname
-        self.color = color
-        self.flat = bool(p.get('flat'))
-        t = self.t
-        if t == 'e':
-            self.cx, self.cy = fnum(p, 'x'), fnum(p, 'y')
-            self.rx = max(0.5, fnum(p, 'rx', 2) or 2)
-            self.ry = max(0.5, fnum(p, 'ry', self.rx) or self.rx)
-            self.rot = math.radians(fnum(p, 'rot', 0))
-            lo, hi = min(self.rx, self.ry), max(self.rx, self.ry)
-            self.rd = (0.82 * lo + 0.12 * hi) * (0.55 if self.flat else 1.0)
-            self.rd = max(self.rd, 0.6)
-            self.thin = min(lo, self.rd)
-            self.area = math.pi * self.rx * self.ry
-        elif t in ('c', 'l'):
-            if t == 'c':
-                r1 = max(0.45, fnum(p, 'r1', 2) or 2)
-                r2 = max(0.45, fnum(p, 'r2', r1) if p.get('r2') is not None else r1)
-                self.segs = [(fnum(p, 'x1'), fnum(p, 'y1'), fnum(p, 'x2'), fnum(p, 'y2'), r1, r2)]
-            else:
-                pts = RS.pairs(p['pts'])
-                w1 = fnum(p, 'w', 2) or 2
-                w2 = fnum(p, 'w2', w1) if p.get('w2') is not None else w1
-                self.segs = [(a, b, c, d, max(0.45, ra), max(0.45, rb))
-                             for a, b, c, d, ra, rb in RS.stroke_segments(pts, w1, w2)]
-            self.thin = min(min(s[4], s[5]) for s in self.segs)
-            self.area = sum(math.hypot(s[2] - s[0], s[3] - s[1]) * (s[4] + s[5]) for s in self.segs) + \
-                math.pi * max(max(s[4], s[5]) for s in self.segs) ** 2
-        elif t == 'p':
-            pts = RS.pairs(p['pts'])
-            # drop duplicate closing point
-            if len(pts) > 3 and abs(pts[0][0] - pts[-1][0]) < 1e-6 and abs(pts[0][1] - pts[-1][1]) < 1e-6:
-                pts = pts[:-1]
-            self.pts = pts
-            cx = sum(q[0] for q in pts) / len(pts)
-            cy = sum(q[1] for q in pts) / len(pts)
-            R = max(math.hypot(q[0] - cx, q[1] - cy) for q in pts)
-            a = 0.0
-            for i in range(len(pts)):
-                x0, y0 = pts[i]
-                x1, y1 = pts[(i + 1) % len(pts)]
-                a += x0 * y1 - x1 * y0
-            self.area = abs(a) * 0.5
-            # inradius estimate on a coarse grid
-            xs = np.linspace(min(q[0] for q in pts), max(q[0] for q in pts), 24)
-            ys = np.linspace(min(q[1] for q in pts), max(q[1] for q in pts), 24)
-            GX, GY = np.meshgrid(xs, ys)
-            d2 = SD.poly_sdf2d(GX, GY, pts)
-            self.inr = max(0.3, float(-d2.min()))
-            k = 0.6 if self.flat else 1.0
-            self.T0 = max(0.5, min(1.4, 0.05 * R)) * k
-            self.T1 = max(self.T0, min(0.42 * self.inr, 0.16 * R, 6.0) * k)
-            self.round = min(self.T0 * 0.85, 0.7)
-            self.thin = self.T0
-        else:
-            raise ValueError('not a solid: %s' % t)
-        self.bx0, self.by0, self.bx1, self.by1 = RS.part_bbox(p) if t != 'l' else self._stroke_bbox()
-
-    def _stroke_bbox(self):
-        xs = [s[0] for s in self.segs] + [s[2] for s in self.segs]
-        ys = [s[1] for s in self.segs] + [s[3] for s in self.segs]
-        r = max(max(s[4], s[5]) for s in self.segs)
-        return min(xs) - r, min(ys) - r, max(xs) + r, max(ys) + r
-
-    def depth_extent(self):
-        if self.t == 'e':
-            return max(self.rx, self.ry, self.rd)
-        if self.t in ('c', 'l'):
-            return max(max(s[4], s[5]) for s in self.segs) + abs(getattr(self, 'depth_to', 0.0))
-        return self.T1
-
-    # half-thickness at a sprite point (None outside the footprint)
-    def surf(self, x, y):
-        t = self.t
-        if t == 'e':
-            dx, dy = x - self.cx, y - self.cy
-            c, s = math.cos(self.rot), math.sin(self.rot)
-            u = (dx * c + dy * s) / self.rx
-            v = (-dx * s + dy * c) / self.ry
-            q = u * u + v * v
-            return self.rd * math.sqrt(1 - q) if q < 1 else None
-        if t in ('c', 'l'):
-            best = None
-            for ax, ay, bx, by, ra, rb in self.segs:
-                ex, ey = bx - ax, by - ay
-                l2 = ex * ex + ey * ey
-                tt = 0.0 if l2 < 1e-12 else max(0.0, min(1.0, ((x - ax) * ex + (y - ay) * ey) / l2))
-                d = math.hypot(x - ax - ex * tt, y - ay - ey * tt)
-                r = ra + (rb - ra) * tt
-                if d < r:
-                    hh = math.sqrt(r * r - d * d)
-                    best = hh if best is None else max(best, hh)
-            return best
-        d2 = float(SD.poly_sdf2d(np.array([x]), np.array([y]), self.pts)[0])
-        if d2 >= 0:
-            return None
-        return self.T0 + (self.T1 - self.T0) * math.sqrt(min(1.0, -d2 / self.inr))
-
-    def samples(self):
-        t = self.t
-        if t == 'e':
-            out = [(self.cx, self.cy)]
-            c, s = math.cos(self.rot), math.sin(self.rot)
-            for k in range(12):
-                a = 2 * math.pi * k / 12
-                for f in (0.45, 0.8):
-                    u, v = math.cos(a) * self.rx * f, math.sin(a) * self.ry * f
-                    out.append((self.cx + u * c - v * s, self.cy + u * s + v * c))
-            return out
-        if t in ('c', 'l'):
-            out = []
-            for ax, ay, bx, by, ra, rb in self.segs:
-                for tt in (0.0, 0.25, 0.5, 0.75, 1.0):
-                    out.append((ax + (bx - ax) * tt, ay + (by - ay) * tt))
-            return out
-        out = []
-        xs = np.linspace(self.bx0, self.bx1, 9)
-        ys = np.linspace(self.by0, self.by1, 9)
-        for x in xs:
-            for y in ys:
-                if self.surf(x, y) is not None:
-                    out.append((float(x), float(y)))
-        cx = sum(q[0] for q in self.pts) / len(self.pts)
-        cy = sum(q[1] for q in self.pts) / len(self.pts)
-        return out or [(cx, cy)]
-
-    # ---- SDF on a grid block (X, Y sprite coords, D depth)
-    def sdf(self, X, Y, D, cd):
-        t = self.t
-        if t == 'e':
-            return SD.sdf_ellipsoid(X, Y, D, self.cx, self.cy, cd, self.rx, self.ry, self.rd, self.rot)
-        if t in ('c', 'l'):
-            F = None
-            dt = getattr(self, 'depth_to', 0.0)
-            for ax, ay, bx, by, ra, rb in self.segs:
-                f = SD.sdf_round_cone(X, Y, D, (ax, ay, cd), (bx, by, cd + dt), ra, rb)
-                F = f if F is None else np.minimum(F, f)
-            return F
-        d2 = SD.poly_sdf2d(X[:, :, :1], Y[:, :, :1], self.pts)
-        T = self.T0 + (self.T1 - self.T0) * np.sqrt(np.clip(-d2 / self.inr, 0.0, 1.0))
-        r = self.round
-        q1 = d2 + r
-        q2 = np.abs(D - cd) - T + r
-        return np.sqrt(np.maximum(q1, 0) ** 2 + np.maximum(q2, 0) ** 2) + np.minimum(np.maximum(q1, q2), 0) - r
-
-
-class Group:
-    def __init__(self, name):
-        self.name = name
-        self.parts = []
-        self.cd = 0.0
-        self.back_only = False
-
-    @property
-    def key(self):
-        # paint order of the group = that of its biggest member
-        return max(self.parts, key=lambda q: q.area).key
-
-    @property
-    def area(self):
-        return sum(q.area for q in self.parts)
-
-    @property
-    def rmax(self):
-        return max(q.depth_extent() for q in self.parts)
-
-    def surf(self, x, y):
-        best = None
-        for q in self.parts:
-            if q.bx0 <= x <= q.bx1 and q.by0 <= y <= q.by1:
-                h = q.surf(x, y)
-                if h is not None and (best is None or h > best):
-                    best = h
-        return best
-
-    def samples(self):
-        out = []
-        for q in self.parts:
-            out += q.samples()
-        return out
-
-
-def solve_depth(groups):
-    """Paint order -> depth.  The anchor group (body, else the biggest) sits at depth 0;
-    groups painted after it are pushed toward the viewer just far enough to be in front
-    of the already-placed groups they overlap, groups painted before it are pushed back.
-
-    Big groups only need most of their overlap in front (a low percentile of the
-    per-sample requirement), so heads/limbs stay embedded in the body instead of
-    floating off it; small decorations must be fully in front.  Ellipsoid groups that
-    lie (almost) entirely over earlier groups -- belly plates, cheeks, noses, bug eyes --
-    are flattened into lenses hugging that surface instead of bulging out."""
-    body = [g for g in groups if g.name.lower() == 'body']
-    anchor = max(body or groups, key=lambda g: g.area)
-    order_front = sorted([g for g in groups if not g.back_only], key=lambda g: g.key)
-    ai = order_front.index(anchor) if anchor in order_front else 0
-    lim = max(anchor.rmax, 2.0) * 1.15
-    placed = [anchor]
-
-    def coverage(G):
-        smp = G.samples()
-        n = hit = 0
-        for (x, y) in smp:
-            if G.surf(x, y) is None:
-                continue
-            n += 1
-            if any(Q.surf(x, y) is not None for Q in placed):
-                hit += 1
-        return hit / float(n) if n else 0.0
-
-    def place(G, sign):
-        cov = coverage(G)
-        face = all(q.p.get('face') or q.p.get('frontOnly') for q in G.parts)
-        if all(q.t == 'e' for q in G.parts) and (cov >= 0.92 or (face and cov >= 0.6)):
-            for q in G.parts:
-                q.rd = max(0.6, min(q.rd, 0.42 * min(q.rx, q.ry)))
-                q.thin = min(q.rx, q.ry, q.rd)
-        eps = max(0.6, 0.2 * min(G.rmax, 6.0))
-        need = []
-        for (x, y) in G.samples():
-            sp = G.surf(x, y)
-            if sp is None:
-                continue
-            b = None
-            for Q in placed:
-                sq = Q.surf(x, y)
-                if sq is None:
-                    continue
-                v = (Q.cd - sq + sp - eps) if sign < 0 else (Q.cd + sq - sp + eps)
-                if b is None or (v < b if sign < 0 else v > b):
-                    b = v
-            if b is not None:
-                need.append(b)
-        bound = 0.0
-        if need:
-            need.sort(reverse=(sign > 0))
-            big = G.area > 120.0 and cov < 0.92 and not face
-            k = int(len(need) * 0.2) if big else 0
-            bound = need[min(k, len(need) - 1)]
-            bound = min(bound, 0.0) if sign < 0 else max(bound, 0.0)
-        if G.area > 120.0 and cov < 0.92 and not face:
-            # big groups (heads, torsos): never pushed so far that they separate from
-            # what they sit on when seen from behind / the side
-            cap = 0.55 * min(G.rmax, anchor.rmax) + 1.0
-            bound = max(-cap, min(cap, bound))
-        G.cd = max(-lim, bound) if sign < 0 else min(lim, bound)
-        placed.append(G)
-
-    for G in order_front[ai + 1:]:
-        place(G, -1)
-    for G in reversed(order_front[:ai]):
-        place(G, +1)
-    for G in groups:
-        if G.back_only:
-            place(G, +1)
-    return anchor
-
-
-def _footprint(G, step=1.25):
-    x0 = min(q.bx0 for q in G.parts)
-    y0 = min(q.by0 for q in G.parts)
-    x1 = max(q.bx1 for q in G.parts)
-    y1 = max(q.by1 for q in G.parts)
-    pts = []
-    for x in np.arange(x0 + step * 0.5, x1, step):
-        for y in np.arange(y0 + step * 0.5, y1, step):
-            h = G.surf(float(x), float(y))
-            if h is not None:
-                pts.append((float(x), float(y), h))
-    return pts
-
-
-def add_connectors(groups, anchor):
-    """Sprites often only *touch* two big shapes (a head resting on a body): the 2D
-    outline makes them read as joined, but in 3D they'd float apart when seen from the
-    side or behind.  Give such groups a short neck (a round cone of their own colour)
-    reaching into the neighbour they touch."""
-    big = [G for G in groups if G.area > 45.0 and not G.back_only]
-    fps = {G.name: _footprint(G) for G in big}
-    for G in big:
-        if G is anchor:
-            continue
-        fp = fps[G.name]
-        if not fp:
-            continue
-        best = None
-        for Q in big:
-            if Q is G or Q.area < 0.25 * G.area:
-                continue
-            # already solidly joined?  count 3D-overlapping footprint samples
-            joined = 0
-            for x, y, h in fp:
-                hq = Q.surf(x, y)
-                if hq is not None and abs(G.cd - Q.cd) < h + hq - 1.0:
-                    joined += 1
-            if joined >= 6:
-                best = None
-                break
-            fq = fps[Q.name]
-            if not fq:
-                continue
-            A = np.array([(x, y) for x, y, _ in fp])
-            B = np.array([(x, y) for x, y, _ in fq])
-            d = np.sqrt(((A[:, None, :] - B[None, :, :]) ** 2).sum(-1))
-            i, j = np.unravel_index(int(np.argmin(d)), d.shape)
-            if d[i, j] < 3.0 and (best is None or d[i, j] < best[0]):
-                best = (d[i, j], Q, A[i], B[j])
-        if best is None:
-            continue
-        _, Q, pa, pb = best
-        main = max(G.parts, key=lambda q: q.area)
-        cg = np.array([sum(q.bx0 + q.bx1 for q in G.parts) / (2 * len(G.parts)),
-                       sum(q.by0 + q.by1 for q in G.parts) / (2 * len(G.parts))])
-        cq = np.array([sum(q.bx0 + q.bx1 for q in Q.parts) / (2 * len(Q.parts)),
-                       sum(q.by0 + q.by1 for q in Q.parts) / (2 * len(Q.parts))])
-        a = pa + (cg - pa) * 0.35
-        b = pb + (cq - pb) * 0.3
-        r = max(1.2, min(4.0, 0.3 * min(G.rmax, Q.rmax)))
-        p = {'t': 'c', 'x1': float(a[0]), 'y1': float(a[1]), 'x2': float(b[0]), 'y2': float(b[1]),
-             'r1': r, 'r2': r * 0.9, 'g': G.name, 'z': main.z}
-        q = Part(p, main.order, G.name, main.color)
-        q.connector = True
-        q.depth_to = Q.cd - G.cd
-        G.parts.append(q)
-
-
-# ============================================================================ geometry
-def group_mesh(G):
-    """Smooth-union SDF of a group's parts -> (verts[N,3] (x, y, d), quads[M,4])."""
-    thin = min(q.thin for q in G.parts)
-    x0 = min(q.bx0 for q in G.parts)
-    y0 = min(q.by0 for q in G.parts)
-    x1 = max(q.bx1 for q in G.parts)
-    y1 = max(q.by1 for q in G.parts)
-    dz = G.rmax
-    h = float(np.clip(thin / 2.2, 0.16, 0.42))
-    pad = 3 * h + 0.5
-    ext = np.array([x1 - x0 + 2 * pad, y1 - y0 + 2 * pad, 2 * dz + 2 * pad])
-    vol = float(np.prod(ext))
-    h = max(h, (vol / 3.0e6) ** (1.0 / 3.0))
-    pad = 3 * h + 0.5
-    xs = np.arange(x0 - pad, x1 + pad + h, h)
-    ys = np.arange(y0 - pad, y1 + pad + h, h)
-    ds = np.arange(G.cd - dz - pad, G.cd + dz + pad + h, h)
-    F = np.full((len(xs), len(ys), len(ds)), SD.BIG)
-    for q in sorted(G.parts, key=lambda q: -q.area):
-        i0 = max(0, int(np.searchsorted(xs, q.bx0 - pad)) - 1)
-        i1 = min(len(xs), int(np.searchsorted(xs, q.bx1 + pad)) + 1)
-        j0 = max(0, int(np.searchsorted(ys, q.by0 - pad)) - 1)
-        j1 = min(len(ys), int(np.searchsorted(ys, q.by1 + pad)) + 1)
-        de = q.depth_extent() + pad
-        k0 = max(0, int(np.searchsorted(ds, G.cd - de)) - 1)
-        k1 = min(len(ds), int(np.searchsorted(ds, G.cd + de)) + 1)
-        if i1 <= i0 or j1 <= j0 or k1 <= k0:
-            continue
-        X, Y, D = np.meshgrid(xs[i0:i1], ys[j0:j1], ds[k0:k1], indexing='ij')
-        f = q.sdf(X, Y, D, G.cd)
-        k = min(1.8, 0.45 * q.thin, 0.45 * thin + 0.3)
-        blk = F[i0:i1, j0:j1, k0:k1]
-        F[i0:i1, j0:j1, k0:k1] = SD.smin(blk, f, k) if len(G.parts) > 1 else np.minimum(blk, f)
-    verts, quads = SD.surface_nets(F, (xs[0], ys[0], ds[0]), h)
-    return verts, quads, h
-
-
-def mesh_from_group(name, verts, quads, budget):
-    """Blender mesh (Blender coords, px units), decimated to ~budget triangles."""
-    me = bpy.data.meshes.new(name)
-    V = [(float(x - 32.0), float(d), float(60.0 - y)) for x, y, d in verts]
-    me.from_pydata(V, [], [tuple(int(i) for i in q) for q in quads])
-    me.validate()
-    obj = bpy.data.objects.new(name, me)
-    bpy.context.scene.collection.objects.link(obj)
-    tris = 2 * len(quads)
-    # a pass of smoothing removes the voxel terracing without shrinking thin parts much
-    bm = bmesh.new()
-    bm.from_mesh(me)
-    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-5)
-    for _ in range(2):
-        bmesh.ops.smooth_vert(bm, verts=bm.verts, factor=0.5, use_axis_x=True, use_axis_y=True, use_axis_z=True)
-    bmesh.ops.triangulate(bm, faces=bm.faces)
-    bm.to_mesh(me)
-    bm.free()
-    if tris > budget:
-        mod = obj.modifiers.new('dec', 'DECIMATE')
-        mod.decimate_type = 'COLLAPSE'
-        mod.ratio = max(0.02, budget / float(tris))
-        dg = bpy.context.evaluated_depsgraph_get()
-        ev = obj.evaluated_get(dg)
-        me2 = bpy.data.meshes.new_from_object(ev)
-        obj.modifiers.clear()
-        obj.data = me2
-        bpy.data.meshes.remove(me)
-        me = me2
-    return obj
+LOOKS = load_looks()
 
 
 # ============================================================================ texture atlas
-def build_layers(defn, groups, pal):
+def build_layers(defn, groups, decals, pal, micro_kind, seed):
     """Per group, front + back albedo layers.  Returns {(g, side): (Region, rgb[h,w,3])}."""
     parts = defn.get('parts', []) or []
-    gnames = {G.name for G in groups}
     part_group = {}
     for G in groups:
         for q in G.parts:
             part_group[q.order] = G.name
-    # front composite (for deciding which group a face feature sits on)
+    S, SS = TEX_S, TEX_SS
+    # front composite (for deciding which group a face feature / decal sits on)
     R = RS.Region(-8, -8, 72, 72, 2.0)
     zb = np.full(R.X.shape, -1e18)
     gid = np.full(R.X.shape, '', dtype=object)
     for order, p in enumerate(parts):
         if order in part_group and not p.get('backOnly'):
-            key = fnum(p, 'z', 0) * 1000 + order
+            key = MP.fnum(p, 'z', 0) * 1000 + order
             m = RS.part_mask(R, p) & (key >= zb)
             zb[m] = key
             gid[m] = part_group[order]
+    covered = np.argwhere(gid != '')
 
     def group_at(x, y):
         i = int((x + 8) * 2.0)
         j = int((y + 8) * 2.0)
         if 0 <= j < gid.shape[0] and 0 <= i < gid.shape[1] and gid[j, i]:
             return gid[j, i]
-        # nearest covered texel
-        ys, xs = np.nonzero(gid != '')
-        if len(xs) == 0:
+        if len(covered) == 0:
             return None
-        k = int(np.argmin((xs - i) ** 2 + (ys - j) ** 2))
-        return gid[ys[k], xs[k]]
+        k = int(np.argmin((covered[:, 1] - i) ** 2 + (covered[:, 0] - j) ** 2))
+        return gid[covered[k][0], covered[k][1]]
 
-    feats = {}
+    # who paints each non-solid / decal part
+    target = {}
     for order, p in enumerate(parts):
-        if p.get('t') in FEATURE_TYPES:
-            g = group_at(fnum(p, 'x'), fnum(p, 'y'))
+        t = p.get('t')
+        if t in FEATURE_TYPES:
+            g = group_at(MP.fnum(p, 'x'), MP.fnum(p, 'y'))
             if g:
-                feats.setdefault(g, []).append((order, p))
+                target[order] = ('feat', g)
+        elif p.get('g') in decals and t in MP.SOLID_TYPES:
+            # the group under most of the decal's area (a limb overlapping the corner of a grin must not steal it)
+            mk = RS.part_mask(R, p)
+            cand = gid[mk]
+            cand = cand[cand != '']
+            if len(cand):
+                vals, cnt = np.unique(cand, return_counts=True)
+                g = vals[int(np.argmax(cnt))]
+            else:
+                x0, y0, x1, y1 = RS.part_bbox(p)
+                g = group_at((x0 + x1) * 0.5, (y0 + y1) * 0.5)
+            if g:
+                target[order] = ('decal', g)
+        elif p.get('on') is not None and t not in FEATURE_TYPES and order not in part_group:
+            target[order] = ('on', p.get('on'))
 
     layers = {}
+    gy0 = min(q.by0 for G in groups for q in G.parts)
+    gy1 = max(q.by1 for G in groups for q in G.parts)
     for G in groups:
-        x0 = min(q.bx0 for q in G.parts) - 1.5
-        y0 = min(q.by0 for q in G.parts) - 1.5
-        x1 = max(q.bx1 for q in G.parts) + 1.5
-        y1 = max(q.by1 for q in G.parts) + 1.5
+        x0 = min(q.bx0 for q in G.parts) - 2.5
+        y0 = min(q.by0 for q in G.parts) - 2.5
+        x1 = max(q.bx1 for q in G.parts) + 2.5
+        y1 = max(q.by1 for q in G.parts) + 2.5
         for side in ('front', 'back'):
-            Rg = RS.Region(x0, y0, x1, y1, TEX_S)
+            Rg = RS.Region(x0, y0, x1, y1, S * SS, mult=SS)
             L = RS.Layer(Rg)
+            cov_all = np.zeros(L.cov.shape, dtype=bool)      # everything this group paints on this side
             for order, p in enumerate(parts):
-                t = p.get('t')
-                if side == 'front' and p.get('backOnly'):
-                    continue
-                if side == 'back' and (p.get('face') or p.get('frontOnly') or p.get('belly')):
-                    continue
-                if order in part_group:
-                    if part_group[order] != G.name:
+                if order in part_group and part_group[order] == G.name:
+                    if (side == 'front' and p.get('backOnly')) or \
+                            (side == 'back' and (p.get('face') or p.get('frontOnly') or p.get('belly'))):
                         continue
-                    z = fnum(p, 'bz', fnum(p, 'z', 0)) if side == 'back' else fnum(p, 'z', 0)
-                    key = z * 1000 + order
-                    m = RS.part_mask(Rg, p) & (key >= L.z)
-                    L.z[m] = key
-                    L.cov |= m
-                    L.put(m, resolve_color(p.get('c'), pal))
-                elif p.get('on') is not None and t not in FEATURE_TYPES:
-                    if p.get('on') != G.name:
+                    cov_all |= RS.part_mask(Rg, p)
+            # solids first (z-buffered), then the spots / stripes / decals that sit on them, in list order
+            for pass_on in (False, True):
+                for order, p in enumerate(parts):
+                    if side == 'front' and p.get('backOnly'):
                         continue
-                    m = RS.part_mask(Rg, p) & L.cov
-                    L.put(m, resolve_color(p.get('c'), pal))
+                    if side == 'back' and (p.get('face') or p.get('frontOnly') or p.get('belly')):
+                        continue
+                    if order in part_group and not pass_on:
+                        if part_group[order] != G.name:
+                            continue
+                        z = MP.fnum(p, 'bz', MP.fnum(p, 'z', 0)) if side == 'back' else MP.fnum(p, 'z', 0)
+                        key = z * 1000 + order
+                        m = RS.part_mask(Rg, p) & (key >= L.z)
+                        L.z[m] = key
+                        L.cov |= m
+                        L.put(m, MP.resolve_color(p.get('c'), pal))
+                    elif pass_on and order not in part_group and order in target \
+                            and target[order][0] in ('on', 'decal'):
+                        if target[order][1] != G.name:
+                            continue
+                        m = RS.part_mask(Rg, p) & cov_all
+                        L.put(m, MP.resolve_color(p.get('c'), pal))
+            before = L.rgb.copy()
             if side == 'front':
-                for order, p in feats.get(G.name, []):
-                    L.draw_feature(p, pal)
+                for order, p in enumerate(parts):
+                    if order in target and target[order][0] == 'feat' and target[order][1] == G.name:
+                        L.draw_feature(p, pal)
+            painted = L.cov | (L.rgb.sum(-1) > 0)
+            featmask = (np.abs(L.rgb - before).sum(-1) > 1e-6)
+            # face detail (decals, features) is not textured with fur / scales
             main = max(G.parts, key=lambda q: q.area).color
-            layers[(G.name, side)] = (Rg, L.finish(main))
+            rgb, alpha = RS.box_down(L.rgb, painted, SS)
+            hh, ww = featmask.shape[0] // SS, featmask.shape[1] // SS
+            fa = featmask.reshape(hh, SS, ww, SS).mean(axis=(1, 3))
+            weight = np.clip(1.0 - fa * 1.5, 0.0, 1.0)
+            rgb = _bleed(rgb, alpha, main, S)
+            rgb = RS.micro_detail(rgb, weight, micro_kind, S, seed + (7 if side == 'back' else 0))
+            # gentle top-light / underside-shade gradient across the whole model (countershading), not on face detail
+            ys = Rg.y0 + (np.arange(rgb.shape[0]) + 0.5) / S
+            gy = 1.0 + GRAD_AMP * (0.5 - np.clip((ys - gy0) / max(gy1 - gy0, 1e-6), 0.0, 1.0))
+            rgb = np.clip(rgb * (1.0 + (gy[:, None, None] - 1.0) * weight[..., None]), 0.0, 1.0)
+            layers[(G.name, side)] = (Rg, rgb)
     return layers
+
+
+def _bleed(rgb, alpha, fill_color, S):
+    """Bleed colours outward from covered texels (so seams / mip levels never show black)."""
+    known = alpha > 0.02
+    rgb = rgb.copy()
+    if not known.any():
+        rgb[:] = RS.hex_rgb(fill_color)
+        return rgb
+    iters = int(max(6, S * 3.5))
+    for _ in range(iters):
+        acc = np.zeros_like(rgb)
+        cnt = np.zeros(known.shape)
+        for dy, dx in ((0, 1), (0, -1), (1, 0), (-1, 0)):
+            k = np.roll(known, (dy, dx), axis=(0, 1))
+            c = np.roll(rgb, (dy, dx), axis=(0, 1))
+            acc += c * k[..., None]
+            cnt += k
+        new = (~known) & (cnt > 0)
+        if not new.any():
+            break
+        rgb[new] = acc[new] / cnt[new][:, None]
+        known = known | new
+    if (~known).any():
+        rgb[~known] = rgb[known].mean(axis=0)
+    return rgb
 
 
 def pack_atlas(layers):
     """Shelf-pack layers into one image.  Returns (atlas[H,W,3], {key: (ax, ay)}, W, H)."""
     items = sorted(layers.items(), key=lambda kv: -kv[1][1].shape[0])
-    pad = 2
+    total = sum(img.shape[0] * img.shape[1] for _, (Rg, img) in items)
+    W = 1024 if total < 0.62 * 1024 * 1400 else 2048
+    pad = 3
     x = y = shelf = 0
     pos = {}
     for key, (Rg, img) in items:
         h, w = img.shape[:2]
-        if x + w + pad > ATLAS_W:
+        if x + w + pad > W:
             x = 0
             y += shelf + pad
             shelf = 0
@@ -570,12 +249,12 @@ def pack_atlas(layers):
         shelf = max(shelf, h)
     H = y + shelf
     H = int(math.ceil(H / 64.0) * 64)
-    atlas = np.zeros((H, ATLAS_W, 3))
+    atlas = np.zeros((H, W, 3))
     for key, (Rg, img) in items:
         ax, ay = pos[key]
         h, w = img.shape[:2]
         atlas[ay:ay + h, ax:ax + w] = img
-    return atlas, pos, ATLAS_W, H
+    return atlas, pos, W, H
 
 
 def save_png(rgb, path):
@@ -594,104 +273,242 @@ def make_textured_material(name, png_path):
     tex = nt.nodes.new('ShaderNodeTexImage')
     tex.image = img
     tex.interpolation = 'Linear'
-    nt.links.new(tex.outputs['Color'], bsdf.inputs['Base Color'])
+    ca = nt.nodes.new('ShaderNodeVertexColor')
+    ca.layer_name = 'Color'
+    mix = nt.nodes.new('ShaderNodeMix')
+    mix.data_type = 'RGBA'
+    mix.blend_type = 'MULTIPLY'
+    mix.inputs['Factor'].default_value = 1.0
+    nt.links.new(tex.outputs['Color'], mix.inputs['A'])
+    nt.links.new(ca.outputs['Color'], mix.inputs['B'])
+    nt.links.new(mix.outputs['Result'], bsdf.inputs['Base Color'])
     bsdf.inputs['Roughness'].default_value = 0.9
     if 'Specular IOR Level' in bsdf.inputs:
         bsdf.inputs['Specular IOR Level'].default_value = 0.1
     return m
 
 
+# ============================================================================ geometry
+def polygonise(model, warnings):
+    """Surface nets on the unified field -> decimated triangle mesh in sprite space.
+    Returns (P[n,3] (x, y, d), tris[m,3])."""
+    v, q = MF.surface_nets_sparse(model.F, model.grid.o, model.h)
+    if len(q) == 0:
+        raise RuntimeError('empty surface')
+    v = model.project(v, 2)
+    area = len(q) * model.h * model.h
+    budget = int(np.clip(area * 1.15, MIN_TRIS, MAX_TRIS))
+    # to Blender frame for the decimator
+    B = np.stack([v[:, 0] - 32.0, v[:, 2], 60.0 - v[:, 1]], axis=1)
+    me = bpy.data.meshes.new('raw')
+    me.from_pydata(B.tolist(), [], q.tolist())
+    me.validate()
+    bm = bmesh.new()
+    bm.from_mesh(me)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-6)
+    bmesh.ops.triangulate(bm, faces=bm.faces, quad_method='SHORT_EDGE')
+    bm.to_mesh(me)
+    bm.free()
+    obj = bpy.data.objects.new('raw', me)
+    bpy.context.scene.collection.objects.link(obj)
+    tris0 = len(me.polygons)
+    if tris0 > budget:
+        mod = obj.modifiers.new('dec', 'DECIMATE')
+        mod.decimate_type = 'COLLAPSE'
+        mod.ratio = max(0.01, budget / float(tris0))
+        mod.use_collapse_triangulate = True
+        dg = bpy.context.evaluated_depsgraph_get()
+        ev = obj.evaluated_get(dg)
+        me2 = bpy.data.meshes.new_from_object(ev)
+        bpy.data.objects.remove(obj)
+        bpy.data.meshes.remove(me)
+        me = me2
+    else:
+        bpy.data.objects.remove(obj)
+    nv = len(me.vertices)
+    co = np.zeros(nv * 3)
+    me.vertices.foreach_get('co', co)
+    co = co.reshape(-1, 3)
+    me.calc_loop_triangles()
+    lt = np.zeros(len(me.loop_triangles) * 3, dtype=np.int64)
+    me.loop_triangles.foreach_get('vertices', lt)
+    tris = lt.reshape(-1, 3)
+    bpy.data.meshes.remove(me)
+    # back to sprite space, snap onto the true surface
+    P = np.stack([co[:, 0] + 32.0, 60.0 - co[:, 2], co[:, 1]], axis=1)
+    P = model.project(P, 2)
+    # drop unreferenced vertices
+    used = np.zeros(nv, dtype=bool)
+    used[tris.ravel()] = True
+    remap = -np.ones(nv, dtype=np.int64)
+    remap[used] = np.arange(int(used.sum()))
+    P, tris = P[used], remap[tris]
+    # drop degenerate / duplicate triangles (mesh.validate() would silently drop them and shift the UVs)
+    a, b, c = tris[:, 0], tris[:, 1], tris[:, 2]
+    ok = (a != b) & (b != c) & (a != c)
+    ar = np.linalg.norm(np.cross(P[b] - P[a], P[c] - P[a]), axis=1)
+    ok &= ar > 1e-7
+    tris = tris[ok]
+    srt = np.sort(tris, axis=1)
+    _, first = np.unique(srt, axis=0, return_index=True)
+    tris = tris[np.sort(first)]
+    # outward winding: signed volume must be positive in the Blender frame
+    Bq = np.stack([P[:, 0] - 32.0, P[:, 2], 60.0 - P[:, 1]], axis=1)
+    vol = np.einsum('ij,ij->i', Bq[tris[:, 0]], np.cross(Bq[tris[:, 1]], Bq[tris[:, 2]])).sum()
+    if vol < 0:
+        tris = tris[:, ::-1].copy()
+    return P, tris
+
+
+def face_owners(FM, tris, groups, nsum_y):
+    """Which group's atlas layer and which side (front/back projection) paints each triangle.
+    Returns (group index[m], front[m]).  Ties (coincident surfaces such as belly plates lying on the
+    body) go to the group nearest the viewer for front faces / the rear for back faces; neighbour
+    majority passes then remove isolated specks so texture seams form clean loops (few split
+    vertices in the exported mesh)."""
+    cd = np.array([G.cd for G in groups])
+    n = len(tris)
+    G = len(groups)
+    front = nsum_y <= 0.6            # avg normal.y <= 0.2: side-on faces take the front (face) layer
+    # a vertex belongs to the group whose own surface it lies on (smallest field value); exact ties
+    # (coincident surfaces) go to the group nearest the viewing side
+    fm = FM[tris].sum(axis=1) / 3.0                                # (m, G)
+    depth = np.where(front[:, None], -cd[None, :], cd[None, :])
+    fg = (fm - 0.004 * depth).argmin(axis=1)
+    label = fg * 2 + (~front).astype(np.int64)
+    # face adjacency over shared edges
+    e = np.concatenate([tris[:, [0, 1]], tris[:, [1, 2]], tris[:, [2, 0]]], axis=0)
+    fid = np.tile(np.arange(n), 3)
+    e = np.sort(e, axis=1)
+    key = e[:, 0].astype(np.int64) * (int(tris.max()) + 1) + e[:, 1]
+    order = np.argsort(key, kind='stable')
+    ks, fs = key[order], fid[order]
+    same = ks[1:] == ks[:-1]
+    a, b = fs[:-1][same], fs[1:][same]
+    for _ in range(4):
+        votes = np.zeros((n, 2 * G))
+        np.add.at(votes, (a, label[b]), 1.0)
+        np.add.at(votes, (b, label[a]), 1.0)
+        best = votes.argmax(axis=1)
+        vb = votes[np.arange(n), best]
+        # a face flips only when at least two neighbours agree on another label and none share its own
+        vs = votes[np.arange(n), label]
+        label = np.where((best != label) & (vb >= 2) & (vs <= 1), best, label)
+    return label // 2, (label % 2) == 0
+
+
+def group_weights(model, groups, P):
+    """Soft per-group membership of each vertex from the group fields, and the raw field values."""
+    cols, raw = [], []
+    for G in groups:
+        F = model.sample_group(G.name, P)
+        tau = float(np.clip(0.32 * MF.blend_k(G) + 0.35, 0.55, 1.6))
+        cols.append(np.exp(-np.maximum(F, 0.0) / tau))
+        raw.append(F)
+    return np.stack(cols, axis=1), np.stack(raw, axis=1)
+
+
 # ============================================================================ species
-def collect_groups(defn, warnings):
+def build_species(name, defn, sp, warnings, tmpdir, look):
     pal = defn.get('pal', {}) or {}
-    parts = defn.get('parts', []) or []
-    groups = {}
-    for order, p in enumerate(parts):
-        t = p.get('t')
-        if t in SOLID_TYPES and p.get('on') is None:
-            gname = p.get('g') or ('_%d' % order)
-            try:
-                q = Part(p, order, gname, resolve_color(p.get('c'), pal))
-            except Exception as e:  # noqa: BLE001
-                warnings.append('part %d (%s) skipped: %s' % (order, t, e))
-                continue
-            G = groups.get(gname)
-            if G is None:
-                G = groups[gname] = Group(gname)
-            G.parts.append(q)
-    for G in groups.values():
-        G.back_only = all(q.p.get('backOnly') for q in G.parts)
-    return list(groups.values())
-
-
-def build_species(name, defn, warnings, tmpdir):
-    pal = defn.get('pal', {}) or {}
-    groups = collect_groups(defn, warnings)
+    groups, decals = MP.collect_groups(defn, warnings)
     if not groups:
         raise RuntimeError('no solid parts')
-    anchor = solve_depth(groups)
-    add_connectors(groups, anchor)
+    anchor = MP.solve_depth(groups)
+    lens = [G for G in groups if G.lens and G is not anchor]
+    if lens:                                   # belly plates, cheeks...: texture on the host group, no geometry
+        decals = set(decals) | {G.name for G in lens}
+        groups = [G for G in groups if G not in lens]
+    MP.add_connectors(groups, anchor)
+    kscale = float((look or {}).get('blend', 1.0))
+    model = MF.Model(groups, GRID_H, k_scale=kscale)
+    P, tris = polygonise(model, warnings)
+    N = model.normals(P)
+    # ambient occlusion: shell radius ~ 7% of the model height
+    hgt = float(P[:, 1].max() - P[:, 1].min())
+    ao = 1.0 - AO_STRENGTH * model.ambient_occlusion(P + N * 0.15, N, radius=max(2.5, 0.075 * hgt), samples=7)
+    Wg, Fmat = group_weights(model, groups, P)
+    gnames = [G.name for G in groups]
+    ginfo = {G.name: dict(area=G.area, cd=G.cd, anchor=(G is anchor)) for G in groups}
+    # Blender-frame vertices (px, x centred)
+    B = np.stack([P[:, 0] - 32.0, P[:, 2], 60.0 - P[:, 1]], axis=1)
+    NB = np.stack([N[:, 0], N[:, 2], -N[:, 1]], axis=1)
+    rig = RG.build(gnames, B, tris, Wg, ginfo, chain_hint=(look or {}).get('chains'),
+                   role_hint=(look or {}).get('roles'))
 
-    # ---- geometry per group
-    raw = {}
-    total_area = 0.0
-    for G in groups:
-        v, q, h = group_mesh(G)
-        if len(q) == 0:
-            warnings.append('group %s produced no surface' % G.name)
-            continue
-        # surface area estimate ~ quads * h^2
-        area = len(q) * h * h
-        raw[G.name] = (v, q, area)
-        total_area += area
-    mb = C.MeshBuilder()
-    uv = mb.bm.loops.layers.uv.new('UVMap')
-
-    # ---- texture atlas
-    layers = build_layers(defn, [G for G in groups if G.name in raw], pal)
+    # ---- texture
+    micro = (look or {}).get('surface', 'smooth')
+    layers = build_layers(defn, groups, decals, pal, micro, seed=abs(hash(name)) % 100000)
     atlas, pos, W, H = pack_atlas(layers)
     png = os.path.join(tmpdir, name + '.png')
     save_png(atlas, png)
-
-    for G in groups:
-        if G.name not in raw:
-            continue
-        v, q, area = raw[G.name]
-        budget = max(90, int(TRI_BUDGET * area / max(total_area, 1e-6)))
-        obj = mesh_from_group('g_' + G.name, v, q, budget)
-        gi = mb.group_index(G.name)
-        me = obj.data
-        vmap = {}
-        for mv in me.vertices:
-            nv = mb.bm.verts.new(mv.co)
-            nv[mb.grp] = gi
-            vmap[mv.index] = nv
-        mb.bm.verts.ensure_lookup_table()
-        for poly in me.polygons:
-            try:
-                f = mb.bm.faces.new([vmap[i] for i in poly.vertices])
-            except ValueError:
+    # ---- per-face group + UVs (planar sprite projection of the owning group's layer)
+    gcol = {g: i for i, g in enumerate(gnames)}
+    nsum = NB[tris].sum(axis=1)
+    fg, front = face_owners(Fmat, tris, groups, nsum[:, 1])
+    uv = np.zeros((len(tris), 3, 2))
+    for gi, g in enumerate(gnames):
+        for side, sel in (('front', (fg == gi) & front), ('back', (fg == gi) & ~front)):
+            if not sel.any():
                 continue
-            f.smooth = True
-            f.material_index = 0
-            f.normal_update()
-            side = 'front' if f.normal.y <= 0 else 'back'
-            Rg, img = layers[(G.name, side)]
-            ax, ay = pos[(G.name, side)]
-            for loop in f.loops:
-                co = loop.vert.co
-                sx, sy = co.x + 32.0, 60.0 - co.z
-                u = (ax + (sx - Rg.x0) * TEX_S) / W
-                vv = (ay + (sy - Rg.y0) * TEX_S) / H
-                loop[uv].uv = (u, 1.0 - vv)
-        bpy.data.objects.remove(obj)
-        bpy.data.meshes.remove(me)
+            Rg, img = layers[(g, side)]
+            ax, ay = pos[(g, side)]
+            sx = np.clip(P[tris[sel], 0], Rg.x0 + 0.4, Rg.x1 - 0.4)
+            sy = np.clip(P[tris[sel], 1], Rg.y0 + 0.4, Rg.y1 - 0.4)
+            uv[sel, :, 0] = (ax + (sx - Rg.x0) * TEX_S) / W
+            uv[sel, :, 1] = 1.0 - (ay + (sy - Rg.y0) * TEX_S) / H
     mat = make_textured_material('mon_' + name.lower(), png)
-    return mb, [mat], (W, H)
+    return dict(B=B, NB=NB, tris=tris, ao=ao, uv=uv, rig=rig, mat=mat, tex=(W, H), groups=gnames, model=model,
+                P=P, palette_de=palette_delta_e(groups, look))
 
 
 # ============================================================================ rig + export
-HEAD_EXCLUDE = ('body', 'leg', 'arm', 'tail', 'wing', 'foot', 'hand', 'shell', 'belly', 'torso')
+def _lab(rgb):
+    c = np.asarray(rgb, dtype=float)
+    c = np.where(c > 0.04045, ((c + 0.055) / 1.055) ** 2.4, c / 12.92)
+    M = np.array([[0.4124, 0.3576, 0.1805], [0.2126, 0.7152, 0.0722], [0.0193, 0.1192, 0.9505]])
+    xyz = M @ c / np.array([0.95047, 1.0, 1.08883])
+    f = np.where(xyz > 0.008856, np.cbrt(xyz), 7.787 * xyz + 16 / 116)
+    return np.array([116 * f[1] - 16, 500 * (f[0] - f[1]), 200 * (f[2] * -1 + f[1]) * 1.0])
+
+
+def palette_delta_e(groups, look):
+    """How far the sprite's dominant colours are from the researched official main colour (CIE-Lab distance to the
+    nearest of the three biggest painted colours).  Recorded in the manifest; a `pal` map in species_looks.json
+    corrects a palette that is off."""
+    if not look or 'colors' not in look:
+        return None
+    acc = {}
+    for G in groups:
+        for q in G.parts:
+            acc[q.color] = acc.get(q.color, 0.0) + q.area
+    top = sorted(acc.items(), key=lambda kv: -kv[1])[:3]
+    if not top:
+        return None
+    main = _lab(RS.hex_rgb(look['colors']['main']))
+    return round(float(min(np.linalg.norm(_lab(RS.hex_rgb(c)) - main) for c, _ in top)), 1)
+
+
+FEATURE_TOKENS = {           # words in species_looks.json `features` -> group-name / role patterns that must exist
+    'ear': r'ear|ant', 'tail': r'tail|^t\d|nt\d|curl|rattle|coil|ten\d|tent|vine|root|whip', 'wing': r'wing|^w[A-Z]|^w\d',
+    'horn': r'horn|crest|spike|spk|sp\d|cap', 'fin': r'fin|dorsal|pelv|pect|ridge|frill|crest', 'antenna': r'ant',
+    'shell': r'shell|carapace|dome', 'mane': r'mane|ruff|hair|tuft|fluff|collar|crest', 'claw': r'claw|blade|hand|fist|scythe|pincer',
+    'flame': r'^fl|flame|tail|mane', 'leaf': r'leaf|lf|petal|frond|ant', 'arm': r'arm|hand|claw|fist', 'beak': r'beak|bill|mouth|lip|snout|head',
+    'trunk': r'nose|snout|trunk',
+}
+
+
+def feature_check(look, group_names):
+    """Words in the researched `features` that have no matching group in the model (fed to the manifest warnings)."""
+    import re
+    if not look:
+        return []
+    text = ' '.join(look.get('features', [])).lower()
+    missing = []
+    for word, pat in FEATURE_TOKENS.items():
+        if re.search(r'\b%s' % word, text) and not any(re.search(pat, g, re.I) for g in group_names):
+            missing.append(word)
+    return missing
 
 
 def ht_metres(sp):
@@ -703,91 +520,127 @@ def ht_metres(sp):
     return max(0.15, m)
 
 
-def finalize(name, mb, mats, sp, out_path, flier=False):
-    mb.finish()
-    lo, hi = mb.bbox()
-    H_px = max(hi.z - lo.z, 1e-3)
+def make_object(name, B, NB, tris, uv, ao, rig, mat, bone_names, smooth=True):
+    me = bpy.data.meshes.new(name)
+    me.vertices.add(len(B))
+    me.vertices.foreach_set('co', B.astype(np.float32).ravel())
+    nt = len(tris)
+    me.loops.add(nt * 3)
+    me.polygons.add(nt)
+    me.loops.foreach_set('vertex_index', tris.astype(np.int32).ravel())
+    me.polygons.foreach_set('loop_start', (np.arange(nt) * 3).astype(np.int32))
+    me.polygons.foreach_set('loop_total', np.full(nt, 3, dtype=np.int32))
+    me.update(calc_edges=True)
+    me.validate()
+    uvl = me.uv_layers.new(name='UVMap')
+    uvl.data.foreach_set('uv', uv.reshape(-1, 2).astype(np.float32).ravel())
+    me.polygons.foreach_set('use_smooth', np.full(nt, bool(smooth), dtype=bool))
+    if smooth:
+        try:
+            me.normals_split_custom_set_from_vertices([tuple(n) for n in NB])
+        except Exception:  # noqa: BLE001
+            pass
+    ca = me.color_attributes.new('Color', 'FLOAT_COLOR', 'POINT')
+    col = np.stack([ao, ao, ao, np.ones_like(ao)], axis=1).astype(np.float32)
+    ca.data.foreach_set('color', col.ravel())
+    me.color_attributes.active_color = ca
+    me.materials.append(mat)
+    obj = bpy.data.objects.new(name, me)
+    bpy.context.scene.collection.objects.link(obj)
+    vgs = {}
+    for bn in bone_names:
+        vgs[bn] = obj.vertex_groups.new(name=bn)
+    for k in range(4):
+        idx = rig.influence_idx[:, k]
+        w = rig.influence_w[:, k]
+        for bi in np.unique(idx):
+            sel = np.nonzero((idx == bi) & (w > 0))[0]
+            if len(sel) == 0:
+                continue
+            # group vertices by weight to keep the python loop short
+            for wv in np.unique(np.round(w[sel], 3)):
+                ss = sel[np.round(w[sel], 3) == wv]
+                vgs[bone_names[bi]].add(ss.tolist(), float(wv), 'ADD')
+    return obj
+
+
+def _to_webp(raw):
+    import io
+    from PIL import Image
+    im = Image.open(io.BytesIO(raw)).convert('RGB')
+    buf = io.BytesIO()
+    im.save(buf, 'WEBP', quality=TEX_WEBP_Q, method=6)
+    return buf.getvalue(), 'webp', 'image/webp'
+
+
+def finalize(name, sp, built, out_path, look, animate=True):
+    B, NB, tris, ao, uv, rig, mat = (built[k] for k in ('B', 'NB', 'tris', 'ao', 'uv', 'rig', 'mat'))
+    lo, hi = B.min(axis=0), B.max(axis=0)
+    H_px = max(hi[2] - lo[2], 1e-3)
     target = ht_metres(sp)
     k = target / H_px
-    cx, cy = (lo.x + hi.x) * 0.5, (lo.y + hi.y) * 0.5
-    zshift = lo.z if lo.z < 4.0 else 0.0     # keep genuine hovering (ghosts, floaters)
-    mb.transform(lambda co: Vector(((co.x - cx) * k, (co.y - cy) * k, (co.z - zshift) * k)))
+    cx, cy = (lo[0] + hi[0]) * 0.5, (lo[1] + hi[1]) * 0.5
+    zshift = lo[2] if lo[2] < 4.0 else 0.0          # keep genuine hovering (ghosts, floaters)
+    hovering = zshift == 0.0 and lo[2] >= 4.0
 
-    stats = {}
-    grp = mb.grp
-    for v in mb.bm.verts:
-        g = mb.groups[v[grp]]
-        s = stats.setdefault(g, [Vector((0, 0, 0)), 0, []])
-        s[0] += v.co
-        s[1] += 1
-        s[2].append(v.co.copy())
-    cent = {g: s[0] / s[1] for g, s in stats.items() if s[1]}
-    body_name = next((g for g in cent if g.lower() == 'body'), None) or max(stats.items(), key=lambda kv: kv[1][1])[0]
-    body_c = cent[body_name]
-    head = next((g for g in cent if g.lower() == 'head'), None) or next((g for g in cent if 'head' in g.lower()), None)
-    head_box = None
-    if head:
-        hv = stats[head][2]
-        hlo = Vector((min(v.x for v in hv), min(v.y for v in hv), min(v.z for v in hv)))
-        hhi = Vector((max(v.x for v in hv), max(v.y for v in hv), max(v.z for v in hv)))
-        hc, hs = (hlo + hhi) * 0.5, (hhi - hlo) * 0.5 * 1.35
-        head_box = (hc - hs, hc + hs)
+    def xf(P):
+        return (P - np.array([cx, cy, zshift])) * k
 
-    bones, gb = [], {}
-    for g in mb.groups:
-        if g not in cent:
-            continue
-        c = cent[g]
-        limb = C.is_leg(g) or C.is_arm(g) or C.is_wing(g) or C.is_tail(g) or C._has(g, 'claw', 'fin', 'ear')
-        if limb:
-            pts = stats[g][2]
-            near = min(pts, key=lambda v: (v - body_c).length)
-            pivot = near.lerp(c, 0.25)
-        else:
-            pivot = c
-        parent = None
-        if head and g != head and head_box and not C._has(g, *HEAD_EXCLUDE):
-            lo_, hi_ = head_box
-            if all(lo_[i] <= c[i] <= hi_[i] for i in (0, 2)):
-                parent = head
-        bname = g if g != 'root' else 'root_grp'
-        bones.append({'name': bname, 'head': pivot, 'parent': parent, 'length': target * 0.12})
-        gb[bname] = {'pivot': pivot, 'x': c.x, 'z': c.z, 'center': c}
-    obj = mb.to_object(name, mats)
-    if 'root' in obj.vertex_groups:
-        obj.vertex_groups['root'].name = 'root_grp'
+    Bm = xf(B)
+    bones = []
+    bname = {}
+    for b in rig.bones:
+        nm = b['name'] if b['name'] != 'root' else 'root_grp'
+        bname[b['name']] = nm
+    for b in rig.bones:
+        par = b['parent']
+        bones.append({'name': bname[b['name']], 'head': Vector(xf(np.asarray(b['head'])[None, :])[0]),
+                      'parent': bname.get(par) if par else None, 'length': target * 0.1})
+    bone_names = [bn['name'] for bn in bones]
+    obj = make_object(name, Bm, NB, tris, uv, ao, rig, mat, bone_names)
     arm = C.build_armature(name, bones, root_len=target * 0.25)
     C.skin_to_armature(obj, arm)
-    C.animate_generic(arm, gb, target, body=body_name if body_name in gb else None, flier=flier,
-                      hovering=zshift == 0.0 and lo.z >= 4.0)
-    C.export_glb(out_path)
-    tris = sum(len(p.vertices) - 2 for p in obj.data.polygons)
-    # px_height: the model's height in upstream sprite pixels (64 = the whole sprite frame),
-    # so the game can size models exactly like upstream's battle sprites (PokemonActor.use_sprite_scale)
-    return {'height_m': round(target, 3), 'px_height': round(H_px, 2), 'groups': len(gb), 'tris': tris,
-            'materials': len(mats)}
+    info = {'height_m': round(target, 3), 'px_height': round(H_px, 2), 'groups': len(built['groups']),
+            'tris': int(len(tris)), 'bones': len(bones), 'materials': 1}
+    if animate:
+        import monanim as MA
+        MA.animate(arm, name, sp, look, rig, bones, xf, target, hovering, verts_m=Bm)
+    C.export_glb(out_path, animations=animate)
+    # the atlas lives next to the glb (referenced by uri, lossy WebP) instead of being embedded, so Godot
+    # does not extract a second copy of it on import; vertex colour / weights are stored as bytes
+    GT.externalize_images(out_path, lambda i, mime: name + '_tex', transcode=_to_webp)
+    GT.quantize_attributes(out_path)
+    d = os.path.dirname(out_path)
+    for stale in (name + '_' + name + '.png', name + '_' + name + '.png.import', name + '_tex.png',
+                  name + '_tex.png.import'):
+        if os.path.exists(os.path.join(d, stale)):
+            os.remove(os.path.join(d, stale))
+    info['bytes_tex'] = os.path.getsize(os.path.join(d, name + '_tex.webp'))
+    return info
 
 
 # ============================================================================ main
-def is_flier(sp, defn):
-    types = sp.get('types') or []
-    names = ' '.join((p.get('g') or '') for p in defn.get('parts', []))
-    return 'FLYING' in types and 'wing' in names.lower()
-
-
-def run_one(name, defn, sp, out_dir, tmpdir):
+def run_one(name, defn, sp, out_dir, tmpdir, animate=True):
     warnings = []
     t0 = time.time()
     out_path = os.path.join(out_dir, name + '.glb')
     C.reset_scene()
-    mb, mats, tex = build_species(name, defn, warnings, tmpdir)
-    info = finalize(name, mb, mats, sp, out_path, flier=is_flier(sp, defn))
+    look = LOOKS.get(name)
+    if FX is not None:
+        defn = FX.apply(name, defn, look)
+    built = build_species(name, defn, sp, warnings, tmpdir, look)
+    info = finalize(name, sp, built, out_path, look, animate=animate)
     info['file'] = name + '.glb'
     info['bytes'] = os.path.getsize(out_path)
     info['status'] = 'generated'
-    info['texture'] = '%dx%d' % tex
-    print('%-12s %5.2fs h=%.2fm groups=%d tris=%d tex=%s %dKB %s' % (
-        name, time.time() - t0, info['height_m'], info['groups'], info['tris'], info['texture'],
+    info['texture'] = '%dx%d' % built['tex']
+    if built.get('palette_de') is not None:
+        info['palette_delta_e'] = built['palette_de']
+    miss = feature_check(look, built['groups'])
+    if miss:
+        info['missing_features'] = miss
+    print('%-12s %5.2fs h=%.2fm groups=%d bones=%d tris=%d tex=%s %dKB %s' % (
+        name, time.time() - t0, info['height_m'], info['groups'], info['bones'], info['tris'], info['texture'],
         info['bytes'] // 1024, ('warn=%d' % len(warnings)) if warnings else ''), flush=True)
     return info, warnings
 
@@ -805,6 +658,7 @@ def main():
         only = [s for s in args[args.index('--only') + 1].split(',') if s]
     out_dir = args[args.index('--out') + 1] if '--out' in args else OUT_DIR
     jobs = int(args[args.index('--jobs') + 1]) if '--jobs' in args else 1
+    animate = '--noanim' not in args
     C.ensure_dir(out_dir)
     mons = json.load(open(os.path.join(EXTRACTED, 'mons.json')))
     pdata = json.load(open(os.path.join(EXTRACTED, 'pokedata.json')))['species']
@@ -822,7 +676,7 @@ def main():
                 continue
             res = os.path.join(tempfile.gettempdir(), 'genmon_part%d.json' % i)
             cmd = [sys.executable, os.path.abspath(__file__), '--', '--only', ','.join(ch), '--out', out_dir,
-                   '--result', res]
+                   '--result', res] + (['--noanim'] if not animate else [])
             procs.append((subprocess.Popen(cmd), res))
         results = {'species': {}, 'warnings': {}, 'errors': {}}
         for p, res in procs:
@@ -836,7 +690,7 @@ def main():
         with tempfile.TemporaryDirectory() as tmpdir:
             for i, name in enumerate(species):
                 try:
-                    info, warnings = run_one(name, mons[name], pdata[name], out_dir, tmpdir)
+                    info, warnings = run_one(name, mons[name], pdata[name], out_dir, tmpdir, animate)
                     results['species'][name] = info
                     if warnings:
                         results['warnings'][name] = warnings
@@ -857,20 +711,21 @@ def main():
         except Exception as e:  # noqa: BLE001
             traceback.print_exc()
             results['errors']['MISSINGNO'] = '%s: %s' % (type(e).__name__, e)
+        import monanim as MA
         manifest = {
             'generated': [s for s in species if s in results['species']] + sorted(extra),
             'fallback': [], 'errors': results['errors'], 'warnings': results['warnings'],
             'species': results['species'],
-            'animations': {'Idle': {'seconds': 2.0, 'loop': True}, 'Walk': {'seconds': 0.8, 'loop': True},
-                           'Attack': {'seconds': 0.6, 'loop': False}, 'Hurt': {'seconds': 0.5, 'loop': False},
-                           'Faint': {'seconds': 1.0, 'loop': False}, 'Special': {'seconds': 1.0, 'loop': False}},
+            'animations': MA.CLIP_INFO,
             'conventions': {
                 'units': 'metres; model height == Pokedex height (min 0.15 m)',
                 'front': 'Blender -Y == glTF/Godot +Z (MODEL_FRONT)',
                 'origin': 'bottom centre; hovering species keep their hover gap',
-                'rig': "one bone per 2D art group, all under 'root'; face groups parented to 'head' when present",
-                'texture': 'one albedo atlas per species (front/back sprite projections per art group); '
-                           'shade with assets/shaders/toon.gdshader',
+                'rig': "one bone per 2D art group in a parent tree under 'root', plus chains along tails / "
+                       "necks / serpent bodies (<group>_1, <group>_2 ...); smooth skin weights",
+                'texture': 'one anti-aliased albedo atlas per species (front/back sprite projections per art '
+                           'group); vertex colour COLOR_0 = baked ambient occlusion; shade with '
+                           'assets/shaders/toon.gdshader',
             },
             'elapsed_seconds': round(time.time() - t_all, 1),
         }

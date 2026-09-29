@@ -11,6 +11,12 @@ extends Node3D
 ## (battleflow.js battleBgFor / battlebg.js THEMES).
 
 const BG_DIR := "res://assets/models/battle/"
+const GROUND_SHADER := preload("res://scripts/battle/shaders/battle_ground.gdshader")
+const DECOR_SHADER := preload("res://scripts/battle/shaders/battle_decor.gdshader")
+## lit planes whose painted texture is a screen projection: drawn by battle_ground.gdshader (exact per fragment)
+const PROJECTED := ["ground", "indoor_floor", "power_floor", "mansion_floor", "elite_floor", "sea", "beach", "cave_sea"]
+## art rows (of 180) above which the plane is animated water
+const WATER_ROWS := {"sea": 1000.0, "cave_sea": 1000.0, "beach": 96.0}
 
 ## Camera + anchor layout (metres). The Blender generator writes the real
 ## values to layout.json (it places every backdrop prop along this camera's
@@ -212,6 +218,12 @@ func _prep_materials(n: Node, tint: Color = Color(1, 1, 1, 0)) -> void:
 			if not (m is BaseMaterial3D):
 				continue
 			var d: BaseMaterial3D = m.duplicate()
+			if PROJECTED.has(m.resource_name) and d.albedo_texture != null:
+				mi.set_surface_override_material(i, _projected_material(d.albedo_texture, tint, m.resource_name))
+				continue
+			if m.resource_name.contains("decor") or m.resource_name.contains("glow"):
+				mi.set_surface_override_material(i, _decor_material(tint, m.resource_name))
+				continue
 			d.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
 			d.metallic_specular = 0.0
 			d.roughness = 1.0
@@ -219,11 +231,32 @@ func _prep_materials(n: Node, tint: Color = Color(1, 1, 1, 0)) -> void:
 			if nm.contains("sky") or nm.contains("cloud") or nm.contains("unlit"):
 				d.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 				d.disable_receive_shadows = true
-			if tint.a > 0:
+			if tint.a > 0 and not nm.contains("notint"):
 				d.albedo_color = d.albedo_color * tint
 			mi.set_surface_override_material(i, d)
 	for c in n.get_children():
 		_prep_materials(c, tint)
+
+func _projected_material(tex: Texture2D, tint: Color, nm: String) -> ShaderMaterial:
+	var sm := ShaderMaterial.new()
+	sm.shader = GROUND_SHADER
+	sm.set_shader_parameter("albedo_tex", tex)
+	sm.set_shader_parameter("tint", tint if tint.a > 0.0 else Color.WHITE)
+	sm.set_shader_parameter("cam_pos", CAM_POS)
+	sm.set_shader_parameter("cam_pitch_deg", CAM_PITCH)
+	sm.set_shader_parameter("cam_fov_deg", CAM_FOV)
+	sm.set_shader_parameter("water_rows", float(WATER_ROWS.get(nm, 0.0)))
+	return sm
+
+func _decor_material(tint: Color, nm: String) -> ShaderMaterial:
+	var sm := ShaderMaterial.new()
+	sm.shader = DECOR_SHADER
+	var glow := nm.contains("notint")
+	var t := Color.WHITE if (glow or tint.a <= 0.0) else tint
+	sm.set_shader_parameter("tint", Vector3(t.r, t.g, t.b))
+	sm.set_shader_parameter("sway", 0.035)
+	sm.set_shader_parameter("flicker", 1.0 if glow else 0.0)
+	return sm
 
 func _tint_meshes(n: Node, tint: Color) -> void:
 	if n is MeshInstance3D:
