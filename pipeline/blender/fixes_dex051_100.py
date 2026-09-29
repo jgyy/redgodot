@@ -234,8 +234,6 @@ def primeape(d, look):
           Poly('earFi', [18.9, 19.2, 16.6, 14.6, 22, 16.6], 'inner', z=3.25, T=1.2)]
     P += Tufts('tuft', [(21, 17), (27.5, 14.6), (34, 17.5)], 'body', z=3.1, n=3, length=4.4, width=2.8, T=1.8)
     # spiky fur ring round the neck / shoulders
-    P += Tufts('ruffB', [(26, 16), (36, 20), (46, 27), (49.5, 36), (49, 46), (46, 54)], 'body', z=-0.5, n=7, length=3.6,
-               width=3.0, dirv=(1, 0.05), T=1.8)
     P += [SolidE('nose', 19.5, 31.0, 5.2, 3.9, 'nose', z=3.5, rd=3.4, face=True)]
     P += [E('nost', 17.8, 31.0, 0.85, 1.1, '#6a3a38', z=3.6, face=True, line=False, flat=True),
           E('nost', 21.3, 31.0, 0.85, 1.1, '#6a3a38', z=3.6, face=True, line=False, flat=True)]
@@ -324,7 +322,10 @@ def growlithe(d, look):
     scale(d, 'head', 1.12, about=(20, 37))
     mod(d, 'earF', T=2.8)
     mod(d, 'earB', T=2.8)
-    mod(d, 'tuft', T=2.2)
+    for p in parts(d, 'tuft'):
+        p['pts'] = [18.5, 30.5, 22, 27, 26.5, 29.5, 31, 28, 34.5, 33, 33.5, 39.5, 30, 43, 25.5, 42, 21, 38.5]
+        p['T'] = 3.4
+        p['z'] = 1.9
     thick(d, 'tail', 1.15)
     for g, (x, y) in (('legF1', (29.4, 58.3)), ('legF2', (46.6, 58.3)), ('legB1', (27.4, 58.3)), ('legB2', (44.4, 58.3))):
         z = parts(d, g)[0].get('z', 0)
@@ -468,21 +469,21 @@ def machop(d, look):
     thick(d, 'armB', 1.12)
     thick(d, 'legF', 1.08)
     thick(d, 'legB', 1.08)
-    add(d, E('belt', 33.8, 50.6, 8.8, 2.2, 'belt', z=0.6, rd=8.4, solid=True))
+    for g in ('crest', 'crest2', 'crest3'):
+        recolor(d, g, '#b8907c')
     add(d, E('ear', 21.8, 31, 2.0, 2.6, 'skin', z=1.8, solid=True, rd=1.6))
     add(d, E('ear', 39.5, 30.2, 2.0, 2.6, 'skin', z=1.8, solid=True, rd=1.6))
     mod(d, 'crest', T=1.8)
     scale(d, 'head', 1.06, about=(30, 32))
 
 
-def _muscle_body(d):
-    d['pal'].update({'brief': '#2c2c3c'})
-    for p in list(d['parts']):
-        if p.get('g') == 'brief' and p['t'] == 'p':
-            d['parts'].remove(p)
-    for p in parts(d, 'brief'):
-        p['rd'] = 8.0
-        p['solid'] = True
+def _muscle_body(d, y=45.0):
+    """Championship belt: a black waist band with a gold buckle (replaces the ragged sprite briefs)."""
+    d['pal'].update({'brief': '#2c2c3c', 'buckle': '#ecc23c'})
+    for g in ('brief', 'belt', 'buckle'):
+        drop(d, g)
+    d['parts'] += [SolidE('belt', 35, y, 10.9, 4.0, 'brief', z=0.7, rd=9.2),
+                   SolidE('buckle', 29.4, y + 0.3, 3.5, 3.3, 'buckle', z=0.8, rd=1.9)]
 
 
 @fix('MACHOKE')
@@ -495,8 +496,6 @@ def machoke(d, look):
     _fists(d, (('fist', 170), ('fistB', 10)), n=3, fr=0.32)
     retoe(d, 'legF', dirx=-1, n=3, tl=0.6, tr=0.24)
     retoe(d, 'legB', dirx=-1, n=3, tl=0.6, tr=0.24)
-    add(d, E('belt', 35, 43.6, 10.4, 2.4, 'belt', z=0.7, rd=8.6, gloss=True, solid=True))
-    add(d, E('buckle', 29.5, 44.2, 3.0, 2.6, 'buckle', z=0.8, solid=True, rd=1.6, gloss=True))
     # pecs / delts read as muscle
     d['parts'] += [E('body', 29.5, 31.5, 6.0, 5.0, 'skin', z=0.2), E('body', 40.5, 31.5, 6.0, 5.0, 'skin', z=0.2)]
     for g in ('armF', 'armB'):
@@ -517,10 +516,6 @@ def machamp(d, look):
     _fists(d, (('fistFT', -95), ('fistBT', -85), ('fistFL', 180), ('fistBL', 0)), n=3, fr=0.32)
     retoe(d, 'legF', dirx=-1, n=3, tl=0.6, tr=0.24)
     retoe(d, 'legB', dirx=-1, n=3, tl=0.6, tr=0.24)
-    for p in parts(d, 'belt'):
-        p['rd'] = 9.5
-        p['solid'] = True
-        p['ry'] = 2.6
     d['parts'] += [E('body', 29, 30.5, 6.5, 5.5, 'skin', z=0.2), E('body', 41.5, 30.5, 6.5, 5.5, 'skin', z=0.2)]
     for g in ('armFT', 'armFL', 'armBT', 'armBL'):
         thick(d, g, 1.1)
@@ -589,8 +584,8 @@ def tentacool(d, look):
         Stroke('tentB2', [33.5, 43.5, 34, 49.5, 36.5, 55], 2.4, 'tent', z=-1.6, w2=1.2),
         E('body', 32, 40.6, 13, 5.2, 'body', rd=10.5),
         E('dome', 32, 29.5, 15, 11.6, 'dome', z=1, gloss=True),
-        SolidE('orbF', 24.0, 25.4, 4.2, 3.9, 'orb', z=2, gloss=True, rd=1.3),
-        SolidE('orbB', 40.4, 24.8, 4.0, 3.7, 'orb', z=2, gloss=True, rd=1.3),
+        E('orbF', 24.0, 25.4, 4.2, 3.9, 'orb', z=2, gloss=True, face=True),
+        E('orbB', 40.4, 24.8, 4.0, 3.7, 'orb', z=2, gloss=True, face=True),
         SolidE('orbC', 32, 43.2, 2.0, 1.7, 'orb', z=2, gloss=True, rd=1.6),
         Stroke('tentF', [27.5, 43.8, 23.5, 49.5, 27, 55, 22, 59.5], 3.4, 'tent', z=2, w2=1.5),
         Stroke('tentF2', [30.5, 44.3, 30, 50, 27.5, 55.5], 2.4, 'tent', z=2.1, w2=1.2),
@@ -636,6 +631,16 @@ def graveler(d, look):
 
 @fix('GOLEM')
 def golem(d, look):
+    d['parts'] = [p for p in d['parts'] if p['t'] not in ('eye', 'mouth', 'shine')]
+    drop(d, 'head')
+    drop(d, 'hole')
+    d['parts'] += [SolidE('head', 17.6, 39.0, 10.8, 9.8, 'skin', z=3, rd=8.8, cd=-10),
+                   SolidE('head', 10.6, 42.4, 6.2, 5.0, 'skin', z=3, rd=5.0),
+                   Poly('tusk', [8.4, 44.6, 7.2, 48.6, 10.6, 45.6], '#f4ecd8', z=3.2, T=1.1),
+                   Poly('tusk', [15.4, 45.4, 15.8, 49.4, 17.6, 45.4], '#f4ecd8', z=3.2, T=1.1),
+                   Eye(14.4, 36.6, 2.6, 'angry', iris='#c03028', look=[-1, 0]),
+                   Eye(22.4, 36.2, 2.6, 'angry', iris='#c03028', look=[-1, 0], flip=True),
+                   Mouth(13.0, 43.4, 3.0, 'line')]
     retoe(d, 'legF', dirx=-1, n=3, tl=0.5, tr=0.3)
     retoe(d, 'legB', dirx=-1, n=3, tl=0.5, tr=0.3)
     refinger(d, 'armF', 190, n=3, spread=50, fl=0.6, fr=0.35)
@@ -928,16 +933,16 @@ def cone_spikes(d, g, center, base_scale=0.5, color=None, z=None, inset=2.5):
 @fix('SHELLDER')
 def shellder(d, look):
     d['pal'].update({'shell': '#8a68c0', 'ridge': '#5c3c90', 'body': '#2c2638', 'tongue': '#f0708c'})
-    P = [E('shellB', 35, 51.5, 15.5, 7, 'shell', rd=10.5),
-         E('shellT', 38, 35.5, 15.4, 10.6, 'shell', z=1, rot=-12, rd=11.5),
-         SolidE('body', 25.5, 44.6, 10.2, 7.2, 'body', z=1.5, rd=6.6)]
+    P = [E('shellB', 36, 52, 15.5, 7, 'shell', rd=10.5),
+         E('shellT', 41, 33.5, 15.2, 10.4, 'shell', z=1, rot=-16, rd=11.5),
+         SolidE('body', 24.5, 44.8, 11.4, 8.0, 'body', z=1.5, rd=7.4, cd=-3)]
     for pts, g in (([22, 44, 30, 30], 'shellT'), ([29, 46, 36, 29], 'shellT'), ([37, 47, 42, 30], 'shellT'),
                    ([44, 46, 48, 33], 'shellT'), ([25, 54, 28, 50], 'shellB'), ([34, 56, 35, 51], 'shellB'),
                    ([43, 55, 42, 51], 'shellB')):
         P.append({'t': 'stripe', 'pts': pts, 'w': 1.3, 'c': 'ridge', 'on': g})
     P += [Stroke('tongue', [19.5, 49.4, 14.5, 52, 11, 51.5, 8.5, 55.5], 4.4, 'tongue', z=2, w2=2.8),
-          Eye(21.8, 43.2, 2.9, iris='#3aa4c8', look=[-1, 0.1]),
-          Eye(30.0, 43.2, 2.9, iris='#3aa4c8', look=[-1, 0.1])]
+          Eye(20.4, 43.4, 3.1, iris='#3aa4c8', look=[-1, 0.1]),
+          Eye(29.6, 43.4, 3.1, iris='#3aa4c8', look=[-1, 0.1])]
     d['parts'] = P
 
 
