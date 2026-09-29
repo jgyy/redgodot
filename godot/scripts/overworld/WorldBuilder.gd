@@ -160,12 +160,23 @@ func _tri(pts: Array, normal: Vector3, uv_col: float = -1.0, shades: Array = [])
 
 ## Flat-coloured trim quad (fascia, ridge cap, sills, steps ...): vertex alpha < 1 tells the shader to use the vertex
 ## colour instead of the atlas. `shade` scales the colour (baked light).
-func _solid(pts: Array, normal: Vector3, col: Color, shade: float = 1.0) -> void:
+func _solid(pts: Array, normal: Vector3, col: Color, shade: float = 1.0, alpha: float = 0.5) -> void:
 	normal = _true_normal(pts, normal)
-	var c := Color(col.r * shade, col.g * shade, col.b * shade, 0.5)
+	var c := Color(col.r * shade, col.g * shade, col.b * shade, alpha)
 	for i in ([0, 1, 2, 0, 2, 3] if pts.size() == 4 else [0, 1, 2]):
 		var p: Array = pts[i]
 		_st.set_color(c)
+		_st.set_normal(normal)
+		_st.set_uv(Vector2.ZERO)
+		_st.add_vertex(px_to_world(float(p[0]), float(p[1]), float(p[2])))
+
+## Trim quad with one colour per corner (baked AO gradients); alpha 0.04 * id selects a procedural material.
+func _solid_v(pts: Array, normal: Vector3, cols: Array, alpha: float = 0.5) -> void:
+	normal = _true_normal(pts, normal)
+	for i in ([0, 1, 2, 0, 2, 3] if pts.size() == 4 else [0, 1, 2]):
+		var p: Array = pts[i]
+		var cc: Color = cols[i]
+		_st.set_color(Color(cc.r, cc.g, cc.b, alpha))
 		_st.set_normal(normal)
 		_st.set_uv(Vector2.ZERO)
 		_st.add_vertex(px_to_world(float(p[0]), float(p[1]), float(p[2])))
@@ -320,6 +331,9 @@ func _breaks(len_px: float, marks: Array) -> Array:
 ## A whole building: walls (with baked AO), pitched (gable) or flat roof with real eave fascia, ridge cap and
 ## parapet, a 3D chimney, window sills and door steps.
 func _emit_house(b: Dictionary) -> void:
+	if BuildingBuilder.supported(b, self):
+		BuildingBuilder.new(self, b).emit()
+		return
 	var x0 := float(b.x0) - 1.0
 	var x1 := float(b.x1) + 1.0
 	var rx0 := float(b.x0) - 2.0

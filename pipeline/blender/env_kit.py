@@ -293,17 +293,24 @@ class Prop:
         self.paint(faces, mat, **kw)
         return faces
 
-    def quad(self, p0, p1, p2, p3, mat, **kw):
+    def quad(self, p0, p1, p2, p3, mat, toward=None, **kw):
+        """toward: optional direction the face must look to (its winding is flipped if needed)."""
         b = self.bm
         f = b.faces.new([b.verts.new(p) for p in (p0, p1, p2, p3)])
         f.normal_update()
+        if toward is not None and f.normal.dot(Vector(toward)) < 0:
+            f.normal_flip()
+            f.normal_update()
         self.paint([f], mat, **kw)
         return f
 
-    def tri(self, p0, p1, p2, mat, **kw):
+    def tri(self, p0, p1, p2, mat, toward=None, **kw):
         b = self.bm
         f = b.faces.new([b.verts.new(p) for p in (p0, p1, p2)])
         f.normal_update()
+        if toward is not None and f.normal.dot(Vector(toward)) < 0:
+            f.normal_flip()
+            f.normal_update()
         self.paint([f], mat, **kw)
         return f
 

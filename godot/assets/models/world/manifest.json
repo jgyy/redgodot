@@ -168,5 +168,65 @@
   "tris": 141,
   "bytes": 10948,
   "notes": "flower tuft (3 blooms)"
+ },
+ "bld_window": {
+  "tris": 108,
+  "bytes": 8800,
+  "notes": "building part (tintable slots in vertex alpha), see env_buildings.py"
+ },
+ "bld_window_big": {
+  "tris": 74,
+  "bytes": 6420,
+  "notes": "building part (tintable slots in vertex alpha), see env_buildings.py"
+ },
+ "bld_shutter": {
+  "tris": 96,
+  "bytes": 7912,
+  "notes": "building part (tintable slots in vertex alpha), see env_buildings.py"
+ },
+ "bld_door": {
+  "tris": 210,
+  "bytes": 15788,
+  "notes": "building part (tintable slots in vertex alpha), see env_buildings.py"
+ },
+ "bld_glassdoor": {
+  "tris": 98,
+  "bytes": 8100,
+  "notes": "building part (tintable slots in vertex alpha), see env_buildings.py"
+ },
+ "bld_awning": {
+  "tris": 28,
+  "bytes": 3156,
+  "notes": "building part (tintable slots in vertex alpha), see env_buildings.py"
+ },
+ "bld_porch": {
+  "tris": 77,
+  "bytes": 6608,
+  "notes": "building part (tintable slots in vertex alpha), see env_buildings.py"
+ },
+ "bld_pillar": {
+  "tris": 84,
+  "bytes": 6820,
+  "notes": "building part (tintable slots in vertex alpha), see env_buildings.py"
+ },
+ "bld_lamp": {
+  "tris": 48,
+  "bytes": 4584,
+  "notes": "building part (tintable slots in vertex alpha), see env_buildings.py"
+ },
+ "bld_dormer": {
+  "tris": 92,
+  "bytes": 7724,
+  "notes": "building part (tintable slots in vertex alpha), see env_buildings.py"
+ },
+ "bld_chimney": {
+  "tris": 72,
+  "bytes": 6276,
+  "notes": "building part (tintable slots in vertex alpha), see env_buildings.py"
+ },
+ "bld_acunit": {
+  "tris": 84,
+  "bytes": 7112,
+  "notes": "building part (tintable slots in vertex alpha), see env_buildings.py"
  }
 }

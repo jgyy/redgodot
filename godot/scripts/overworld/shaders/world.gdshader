@@ -69,6 +69,51 @@ vec3 water_color(vec2 px, float d, bool deep, float t) {
 	return water_pal[idx];
 }
 
+
+float h21(vec2 p) {
+	return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+}
+
+// Procedural building materials (BuildingBuilder.gd): vertex alpha 0.04 * id, laid out in the 2D-art pixel space so the
+// joints land on the pixel grid like upstream's painters: 1/2 roof shingle rows (even / odd), 3 clapboard siding,
+// 4 brick, 5 ashlar stone, 6 concrete panels, 7 plaster.
+vec3 bld_pattern(int pid, vec3 col, vec2 p, float h) {
+	vec2 q = floor(p);
+	if (pid == 1 || pid == 2) {
+		float off = pid == 2 ? 4.0 : 0.0;
+		float jx = mod(q.x + off, 8.0);
+		float tone = h21(vec2(floor((q.x + off) / 8.0), floor(h / 5.0) + float(pid))) - 0.5;
+		col *= 1.0 + tone * 0.16;
+		if (jx < 1.0) col *= 0.72;
+	} else if (pid == 3) {
+		float r = mod(q.y, 4.0);
+		if (r < 1.0) col *= 0.82; else if (r < 2.0) col *= 1.05;
+	} else if (pid == 4) {
+		float c = floor(q.y / 4.0);
+		float r = mod(q.y, 4.0);
+		float o = mod(c, 2.0) * 4.0;
+		float jx = mod(q.x + o, 8.0);
+		float tone = h21(vec2(floor((q.x + o) / 8.0), c)) - 0.5;
+		col *= 1.0 + tone * 0.18;
+		if (r < 1.0 || jx < 1.0) col = mix(col, vec3(0.88, 0.82, 0.74), 0.6);
+	} else if (pid == 5) {
+		float c = floor(q.y / 8.0);
+		float r = mod(q.y, 8.0);
+		float o = mod(c, 2.0) * 8.0;
+		float jx = mod(q.x + o, 16.0);
+		float tone = h21(vec2(floor((q.x + o) / 16.0), c + 7.0)) - 0.5;
+		col *= 1.0 + tone * 0.14;
+		if (r < 1.0 || jx < 1.0) col *= 0.78; else if (r < 2.0) col *= 1.06;
+	} else if (pid == 6) {
+		float mx = mod(q.x, 16.0);
+		float my = mod(q.y, 16.0);
+		if (mx < 1.0 || my < 1.0) col *= 0.8; else if (mx < 2.0 || my < 2.0) col *= 1.06;
+	} else if (pid == 7) {
+		col *= 1.0 + (h21(q * 0.37) - 0.5) * 0.06;
+	}
+	return col;
+}
+
 void fragment() {
 	vec4 c = texture(albedo_tex, UV);
 	bool solid = !is_ground && COLOR.a < 0.99;     // procedural trim (WorldBuilder._solid): vertex colour, no atlas
@@ -77,7 +122,10 @@ void fragment() {
 	vec2 pix = floor(p2d);
 	bool in_water = false;
 	if (!is_ground) {
-		if (COLOR.a < 0.99) col = COLOR.rgb;                 // procedural trim geometry: vertex colour instead of the atlas
+		if (COLOR.a < 0.99) {
+			col = COLOR.rgb;                                  // procedural trim geometry: vertex colour instead of the atlas
+			if (COLOR.a < 0.45) col = bld_pattern(int(COLOR.a / 0.04 + 0.5), col, p2d, hpx);
+		}
 		else col *= COLOR.rgb * 1.25;                      // baked ambient occlusion (0.8 = unchanged)
 	}
 	if (is_ground && has_water) {

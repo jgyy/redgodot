@@ -33,6 +33,7 @@ from mathutils import Vector  # noqa: E402
 import common as C  # noqa: E402
 import env_kit as K  # noqa: E402
 import env_props as EP  # noqa: E402
+import env_buildings as EBL  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, '..', '..'))
@@ -246,6 +247,15 @@ def main():
         path = os.path.join(OUT_DIR, '%s.glb' % name)
         size = K.export(path)
         manifest[name] = {'tris': tris, 'bytes': size, 'notes': note}
+        print('[gen_world] %s: %d tris' % (path, tris))
+    for name, fn in EBL.PARTS.items():
+        K.reset()
+        P = fn()
+        tris = P.tri_count()
+        P.to_object()
+        path = os.path.join(OUT_DIR, '%s.glb' % name)
+        size = K.export(path)
+        manifest[name] = {'tris': tris, 'bytes': size, 'notes': 'building part (tintable slots in vertex alpha), see env_buildings.py'}
         print('[gen_world] %s: %d tris' % (path, tris))
     json.dump(manifest, open(os.path.join(OUT_DIR, 'manifest.json'), 'w'), indent=1)
 

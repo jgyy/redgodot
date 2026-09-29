@@ -19,6 +19,7 @@ import env_kit as K  # noqa: E402
 import env_props as EP  # noqa: E402
 import env_textures as ET  # noqa: E402
 import env_tiles as TL  # noqa: E402
+import env_buildings as EBL  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, '..', '..'))
@@ -40,6 +41,7 @@ def main():
     jobs = [(n, fn, note, 'tiles') for n, fn, note in TL.TILES]
     jobs += [(n, fn, note, 'props') for n, fn, note in TL.PROPS_EXTRA]
     jobs += [(n, EP.PROPS[n][0], EP.PROPS[n][1], 'props') for n in KIT_PROPS]
+    jobs += [(n, (lambda style, f=f: f()), 'building part (neutral grey in the kit; tinted per building in game)', 'props') for n, f in EBL.PARTS.items()]
     for name, fn, note, group in jobs:
         K.reset()
         P = fn('tex')

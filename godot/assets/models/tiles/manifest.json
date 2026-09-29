@@ -259,6 +259,78 @@
    "tris": 88,
    "bytes": 21932,
    "notes": "railing post"
+  },
+  "bld_window": {
+   "file": "bld_window.glb",
+   "tris": 108,
+   "bytes": 8800,
+   "notes": "building part (neutral grey in the kit; tinted per building in game)"
+  },
+  "bld_window_big": {
+   "file": "bld_window_big.glb",
+   "tris": 74,
+   "bytes": 6420,
+   "notes": "building part (neutral grey in the kit; tinted per building in game)"
+  },
+  "bld_shutter": {
+   "file": "bld_shutter.glb",
+   "tris": 96,
+   "bytes": 7912,
+   "notes": "building part (neutral grey in the kit; tinted per building in game)"
+  },
+  "bld_door": {
+   "file": "bld_door.glb",
+   "tris": 210,
+   "bytes": 15788,
+   "notes": "building part (neutral grey in the kit; tinted per building in game)"
+  },
+  "bld_glassdoor": {
+   "file": "bld_glassdoor.glb",
+   "tris": 98,
+   "bytes": 8100,
+   "notes": "building part (neutral grey in the kit; tinted per building in game)"
+  },
+  "bld_awning": {
+   "file": "bld_awning.glb",
+   "tris": 28,
+   "bytes": 3156,
+   "notes": "building part (neutral grey in the kit; tinted per building in game)"
+  },
+  "bld_porch": {
+   "file": "bld_porch.glb",
+   "tris": 77,
+   "bytes": 6608,
+   "notes": "building part (neutral grey in the kit; tinted per building in game)"
+  },
+  "bld_pillar": {
+   "file": "bld_pillar.glb",
+   "tris": 84,
+   "bytes": 6820,
+   "notes": "building part (neutral grey in the kit; tinted per building in game)"
+  },
+  "bld_lamp": {
+   "file": "bld_lamp.glb",
+   "tris": 48,
+   "bytes": 4584,
+   "notes": "building part (neutral grey in the kit; tinted per building in game)"
+  },
+  "bld_dormer": {
+   "file": "bld_dormer.glb",
+   "tris": 92,
+   "bytes": 7724,
+   "notes": "building part (neutral grey in the kit; tinted per building in game)"
+  },
+  "bld_chimney": {
+   "file": "bld_chimney.glb",
+   "tris": 72,
+   "bytes": 6276,
+   "notes": "building part (neutral grey in the kit; tinted per building in game)"
+  },
+  "bld_acunit": {
+   "file": "bld_acunit.glb",
+   "tris": 84,
+   "bytes": 7112,
+   "notes": "building part (neutral grey in the kit; tinted per building in game)"
   }
  },
  "conventions": {
