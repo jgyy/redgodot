@@ -206,6 +206,14 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		_open_menu()
 
+## Screenshots (--scene=version_menu): the NEW GAME version list open, with `v` highlighted and shown under the logo.
+func pose_version_menu(v: String = "YELLOW") -> void:
+	_menu_open = true
+	_overlay.version = v
+	var m := PxMenu.new()
+	m.setup(VERSION_CHOICES, {"x": 6, "y": 6, "w": 190, "sel": maxi(0, GameData.VERSIONS.find(v))})
+	_overlay.get_parent().add_child(m)
+
 func _open_menu() -> void:
 	_menu_open = true
 	UI.sfx("select")

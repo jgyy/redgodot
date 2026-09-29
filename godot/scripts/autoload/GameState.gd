@@ -481,7 +481,10 @@ func set_look(l: PlayerLook) -> void:
 
 func new_game(starter_id: String) -> void:
 	party.clear()
-	add_to_party(starter_id, 5)
+	var starter_mon := add_to_party(starter_id, 5)
+	if is_yellow() and starter_id == "PIKACHU":
+		starter_mon.buddy = true   # YELLOW: the starter PIKACHU walks behind the player
+		starter = "PIKACHU"
 	bag = {"POTION": 3, "SUPER_POTION": 3, "POKE_BALL": 3, "GREAT_BALL": 3,
 		"ULTRA_BALL": 3, "REVIVE": 3, "ESCAPE_ROPE": 3, "TOWN_MAP": 1}
 	badges.clear()

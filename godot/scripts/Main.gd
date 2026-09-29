@@ -89,6 +89,11 @@ func _setup_scene(scene: String, args: Dictionary) -> void:
 					intro.seek(int(args["intro_frame"]), args.has("intro_hold"))
 		"oak_speech":
 			SceneRouter.goto_oak_speech()
+		"version_menu":   # the NEW GAME version list on the title screen (--version=RED|BLUE|YELLOW highlights one)
+			await get_tree().process_frame
+			var title := get_node_or_null("Title")
+			if title and title.has_method("pose_version_menu"):
+				title.call("pose_version_menu", GameState.pending_version)
 		"naming":
 			GameState.new_game(args.get("player", "CHARMANDER"))
 			SceneRouter.goto_title()
