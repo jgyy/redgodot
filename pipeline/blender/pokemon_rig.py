@@ -76,10 +76,10 @@ def _pctl(a, q):
 
 
 def _seg_bones(sk, gid, role, pts, parent, side='', pattern=None, index=0):
-    """chain of bones through `pts` (len n+1); names <gid>1..n unless `pattern` supplies them."""
+    """chain of bones through `pts` (len n+1); names <gid>_1.._n unless `pattern` supplies them."""
     prev = parent
     for i in range(len(pts) - 1):
-        nm = (pattern[i] if pattern else '%s%d' % (gid, i + 1))
+        nm = (pattern[i] if pattern else '%s_%d' % (gid, i + 1))
         sk.add(Bone(nm, pts[i], pts[i + 1], prev, role, side, gid, i))
         prev = nm
     return prev
@@ -191,14 +191,24 @@ def _classify(tips, spec, V, H, L, xcore, cf, hc, hr, hips, posture):
     F = {id(t): feat(t) for t in tips}
     pool = list(tips)
 
-    def take(pred, key, n, role, reverse=True):
+    chosen_all = []
+
+    def take(pred, key, n, role, reverse=True, sep=0.09):
         cs = [t for t in pool if pred(F[id(t)], t)]
         cs.sort(key=lambda t: key(F[id(t)], t), reverse=reverse)
-        out = cs[:n]
+        out = []
+        for t in cs:
+            if len(out) >= n:
+                break
+            # fingers / toes / feathers of one limb are separate persistence peaks: one limb = one pick
+            if any(np.linalg.norm(t.pos - o.pos) < sep * H for o in out):
+                continue
+            out.append(t)
         for t in out:
             t.role = role
             t.side = '' if abs(t.pos[0]) < 0.06 * H else ('L' if t.pos[0] > 0 else 'R')
             pool.remove(t)
+            chosen_all.append(t)
         return out
 
     # the head itself (snout / crown of a head that pokes out): not a chain
@@ -218,8 +228,17 @@ def _classify(tips, spec, V, H, L, xcore, cf, hc, hr, hips, posture):
         take(lambda a, t: a['len'] > 0.06, lambda a, t: t.pers, cap['fins'], 'Fin')
     legz = 0.34 if not horizontal else 0.42
     take(lambda a, t: a['z'] < legz and t.pers > 0.05 * H, lambda a, t: (t.pers, -t.pos[2]), cap['legs'], 'Leg')
-    take(lambda a, t: 0.16 < a['z'] < 0.9 and a['lat'] > 0.55 and t.pers > 0.05 * H, lambda a, t: (t.pers * a['lat']), cap['arms'], 'Arm')
-    rest = [t for t in pool if t.pers > 0.08 * H]
+    take(lambda a, t: 0.16 < a['z'] < (0.9 if plan != 'multileg' else 1.1) and a['lat'] > 0.55 and t.pers > 0.05 * H, lambda a, t: (t.pers * a['lat']), cap['arms'], 'Arm')
+    def near_limb(t):
+        """fingers, claws and hand-held props peak on their own: fold them into the limb they sit on (its bones will skin them)."""
+        for o in chosen_all:
+            if o.role == 'Extra':
+                continue
+            ln = float(np.linalg.norm(o.pos - o.base))
+            if float(_seg_dist(t.pos, o.base, o.pos)) < max(0.12 * H, 0.45 * ln):
+                return True
+        return False
+    rest = [t for t in pool if t.pers > 0.08 * H and not near_limb(t)]
     rest.sort(key=lambda t: -t.pers)
     for t in rest[:cap['extras']]:
         t.role = 'Extra'
@@ -245,6 +264,58 @@ def _trim_chain(t, sk, role):
     cut = int(inside[0]) if len(inside) else len(pts) - 1
     cut = max(cut, 1)
     return pts[:cut + 1]
+
+
+def _fill_slots(used, spec, V, H, L, xcore, cf, hips, chest, posture):
+    """limbs the tip search could not separate (fused feet, arms hugging the body) are rebuilt from regional extremes so
+    every two-/four-legged body gets its full set of limbs."""
+    plan = spec.get('plan')
+    if plan in ('multileg', 'plant', 'rock', 'radial', 'sphere', 'blob', 'floating', 'serpent', 'fish', 'shell') and plan != 'shell':
+        return []
+    x, y, z = V[:, 0], V[:, 1], V[:, 2]
+    f = -y
+    horizontal = posture == 'horizontal'
+    out = []
+    nleg, narm = int(spec.get('legs', 2)), int(spec.get('arms', 2))
+
+    def mk(role, side, pos, base):
+        t = Tip(-1, np.asarray(pos, float), np.asarray(base, float), float(np.linalg.norm(pos - base)), float(np.linalg.norm(pos - base)),
+                np.array([pos, base], dtype=float))
+        t.role, t.side = role, side
+        return t
+    if nleg in (2, 4):
+        slots = [('', 'L'), ('', 'R')] if not (nleg == 4 and horizontal) else [(a, b) for a in 'FH' for b in 'LR']
+        for fh, sd in slots:
+            sg = 1.0 if sd == 'L' else -1.0
+            have = any(t.role == 'Leg' and t.side == sd and (not fh or fh == ('F' if (-t.pos[1] - cf) > 0 else 'H')) for t in used)
+            if have:
+                continue
+            m = (np.sign(x) == sg) & (z < 0.14 * H)
+            if horizontal and fh:
+                m &= (f > cf) if fh == 'F' else (f <= cf)
+            if m.sum() >= 3:
+                foot = np.array([x[m].mean(), -f[m].mean(), 0.03 * H])
+            else:
+                foot = np.array([sg * 0.3 * xcore, -(cf + (0.2 if fh == 'F' else -0.2 if fh == 'H' else 0.0) * L), 0.03 * H])
+            hy = chest[1] if fh == 'F' else hips[1]
+            hip = np.array([sg * 0.5 * abs(foot[0]), hy, hips[2]])
+            out.append(mk('Leg', sd, foot, hip))
+    if narm == 2 and plan not in ('quadruped', 'quadruped_small', 'bird', 'fish', 'serpent'):
+        for sd in 'LR':
+            sg = 1.0 if sd == 'L' else -1.0
+            if any(t.role == 'Arm' and t.side == sd for t in used):
+                continue
+            m = (np.sign(x) == sg) & (z > 0.25 * H) & (z < 0.8 * H)
+            if m.sum() < 8:
+                continue
+            ax = np.abs(x[m])
+            sel = m & (np.abs(x) >= np.quantile(ax, 0.96))
+            hand = V[sel].mean(0)
+            sh = np.array([sg * 0.2 * xcore, chest[1], 0.66 * H])
+            if np.linalg.norm(hand - sh) < 0.1 * H:
+                hand = sh + np.array([sg * 0.1 * H, 0.0, -0.16 * H])
+            out.append(mk('Arm', sd, hand, sh))
+    return out
 
 
 def _polyline_from_tip(t, n, V, H, sk=None, role=None, radius=0.06):
@@ -296,6 +367,7 @@ def _fit_trunk_body(sk, V, g, tips, spec, H, L, xcore, cf, posture):
     sk.info.update(hips=hips, hc=hc, hr=hr, chest=chest, ax=ax, xcore=xcore, cf=cf, head_base=head_base)
     top_spine = 'Spine%d' % n_spine
     used = _classify(tips, spec, V, H, L, xcore, cf, hc, hr, hips, posture)
+    used += _fill_slots(used, spec, V, H, L, xcore, cf, hips, chest, posture)
     _attach_limbs(sk, used, spec, V, H, L, xcore, cf, hc, hr, hips, chest, top_spine, horizontal)
 
 

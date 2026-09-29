@@ -34,10 +34,6 @@ def striker(c, v):
     return 'head', None
 
 
-def sway_body(c, P, k, u=0.0):
-    c.spine_yaw(P, 0)
-
-
 def rear_up(c, P, k, deg=30.0):
     """raise the front of the body (rearing, chest out)."""
     r = c.rig
@@ -122,7 +118,6 @@ def multi_strike(c, P, u, v):
     reps = int(v.get('reps', 4))
     ph = (u * reps) % 1.0
     k = bump(ph, 0.0, 0.35, 0.8) * bump(u, 0.02, 0.15, 0.98) ** 0.3
-    env = bump(u, 0.0, 0.12, 1.0) if u < 0.9 else bump(u, 0.9, 0.9, 1.0)
     env = hold(u, 0.0, 0.1, 0.85, 1.0)
     k *= env
     s = v.get('side', 1.0)
@@ -249,8 +244,7 @@ def burst(c, P, u, v):
     ph = (u * reps) % 1.0
     k = bump(ph, 0.0, 0.3, 0.75) * hold(u, 0.0, 0.08, 0.9, 1.0)
     rear_up(c, P, 0.4 * hold(u, 0.0, 0.1, 0.9, 1.0), 20)
-    c.head_look(P, pitch=14 - 30 * k if u > 0.02 and u < 0.98 else 0.0)
-    c.head_look(P, pitch=0)
+    c.head_look(P, pitch=-16 * k)
     c.mouth(P, 38 * k)
     lunge(c, P, 0.05 * k)
     c.spine_pitch(P, -8 * k)
@@ -314,7 +308,6 @@ def throw(c, P, u, v):
     lunge(c, P, 0.05 * rel)
     if kind == 'arm':
         n = ch.names
-        P.bend(n[0], UP, 0.0)
         P.bend(n[0], FWD, 160 * wind - 140 * rel * 0.3 - 20 * rel)
         P.bend(n[0], OUT(ch.sign), 30 * wind)
         if len(n) > 1:
@@ -655,7 +648,7 @@ def kick(c, P, u, v):
             P.bend(n[1], FWD, 75 * hit)
         for l in legs:
             if l is not pick and l.fh != 'F':
-                P.bend(l.names[0], FWD, -10 * hit)
+                P.bend(l.names[0], BACK, 10 * hit)
     else:
         for t in c.rig.tails:
             P.chain(t.names, UP, 60 * wind - 90 * hit)
@@ -663,8 +656,6 @@ def kick(c, P, u, v):
     for a in c.rig.arms:
         P.bend(a.names[0], FWD, 40 * wind - 55 * hit * a.sign * v.get('side', 1.0))
     tail_react(c, P, u, hit, 10)
-    if v.get('double'):
-        P.bend(legs[-1].names[0] if legs else c.rig.root, FWD, 0)
 
 
 def leech(c, P, u, v):

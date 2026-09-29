@@ -41,10 +41,16 @@ jobs:
       - name: Install Xvfb + Mesa software renderer
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends xvfb libgl1-mesa-dri
 
-      - name: Verify Pokémon glbs (rigged, 18 clips each)
+      - name: Verify Pokémon glbs (species-specific rigs, >= 24 clips each, no T-pose)
         run: |
-          python3 pipeline/blender/verify_glb.py godot/assets/models/pokemon --require-skin --min-kb 20 \
-            --anims Idle,Walk,Run,Attack,Special,Hurt,Faint,Victory,Sleep,Roar,Dodge,Spin,Hop,Charge,Taunt,Spawn,Hover,Talk
+          python3 pipeline/blender/verify_glb.py godot/assets/models/pokemon --require-skin --min-kb 20 --max-kb 2200 \
+            --min-anims 24 --tpose --bones-report \
+            --anims Idle,Walk,Run,Attack,Special,Hurt,Faint,Victory,Sleep,Roar,Dodge,Spin,Hop,Charge,Taunt,Spawn,Hover,Talk,IdleLook,IdleStretch,IdleFidget
+
+      - name: Pokémon rig tests (T-pose angles, unique skeletons, clip distinctness, mesh stretch)
+        run: |
+          python3 -m pip install --quiet numpy
+          python3 -m unittest discover -s pipeline/tests -v
 
       - name: Verify NPC glbs (rigged, 19 clips each)
         run: |

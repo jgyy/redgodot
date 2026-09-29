@@ -7,6 +7,8 @@ extends Node
 ##        --view=front|back|side  --cols=N  --cell=PX  --yaw=DEG (3/4 turn, default -25 = toward the light)
 ##        --anim=Idle --anim_t=0.0 (pose to sample)  --labels=1  --toon=0 --outline=PX
 ##        --sprite_frame=M (Pokemon sized like upstream sprites: 64px frame = M metres, fixed camera)
+##        --clips=Idle,Walk,Attack --tfrac=0.5   one cell per (species, clip) sampled at tfrac of the clip length
+##        --strip=Attack --frames=6              one row per species: the clip sampled at N even steps (--cols is set to N)
 
 var _vp: SubViewport
 var _cam: Camera3D
@@ -27,12 +29,29 @@ func run(args: Dictionary, out_path: String) -> void:
 	var labels: bool = args.get("labels", "1") != "0"
 	_toon = args.get("toon", "1") != "0"
 	_frame_m = float(args.get("sprite_frame", "0"))
-	var rows := int(ceil(float(ids.size()) / float(cols)))
+	# cells: (species, clip, time in [0,1) of the clip; -1 = anim_t seconds)
+	var cells: Array = []
+	if args.has("strip"):
+		var n := maxi(2, int(args.get("frames", "6")))
+		cols = n
+		for id in ids:
+			for k in n:
+				cells.append([id, String(args["strip"]), float(k) / float(n)])
+	elif args.has("clips"):
+		var cl: PackedStringArray = String(args["clips"]).split(",", false)
+		cols = cl.size()
+		for id in ids:
+			for c in cl:
+				cells.append([id, c, float(args.get("tfrac", "0.5"))])
+	else:
+		for id in ids:
+			cells.append([id, anim_name, -1.0])
+	var rows := int(ceil(float(cells.size()) / float(cols)))
 	_build(cell)
 	var sheet := Image.create(cols * cell, max(1, rows) * cell, false, Image.FORMAT_RGBA8)
 	sheet.fill(Color(0.87, 0.91, 0.95))
-	for i in range(ids.size()):
-		var id: String = ids[i]
+	for i in range(cells.size()):
+		var id: String = cells[i][0]
 		var holder := Node3D.new()
 		_stage.add_child(holder)
 		var model: Node3D = _instantiate(kind, id)
@@ -43,10 +62,12 @@ func run(args: Dictionary, out_path: String) -> void:
 		if ap:
 			AnimUtil.fix_looping(ap)
 			ap.playback_default_blend_time = 0.0   # paused poses: a pending cross-fade would hide the clip
-			var nm := anim_name if ap.has_animation(anim_name) else "Idle"
+			var want: String = cells[i][1]
+			var nm := want if ap.has_animation(want) else "Idle"
 			if ap.has_animation(nm):
 				ap.play(nm)
-				ap.seek(anim_t, true)
+				var tt := anim_t if float(cells[i][2]) < 0.0 else float(cells[i][2]) * ap.get_animation(nm).length
+				ap.seek(tt, true)
 				ap.speed_scale = 0.0
 		match view:
 			"back":
@@ -57,7 +78,7 @@ func run(args: Dictionary, out_path: String) -> void:
 				holder.rotation_degrees.y = yaw
 		await get_tree().process_frame
 		_frame(holder)
-		_label.text = (id if labels else "")
+		_label.text = ((id if cells[i][1] == anim_name and not args.has("strip") and not args.has("clips") else "%s %s" % [id, cells[i][1]]) if labels else "")
 		await RenderingServer.frame_post_draw
 		await RenderingServer.frame_post_draw
 		var img := _vp.get_texture().get_image()
@@ -90,6 +111,7 @@ func _instantiate(kind: String, id: String) -> Node3D:
 	if kind == "characters":
 		return CharacterSkin.instantiate(id, _toon)
 	var actor := PokemonActor.new()
+	actor.idle_variety = false   # sheets sample paused poses
 	actor.setup(id)
 	if _frame_m > 0.0:
 		actor.use_sprite_scale(_frame_m)

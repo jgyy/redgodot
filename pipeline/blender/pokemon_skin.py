@@ -128,6 +128,7 @@ def natural_pose(V, W, names, sk, spec):
     arm_fwd = float(spec.get('arm_fwd', 16.0))
     leg_t = float(spec.get('leg_hang', 10.0))
     log = {}
+    cols = {n: i for i, n in enumerate(names)}
     for gid, names_c in sk.chains.items():
         b0 = sk.bones[names_c[0]]
         if b0.role not in ('Arm', 'Leg', 'Wing'):
@@ -138,21 +139,25 @@ def natural_pose(V, W, names, sk, spec):
         if L < 1e-9:
             continue
         side = 1.0 if (b[0] - sk.info['hips'][0]) >= 0 else -1.0
-        if b0.role == 'Arm' and angle_deg(v, -UP) > ARM_MAX:
+        vm = mesh_vec(V, W, cols, names_c, a)
+        if b0.role == 'Arm' and (angle_deg(v, -UP) > ARM_MAX or (vm is not None and _t_like(vm))):
             ang = math.radians(arm_t)
             fw = math.radians(arm_fwd)
             tgt = np.array([side * math.sin(ang), -math.sin(fw), -math.cos(ang)])
-            log[gid] = ('arm', angle_deg(v, -UP))
-            R = rot_between(v, tgt)
+            src = vm if vm is not None else v           # aim the *mesh* (what the eye sees), not just the bone
+            log[gid] = ('arm', angle_deg(src, -UP))
+            R = rot_between(src, tgt)
             rot[names_c[0]] = R
             piv[names_c[0]] = a
-        elif b0.role == 'Leg' and angle_deg(v, -UP) > LEG_MAX:
-            ang = math.radians(leg_t)
-            tgt = np.array([side * math.sin(ang) * 0.6, 0.0, -math.cos(ang)])
-            # keep the fore/aft lean of the original leg (knees and paws point somewhere on purpose)
-            tgt[1] = float(np.clip(v[1] / L, -0.35, 0.35))
-            log[gid] = ('leg', angle_deg(v, -UP))
-            R = rot_between(v, unit(tgt))
+        elif b0.role == 'Leg' and max(abs(v[0]) / L, (abs(vm[0]) / np.linalg.norm(vm)) if vm is not None else 0.0) > math.sin(math.radians(LEG_MAX)):
+            # splayed legs: bring them under the body by rolling about the fore/aft axis only (keeps knees and paws pointing where they do)
+            src = vm if vm is not None and abs(vm[0]) / np.linalg.norm(vm) > abs(v[0]) / L else v
+            cur = math.degrees(math.asin(min(1.0, abs(src[0]) / np.linalg.norm(src))))
+            want = float(spec.get('leg_hang', 14.0))
+            log[gid] = ('leg', cur)
+            R = axis_angle(FWD, math.radians(cur - want) * (1.0 if src[0] > 0 else -1.0))
+            if abs((R @ src)[0]) > abs(src[0]):
+                R = R.T
             rot[names_c[0]] = R
             piv[names_c[0]] = a
         elif b0.role == 'Wing':
@@ -194,6 +199,26 @@ def natural_pose(V, W, names, sk, spec):
         bn.head = R @ bn.head + t
         bn.tail = R @ bn.tail + t
     return Vn, log
+
+
+def mesh_vec(V, W, cols, chain, root):
+    """root joint -> centroid of the farthest 15% of the vertices bound (>50%) to the chain: what the eye sees as the limb."""
+    w = sum(W[:, cols[n]] for n in chain if n in cols)
+    sel = w > 0.5
+    if sel.sum() < 6:
+        return None
+    pts = V[sel]
+    d = np.linalg.norm(pts - root, axis=1)
+    far = pts[d >= np.percentile(d, 85)]
+    v = far.mean(0) - root
+    return v if np.linalg.norm(v) > 1e-6 else None
+
+
+def _t_like(v):
+    """sticks out sideways and roughly level (the pose the T-pose detector rejects)."""
+    down = angle_deg(v, -UP)
+    spread = math.degrees(math.asin(min(1.0, abs(v[0]) / max(np.linalg.norm(v), 1e-9))))
+    return 52.0 < down < 125.0 and spread > 32.0
 
 
 def _flat_normal(V, W, names, sk, chain_names, R):

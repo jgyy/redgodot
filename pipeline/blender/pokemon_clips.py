@@ -111,8 +111,6 @@ def idle(c, P, u):
         c.extras_sway(P, u, 6, 2.0, 0.0, toward=UP)
         c.root_move(P, z=0.01 * s)
     c.ears_move(P, u, 4, 1.0, phase=0.5)
-    if r.fam if False else False:
-        pass
 
 
 # ------------------------------------------------------------------------------------------------ Walk / Run
@@ -122,7 +120,7 @@ def locomote(c, P, u, run):
     cyc = 2.0 if not run else 4.0
     a = TAU * cyc * u
     fam = c.fam
-    bob = abs(math.sin(a * 0.5 * 2)) if False else abs(math.sin(a))
+    bob = abs(math.sin(a))
     if fam in ('biped', 'rock'):
         c.stride(P, u, cyc, 26 * k, 34 * k, 14 * k)
         c.arms_counter(P, u, cyc, 20 * k, 16 * k)
@@ -158,7 +156,6 @@ def locomote(c, P, u, run):
         c.extras_sway(P, u, 12 * k, cyc, 0.7)
     elif fam == 'bird':
         c.stride(P, u, cyc, 30 * k, 44 * k, 20 * k)
-        neck_toward = FWD
         for i, n in enumerate(r.neck):
             P.bend(n, FWD, 12 * k * math.sin(a + 1.0))
         P.bend(r.head, FWD, 10 * k * math.sin(a + 1.0)) if r.head in r.bones else None
@@ -195,7 +192,7 @@ def locomote(c, P, u, run):
         P.pitch(r.root, 4 * math.sin(a * 0.5))
         c.mouth(P, 8 + 8 * max(0, math.sin(a)))
     elif fam == 'blob':
-        hp = abs(math.sin(a * 0.5 * 2 * 0.5 * 2)) if False else abs(math.sin(a * 0.5))
+        hp = abs(math.sin(a * 0.5))
         c.squash(P, 0.24 * k * math.cos(a) * 0.6)
         c.root_move(P, z=0.10 * k * hp * c.amp, f=0.0)
         P.pitch(r.root, -8 * k * math.sin(a * 0.5))
@@ -240,11 +237,9 @@ def locomote(c, P, u, run):
         c.sides_wobble(P, u, 0.08, cyc * 0.5)
     elif fam == 'radial':
         P.roll(r.root, 20 * k * math.sin(a * 0.5))
-        P.yaw(r.root, 360 * u * (1 if run else 0.5) if True else 0)
+        P.yaw(r.root, 360 * u * (1 if run else 0.5))
         c.root_move(P, z=0.04 * abs(math.sin(a * 0.5)))
         c.extras_sway(P, u, 20 * k, cyc, 0.5, toward=UP)
-    if fam in ('rock',) and False:
-        pass
 
 
 # ------------------------------------------------------------------------------------------------ one-shot base clips

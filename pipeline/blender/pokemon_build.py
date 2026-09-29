@@ -84,7 +84,8 @@ def bake(rg, obj, C, out_path, export_kw=None):
             made[nm].parent = made[b.parent]
     bpy.ops.object.mode_set(mode='OBJECT')
     arm.select_set(False)
-    # weights
+    # weights (the source model's own vertex groups - Hips, Spine1 ... of its Sketchfab rig - would clash by name)
+    obj.vertex_groups.clear()
     for nm in rg.names:
         obj.vertex_groups.new(name=nm)
     W = rg.W

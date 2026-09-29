@@ -1058,11 +1058,12 @@ func anim(move_id: String, side: Variant, hit: int) -> void:
 	if pa and hit == 0 and (move_id == "CHARGE" or move_id.ends_with("_CHARGE")):
 		pa.play("Charge")
 	elif pa and hit == 0:
-		# damaging moves swing the Attack clip, self-targeting ones the Special clip; both hand back to Idle
-		# with a crossfade by themselves (PokemonActor.play_once queues it)
-		pa.play_once("Special" if BattleVfx.is_status_move(move_id) and pa.has_anim("Special") else "Attack")
+		# the species' own clip for this move when it has one (Flamethrower, ThunderShock ...); otherwise damaging moves
+		# swing the Attack clip, self-targeting ones the Special clip.  All hand back to Idle with a crossfade by
+		# themselves (PokemonActor.play_once queues it)
+		pa.play_move(move_id, BattleVfx.is_status_move(move_id))
 	await vfx.move(move_id, k, hit)
-	if pa and is_instance_valid(pa) and pa.current_clip() not in [pa.idle_clip(), "Idle", "Attack", "Special", "Hurt"]:
+	if pa and is_instance_valid(pa) and pa.current_clip() not in [pa.idle_clip(), "Idle", "Attack", "Special", "Hurt"] and not pa.is_signature_clip(pa.current_clip()):
 		pa.play("Idle")
 
 ## The target of a missed move sidesteps it (Dodge clip + a slide on the stage).
