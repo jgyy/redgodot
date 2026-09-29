@@ -26,6 +26,11 @@ const LOOPING_EXTRA := ["Talk", "Wave", "Cheer", "Surf", "Nod", "Shake", "Think"
 ## The 13 gesture clips every character has on top of Idle/Walk/Run/Talk/Wave/Cheer (Bow and Surprised play once).
 const GESTURES := ["Nod", "Shake", "Think", "Laugh", "Bow", "Point", "Sleep", "Surprised", "Salute", "Stretch", "Dance", "Sad", "Shiver"]
 
+## Cel-shader settings for the realistic characters: a softer ramp than the old chibi models had, so the smooth skin and cloth
+## read as forms (not as flat sprites) and the highlight band does not blow pink dresses out to white patches.
+const RAMP_BIAS := 0.32
+const RAMP_STRENGTH := 0.42
+
 const SLOT_FIELD := {
 	"mat_skin": "skin", "mat_hair": "hair", "mat_top": "shirt",
 	"mat_pants": "pants", "mat_shoes": "shoes", "mat_hat": "hat",
@@ -60,10 +65,9 @@ static func instantiate(sprite_key: String, toon: bool = true) -> Node3D:
 		_fit_bounds(model)
 	if toon:
 		Toon.apply(model, 1.3, 0.02)
-		# chibi faces are big spheres: keep them out of the darkest bands (upstream's
-		# character sprites are mostly flat skin with a darker lower edge)
-		Toon.set_param(model, "ramp_bias", 0.28)
-		Toon.set_param(model, "ramp_strength", 0.6)
+		# keep the faces out of the darkest bands (upstream's character sprites are mostly flat skin with a darker lower edge)
+		Toon.set_param(model, "ramp_bias", RAMP_BIAS)
+		Toon.set_param(model, "ramp_strength", RAMP_STRENGTH)
 	finish_model(model)
 	return model
 

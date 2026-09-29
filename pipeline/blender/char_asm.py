@@ -26,12 +26,14 @@ def assemble_mesh(ctx, bones):
     """Concatenate parts -> arrays: V, F, N, UV, J (n,4), W (n,4), plus per-vertex AO."""
     bone_index = {b[0]: i for i, b in enumerate(bones)}
     ctx.atlas._pack()
-    Vs, Fs, Ns, Js, Ws, gs, cells, uvs, gains = [], [], [], [], [], [], [], [], []
+    Vs, Fs, Ns, Js, Ws, gs, cells, uvs, gains, consts = [], [], [], [], [], [], [], [], [], []
     off = 0
+    ctx.part_ranges = []
     for p in ctx.parts:
         if len(p.V) == 0 or len(p.F) == 0:
             continue
-        N = G.vertex_normals(p.V, p.F)
+        ctx.part_ranges.append((p.name, off, off + len(p.V)))
+        N = p.N if p.N is not None else G.vertex_normals(p.V, p.F)
         J, W = G.finalize_weights(p, bone_index)
         Vs.append(p.V)
         Fs.append(p.F + off)
@@ -42,6 +44,7 @@ def assemble_mesh(ctx, bones):
         cells.extend([p.cell] * len(p.V))
         uvs.append(p.uv if p.uv is not None else np.zeros((len(p.V), 2)))
         gains.append(np.full(len(p.V), p.ao_gain))
+        consts.append(np.full(len(p.V), np.nan if p.ao_const is None else p.ao_const))
         off += len(p.V)
     V = np.vstack(Vs)
     F = np.vstack(Fs)
@@ -51,8 +54,10 @@ def assemble_mesh(ctx, bones):
     g = np.concatenate(gs)
     gain = np.concatenate(gains)
     uv_d = np.vstack(uvs)
-    ao = G.bake_ao(V, F, N, samples=18, max_dist=2.4)
+    ao = G.bake_ao(V, F, N, samples=18, max_dist=1.7, extra=getattr(ctx, 'ao_extra', None))
     ao = 1.0 - (1.0 - ao) * gain
+    const = np.concatenate(consts)
+    ao = np.where(np.isnan(const), ao, const)
     UV = np.zeros((len(V), 2))
     cells = np.array(cells)
     for name in np.unique(cells):
@@ -61,18 +66,20 @@ def assemble_mesh(ctx, bones):
     return V, F, N, UV, J, W, ao
 
 
-def export_glb(path):
+def export_glb(path, anims=True):
     C.ensure_dir(os.path.dirname(path))
-    bpy.ops.export_scene.gltf(filepath=path, export_format='GLB', check_existing=False, use_selection=False, export_apply=False,
-                              export_yup=True, export_materials='EXPORT', export_animations=True, export_animation_mode='ACTIONS',
-                              export_skins=True, export_force_sampling=FORCE_SAMPLING, export_reset_pose_bones=True,
-                              export_anim_slide_to_zero=True, export_optimize_animation_size=True)
+    kw = dict(filepath=path, export_format='GLB', check_existing=False, use_selection=False, export_apply=False,
+              export_yup=True, export_materials='EXPORT', export_animations=anims, export_skins=True)
+    if anims:
+        kw.update(export_animation_mode='ACTIONS', export_force_sampling=FORCE_SAMPLING, export_reset_pose_bones=True,
+                  export_anim_slide_to_zero=True, export_optimize_animation_size=True)
+    bpy.ops.export_scene.gltf(**kw)
 
 
 FORCE_SAMPLING = os.environ.get('CHAR_FORCE_SAMPLING', '1') == '1'
 
 
-def build_and_export(ctx, out_path, hair_hint=None, tmp_dir='/tmp', log=None):
+def build_and_export(ctx, out_path, hair_hint=None, tmp_dir='/tmp', log=None, dry=False, white_material=False, anims=True):
     t0 = time.time()
     reset_scene()
     P = ctx.P
@@ -82,18 +89,21 @@ def build_and_export(ctx, out_path, hair_hint=None, tmp_dir='/tmp', log=None):
     V = V * K
     bones = [(n_, p_, tuple(np.array(h_) * K), tuple(np.array(t_) * K)) for n_, p_, h_, t_ in bones]
     # ---- texture
-    png = os.path.join(tmp_dir, '%s_atlas.png' % ctx.key)
-    ctx.atlas.save(png)
-    img = bpy.data.images.load(png)
-    img.pack()
     mat = bpy.data.materials.new('mat_atlas')
     mat.use_nodes = True
     nt = mat.node_tree
     bsdf = nt.nodes.get('Principled BSDF')
-    tex = nt.nodes.new('ShaderNodeTexImage')
-    tex.image = img
-    tex.interpolation = 'Linear'
-    nt.links.new(tex.outputs['Color'], bsdf.inputs['Base Color'])
+    if white_material:          # modular player parts: the recolourable atlas ships as a separate RGBA png
+        bsdf.inputs['Base Color'].default_value = (1, 1, 1, 1)
+    else:
+        png = os.path.join(tmp_dir, '%s_atlas.png' % ctx.key)
+        ctx.atlas.save(png)
+        img = bpy.data.images.load(png)
+        img.pack()
+        tex = nt.nodes.new('ShaderNodeTexImage')
+        tex.image = img
+        tex.interpolation = 'Linear'
+        nt.links.new(tex.outputs['Color'], bsdf.inputs['Base Color'])
     bsdf.inputs['Roughness'].default_value = 0.9
     if 'Specular IOR Level' in bsdf.inputs:
         bsdf.inputs['Specular IOR Level'].default_value = 0.05
@@ -130,8 +140,13 @@ def build_and_export(ctx, out_path, hair_hint=None, tmp_dir='/tmp', log=None):
     hair = ctx.anim_hints
     clips = A.build_all(P, hair)
     acts = A.write_actions(arm, clips, names, unit=K)
-    C.stash_actions(arm, acts)
-    export_glb(out_path)
+    if anims or getattr(ctx, 'clip_test', None):
+        C.stash_actions(arm, acts)
+    if getattr(ctx, 'clip_test', None):
+        ctx.clip_test(obj, arm, acts, names, K)
+    if dry:
+        return {}
+    export_glb(out_path, anims=anims)
     info = {'verts': len(V), 'tris': len(F), 'bytes': os.path.getsize(out_path), 'bones': len(names),
             'clips': {c.name: {'frames': c.n, 'seconds': round(c.n / float(FPS), 4)} for c in clips},
             'seconds': round(time.time() - t0, 1)}

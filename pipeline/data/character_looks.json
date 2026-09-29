@@ -2,7 +2,7 @@
  "_meta": {
   "about": "Design notes that DRIVE pipeline/blender/gen_characters.py. Palette colours come from pipeline/extracted/cast.json (role names such as 'hair', 'shirt', 'accent', 'hat', 'hatk' resolve to them); anything here overrides. Every key is optional.",
   "schema": {
-   "build": "sh (height of body), sw (width), hs (head scale), bulk (limb thickness), belly, jaw, face_wide",
+   "build": "sh (overall height, 1.0 = 1.5 m adult, children ~0.72), sw (shoulder / hip width), hs (head scale), bulk (limb thickness), belly, muscle (0..1), jaw, face_wide, stoop (old), sex ('m'|'f'), age ('child'|'teen'|'adult'|'old'), lift (sole height, 0 for barefoot -- automatic)",
    "face": "eyes (round|big|oval|tall|narrow|sharp|sleepy|dot|lash|lash_white|closed), iris, brows (none|thin|normal|thick|bushy) + brow_tilt (+ angry, - worried), mouth (smile|grin|flat|frown|open|o), nose (none|dot|small|normal|big|pointy), blush, freckles, glasses{type round|square|shades}, beard{type full|goatee|chin}, moustache{type thin|normal|bushy|handle}",
    "hair": "style (short|spiky|flat|long|bob|pony|twin|bun|loops|bald|tuft|long_pony|mohawk|none) + per-style knobs (len, spike_w, length, side, bun, bun_r ...)",
    "headwear": "type (cap|beanie|wide|sailor|chef|nurse|headband) + colours/logo",
@@ -66,6 +66,10 @@
      "color": "bag",
      "size": 1.0
     }
+   },
+   "build": {
+    "age": "teen",
+    "sh": 0.95
    }
   },
   "blue": {
@@ -75,7 +79,8 @@
     "https://nintendo.fandom.com/wiki/Blue_(Pok%C3%A9mon_Trainer)"
    ],
    "build": {
-    "sh": 1.03
+    "sh": 0.98,
+    "age": "teen"
    },
    "face": {
     "eyes": "sharp",
@@ -164,7 +169,8 @@
    ],
    "build": {
     "sw": 1.08,
-    "bulk": 1.06
+    "bulk": 1.06,
+    "muscle": 0.4
    },
    "face": {
     "eyes": "closed",
@@ -238,6 +244,10 @@
     "suspenders": {
      "color": "accent"
     }
+   },
+   "build": {
+    "sex": "f",
+    "sh": 0.92
    }
   },
   "nurse": {
@@ -274,6 +284,10 @@
     "type": "flat",
     "color": "#f4f4f8",
     "sole": "#e8e0e4"
+   },
+   "build": {
+    "sex": "f",
+    "sh": 0.92
    }
   },
   "rocket": {
@@ -325,7 +339,8 @@
      "w": 0.9,
      "h": 3.4
     }
-   }
+   },
+   "build": {}
   },
   "hiker": {
    "notes": "Big bearded man: wide brown hat, orange shirt, khaki trousers, sturdy boots, big backpack with roll.",
@@ -336,7 +351,8 @@
     "sw": 1.14,
     "bulk": 1.14,
     "belly": 0.5,
-    "hs": 0.98
+    "hs": 0.98,
+    "muscle": 0.3
    },
    "face": {
     "eyes": "narrow",
@@ -392,7 +408,8 @@
     "https://pokemon.fandom.com/wiki/Delia_Ketchum"
    ],
    "build": {
-    "sh": 0.98
+    "sh": 0.98,
+    "sex": "f"
    },
    "face": {
     "eyes": "lash",
@@ -454,13 +471,19 @@
    "shoes": {
     "type": "flat",
     "color": "shoes"
+   },
+   "build": {
+    "sex": "f",
+    "sh": 0.93
    }
   },
   "girl": {
    "notes": "Young girl NPC: high ponytail with a big ribbon, pink dress.",
    "build": {
     "sh": 0.94,
-    "hs": 1.03
+    "hs": 1.03,
+    "sex": "f",
+    "age": "teen"
    },
    "face": {
     "eyes": "big",
@@ -490,7 +513,10 @@
    "build": {
     "sh": 0.88,
     "hs": 1.06,
-    "bulk": 0.92
+    "bulk": 0.92,
+    "sex": "f",
+    "age": "child",
+    "jaw": 0.88
    },
    "face": {
     "eyes": "big",
@@ -539,6 +565,11 @@
    "shoes": {
     "type": "flat",
     "color": "shoes"
+   },
+   "build": {
+    "sex": "f",
+    "age": "teen",
+    "sh": 0.93
    }
   },
   "beauty": {
@@ -574,6 +605,10 @@
     "type": "heel",
     "color": "shoes",
     "sole": "#6a2a3a"
+   },
+   "build": {
+    "sex": "f",
+    "sh": 0.95
    }
   },
   "cooltrainer_f": {
@@ -609,6 +644,10 @@
      "color": "#3a3a4a",
      "balls": 1
     }
+   },
+   "build": {
+    "sex": "f",
+    "sh": 0.95
    }
   },
   "cooltrainer_m": {
@@ -644,13 +683,17 @@
      "color": "#2a2a3a",
      "balls": 2
     }
+   },
+   "build": {
+    "muscle": 0.2
    }
   },
   "youngster": {
    "notes": "Youngster: yellow cap, blue shirt, short shorts, red sneakers; little bug-catching kid.",
    "build": {
     "sh": 0.9,
-    "hs": 1.04
+    "hs": 1.04,
+    "age": "teen"
    },
    "face": {
     "eyes": "round",
@@ -693,7 +736,9 @@
    "build": {
     "sh": 0.86,
     "hs": 1.07,
-    "bulk": 0.92
+    "bulk": 0.92,
+    "age": "child",
+    "jaw": 0.9
    },
    "face": {
     "eyes": "big",
@@ -761,6 +806,9 @@
     "tie": {
      "color": "accent"
     }
+   },
+   "build": {
+    "sh": 0.97
    }
   },
   "scientist": {
@@ -795,7 +843,8 @@
    "shoes": {
     "type": "loafer",
     "color": "shoes"
-   }
+   },
+   "build": {}
   },
   "swimmer": {
    "notes": "Swimmer: bare-chested, blue swim cap, blue trunks, barefoot.",
@@ -892,7 +941,8 @@
     "bowtie": {
      "color": "#8a2a3a"
     }
-   }
+   },
+   "build": {}
   },
   "biker": {
    "notes": "Biker: black bandana, sleeveless black jacket with silver studs, wristbands, chunky boots.",
@@ -901,7 +951,8 @@
    ],
    "build": {
     "sw": 1.1,
-    "bulk": 1.1
+    "bulk": 1.1,
+    "muscle": 0.35
    },
    "face": {
     "eyes": "sharp",
@@ -1010,7 +1061,8 @@
     "tie": {
      "color": "accent"
     }
-   }
+   },
+   "build": {}
   },
   "channeler": {
    "notes": "Channeler: long white hair, pale sleepy stare, deep purple robe with wide sleeves.",
@@ -1039,6 +1091,10 @@
    "shoes": {
     "type": "flat",
     "color": "shoes"
+   },
+   "build": {
+    "sex": "f",
+    "sh": 0.93
    }
   },
   "fisher": {
@@ -1080,13 +1136,15 @@
    "shoes": {
     "type": "boot",
     "color": "shoes"
-   }
+   },
+   "build": {}
   },
   "fishing_guru": {
    "notes": "Old Fishing Guru: blue floppy hat, long white beard, green shirt, tan vest.",
    "build": {
     "stoop": 0.5,
-    "sh": 0.97
+    "sh": 0.95,
+    "age": "old"
    },
    "face": {
     "eyes": "dot",
@@ -1166,7 +1224,8 @@
      "w": 0.5,
      "h": 1.6
     }
-   }
+   },
+   "build": {}
   },
   "guard": {
    "notes": "Guard: navy uniform with gold buttons/trim and a peaked cap with a gold badge.",
@@ -1214,7 +1273,8 @@
     "tie": {
      "color": "accent"
     }
-   }
+   },
+   "build": {}
   },
   "sailor": {
    "notes": "Sailor: white sailor cap, white blouse with blue collar, navy bell-bottoms, neckerchief.",
@@ -1252,7 +1312,8 @@
      "color": "accent",
      "tail": false
     }
-   }
+   },
+   "build": {}
   },
   "link_receptionist": {
    "notes": "Cable Club receptionist: violet hair in a neat bun, lavender uniform dress with white collar.",
@@ -1277,6 +1338,10 @@
    "shoes": {
     "type": "heel",
     "color": "shoes"
+   },
+   "build": {
+    "sex": "f",
+    "sh": 0.92
    }
   },
   "silph_worker_m": {
@@ -1316,7 +1381,8 @@
      "w": 0.5,
      "h": 1.4
     }
-   }
+   },
+   "build": {}
   },
   "silph_worker_f": {
    "notes": "Silph Co. employee (female): long brown hair, white dress with blue collar.",
@@ -1340,6 +1406,10 @@
    "shoes": {
     "type": "heel",
     "color": "shoes"
+   },
+   "build": {
+    "sex": "f",
+    "sh": 0.93
    }
   },
   "rocker": {
@@ -1383,7 +1453,8 @@
     "wristbands": {
      "color": "#c8c8d0"
     }
-   }
+   },
+   "build": {}
   },
   "middle_aged_man": {
    "notes": "Middle-aged man: receding brown hair, green polo shirt, khaki trousers, a little belly.",
@@ -1424,7 +1495,9 @@
   "middle_aged_woman": {
    "notes": "Middle-aged woman: brown hair in a bun, rose dress with cream collar and apron.",
    "build": {
-    "belly": 0.3
+    "belly": 0.3,
+    "sex": "f",
+    "sh": 0.91
    },
    "face": {
     "eyes": "lash",
@@ -1483,13 +1556,16 @@
    "shoes": {
     "type": "sneaker",
     "color": "shoes"
-   }
+   },
+   "build": {}
   },
   "gramps": {
    "notes": "Gramps: bald with white side hair, bushy white brows and moustache, cardigan and slacks.",
    "build": {
     "stoop": 1.0,
-    "sh": 0.96
+    "sh": 0.93,
+    "age": "old",
+    "jaw": 0.95
    },
    "face": {
     "eyes": "dot",
@@ -1507,7 +1583,8 @@
     }
    },
    "hair": {
-    "style": "bald"
+    "style": "bald",
+    "sides": true
    },
    "top": {
     "type": "jacket",
@@ -1567,7 +1644,8 @@
      "color": "accent",
      "tail": false
     }
-   }
+   },
+   "build": {}
   },
   "safari_zone_worker": {
    "notes": "Safari Zone ranger: khaki campaign hat, olive shirt with pockets, khaki trousers, boots.",
@@ -1607,13 +1685,17 @@
    "shoes": {
     "type": "boot",
     "color": "shoes"
-   }
+   },
+   "build": {}
   },
   "granny": {
    "notes": "Granny: silver hair in a bun, lilac dress with a shawl, kind squint.",
    "build": {
     "stoop": 1.0,
-    "sh": 0.94
+    "sh": 0.88,
+    "sex": "f",
+    "age": "old",
+    "jaw": 0.88
    },
    "face": {
     "eyes": "dot",
@@ -1681,7 +1763,8 @@
    "notes": "Game Boy kid: green cap, yellow shirt, blue trousers, sneakers; excited grin.",
    "build": {
     "sh": 0.9,
-    "hs": 1.05
+    "hs": 1.05,
+    "age": "teen"
    },
    "face": {
     "eyes": "big",
@@ -1796,13 +1879,15 @@
     "bowtie": {
      "color": "#1a1a22"
     }
-   }
+   },
+   "build": {}
   },
   "silph_president": {
    "notes": "Silph Co. president: bald with grey sides, grey moustache, navy business suit with red tie.",
    "build": {
     "belly": 0.5,
-    "sw": 1.05
+    "sw": 1.05,
+    "sh": 0.99
    },
    "face": {
     "eyes": "dot",
@@ -1817,7 +1902,8 @@
     "beard": null
    },
    "hair": {
-    "style": "bald"
+    "style": "bald",
+    "sides": true
    },
    "top": {
     "type": "jacket",
@@ -1848,7 +1934,8 @@
    "notes": "Mr. Fuji: kindly bald old man, white brows and short beard, lilac-purple robe.",
    "build": {
     "stoop": 0.8,
-    "sh": 0.97
+    "sh": 0.94,
+    "age": "old"
    },
    "face": {
     "eyes": "dot",
@@ -1908,13 +1995,15 @@
    "shoes": {
     "type": "sneaker",
     "color": "shoes"
-   }
+   },
+   "build": {}
   },
   "warden": {
    "notes": "Safari Zone Warden: khaki hat, grey moustache and beard, olive uniform.",
    "build": {
     "sw": 1.08,
-    "belly": 0.4
+    "belly": 0.4,
+    "sh": 0.99
    },
    "face": {
     "eyes": "narrow",
@@ -1999,6 +2088,10 @@
    "shoes": {
     "type": "heel",
     "color": "shoes"
+   },
+   "build": {
+    "sex": "f",
+    "sh": 0.97
    }
   },
   "lance": {
@@ -2007,7 +2100,8 @@
     "https://bulbapedia.bulbagarden.net/wiki/Lance"
    ],
    "build": {
-    "sh": 1.04
+    "sh": 1.04,
+    "muscle": 0.25
    },
    "face": {
     "eyes": "sharp",
@@ -2126,7 +2220,8 @@
      "color": "#c83a3a",
      "buckle": "#c8c8d0"
     }
-   }
+   },
+   "build": {}
   },
   "captain": {
    "notes": "Ship's Captain: white captain's cap with gold badge, white beard, navy jacket with gold buttons.",
@@ -2177,6 +2272,10 @@
      "color": "#1a1a22",
      "buckle": "#e8c84a"
     }
+   },
+   "build": {
+    "age": "old",
+    "sh": 0.98
    }
   },
   "bruno": {
@@ -2188,7 +2287,9 @@
     "sh": 1.05,
     "sw": 1.28,
     "bulk": 1.28,
-    "hs": 0.96
+    "hs": 0.96,
+    "muscle": 1.0,
+    "jaw": 1.15
    },
    "face": {
     "eyes": "sharp",
@@ -2229,7 +2330,9 @@
    "notes": "Agatha: sharp-eyed old lady, silver hair in a high bun, long violet dress with a white apron-like bib.",
    "build": {
     "stoop": 1.0,
-    "sh": 0.96
+    "sh": 0.9,
+    "sex": "f",
+    "age": "old"
    },
    "face": {
     "eyes": "sharp",
@@ -2268,7 +2371,9 @@
     "sh": 1.02,
     "sw": 1.22,
     "bulk": 1.2,
-    "hs": 0.98
+    "hs": 0.98,
+    "muscle": 0.85,
+    "jaw": 1.12
    },
    "face": {
     "eyes": "sharp",
@@ -2340,6 +2445,10 @@
    "shoes": {
     "type": "flat",
     "color": "shoes"
+   },
+   "build": {
+    "sex": "f",
+    "sh": 0.92
    }
   },
   "blaine": {
@@ -2348,7 +2457,9 @@
     "https://pokemon.fandom.com/wiki/Blaine"
    ],
    "build": {
-    "sw": 1.05
+    "sw": 1.05,
+    "age": "old",
+    "sh": 0.97
    },
    "face": {
     "eyes": "dot",
@@ -2367,7 +2478,8 @@
     "beard": null
    },
    "hair": {
-    "style": "bald"
+    "style": "bald",
+    "sides": true
    },
    "top": {
     "type": "coat",
@@ -2421,6 +2533,10 @@
    "shoes": {
     "type": "heel",
     "color": "shoes"
+   },
+   "build": {
+    "sex": "f",
+    "sh": 0.95
    }
   },
   "bill": {
@@ -2449,7 +2565,8 @@
    "shoes": {
     "type": "sneaker",
     "color": "shoes"
-   }
+   },
+   "build": {}
   }
  }
 }

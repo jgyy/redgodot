@@ -1,80 +1,108 @@
-"""Proportions + skeleton for the chibi characters (pure data; bpy only in build_armature)."""
+"""Proportions + skeleton for the realistic characters (pure data; bpy only in build_armature).
+
+Units are "sprite rows": a standard adult stands ~23.4 rows to the top of the skull (7.1 heads) and the
+exporter scales rows to metres (1.5 m nominal).  The bone names and the hierarchy are the game contract
+(OwActor / PlayerModel / CharacterSkin and char_anim.py address bones by name) and did not change when the
+chibi bodies were replaced with realistic ones.
+"""
 import math
 
 import numpy as np
 
-# ----------------------------------------------------------------------------- proportions
-FOOT_LEN_BACK = 1.3       # heel behind the ankle (+Y)
-FOOT_LEN_FRONT = 3.3      # toe in front of the ankle (-Y)
+FOOT_LEN_BACK = 1.1       # heel behind the ankle (+Y)
+FOOT_LEN_FRONT = 2.75     # toe in front of the ankle (-Y)
+
+AGE_HEAD = {'child': 0.55, 'teen': 0.25, 'adult': 0.0, 'old': 0.0}
 
 
 class Prop:
-    """Body proportions in "sprite rows" (a full figure is ~24 tall).  Everything the body /
-    clothing builders need (joint heights, limb radii) derives from a few knobs:
-      sh    height of legs+torso (1.0 = standard adult chibi; kids ~0.86)
-      sw    width of shoulders / hips
-      hs    head scale
-      bulk  limb thickness
-      belly torso depth bulge
+    """Body proportions.  Knobs (all come from `build` in character_looks.json):
+      sh     overall height of trunk + legs (1.0 = 1.5 m adult; children 0.75-0.9)
+      sw     width of shoulders / hips
+      hs     head scale (on top of the automatic bigger-head-for-smaller-body rule)
+      bulk   limb thickness (muscle / fat)
+      belly  torso depth bulge at the waist
+      neck   neck length
+      stoop  forward hunch of the old (animation only)
+      sex    'm' | 'f' (shoulder / hip / bust / jaw / hand size)
+      lift   shoe sole height (the foot volume sits on top of it)
     """
 
-    def __init__(self, sh=1.0, sw=1.0, hs=1.0, bulk=1.0, belly=0.0, neck=1.0, stoop=0.0):
+    def __init__(self, sh=1.0, sw=1.0, hs=1.0, bulk=1.0, belly=0.0, neck=1.0, stoop=0.0, sex='m', lift=0.3, muscle=0.0,
+                 bust=None, jaw=1.0, age='adult'):
         self.sh, self.sw, self.hs, self.bulk, self.belly, self.stoop = sh, sw, hs, bulk, belly, stoop
-        self.ankle = 1.4
-        self.hip = 6.7 * sh
-        self.knee = self.ankle + (self.hip - self.ankle) * 0.5
-        self.waist = 8.2 * sh
-        self.chest = 9.7 * sh
-        self.shoulder = 11.0 * sh
-        self.neck_base = 11.55 * sh
-        self.neck_top = 12.45 * sh + (neck - 1.0) * 0.6
-        self.head_rx, self.head_ry, self.head_rz = 5.9 * hs, 5.55 * hs, 5.6 * hs
-        self.chin = self.neck_top - 0.7
-        self.head_c = np.array([0.0, 0.0, self.chin + self.head_rz * 0.97])
-        self.head_top = self.head_c[2] + self.head_rz
-        self.leg_x = 1.85 * sw
-        self.shoulder_x = 3.75 * sw
-        self.elbow_z = self.shoulder - 2.65 * sh
-        self.wrist_z = self.shoulder - 5.05 * sh
-        self.arm_lean = 0.55 * sw     # outward drift of the hanging arm per bone (A-pose)
-        self.hand_len = 1.85
-
-    # -- radii
-    def torso_rx(self, z):
-        """Half width of the torso at height z."""
-        sw = self.sw
-        pts = [(self.hip - 0.6, 3.05 * sw), (self.waist, 2.95 * sw), (self.chest, 3.35 * sw),
-               (self.shoulder - 0.35, 3.55 * sw), (self.neck_base, 1.9 * sw)]
-        zs = [p[0] for p in pts]
-        return float(np.interp(z, zs, [p[1] for p in pts]))
-
-    def torso_ry(self, z):
-        pts = [(self.hip - 0.6, 2.45), (self.waist, 2.3 + self.belly), (self.chest, 2.5 + self.belly * 0.5),
-               (self.shoulder - 0.35, 2.35), (self.neck_base, 1.6)]
-        return float(np.interp(z, [p[0] for p in pts], [p[1] for p in pts]))
+        self.sex, self.age = sex, age
+        s = sh
+        self.s = s
+        self.ls = s ** 0.8                       # lateral scale (kids are narrower but not as much as they are short)
+        self.lift = lift
+        f = sex == 'f'
+        self.f = f
+        self.muscle = muscle
+        self.bust = (0.75 if f else 0.0) if bust is None else bust
+        self.jaw = jaw
+        L = lift
+        self.ankle = L + 0.95 * (0.5 + 0.5 * s)
+        self.knee = L + 6.4 * s
+        self.hip = L + 12.0 * s
+        self.crotch = self.hip - 1.15 * s
+        self.waist = L + 14.6 * s
+        self.chest = L + 16.8 * s
+        self.shoulder = L + 18.6 * s                 # glenohumeral joint height
+        self.shoulder_top = L + 19.25 * s
+        self.neck_base = L + 19.0 * s
+        head_k = hs * 1.05 * (1.0 + (1.0 - s) * 0.85)   # small bodies keep proportionally big heads (adults ~6.8 heads tall)
+        self.head_h = 3.3 * head_k * (0.97 if f else 1.0)
+        self.head_k = head_k
+        self.neck_len = 1.0 * neck
+        self.chin = L + 19.9 * s + (neck - 1.0) * 0.7 + (0.0 if s > 0.95 else (1 - s) * 1.1)
+        self.head_top = self.chin + self.head_h
+        self.neck_top = self.chin + self.head_h * 0.36
+        self.head_c = np.array([0.0, 0.2 * head_k, self.chin + self.head_h * 0.55])
+        # lateral positions
+        ls = self.ls
+        self.hip_x = 1.42 * ls * (sw ** 0.6) * (1.06 if f else 1.0)
+        self.shoulder_x = (2.5 if not f else 2.25) * ls * sw
+        self.arm_lean = 0.26                          # A-pose: tan of the outward tilt of the upper arm
+        self.forearm_lean = 0.17
+        self.upper_arm = 4.35 * s
+        self.forearm = 3.35 * s
+        self.hand_len = 2.35 * (0.5 + 0.5 * s) * (0.94 if f else 1.0)
+        self.elbow_flex = 0.10                        # relaxed elbow, forearm swings forward
+        # sprite-row -> named heights the animation module uses
+        self.elbow_z = self.shoulder - self.upper_arm / math.sqrt(1 + self.arm_lean ** 2)
+        self.wrist_z = self.elbow_z - self.forearm / math.sqrt(1 + self.forearm_lean ** 2)
 
     def joints(self, side):
         """Named joint positions for a side (+1 = character's left = +X)."""
         s = side
-        sx, sh = self.shoulder_x, self.sh
-        elbow_x = s * (sx + self.arm_lean * (self.shoulder - self.elbow_z) / 2.65)
-        wrist_x = s * (sx + self.arm_lean * (self.shoulder - self.wrist_z) / 2.65)
+        sx = self.shoulder_x
+        sh = np.array([s * sx, 0.0, self.shoulder])
+        ua = self.upper_arm
+        d1 = np.array([s * self.arm_lean, 0.0, -1.0])
+        d1 /= np.linalg.norm(d1)
+        el = sh + d1 * ua
+        d2 = np.array([s * self.forearm_lean, -self.elbow_flex, -1.0])
+        d2 /= np.linalg.norm(d2)
+        wr = el + d2 * self.forearm
+        d3 = np.array([s * 0.06, -0.20, -1.0])
+        d3 /= np.linalg.norm(d3)
+        tip = wr + d3 * self.hand_len
+        hx = s * self.hip_x
         return {
-            'shoulder': np.array([s * sx, 0.0, self.shoulder]),
-            'elbow': np.array([elbow_x, 0.0, self.elbow_z]),
-            'wrist': np.array([wrist_x, 0.0, self.wrist_z]),
-            'hand_tip': np.array([wrist_x + s * self.arm_lean * 0.3, 0.0, self.wrist_z - self.hand_len]),
-            'hip': np.array([s * self.leg_x, 0.0, self.hip]),
-            'knee': np.array([s * self.leg_x, 0.0, self.knee]),
-            'ankle': np.array([s * self.leg_x, 0.0, self.ankle]),
-            'toe': np.array([s * self.leg_x, -FOOT_LEN_FRONT, 0.55]),
+            'shoulder': sh, 'elbow': el, 'wrist': wr, 'hand_tip': tip,
+            'hip': np.array([hx, 0.0, self.hip]),
+            'knee': np.array([hx * 1.02, -0.05, self.knee]),
+            'ankle': np.array([hx * 1.04, 0.0, self.ankle]),
+            'toe': np.array([hx * 1.06, -FOOT_LEN_FRONT, self.lift + 0.35]),
+            'arm_dirs': (d1, d2, d3),
         }
 
 
 # ----------------------------------------------------------------------------- skeleton
 def skeleton(P, extra=()):
     """List of (name, parent, head, tail).  `extra` = additional secondary bones."""
-    hs = P.hs
+    hs = P.head_k
     bones = [
         ('root', None, (0, 0, 0), (0, 0, 0.6)),
         ('hips', 'root', (0, 0, P.hip + 0.3), (0, 0, P.waist)),
@@ -86,20 +114,26 @@ def skeleton(P, extra=()):
     for side, sfx in ((1, '_L'), (-1, '_R')):
         j = P.joints(side)
         bones += [
-            ('clavicle' + sfx, 'chest', (side * 0.9, 0, P.shoulder - 0.15), tuple(j['shoulder'])),
+            ('clavicle' + sfx, 'chest', (side * 0.55, 0.0, P.shoulder_top - 0.25 * P.s), tuple(j['shoulder'])),
             ('upper_arm' + sfx, 'clavicle' + sfx, tuple(j['shoulder']), tuple(j['elbow'])),
             ('forearm' + sfx, 'upper_arm' + sfx, tuple(j['elbow']), tuple(j['wrist'])),
             ('hand' + sfx, 'forearm' + sfx, tuple(j['wrist']), tuple(j['hand_tip'])),
             ('thigh' + sfx, 'hips', tuple(j['hip']), tuple(j['knee'])),
             ('shin' + sfx, 'thigh' + sfx, tuple(j['knee']), tuple(j['ankle'])),
-            ('foot' + sfx, 'shin' + sfx, tuple(j['ankle']), (j['ankle'][0], -FOOT_LEN_FRONT, 0.6)),
+            ('foot' + sfx, 'shin' + sfx, tuple(j['ankle']), (j['ankle'][0], -FOOT_LEN_FRONT, P.lift + 0.4)),
         ]
-    # facial bones: eyes blink by squashing, mouth pulses when talking
-    ey = P.head_c[2] - 0.9 * hs
+    # facial bones: the eyelids rotate about the eyeball centres (blink), the mouth pulses when talking
+    ec = getattr(P, 'eye_c', None)
+    if ec is None:
+        ez = P.chin + P.head_h * 0.62
+        ec = {1: np.array([0.5 * hs, -0.8 * hs, ez]), -1: np.array([-0.5 * hs, -0.8 * hs, ez])}
+    mc = getattr(P, 'mouth_c', None)
+    if mc is None:
+        mc = np.array([0.0, -1.1 * hs, P.chin + P.head_h * 0.24])
     bones += [
-        ('eye_L', 'head', (2.35 * hs, -5.0 * hs, P.head_c[2] - 0.7 * hs), (2.35 * hs, -5.2 * hs, P.head_c[2] - 0.7 * hs)),
-        ('eye_R', 'head', (-2.35 * hs, -5.0 * hs, P.head_c[2] - 0.7 * hs), (-2.35 * hs, -5.2 * hs, P.head_c[2] - 0.7 * hs)),
-        ('mouth', 'head', (0, -5.0 * hs, P.head_c[2] - 3.4 * hs), (0, -5.3 * hs, P.head_c[2] - 3.4 * hs)),
+        ('eye_L', 'head', tuple(ec[1]), tuple(ec[1] + np.array([0, -0.3, 0]))),
+        ('eye_R', 'head', tuple(ec[-1]), tuple(ec[-1] + np.array([0, -0.3, 0]))),
+        ('mouth', 'head', tuple(mc), tuple(mc + np.array([0, -0.3, 0]))),
     ]
     bones += list(extra)
     return bones

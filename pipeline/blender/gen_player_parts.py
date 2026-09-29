@@ -8,6 +8,9 @@ The player is assembled in Godot from two skinned parts on one skeleton (godot/s
                                  clip of char_anim.py (Idle Walk Run Talk ... + 13 gestures)      6 x 3 x 2 = 36
   body_<outfit>.glb              arms, torso, legs, shoes, backpack skinned to the standard bones     7 outfits
 
+Both halves are cut from ONE welded body surface at the middle of the neck, so the cut vertices, their normals and their
+skin weights are identical in every head and every body part and the join is invisible in any pose.
+
 Colours are applied at runtime.  Each part ships an RGBA atlas (<part>.png): RGB = the atlas painted with a neutral
 reference palette, ALPHA = 255 - 20 * role (0 = fixed colour, 1.. = index into manifest["roles"]).  The role map is found
 by rebuilding the part once per role with that role's colour changed and diffing the painted atlases, so it needs no
@@ -29,8 +32,9 @@ OUT_DIR = os.path.join(ROOT, 'godot', 'assets', 'models', 'player')
 ROLES = ['skin', 'hair', 'hat', 'hatk', 'shirt', 'pants', 'shoes', 'bag', 'coat', 'iris']
 C0 = {'skin': '#f4cca4', 'hair': '#d0d0d0', 'hat': '#d0d0d0', 'hatk': '#d0d0d0', 'shirt': '#d0d0d0', 'pants': '#d0d0d0',
       'shoes': '#d0d0d0', 'bag': '#d0d0d0', 'coat': '#d0d0d0', 'iris': '#d0d0d0'}
-HAIRS = {'short': {'style': 'short', 'bang_n': 4}, 'spiky': {'style': 'spiky', 'len': 4.0, 'spike_w': 2.8},
-         'long': {'style': 'long'}, 'pony': {'style': 'pony'}, 'bun': {'style': 'bun'}, 'bald': {'style': 'bald'}}
+HAIRS = {'short': {'style': 'short', 'bang_n': 4, 'part': 0.4}, 'spiky': {'style': 'spiky', 'len': 3.8, 'sweep_back': 0.45, 'seed': 5},
+         'long': {'style': 'long', 'part': 0.0}, 'pony': {'style': 'pony', 'length': 1.0, 'tie': 'accent'},
+         'bun': {'style': 'bun', 'bun': 'top', 'bun_r': 2.5, 'tie': 'accent'}, 'bald': {'style': 'bald'}}
 HATS = {'none': None,
         'cap': {'type': 'cap', 'color': 'hat', 'panel': 'hatk', 'brim': 'hat', 'logo': 'ball'},
         'beanie': {'type': 'beanie', 'color': 'hat'}}
@@ -46,6 +50,9 @@ OUTFITS = {
     'coat_pants': ({'type': 'coat', 'color': 'coat', 'under_color': 'shirt'}, {'type': 'pants'}),
     'long_pants': ({'type': 'shirt', 'sleeves': 'long', 'collar': 'high'}, {'type': 'pants'}),
 }
+# one androgynous teenage body for every look (the creator's hair / outfit / eye choices carry the boy / girl styling)
+PLAYER_BUILD = {'sh': 0.96, 'sw': 0.95, 'hs': 1.0, 'bulk': 0.95, 'sex': 'm', 'age': 'teen', 'jaw': 0.9, 'lift': 0.28}
+FACE = {'nose': 'small'}
 
 
 def head_names():
@@ -73,30 +80,38 @@ def variant_colors(role=None):
     return c
 
 
+def neck_cut(P):
+    return P.neck_base + 0.35
+
+
 # ---------------------------------------------------------------------------------------------- part builders
+def new_ctx(name, colors, look):
+    import char_body as B
+    import char_hair as H
+    ctx = B.Ctx(name, cast_for(colors), look)
+    B.build_body(ctx, cache=True)
+    ctx.headref = H.HeadRef(ctx)
+    return ctx
+
+
 def build_head_ctx(name, colors):
     import char_body as B
+    import char_face as FC
     import char_hair as H
     import char_extras as X
     _, hair_k, hat_k, eyes_k = name.split('_')
-    look = {'face': {'eyes': eyes_k, 'iris': colors['iris'], 'brows': 'thin' if eyes_k == 'lash' else 'normal', 'mouth': 'smile',
-                     'nose': 'dot', 'blush': eyes_k == 'lash'},
-            'hair': dict(HAIRS[hair_k]), 'headwear': HATS[hat_k]}
-    ctx = B.Ctx(name, cast_for(colors), look)
-    hair = dict(look['hair'])
+    face = dict(FACE, eyes=eyes_k, iris=colors['iris'], brows='thin' if eyes_k == 'lash' else 'normal', mouth='smile', lash=(eyes_k == 'lash'))
+    look = {'build': dict(PLAYER_BUILD), 'face': face, 'hair': dict(HAIRS[hair_k]), 'headwear': HATS[hat_k]}
+    ctx = new_ctx(name, colors, look)
     hw = look['headwear']
     ctx.cover = bool(hw and hw['type'] in ('cap', 'beanie'))
-    if ctx.cover:
-        rim = X.CAP_RIM if hw['type'] == 'cap' else X.BEANIE_RIM
-        hair['top'] = [(a, t - 4.0) for a, t in rim]
-        hair.setdefault('thick', 0.55)
-        hair.setdefault('volume', 0.0)
-    B.build_head(ctx, ear=True, nose='dot')
-    B.build_face(ctx, look['face'])
-    if hair.get('style') != 'none':
-        H.build_hair(ctx, hair)
+    FC.build_face(ctx, face)
     if hw:
         X.build_hat(ctx, hw)
+    if look['hair'].get('style') != 'none':
+        H.build_hair(ctx, dict(look['hair']))
+    ctx.add(B.skin_part(ctx, drop_covered=False, z_range=(neck_cut(ctx.P), 1e9)))
+    ctx.ao_extra = (ctx.body.V, ctx.body.F)
     return ctx
 
 
@@ -106,21 +121,15 @@ def build_body_ctx(name, colors):
     import char_extras as X
     outfit = name[len('body_'):]
     top, legs = OUTFITS[outfit]
-    look = {'face': {}, 'top': top, 'legs': legs, 'shoes': {'type': 'sneaker', 'color': 'shoes', 'sole': '#f4f4f8'},
-            'extras': {'backpack': {'color': 'bag', 'size': 1.0}}}
-    ctx = B.Ctx(name, cast_for(colors), look)
-    ctx.ramp('skin', 'skin', ctx.col('skin'))      # the head build normally creates it
-    long_sleeves = top.get('type') in ('coat', 'robe') or top.get('sleeves') == 'long'
-    for s in (1, -1):
-        if not long_sleeves:
-            ctx.add(B.build_arm(ctx, s, 'skin', name='arm', s_from=0.2))
-        else:
-            ctx.add(B.build_arm(ctx, s, 'skin', name='arm', s_from=0.88, cap_end=0.7))
+    look = {'build': dict(PLAYER_BUILD), 'face': dict(FACE), 'top': top, 'legs': legs,
+            'shoes': {'type': 'sneaker', 'color': 'shoes', 'sole': '#f4f4f8'}, 'extras': {'backpack': {'color': 'bag', 'size': 1.0}}}
+    ctx = new_ctx(name, colors, look)
     O.build_top(ctx, top)
     O.build_legs(ctx, legs)
     O.build_shoes(ctx, look['shoes'])
-    O.build_hands(ctx, None)
     X.backpack(ctx, look['extras']['backpack'])
+    ctx.add(B.skin_part(ctx, drop_covered=True, z_range=(-1e9, neck_cut(ctx.P))))
+    ctx.ao_extra = (ctx.body.V, ctx.body.F)
     return ctx
 
 
@@ -148,69 +157,15 @@ def role_atlas(name, base_ctx):
 
 
 # ---------------------------------------------------------------------------------------------- export
-def export_part(ctx, path, anims):
-    import bpy
-    import numpy as np
-    import common as C
-    import char_asm as AS
-    import char_rig as R
-    import char_anim as A
-    AS.reset_scene()
-    P = ctx.P
-    bones = R.skeleton(P, ctx.extra_bones)
-    V, F, N, UV, J, W, ao = AS.assemble_mesh(ctx, bones)
-    K = AS.UNIT
-    V = V * K
-    bones = [(n_, p_, tuple(np.array(h_) * K), tuple(np.array(t_) * K)) for n_, p_, h_, t_ in bones]
-    mat = bpy.data.materials.new('mat_atlas')
-    mat.use_nodes = True
-    bsdf = mat.node_tree.nodes.get('Principled BSDF')
-    bsdf.inputs['Base Color'].default_value = (1, 1, 1, 1)
-    bsdf.inputs['Roughness'].default_value = 0.9
-    me = bpy.data.meshes.new(ctx.key)
-    me.from_pydata([tuple(map(float, v)) for v in V], [], [tuple(int(i) for i in f) for f in F])
-    me.update()
-    me.polygons.foreach_set('use_smooth', [True] * len(me.polygons))
-    uvl = me.uv_layers.new(name='UVMap')
-    uvl.data.foreach_set('uv', UV[F.reshape(-1)].reshape(-1).astype(np.float32))
-    try:
-        me.normals_split_custom_set_from_vertices([tuple(map(float, n)) for n in N])
-    except Exception:
-        pass
-    me.materials.append(mat)
-    obj = bpy.data.objects.new(ctx.key, me)
-    bpy.context.scene.collection.objects.link(obj)
-    arm = R.build_armature(ctx.key, bones)
-    names = [b[0] for b in bones]
-    vgs = [obj.vertex_groups.new(name=nm) for nm in names]
-    for bi in range(len(names)):
-        sel = np.where((J == bi) & (W > 0))
-        for v, k in zip(sel[0].tolist(), sel[1].tolist()):
-            vgs[bi].add([v], float(W[v, k]), 'ADD')
-    obj.parent = arm
-    md = obj.modifiers.new('Armature', 'ARMATURE')
-    md.object = arm
-    if anims:
-        clips = A.build_all(P, ctx.anim_hints)
-        C.stash_actions(arm, A.write_actions(arm, clips, names, unit=K))
-    C.ensure_dir(os.path.dirname(path))
-    kw = dict(filepath=path, export_format='GLB', check_existing=False, use_selection=False, export_apply=False,
-              export_yup=True, export_materials='EXPORT', export_animations=anims, export_skins=True)
-    if anims:
-        kw.update(export_animation_mode='ACTIONS', export_force_sampling=True, export_reset_pose_bones=True,
-                  export_anim_slide_to_zero=True, export_optimize_animation_size=True)
-    bpy.ops.export_scene.gltf(**kw)
-    return len(V), len(F)
-
-
 def build_one(name, out_dir):
     from PIL import Image
+    import char_asm as AS
     t0 = time.time()
     ctx = builder(name)(name, dict(C0))
-    verts, tris = export_part(ctx, os.path.join(out_dir, name + '.glb'), anims=name.startswith('head_'))
+    info = AS.build_and_export(ctx, os.path.join(out_dir, name + '.glb'), white_material=True, anims=name.startswith('head_'))
     rgba, counts = role_atlas(name, ctx)
     Image.fromarray(rgba, 'RGBA').save(os.path.join(out_dir, name + '.png'), optimize=True)
-    return {'verts': verts, 'tris': tris, 'roles': counts, 'seconds': round(time.time() - t0, 1),
+    return {'verts': info['verts'], 'tris': info['tris'], 'roles': counts, 'seconds': round(time.time() - t0, 1),
             'bytes': os.path.getsize(os.path.join(out_dir, name + '.glb'))}
 
 

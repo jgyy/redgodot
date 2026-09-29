@@ -76,6 +76,9 @@ jobs:
           print("versions.json OK:", {k: len(v["wild"][k]) for k in v["wild"]}, "wild maps")
           EOF
 
+      - name: Check the character clipping report (nothing pokes through at rest, animated penetrations within budget)
+        run: python3 pipeline/blender/check_clipping_report.py
+
       - name: Import project
         run: timeout 20m /opt/godot/godot4 --headless --path godot --import
 
