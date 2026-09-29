@@ -32,6 +32,7 @@ OUT_DIR = os.path.join(ROOT, 'godot', 'assets', 'models', 'pokemon')
 SRC = os.environ.get('SRC_ASSETS', os.path.join(ROOT, 'pipeline', '_assets'))
 MISSINGNO_SRC = os.path.join(ROOT, 'pipeline', 'data', 'MISSINGNO_source.glb')
 sys.path.insert(0, HERE)
+import pokemon_mesh_fix   # noqa: E402  (mesh/eye branch hook)
 
 TRI_BUDGET = 14000
 TEX_MAX = 512
@@ -118,6 +119,7 @@ def build_one(sid, src_path, height_m, ov, out_path):
     me = obj.data
     me.name = sid
     fold_uvs(me)
+    eyes_rec = pokemon_mesh_fix.cleanup(sid, obj, ov)   # mesh/eye branch hook (before normalising)
     # -- 2. normalise ------------------------------------------------------------------------------------------
     if ov.get('rot_deg'):   # fix models whose source axes are off (degrees about X, Y, Z)
         me.transform(Euler([math.radians(a) for a in ov['rot_deg']], 'XYZ').to_matrix().to_4x4())
@@ -165,6 +167,10 @@ def build_one(sid, src_path, height_m, ov, out_path):
                     nd.inputs['Metallic'].default_value = 0.0
                     nd.inputs['Roughness'].default_value = 0.8
 
+    # >>> pokemon_mesh_fix hook (owned by the mesh/eye branch): materials, stray pieces, eyes
+    eyes_rec = pokemon_mesh_fix.prepare(sid, obj, ov, eyes_rec)
+    me = obj.data
+    # <<< pokemon_mesh_fix hook
     n = len(me.vertices)
     co = np.empty(n * 3, dtype=np.float64)
     me.vertices.foreach_get('co', co)
@@ -193,6 +199,7 @@ def build_one(sid, src_path, height_m, ov, out_path):
         acts.append(write_clip(arm, clip, H, plan))
     C.stash_actions(arm, acts)
     C.export_glb(out_path, export_image_format='JPEG', export_jpeg_quality=88)
+    pokemon_mesh_fix.dump_record(os.path.dirname(out_path), sid, eyes_rec)   # mesh/eye branch hook
     return {'height_m': round(H, 3), 'tris': int(tris), 'bones': len(BONES), 'plan': plan['kind'],
             'animations': CLIPS, 'bytes': os.path.getsize(out_path)}
 
@@ -681,6 +688,7 @@ def main():
             print('%-12s dex %3d  %s' % (sid, dex, info), flush=True)
     if not a.no_manifest and (a.all or want):
         write_manifest(a.out, todo_ids)
+        pokemon_mesh_fix.write_index(a.out, todo_ids)   # mesh/eye branch hook
 
 
 def write_manifest(out, ids):

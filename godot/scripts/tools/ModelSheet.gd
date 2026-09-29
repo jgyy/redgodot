@@ -6,6 +6,8 @@ extends Node
 ## Flags: --kind=pokemon|characters  --species=A,B,C (default: every model in the manifest)
 ##        --view=front|back|side  --cols=N  --cell=PX  --yaw=DEG (3/4 turn, default -25 = toward the light)
 ##        --anim=Idle --anim_t=0.0 (pose to sample)  --labels=1  --toon=0 --outline=PX
+##        --focus=head (head close-up for eye checks; centre from eyes.json)  --focus_r=0.22 (radius as a share of body height)
+##        --pitch=-10 (camera pitch, 0 = level)
 ##        --sprite_frame=M (Pokemon sized like upstream sprites: 64px frame = M metres, fixed camera)
 
 var _vp: SubViewport
@@ -13,6 +15,11 @@ var _cam: Camera3D
 var _stage: Node3D
 var _label: Label
 var _toon := true
+var _eyes := {}
+var _cur_id := ""
+var _pitch_deg := -10.0
+var _focus := ""
+var _focus_r := 0.22
 var _frame_m := 0.0  # --sprite_frame=M: size Pokemon like upstream sprites, fixed camera
 
 func run(args: Dictionary, out_path: String) -> void:
@@ -27,12 +34,22 @@ func run(args: Dictionary, out_path: String) -> void:
 	var labels: bool = args.get("labels", "1") != "0"
 	_toon = args.get("toon", "1") != "0"
 	_frame_m = float(args.get("sprite_frame", "0"))
+	_focus = args.get("focus", "")
+	_pitch_deg = float(args.get("pitch", "-10"))
+	_focus_r = float(args.get("focus_r", "0.22"))
+	if _focus != "":
+		var ef := FileAccess.open("res://assets/models/pokemon/eyes.json", FileAccess.READ)
+		if ef:
+			var parsed: Variant = JSON.parse_string(ef.get_as_text())
+			if parsed is Dictionary:
+				_eyes = (parsed as Dictionary).get("species", {})
 	var rows := int(ceil(float(ids.size()) / float(cols)))
 	_build(cell)
 	var sheet := Image.create(cols * cell, max(1, rows) * cell, false, Image.FORMAT_RGBA8)
 	sheet.fill(Color(0.87, 0.91, 0.95))
 	for i in range(ids.size()):
 		var id: String = ids[i]
+		_cur_id = id
 		var holder := Node3D.new()
 		_stage.add_child(holder)
 		var model: Node3D = _instantiate(kind, id)
@@ -136,8 +153,18 @@ func _frame(holder: Node3D) -> void:
 		box = AABB(Vector3(-fm * 0.5, 0, -fm * 0.5), Vector3(fm, fm, fm))
 	var c := box.get_center()
 	var r: float = max(box.size.y, max(box.size.x, box.size.z)) * 0.5
+	if _focus == "head" and not first:
+		# head centre + radius come from eyes.json (written by pokemon_mesh_fix.py); fall back to the top of the box
+		var rec: Dictionary = _eyes.get(_cur_id, {})
+		if rec.has("focus"):
+			var actor: Node3D = holder.get_child(0)
+			c = actor.to_global(Vector3(rec["focus"][0], rec["focus"][1], rec["focus"][2]))
+			r = maxf(0.05, float(rec.get("focus_r", box.size.y * _focus_r)) * actor.global_transform.basis.get_scale().y)
+		else:
+			c = Vector3(box.get_center().x, box.end.y - box.size.y * 0.15, box.get_center().z)
+			r = box.size.y * _focus_r
 	var dist: float = r / tan(deg_to_rad(_cam.fov * 0.5)) * 1.12
-	var pitch := deg_to_rad(-10.0)
+	var pitch := deg_to_rad(_pitch_deg)
 	_cam.position = c + Vector3(0, -sin(pitch), cos(pitch)) * dist
 	_cam.look_at(c, Vector3.UP)
 	_cam.near = max(0.01, dist * 0.05)
