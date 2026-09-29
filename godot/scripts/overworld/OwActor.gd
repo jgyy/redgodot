@@ -422,7 +422,8 @@ func _pick_clip(speed: float, jump: bool) -> void:
 	if _clip == "":
 		return
 	_clip_len = maxf(0.05, _anim.get_animation(_clip).length)
-	var base := 1.0 if is_mon else 2.0
+	# character Walk clips hold a full two-step gait in exactly one cell (16 frames); Pokémon clips one cycle per cell
+	var base := 1.0
 	_gait_cells = base if speed < 1.5 else (base * 1.5 if speed < 2.5 else base * 3.0)
 
 func _dust_ok() -> bool:
