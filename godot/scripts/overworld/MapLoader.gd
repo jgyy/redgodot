@@ -354,6 +354,9 @@ func _build_visuals() -> void:
 	var my := int(bake.get("my", 0))
 	var deco := TileKit.build_decor(bake, mx, my)
 	add_child(deco)
+	var smoke := TileKit.build_smoke(bake, wb.smoke_points)
+	if smoke:
+		add_child(smoke)
 	grass_node = deco.get_node_or_null("TallGrass")
 	add_child(PropKit.build(bake, label_override, TileKit.prop_material()))
 	_spawn_npcs()

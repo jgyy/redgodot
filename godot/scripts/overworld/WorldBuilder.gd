@@ -17,6 +17,7 @@ var my := 0
 var atlas_size := Vector2(4, 4)
 var _st: SurfaceTool
 var _cur: Dictionary   # the block being emitted (sx, sy, ax, ay)
+var smoke_points: Array = []   # world position of every chimney top (TileKit.build_smoke)
 var atlas_img: Image = null   # the atlas pixels (to pick trim colours that belong to each building)
 const NEUTRAL := 0.8   # textured faces multiply the atlas by COLOR.rgb / NEUTRAL (world.gdshader): 0.8 = unchanged
 
@@ -80,6 +81,7 @@ func build_ground(mat: ShaderMaterial) -> MeshInstance3D:
 func build_objects(mat: ShaderMaterial, hide_cells: Array = []) -> MeshInstance3D:
 	_st = SurfaceTool.new()
 	_st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	smoke_points.clear()
 	var n := 0
 	for b in bake.get("blocks", []):
 		_cur = b
@@ -377,7 +379,7 @@ func _emit_house(b: Dictionary) -> void:
 		# eave board (fascia) hanging under the front edge of the roof, and the ridge cap
 		var fas := _shade_col(roof_col, 0.5)
 		_solid([[rx0, zf + e, hw + e], [rx1, zf + e, hw + e], [rx1, zf + e, hw + e - 2.6], [rx0, zf + e, hw + e - 2.6]], Vector3.BACK, fas, 0.95)
-		_solid_box(rx0 - 0.6, zr - 1.4, hr - 0.8, rx1 + 0.6, zr + 1.4, hr + 1.5, _shade_col(roof_col, 1.16))
+		_solid_box(rx0 - 0.6, zr - 1.9, hr - 0.9, rx1 + 0.6, zr + 1.9, hr + 2.2, _shade_col(roof_col, 1.22))
 		# chimney: front face is the baked sprite, the rest is real geometry
 		if b.has("chimney"):
 			var c: Array = b.chimney
@@ -396,6 +398,7 @@ func _emit_house(b: Dictionary) -> void:
 			_solid([[cx - 1.0, zc - cd, top], [cx - 1.0, zc, top], [cx - 1.0, zc, hc], [cx - 1.0, zc - cd, hc]], Vector3.LEFT, _shade_col(brick, 1.0), 0.95)
 			_solid([[cx + 7.0, zc, top], [cx + 7.0, zc - cd, top], [cx + 7.0, zc - cd, hc], [cx + 7.0, zc, hc]], Vector3.RIGHT, _shade_col(brick, 0.72))
 			_solid_box(cx - 1.8, zc - cd - 0.8, top - 0.2, cx + 7.8, zc + 0.8, top + 1.5, _shade_col(brick, 0.9))   # stone cap
+			smoke_points.append(px_to_world(cx + 3.0, zc - cd * 0.5, top + 2.0))
 	_emit_house_details(x0, x1, zf, wall_top, hw)
 
 ## Window sills and door steps found from the label grid + the sprite's own pixels.

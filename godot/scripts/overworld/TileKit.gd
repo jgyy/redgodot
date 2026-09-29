@@ -10,6 +10,7 @@ const TREE_SHADER := preload("res://scripts/overworld/shaders/tree.gdshader")
 const TREE_OUTLINE_SHADER := preload("res://scripts/overworld/shaders/tree_outline.gdshader")
 const DECOR_SHADER := preload("res://scripts/overworld/shaders/decor.gdshader")
 const FX_SHADER := preload("res://scripts/overworld/shaders/fx.gdshader")
+const SMOKE_SHADER := preload("res://scripts/overworld/shaders/smoke.gdshader")
 const CHUNK := 8
 
 static var _palette: Dictionary = {}
@@ -110,7 +111,10 @@ static func build_decor(bake: Dictionary, mx: int, my: int) -> Node3D:
 	_tree_mat = tree_mat
 	_prop_mat = _prop_shader_material(bake, 0.0, Color("#1b1a2e"), 0.03)
 	var groups := {}   # "chunk|kind|v" -> Array[Transform3D]
-	for t in bake.get("trees", []):
+	var all_trees: Array = (bake.get("trees", []) as Array).duplicate()
+	if String(bake.get("map", "")) == "ViridianForest":
+		all_trees.append_array(_margin_forest(bake))
+	for t in all_trees:
 		var cx := int(t[0])
 		var cy := int(t[1])
 		var key := "%d,%d|%d|%d" % [cx / CHUNK, cy / CHUNK, int(t[2]), int(t[3])]
@@ -218,6 +222,55 @@ static func build_decor(bake: Dictionary, mx: int, my: int) -> Node3D:
 		root.add_child(_fx_multimesh(kind.capitalize(), _flower_mesh(), 1 if kind == "barrier" else 2, cells.map(func(e: Array) -> Array:
 			return [Vector3(int(e[0]) - mx, 0.002, int(e[1]) - my), float(int(e[0]) * 7 + int(e[1]))])))
 	return root
+
+## Viridian Forest is a 'field' map drawn on void; in 3D the camera sees past its edge, so the bake's margin is grown
+## into more forest (visual only): a hashed grid of trees in every margin cell that is not already a tree.
+static func _margin_forest(bake: Dictionary) -> Array:
+	var out: Array = []
+	var cw := int(bake.get("cw", 0))
+	var ch := int(bake.get("ch", 0))
+	var mx := int(bake.get("mx", 0))
+	var my := int(bake.get("my", 0))
+	var w := int(bake.get("w", 0))
+	var h := int(bake.get("h", 0))
+	var taken := {}
+	for t in bake.get("trees", []):
+		taken[Vector2i(int(t[0]), int(t[1]))] = true
+	for y in range(ch):
+		for x in range(cw):
+			var inside := x >= mx and x < mx + w and y >= my and y < my + h
+			if inside or taken.has(Vector2i(x, y)):
+				continue
+			if PropKit._h(x, y, 71) < 0.86:
+				out.append([x, y, 0, int(PropKit._h(x, y, 72) * 6.0) % 6])
+	return out
+
+## Smoke puffs rising from the chimneys (world points = chimney tops from WorldBuilder.smoke_points).
+static func build_smoke(bake: Dictionary, points: Array) -> Node3D:
+	if points.is_empty():
+		return null
+	var mat := _register(ShaderMaterial.new(), bake)
+	mat.shader = SMOKE_SHADER
+	var mm := MultiMesh.new()
+	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.use_custom_data = true
+	var q := QuadMesh.new()
+	q.size = Vector2(1, 1)
+	mm.mesh = q
+	var per := 5
+	mm.instance_count = points.size() * per
+	for i in range(points.size()):
+		for j in range(per):
+			var idx := i * per + j
+			mm.set_instance_transform(idx, Transform3D(Basis.IDENTITY, points[i]))
+			mm.set_instance_custom_data(idx, Color(float(j) / float(per) + float(i) * 0.137, 0, 0, 0))
+	var mmi := MultiMeshInstance3D.new()
+	mmi.name = "Smoke"
+	mmi.multimesh = mm
+	mmi.material_override = mat
+	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mmi.custom_aabb = AABB(Vector3(-200, -20, -200), Vector3(400, 80, 400))
+	return mmi
 
 static func _fx_multimesh(node_name: String, mesh: Mesh, mode: int, items: Array) -> MultiMeshInstance3D:
 	var mat := ShaderMaterial.new()
