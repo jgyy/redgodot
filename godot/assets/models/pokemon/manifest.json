@@ -160,7 +160,7 @@
    "tris": 4338,
    "bones": 29,
    "file": "BULBASAUR.glb",
-   "bytes": 684524,
+   "bytes": 684756,
    "status": "generated",
    "plan": "quadruped",
    "signature": [
@@ -184,10 +184,10 @@
   "CHARMELEON": {
    "height_m": 1.092,
    "px_height": 58.85,
-   "tris": 5404,
+   "tris": 5256,
    "bones": 29,
    "file": "CHARMELEON.glb",
-   "bytes": 646360,
+   "bytes": 651612,
    "status": "generated",
    "plan": "biped_tail",
    "signature": [
@@ -211,10 +211,10 @@
   "BLASTOISE": {
    "height_m": 1.6,
    "px_height": 53.41,
-   "tris": 6305,
-   "bones": 21,
+   "tris": 6101,
+   "bones": 20,
    "file": "BLASTOISE.glb",
-   "bytes": 609188,
+   "bytes": 604712,
    "status": "generated",
    "plan": "shell",
    "signature": [
@@ -241,7 +241,7 @@
    "tris": 4476,
    "bones": 24,
    "file": "WEEDLE.glb",
-   "bytes": 525632,
+   "bytes": 525800,
    "status": "generated",
    "plan": "multileg",
    "signature": [
@@ -265,10 +265,10 @@
   "PIDGEOTTO": {
    "height_m": 1.092,
    "px_height": 52.51,
-   "tris": 5640,
+   "tris": 5608,
    "bones": 27,
    "file": "PIDGEOTTO.glb",
-   "bytes": 648120,
+   "bytes": 650948,
    "status": "generated",
    "plan": "bird",
    "signature": [
@@ -295,7 +295,7 @@
    "tris": 4822,
    "bones": 31,
    "file": "SPEAROW.glb",
-   "bytes": 681840,
+   "bytes": 682072,
    "status": "generated",
    "plan": "bird",
    "signature": [
@@ -322,7 +322,7 @@
    "tris": 4556,
    "bones": 31,
    "file": "PIKACHU.glb",
-   "bytes": 586284,
+   "bytes": 586028,
    "status": "generated",
    "plan": "biped_tail",
    "signature": [
@@ -349,7 +349,7 @@
    "tris": 4352,
    "bones": 31,
    "file": "NIDORAN_F.glb",
-   "bytes": 620156,
+   "bytes": 620324,
    "status": "generated",
    "plan": "quadruped_small",
    "signature": [
@@ -376,7 +376,7 @@
    "tris": 4914,
    "bones": 31,
    "file": "NIDORINO.glb",
-   "bytes": 619988,
+   "bytes": 620156,
    "status": "generated",
    "plan": "quadruped_small",
    "signature": [
@@ -403,7 +403,7 @@
    "tris": 5631,
    "bones": 39,
    "file": "VULPIX.glb",
-   "bytes": 822176,
+   "bytes": 822468,
    "status": "generated",
    "plan": "quadruped",
    "signature": [
@@ -430,7 +430,7 @@
    "tris": 3784,
    "bones": 20,
    "file": "ZUBAT.glb",
-   "bytes": 485008,
+   "bytes": 485112,
    "status": "generated",
    "plan": "winged",
    "signature": [
@@ -457,7 +457,7 @@
    "tris": 4816,
    "bones": 23,
    "file": "VILEPLUME.glb",
-   "bytes": 607720,
+   "bytes": 607948,
    "status": "generated",
    "plan": "plant",
    "signature": [
@@ -481,10 +481,10 @@
   "VENOMOTH": {
    "height_m": 1.499,
    "px_height": 53.56,
-   "tris": 4940,
+   "tris": 4626,
    "bones": 31,
    "file": "VENOMOTH.glb",
-   "bytes": 626888,
+   "bytes": 614732,
    "status": "generated",
    "plan": "winged",
    "signature": [
@@ -508,10 +508,10 @@
   "PERSIAN": {
    "height_m": 0.991,
    "px_height": 50.67,
-   "tris": 4946,
+   "tris": 4810,
    "bones": 28,
    "file": "PERSIAN.glb",
-   "bytes": 637608,
+   "bytes": 636440,
    "status": "generated",
    "plan": "quadruped",
    "signature": [
@@ -538,7 +538,7 @@
    "tris": 3910,
    "bones": 22,
    "file": "PRIMEAPE.glb",
-   "bytes": 471504,
+   "bytes": 471672,
    "status": "generated",
    "plan": "biped_humanoid",
    "signature": [
@@ -562,10 +562,10 @@
   "POLIWHIRL": {
    "height_m": 0.991,
    "px_height": 40.37,
-   "tris": 4562,
+   "tris": 4386,
    "bones": 19,
    "file": "POLIWHIRL.glb",
-   "bytes": 448452,
+   "bytes": 445464,
    "status": "generated",
    "plan": "biped_humanoid",
    "signature": [
@@ -589,10 +589,10 @@
   "ALAKAZAM": {
    "height_m": 1.499,
    "px_height": 59.0,
-   "tris": 5116,
-   "bones": 22,
+   "tris": 4788,
+   "bones": 27,
    "file": "ALAKAZAM.glb",
-   "bytes": 536364,
+   "bytes": 590968,
    "status": "generated",
    "plan": "biped_humanoid",
    "signature": [
@@ -619,7 +619,7 @@
    "tris": 3718,
    "bones": 16,
    "file": "BELLSPROUT.glb",
-   "bytes": 454832,
+   "bytes": 455000,
    "status": "generated",
    "plan": "plant",
    "signature": [
@@ -646,7 +646,7 @@
    "tris": 4982,
    "bones": 28,
    "file": "TENTACRUEL.glb",
-   "bytes": 666692,
+   "bytes": 666920,
    "status": "generated",
    "plan": "multileg",
    "signature": [
@@ -673,7 +673,7 @@
    "tris": 13999,
    "bones": 33,
    "file": "PONYTA.glb",
-   "bytes": 974404,
+   "bytes": 974572,
    "status": "generated",
    "plan": "quadruped",
    "signature": [
@@ -700,7 +700,7 @@
    "tris": 13506,
    "bones": 14,
    "file": "MAGNEMITE.glb",
-   "bytes": 1051092,
+   "bytes": 1051188,
    "status": "generated",
    "plan": "floating",
    "signature": [
@@ -727,7 +727,7 @@
    "tris": 5687,
    "bones": 29,
    "file": "DODRIO.glb",
-   "bytes": 639948,
+   "bytes": 640116,
    "status": "generated",
    "plan": "bird",
    "signature": [
@@ -754,7 +754,7 @@
    "tris": 5060,
    "bones": 18,
    "file": "MUK.glb",
-   "bytes": 475508,
+   "bytes": 475676,
    "status": "generated",
    "plan": "blob",
    "signature": [
@@ -781,7 +781,7 @@
    "tris": 8193,
    "bones": 18,
    "file": "HAUNTER.glb",
-   "bytes": 651244,
+   "bytes": 651448,
    "status": "generated",
    "plan": "floating",
    "signature": [
@@ -808,7 +808,7 @@
    "tris": 6110,
    "bones": 23,
    "file": "HYPNO.glb",
-   "bytes": 605716,
+   "bytes": 605884,
    "status": "generated",
    "plan": "biped_humanoid",
    "signature": [
@@ -835,7 +835,7 @@
    "tris": 5136,
    "bones": 14,
    "file": "ELECTRODE.glb",
-   "bytes": 392556,
+   "bytes": 392764,
    "status": "generated",
    "plan": "sphere",
    "signature": [
@@ -859,10 +859,10 @@
   "MAROWAK": {
    "height_m": 0.991,
    "px_height": 63.74,
-   "tris": 5034,
-   "bones": 23,
+   "tris": 4950,
+   "bones": 25,
    "file": "MAROWAK.glb",
-   "bytes": 536932,
+   "bytes": 567648,
    "status": "generated",
    "plan": "biped_tail",
    "signature": [
@@ -889,7 +889,7 @@
    "tris": 14000,
    "bones": 12,
    "file": "KOFFING.glb",
-   "bytes": 655580,
+   "bytes": 654492,
    "status": "generated",
    "plan": "sphere",
    "signature": [
@@ -916,7 +916,7 @@
    "tris": 7320,
    "bones": 27,
    "file": "CHANSEY.glb",
-   "bytes": 733784,
+   "bytes": 734016,
    "status": "generated",
    "plan": "biped_tail",
    "signature": [
@@ -943,7 +943,7 @@
    "tris": 10320,
    "bones": 24,
    "file": "SEADRA.glb",
-   "bytes": 815240,
+   "bytes": 815408,
    "status": "generated",
    "plan": "fish",
    "signature": [
@@ -970,7 +970,7 @@
    "tris": 2880,
    "bones": 13,
    "file": "STARMIE.glb",
-   "bytes": 397648,
+   "bytes": 397816,
    "status": "generated",
    "plan": "radial",
    "signature": [
@@ -997,7 +997,7 @@
    "tris": 9988,
    "bones": 23,
    "file": "ELECTABUZZ.glb",
-   "bytes": 732588,
+   "bytes": 732756,
    "status": "generated",
    "plan": "biped_humanoid",
    "signature": [
@@ -1024,7 +1024,7 @@
    "tris": 3667,
    "bones": 21,
    "file": "MAGIKARP.glb",
-   "bytes": 451500,
+   "bytes": 451668,
    "status": "generated",
    "plan": "fish",
    "signature": [
@@ -1051,7 +1051,7 @@
    "tris": 4850,
    "bones": 29,
    "file": "EEVEE.glb",
-   "bytes": 579572,
+   "bytes": 579804,
    "status": "generated",
    "plan": "quadruped",
    "signature": [
@@ -1078,7 +1078,7 @@
    "tris": 182,
    "bones": 19,
    "file": "PORYGON.glb",
-   "bytes": 412848,
+   "bytes": 413016,
    "status": "generated",
    "plan": "floating",
    "signature": [
@@ -1105,7 +1105,7 @@
    "tris": 11092,
    "bones": 31,
    "file": "KABUTOPS.glb",
-   "bytes": 891704,
+   "bytes": 891872,
    "status": "generated",
    "plan": "biped_tail",
    "signature": [
@@ -1132,7 +1132,7 @@
    "tris": 5221,
    "bones": 27,
    "file": "ZAPDOS.glb",
-   "bytes": 607536,
+   "bytes": 607768,
    "status": "generated",
    "plan": "bird",
    "signature": [
@@ -1186,7 +1186,7 @@
    "tris": 6324,
    "bones": 28,
    "file": "IVYSAUR.glb",
-   "bytes": 715044,
+   "bytes": 715336,
    "status": "generated",
    "plan": "quadruped",
    "signature": [
@@ -1213,7 +1213,7 @@
    "tris": 6218,
    "bones": 33,
    "file": "CHARIZARD.glb",
-   "bytes": 725248,
+   "bytes": 725604,
    "status": "generated",
    "plan": "winged",
    "signature": [
@@ -1240,7 +1240,7 @@
    "tris": 4362,
    "bones": 14,
    "file": "CATERPIE.glb",
-   "bytes": 403176,
+   "bytes": 403280,
    "status": "generated",
    "plan": "multileg",
    "signature": [
@@ -1267,7 +1267,7 @@
    "tris": 3850,
    "bones": 13,
    "file": "KAKUNA.glb",
-   "bytes": 431024,
+   "bytes": 431192,
    "status": "generated",
    "plan": "rock",
    "signature": [
@@ -1291,10 +1291,10 @@
   "PIDGEOT": {
    "height_m": 1.493,
    "px_height": 55.26,
-   "tris": 6080,
+   "tris": 6052,
    "bones": 24,
    "file": "PIDGEOT.glb",
-   "bytes": 676716,
+   "bytes": 680096,
    "status": "generated",
    "plan": "bird",
    "signature": [
@@ -1321,7 +1321,7 @@
    "tris": 6496,
    "bones": 25,
    "file": "FEAROW.glb",
-   "bytes": 685816,
+   "bytes": 686044,
    "status": "generated",
    "plan": "bird",
    "signature": [
@@ -1345,10 +1345,10 @@
   "RAICHU": {
    "height_m": 0.665,
    "px_height": 58.65,
-   "tris": 4758,
+   "tris": 4622,
    "bones": 27,
    "file": "RAICHU.glb",
-   "bytes": 583300,
+   "bytes": 572404,
    "status": "generated",
    "plan": "biped_tail",
    "signature": [
@@ -1372,10 +1372,10 @@
   "NIDORINA": {
    "height_m": 0.787,
    "px_height": 39.23,
-   "tris": 5097,
-   "bones": 30,
+   "tris": 4941,
+   "bones": 26,
    "file": "NIDORINA.glb",
-   "bytes": 665588,
+   "bytes": 617828,
    "status": "generated",
    "plan": "quadruped_small",
    "signature": [
@@ -1402,7 +1402,7 @@
    "tris": 5590,
    "bones": 23,
    "file": "NIDOKING.glb",
-   "bytes": 571500,
+   "bytes": 571732,
    "status": "generated",
    "plan": "biped_tail",
    "signature": [
@@ -1429,7 +1429,7 @@
    "tris": 6783,
    "bones": 36,
    "file": "NINETALES.glb",
-   "bytes": 858348,
+   "bytes": 858580,
    "status": "generated",
    "plan": "quadruped",
    "signature": [
@@ -1456,7 +1456,7 @@
    "tris": 1553,
    "bones": 14,
    "file": "GOLBAT.glb",
-   "bytes": 263360,
+   "bytes": 263528,
    "status": "generated",
    "plan": "winged",
    "signature": [
@@ -1480,10 +1480,10 @@
   "PARAS": {
    "height_m": 0.305,
    "px_height": 37.07,
-   "tris": 5038,
+   "tris": 4865,
    "bones": 31,
    "file": "PARAS.glb",
-   "bytes": 637896,
+   "bytes": 631344,
    "status": "generated",
    "plan": "multileg",
    "signature": [
@@ -1510,7 +1510,7 @@
    "tris": 1548,
    "bones": 14,
    "file": "DIGLETT.glb",
-   "bytes": 270232,
+   "bytes": 270400,
    "status": "generated",
    "plan": "blob",
    "signature": [
@@ -1534,10 +1534,10 @@
   "PSYDUCK": {
    "height_m": 0.787,
    "px_height": 47.52,
-   "tris": 4658,
-   "bones": 25,
+   "tris": 4576,
+   "bones": 22,
    "file": "PSYDUCK.glb",
-   "bytes": 579444,
+   "bytes": 551532,
    "status": "generated",
    "plan": "biped_humanoid",
    "signature": [
@@ -1561,10 +1561,10 @@
   "GROWLITHE": {
    "height_m": 0.711,
    "px_height": 35.4,
-   "tris": 5342,
-   "bones": 29,
+   "tris": 5282,
+   "bones": 28,
    "file": "GROWLITHE.glb",
-   "bytes": 675900,
+   "bytes": 665168,
    "status": "generated",
    "plan": "quadruped",
    "signature": [
@@ -1588,10 +1588,10 @@
   "POLIWRATH": {
    "height_m": 1.295,
    "px_height": 47.88,
-   "tris": 4906,
+   "tris": 4730,
    "bones": 21,
    "file": "POLIWRATH.glb",
-   "bytes": 536284,
+   "bytes": 533536,
    "status": "generated",
    "plan": "biped_humanoid",
    "signature": [
@@ -1615,10 +1615,10 @@
   "MACHOP": {
    "height_m": 0.787,
    "px_height": 39.56,
-   "tris": 4666,
+   "tris": 4506,
    "bones": 28,
    "file": "MACHOP.glb",
-   "bytes": 576076,
+   "bytes": 578808,
    "status": "generated",
    "plan": "biped_humanoid",
    "signature": [
@@ -1645,7 +1645,7 @@
    "tris": 3260,
    "bones": 16,
    "file": "WEEPINBELL.glb",
-   "bytes": 389996,
+   "bytes": 390164,
    "status": "generated",
    "plan": "plant",
    "signature": [
@@ -1669,10 +1669,10 @@
   "GEODUDE": {
    "height_m": 0.191,
    "px_height": 29.89,
-   "tris": 4476,
+   "tris": 4348,
    "bones": 9,
    "file": "GEODUDE.glb",
-   "bytes": 363520,
+   "bytes": 361664,
    "status": "generated",
    "plan": "rock",
    "signature": [
@@ -1699,7 +1699,7 @@
    "tris": 5788,
    "bones": 22,
    "file": "RAPIDASH.glb",
-   "bytes": 656116,
+   "bytes": 656408,
    "status": "generated",
    "plan": "quadruped",
    "signature": [
@@ -1726,7 +1726,7 @@
    "tris": 8394,
    "bones": 18,
    "file": "MAGNETON.glb",
-   "bytes": 767780,
+   "bytes": 746668,
    "status": "generated",
    "plan": "floating",
    "signature": [
@@ -1753,7 +1753,7 @@
    "tris": 4622,
    "bones": 24,
    "file": "SEEL.glb",
-   "bytes": 565596,
+   "bytes": 565764,
    "status": "generated",
    "plan": "fish",
    "signature": [
@@ -1780,7 +1780,7 @@
    "tris": 7040,
    "bones": 7,
    "file": "SHELLDER.glb",
-   "bytes": 424964,
+   "bytes": 425132,
    "status": "generated",
    "plan": "shell",
    "signature": [
@@ -1807,7 +1807,7 @@
    "tris": 4308,
    "bones": 22,
    "file": "GENGAR.glb",
-   "bytes": 457304,
+   "bytes": 457472,
    "status": "generated",
    "plan": "biped_tail",
    "signature": [
@@ -1834,7 +1834,7 @@
    "tris": 10892,
    "bones": 25,
    "file": "KRABBY.glb",
-   "bytes": 790252,
+   "bytes": 790420,
    "status": "generated",
    "plan": "multileg",
    "signature": [
@@ -1861,7 +1861,7 @@
    "tris": 8160,
    "bones": 14,
    "file": "EXEGGCUTE.glb",
-   "bytes": 623656,
+   "bytes": 624072,
    "status": "generated",
    "plan": "sphere",
    "signature": [
@@ -1888,7 +1888,7 @@
    "tris": 9492,
    "bones": 20,
    "file": "HITMONLEE.glb",
-   "bytes": 642340,
+   "bytes": 642508,
    "status": "generated",
    "plan": "biped_humanoid",
    "signature": [
@@ -1915,7 +1915,7 @@
    "tris": 13999,
    "bones": 12,
    "file": "WEEZING.glb",
-   "bytes": 1124780,
+   "bytes": 1082436,
    "status": "generated",
    "plan": "sphere",
    "signature": [
@@ -1942,7 +1942,7 @@
    "tris": 10756,
    "bones": 25,
    "file": "TANGELA.glb",
-   "bytes": 800680,
+   "bytes": 800908,
    "status": "generated",
    "plan": "plant",
    "signature": [
@@ -1969,7 +1969,7 @@
    "tris": 8604,
    "bones": 28,
    "file": "GOLDEEN.glb",
-   "bytes": 766184,
+   "bytes": 766416,
    "status": "generated",
    "plan": "fish",
    "signature": [
@@ -1993,10 +1993,10 @@
   "MR_MIME": {
    "height_m": 1.295,
    "px_height": 64.08,
-   "tris": 4994,
+   "tris": 4946,
    "bones": 20,
    "file": "MR_MIME.glb",
-   "bytes": 468220,
+   "bytes": 474076,
    "status": "generated",
    "plan": "biped_humanoid",
    "signature": [
@@ -2023,7 +2023,7 @@
    "tris": 12510,
    "bones": 32,
    "file": "MAGMAR.glb",
-   "bytes": 1032980,
+   "bytes": 1033396,
    "status": "generated",
    "plan": "biped_humanoid",
    "signature": [
@@ -2047,10 +2047,10 @@
   "GYARADOS": {
    "height_m": 6.502,
    "px_height": 70.64,
-   "tris": 5306,
+   "tris": 5254,
    "bones": 24,
    "file": "GYARADOS.glb",
-   "bytes": 635488,
+   "bytes": 643468,
    "status": "generated",
    "plan": "serpent",
    "signature": [
@@ -2077,7 +2077,7 @@
    "tris": 5240,
    "bones": 29,
    "file": "VAPOREON.glb",
-   "bytes": 675740,
+   "bytes": 675972,
    "status": "generated",
    "plan": "quadruped",
    "signature": [
@@ -2104,7 +2104,7 @@
    "tris": 4646,
    "bones": 17,
    "file": "OMANYTE.glb",
-   "bytes": 442112,
+   "bytes": 442280,
    "status": "generated",
    "plan": "shell",
    "signature": [
@@ -2131,7 +2131,7 @@
    "tris": 5374,
    "bones": 24,
    "file": "AERODACTYL.glb",
-   "bytes": 548100,
+   "bytes": 548332,
    "status": "generated",
    "plan": "winged",
    "signature": [
@@ -2155,10 +2155,10 @@
   "MOLTRES": {
    "height_m": 1.522,
    "px_height": 66.89,
-   "tris": 8409,
+   "tris": 8403,
    "bones": 32,
    "file": "MOLTRES.glb",
-   "bytes": 841536,
+   "bytes": 868536,
    "status": "generated",
    "plan": "bird",
    "signature": [
@@ -2212,7 +2212,7 @@
    "tris": 6346,
    "bones": 32,
    "file": "VENUSAUR.glb",
-   "bytes": 751456,
+   "bytes": 751748,
    "status": "generated",
    "plan": "quadruped",
    "signature": [
@@ -2239,7 +2239,7 @@
    "tris": 4672,
    "bones": 25,
    "file": "SQUIRTLE.glb",
-   "bytes": 554064,
+   "bytes": 554232,
    "status": "generated",
    "plan": "shell",
    "signature": [
@@ -2266,7 +2266,7 @@
    "tris": 3702,
    "bones": 11,
    "file": "METAPOD.glb",
-   "bytes": 392028,
+   "bytes": 392196,
    "status": "generated",
    "plan": "rock",
    "signature": [
@@ -2293,7 +2293,7 @@
    "tris": 4632,
    "bones": 35,
    "file": "BEEDRILL.glb",
-   "bytes": 597664,
+   "bytes": 597768,
    "status": "generated",
    "plan": "winged",
    "signature": [
@@ -2317,10 +2317,10 @@
   "RATTATA": {
    "height_m": 0.247,
    "px_height": 31.77,
-   "tris": 4262,
+   "tris": 4122,
    "bones": 27,
    "file": "RATTATA.glb",
-   "bytes": 557768,
+   "bytes": 556480,
    "status": "generated",
    "plan": "quadruped_small",
    "signature": [
@@ -2347,7 +2347,7 @@
    "tris": 1994,
    "bones": 16,
    "file": "EKANS.glb",
-   "bytes": 378208,
+   "bytes": 378376,
    "status": "generated",
    "plan": "serpent",
    "signature": [
@@ -2374,7 +2374,7 @@
    "tris": 5322,
    "bones": 21,
    "file": "SANDSHREW.glb",
-   "bytes": 531508,
+   "bytes": 531740,
    "status": "generated",
    "plan": "biped_tail",
    "signature": [
@@ -2401,7 +2401,7 @@
    "tris": 4941,
    "bones": 22,
    "file": "NIDOQUEEN.glb",
-   "bytes": 561848,
+   "bytes": 562016,
    "status": "generated",
    "plan": "biped_tail",
    "signature": [
@@ -2428,7 +2428,7 @@
    "tris": 1862,
    "bones": 23,
    "file": "CLEFAIRY.glb",
-   "bytes": 397104,
+   "bytes": 397336,
    "status": "generated",
    "plan": "biped_tail",
    "signature": [
@@ -2452,10 +2452,10 @@
   "JIGGLYPUFF": {
    "height_m": 0.508,
    "px_height": 45.79,
-   "tris": 4100,
+   "tris": 3760,
    "bones": 10,
    "file": "JIGGLYPUFF.glb",
-   "bytes": 392836,
+   "bytes": 389252,
    "status": "generated",
    "plan": "blob",
    "signature": [
@@ -2482,7 +2482,7 @@
    "tris": 3662,
    "bones": 24,
    "file": "ODDISH.glb",
-   "bytes": 597760,
+   "bytes": 597992,
    "status": "generated",
    "plan": "plant",
    "signature": [
@@ -2509,7 +2509,7 @@
    "tris": 4978,
    "bones": 29,
    "file": "PARASECT.glb",
-   "bytes": 664620,
+   "bytes": 664788,
    "status": "generated",
    "plan": "multileg",
    "signature": [
@@ -2536,7 +2536,7 @@
    "tris": 4332,
    "bones": 14,
    "file": "DUGTRIO.glb",
-   "bytes": 402068,
+   "bytes": 402300,
    "status": "generated",
    "plan": "blob",
    "signature": [
@@ -2563,7 +2563,7 @@
    "tris": 4922,
    "bones": 24,
    "file": "GOLDUCK.glb",
-   "bytes": 626948,
+   "bytes": 627116,
    "status": "generated",
    "plan": "biped_humanoid",
    "signature": [
@@ -2587,10 +2587,10 @@
   "ARCANINE": {
    "height_m": 1.905,
    "px_height": 54.19,
-   "tris": 6056,
-   "bones": 35,
+   "tris": 5896,
+   "bones": 34,
    "file": "ARCANINE.glb",
-   "bytes": 770280,
+   "bytes": 761944,
    "status": "generated",
    "plan": "quadruped",
    "signature": [
@@ -2617,7 +2617,7 @@
    "tris": 4732,
    "bones": 32,
    "file": "ABRA.glb",
-   "bytes": 662332,
+   "bytes": 662440,
    "status": "generated",
    "plan": "biped_humanoid",
    "signature": [
@@ -2644,7 +2644,7 @@
    "tris": 5526,
    "bones": 21,
    "file": "MACHOKE.glb",
-   "bytes": 551680,
+   "bytes": 551848,
    "status": "generated",
    "plan": "biped_humanoid",
    "signature": [
@@ -2671,7 +2671,7 @@
    "tris": 3668,
    "bones": 15,
    "file": "VICTREEBEL.glb",
-   "bytes": 422784,
+   "bytes": 422952,
    "status": "generated",
    "plan": "plant",
    "signature": [
@@ -2698,7 +2698,7 @@
    "tris": 4992,
    "bones": 17,
    "file": "GRAVELER.glb",
-   "bytes": 486540,
+   "bytes": 486772,
    "status": "generated",
    "plan": "rock",
    "signature": [
@@ -2725,7 +2725,7 @@
    "tris": 3892,
    "bones": 25,
    "file": "SLOWPOKE.glb",
-   "bytes": 615560,
+   "bytes": 615728,
    "status": "generated",
    "plan": "quadruped_small",
    "signature": [
@@ -2752,7 +2752,7 @@
    "tris": 5250,
    "bones": 34,
    "file": "FARFETCHD.glb",
-   "bytes": 674152,
+   "bytes": 679284,
    "status": "generated",
    "plan": "bird",
    "signature": [
@@ -2779,7 +2779,7 @@
    "tris": 4828,
    "bones": 21,
    "file": "DEWGONG.glb",
-   "bytes": 563612,
+   "bytes": 563780,
    "status": "generated",
    "plan": "fish",
    "signature": [
@@ -2806,7 +2806,7 @@
    "tris": 4984,
    "bones": 17,
    "file": "CLOYSTER.glb",
-   "bytes": 504984,
+   "bytes": 505256,
    "status": "generated",
    "plan": "shell",
    "signature": [
@@ -2833,7 +2833,7 @@
    "tris": 5714,
    "bones": 20,
    "file": "ONIX.glb",
-   "bytes": 665548,
+   "bytes": 670352,
    "status": "generated",
    "plan": "serpent",
    "signature": [
@@ -2860,7 +2860,7 @@
    "tris": 10968,
    "bones": 28,
    "file": "KINGLER.glb",
-   "bytes": 851012,
+   "bytes": 851244,
    "status": "generated",
    "plan": "multileg",
    "signature": [
@@ -2887,7 +2887,7 @@
    "tris": 13999,
    "bones": 36,
    "file": "EXEGGUTOR.glb",
-   "bytes": 1131212,
+   "bytes": 1131584,
    "status": "generated",
    "plan": "plant",
    "signature": [
@@ -2911,10 +2911,10 @@
   "HITMONCHAN": {
    "height_m": 1.397,
    "px_height": 59.87,
-   "tris": 5726,
+   "tris": 5662,
    "bones": 22,
    "file": "HITMONCHAN.glb",
-   "bytes": 523784,
+   "bytes": 527352,
    "status": "generated",
    "plan": "biped_humanoid",
    "signature": [
@@ -2941,7 +2941,7 @@
    "tris": 10216,
    "bones": 34,
    "file": "RHYHORN.glb",
-   "bytes": 1025944,
+   "bytes": 1026176,
    "status": "generated",
    "plan": "quadruped",
    "signature": [
@@ -2968,7 +2968,7 @@
    "tris": 6406,
    "bones": 24,
    "file": "KANGASKHAN.glb",
-   "bytes": 656752,
+   "bytes": 657108,
    "status": "generated",
    "plan": "biped_tail",
    "signature": [
@@ -2995,7 +2995,7 @@
    "tris": 9436,
    "bones": 29,
    "file": "SEAKING.glb",
-   "bytes": 787800,
+   "bytes": 787968,
    "status": "generated",
    "plan": "fish",
    "signature": [
@@ -3019,10 +3019,10 @@
   "SCYTHER": {
    "height_m": 1.499,
    "px_height": 63.94,
-   "tris": 5416,
+   "tris": 5232,
    "bones": 32,
    "file": "SCYTHER.glb",
-   "bytes": 623792,
+   "bytes": 624144,
    "status": "generated",
    "plan": "winged",
    "signature": [
@@ -3049,7 +3049,7 @@
    "tris": 4852,
    "bones": 23,
    "file": "PINSIR.glb",
-   "bytes": 533652,
+   "bytes": 533820,
    "status": "generated",
    "plan": "biped_humanoid",
    "signature": [
@@ -3076,7 +3076,7 @@
    "tris": 14000,
    "bones": 26,
    "file": "LAPRAS.glb",
-   "bytes": 955088,
+   "bytes": 955196,
    "status": "generated",
    "plan": "fish",
    "signature": [
@@ -3103,7 +3103,7 @@
    "tris": 4825,
    "bones": 27,
    "file": "JOLTEON.glb",
-   "bytes": 499764,
+   "bytes": 499932,
    "status": "generated",
    "plan": "quadruped",
    "signature": [
@@ -3130,7 +3130,7 @@
    "tris": 5304,
    "bones": 25,
    "file": "OMASTAR.glb",
-   "bytes": 568048,
+   "bytes": 568216,
    "status": "generated",
    "plan": "shell",
    "signature": [
@@ -3157,7 +3157,7 @@
    "tris": 800,
    "bones": 24,
    "file": "SNORLAX.glb",
-   "bytes": 420720,
+   "bytes": 420908,
    "status": "generated",
    "plan": "biped_tail",
    "signature": [
@@ -3184,7 +3184,7 @@
    "tris": 2994,
    "bones": 11,
    "file": "DRATINI.glb",
-   "bytes": 328520,
+   "bytes": 328752,
    "status": "generated",
    "plan": "serpent",
    "signature": [
@@ -3208,10 +3208,10 @@
   "MEW": {
    "height_m": 0.406,
    "px_height": 54.19,
-   "tris": 4582,
+   "tris": 4462,
    "bones": 23,
    "file": "MEW.glb",
-   "bytes": 511768,
+   "bytes": 517204,
    "status": "generated",
    "plan": "floating",
    "signature": [
@@ -3238,7 +3238,7 @@
    "tris": 4680,
    "bones": 24,
    "file": "CHARMANDER.glb",
-   "bytes": 536372,
+   "bytes": 536664,
    "status": "generated",
    "plan": "biped_tail",
    "signature": [
@@ -3262,10 +3262,10 @@
   "WARTORTLE": {
    "height_m": 0.991,
    "px_height": 59.93,
-   "tris": 5032,
+   "tris": 4952,
    "bones": 28,
    "file": "WARTORTLE.glb",
-   "bytes": 650136,
+   "bytes": 656196,
    "status": "generated",
    "plan": "shell",
    "signature": [
@@ -3292,7 +3292,7 @@
    "tris": 3932,
    "bones": 28,
    "file": "BUTTERFREE.glb",
-   "bytes": 566956,
+   "bytes": 567184,
    "status": "generated",
    "plan": "winged",
    "signature": [
@@ -3319,7 +3319,7 @@
    "tris": 5222,
    "bones": 26,
    "file": "PIDGEY.glb",
-   "bytes": 625248,
+   "bytes": 625416,
    "status": "generated",
    "plan": "bird",
    "signature": [
@@ -3346,7 +3346,7 @@
    "tris": 5379,
    "bones": 32,
    "file": "RATICATE.glb",
-   "bytes": 657884,
+   "bytes": 658052,
    "status": "generated",
    "plan": "quadruped_small",
    "signature": [
@@ -3373,7 +3373,7 @@
    "tris": 3418,
    "bones": 11,
    "file": "ARBOK.glb",
-   "bytes": 354880,
+   "bytes": 355112,
    "status": "generated",
    "plan": "serpent",
    "signature": [
@@ -3400,7 +3400,7 @@
    "tris": 5468,
    "bones": 29,
    "file": "SANDSLASH.glb",
-   "bytes": 631168,
+   "bytes": 631400,
    "status": "generated",
    "plan": "biped_tail",
    "signature": [
@@ -3424,10 +3424,10 @@
   "NIDORAN_M": {
    "height_m": 0.508,
    "px_height": 39.18,
-   "tris": 4568,
+   "tris": 4492,
    "bones": 29,
    "file": "NIDORAN_M.glb",
-   "bytes": 581964,
+   "bytes": 588628,
    "status": "generated",
    "plan": "quadruped_small",
    "signature": [
@@ -3454,7 +3454,7 @@
    "tris": 4681,
    "bones": 27,
    "file": "CLEFABLE.glb",
-   "bytes": 639800,
+   "bytes": 640032,
    "status": "generated",
    "plan": "biped_tail",
    "signature": [
@@ -3481,7 +3481,7 @@
    "tris": 4316,
    "bones": 14,
    "file": "WIGGLYTUFF.glb",
-   "bytes": 417884,
+   "bytes": 418116,
    "status": "generated",
    "plan": "blob",
    "signature": [
@@ -3508,7 +3508,7 @@
    "tris": 4884,
    "bones": 20,
    "file": "GLOOM.glb",
-   "bytes": 561268,
+   "bytes": 561436,
    "status": "generated",
    "plan": "plant",
    "signature": [
@@ -3535,7 +3535,7 @@
    "tris": 4812,
    "bones": 22,
    "file": "VENONAT.glb",
-   "bytes": 532580,
+   "bytes": 532748,
    "status": "generated",
    "plan": "multileg",
    "signature": [
@@ -3559,10 +3559,10 @@
   "MEOWTH": {
    "height_m": 0.406,
    "px_height": 46.33,
-   "tris": 5652,
-   "bones": 31,
+   "tris": 5460,
+   "bones": 29,
    "file": "MEOWTH.glb",
-   "bytes": 689268,
+   "bytes": 661116,
    "status": "generated",
    "plan": "biped_tail",
    "signature": [
@@ -3589,7 +3589,7 @@
    "tris": 4334,
    "bones": 21,
    "file": "MANKEY.glb",
-   "bytes": 485564,
+   "bytes": 485732,
    "status": "generated",
    "plan": "biped_humanoid",
    "signature": [
@@ -3616,7 +3616,7 @@
    "tris": 1248,
    "bones": 17,
    "file": "POLIWAG.glb",
-   "bytes": 330668,
+   "bytes": 330896,
    "status": "generated",
    "plan": "fish",
    "signature": [
@@ -3640,10 +3640,10 @@
   "KADABRA": {
    "height_m": 1.295,
    "px_height": 58.46,
-   "tris": 5812,
+   "tris": 5692,
    "bones": 28,
    "file": "KADABRA.glb",
-   "bytes": 677864,
+   "bytes": 684396,
    "status": "generated",
    "plan": "biped_humanoid",
    "signature": [
@@ -3670,7 +3670,7 @@
    "tris": 5751,
    "bones": 26,
    "file": "MACHAMP.glb",
-   "bytes": 641676,
+   "bytes": 641904,
    "status": "generated",
    "plan": "biped_humanoid",
    "signature": [
@@ -3697,7 +3697,7 @@
    "tris": 4418,
    "bones": 14,
    "file": "TENTACOOL.glb",
-   "bytes": 469228,
+   "bytes": 469396,
    "status": "generated",
    "plan": "multileg",
    "signature": [
@@ -3724,7 +3724,7 @@
    "tris": 5077,
    "bones": 25,
    "file": "GOLEM.glb",
-   "bytes": 649356,
+   "bytes": 649584,
    "status": "generated",
    "plan": "rock",
    "signature": [
@@ -3751,7 +3751,7 @@
    "tris": 5248,
    "bones": 23,
    "file": "SLOWBRO.glb",
-   "bytes": 634008,
+   "bytes": 634300,
    "status": "generated",
    "plan": "shell",
    "signature": [
@@ -3778,7 +3778,7 @@
    "tris": 5170,
    "bones": 24,
    "file": "DODUO.glb",
-   "bytes": 537900,
+   "bytes": 538068,
    "status": "generated",
    "plan": "bird",
    "signature": [
@@ -3805,7 +3805,7 @@
    "tris": 4424,
    "bones": 18,
    "file": "GRIMER.glb",
-   "bytes": 447972,
+   "bytes": 448140,
    "status": "generated",
    "plan": "blob",
    "signature": [
@@ -3829,10 +3829,10 @@
   "GASTLY": {
    "height_m": 1.295,
    "px_height": 49.43,
-   "tris": 14000,
+   "tris": 7531,
    "bones": 12,
    "file": "GASTLY.glb",
-   "bytes": 650656,
+   "bytes": 454256,
    "status": "generated",
    "plan": "floating",
    "signature": [
@@ -3859,7 +3859,7 @@
    "tris": 9440,
    "bones": 22,
    "file": "DROWZEE.glb",
-   "bytes": 731844,
+   "bytes": 732012,
    "status": "generated",
    "plan": "biped_humanoid",
    "signature": [
@@ -3886,7 +3886,7 @@
    "tris": 5168,
    "bones": 8,
    "file": "VOLTORB.glb",
-   "bytes": 298564,
+   "bytes": 298732,
    "status": "generated",
    "plan": "sphere",
    "signature": [
@@ -3913,7 +3913,7 @@
    "tris": 4934,
    "bones": 28,
    "file": "CUBONE.glb",
-   "bytes": 588532,
+   "bytes": 588700,
    "status": "generated",
    "plan": "biped_tail",
    "signature": [
@@ -3940,7 +3940,7 @@
    "tris": 10204,
    "bones": 25,
    "file": "LICKITUNG.glb",
-   "bytes": 837944,
+   "bytes": 838112,
    "status": "generated",
    "plan": "biped_tail",
    "signature": [
@@ -3967,7 +3967,7 @@
    "tris": 5104,
    "bones": 22,
    "file": "RHYDON.glb",
-   "bytes": 553288,
+   "bytes": 553516,
    "status": "generated",
    "plan": "biped_tail",
    "signature": [
@@ -3994,7 +3994,7 @@
    "tris": 7556,
    "bones": 23,
    "file": "HORSEA.glb",
-   "bytes": 670220,
+   "bytes": 670388,
    "status": "generated",
    "plan": "fish",
    "signature": [
@@ -4021,7 +4021,7 @@
    "tris": 2684,
    "bones": 13,
    "file": "STARYU.glb",
-   "bytes": 381780,
+   "bytes": 381884,
    "status": "generated",
    "plan": "radial",
    "signature": [
@@ -4048,7 +4048,7 @@
    "tris": 10856,
    "bones": 27,
    "file": "JYNX.glb",
-   "bytes": 826652,
+   "bytes": 826820,
    "status": "generated",
    "plan": "biped_humanoid",
    "signature": [
@@ -4075,7 +4075,7 @@
    "tris": 1972,
    "bones": 33,
    "file": "TAUROS.glb",
-   "bytes": 514252,
+   "bytes": 514420,
    "status": "generated",
    "plan": "quadruped",
    "signature": [
@@ -4129,7 +4129,7 @@
    "tris": 6056,
    "bones": 34,
    "file": "FLAREON.glb",
-   "bytes": 779616,
+   "bytes": 780816,
    "status": "generated",
    "plan": "quadruped",
    "signature": [
@@ -4156,7 +4156,7 @@
    "tris": 6108,
    "bones": 18,
    "file": "KABUTO.glb",
-   "bytes": 500576,
+   "bytes": 500744,
    "status": "generated",
    "plan": "multileg",
    "signature": [
@@ -4183,7 +4183,7 @@
    "tris": 6248,
    "bones": 25,
    "file": "ARTICUNO.glb",
-   "bytes": 676576,
+   "bytes": 676808,
    "status": "generated",
    "plan": "bird",
    "signature": [
@@ -4210,7 +4210,7 @@
    "tris": 3777,
    "bones": 14,
    "file": "DRAGONAIR.glb",
-   "bytes": 430664,
+   "bytes": 430892,
    "status": "generated",
    "plan": "serpent",
    "signature": [
@@ -4237,7 +4237,7 @@
    "tris": 396,
    "bones": 12,
    "file": "MISSINGNO.glb",
-   "bytes": 209176,
+   "bytes": 209160,
    "status": "generated",
    "plan": "blob",
    "signature": [
