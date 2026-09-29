@@ -23,6 +23,8 @@ const BLOCK_MODELS := {"truck": "truck"}
 const FLOWER_MESHES := ["flower_red", "flower_yellow", "flower_white", "flower_pink"]
 
 static var _meshes: Dictionary = {}
+## Draw statistics of the last build (multimesh instances = draw calls, instances, triangles): PROP_STATS=1 prints them.
+static var stats := {"draw_calls": 0, "instances": 0, "tris": 0, "kinds": 0}
 
 ## `prop` = a glb name, or "set/piece" for one mesh of a modular set glb (table_set/m5 ...: FurnitureKit).
 static func mesh(prop: String) -> Mesh:
@@ -41,6 +43,18 @@ static func mesh(prop: String) -> Mesh:
 			inst.free()
 	_meshes[prop] = m
 	return m
+
+static var _tri_cache: Dictionary = {}
+static func _tri_count(m: Mesh) -> int:
+	var id := m.get_instance_id()
+	if not _tri_cache.has(id):
+		var n := 0
+		for i in range(m.get_surface_count()):
+			var arr := m.surface_get_arrays(i)
+			var idx: Variant = arr[Mesh.ARRAY_INDEX]
+			n += (idx as PackedInt32Array).size() / 3 if idx != null and (idx as PackedInt32Array).size() > 0 else (arr[Mesh.ARRAY_VERTEX] as PackedVector3Array).size() / 3
+		_tri_cache[id] = n
+	return _tri_cache[id]
 
 static func _find_named(n: Node, nm: String) -> MeshInstance3D:
 	if n is MeshInstance3D and String(n.name) == nm:
@@ -173,7 +187,14 @@ static func build(bake: Dictionary, overrides: Dictionary, mat: ShaderMaterial, 
 	for f in bake.get("fires", []):
 		var cell2 := Vector2i(floori(float(f[0]) / 16.0) - mx, floori((float(f[1]) + 8.0) / 16.0) - my)
 		add.call("brazier", Vector3(float(f[0]) / 16.0 - mx, 0.0, (float(f[1]) + 9.0) / 16.0 - my), 0.0, cell2)
+	stats = {"draw_calls": 0, "instances": 0, "tris": 0, "kinds": 0}
+	var kinds := {}
+	for key in groups.keys():
+		kinds[String(key).get_slice("|", 1)] = true
 	_flush(root, groups, mat)
+	stats["kinds"] = kinds.size()
+	if OS.has_environment("PROP_STATS"):
+		print("[PropKit] %s: %d draw calls, %d instances, %d tris, %d model kinds" % [bake.get("map", "?"), stats["draw_calls"], stats["instances"], stats["tris"], stats["kinds"]])
 	return root
 
 ## Grass tufts on plain grass / path-edge cells and stones along ledge feet (visual sprinkles, windy material).
@@ -288,3 +309,6 @@ static func _flush(root: Node3D, groups: Dictionary, mat: ShaderMaterial) -> voi
 		mmi.material_override = mat
 		mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		root.add_child(mmi)
+		stats["draw_calls"] += 1
+		stats["instances"] += items.size()
+		stats["tris"] += items.size() * _tri_count(m)

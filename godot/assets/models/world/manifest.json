@@ -235,12 +235,6 @@
   "notes": "PC terminal: cabinet desk, tilted LCD with lit screen, keyboard, mouse, mini-tower, cables",
   "set": "furniture"
  },
- "heal_machine": {
-  "tris": 2920,
-  "bytes": 200180,
-  "notes": "Pokemon Center healing machine, 2 x 2 cells (six balls in cradles)",
-  "set": "furniture"
- },
  "pc_dark": {
   "tris": 1002,
   "bytes": 73200,
@@ -277,6 +271,54 @@
   "notes": "tall data rack with blinking bays",
   "set": "furniture"
  },
+ "server_unit": {
+  "tris": 660,
+  "bytes": 48680,
+  "notes": "waist-high computer bank",
+  "set": "furniture"
+ },
+ "tableware": {
+  "tris": 276,
+  "bytes": 19468,
+  "notes": "two plates, cutlery, mug",
+  "set": "furniture"
+ },
+ "flower_vase": {
+  "tris": 296,
+  "bytes": 25800,
+  "notes": "vase of flowers",
+  "set": "furniture"
+ },
+ "book_stack": {
+  "tris": 224,
+  "bytes": 17944,
+  "notes": "stack of four books",
+  "set": "furniture"
+ },
+ "fruit_bowl": {
+  "tris": 216,
+  "bytes": 18920,
+  "notes": "bowl of fruit",
+  "set": "furniture"
+ },
+ "cutting_board": {
+  "tris": 128,
+  "bytes": 10392,
+  "notes": "kitchen board with knife",
+  "set": "furniture"
+ },
+ "stew_pot": {
+  "tris": 234,
+  "bytes": 17104,
+  "notes": "steaming pot",
+  "set": "furniture"
+ },
+ "paper_pile": {
+  "tris": 97,
+  "bytes": 7992,
+  "notes": "paperwork with pen",
+  "set": "furniture"
+ },
  "cash_register": {
   "tris": 492,
   "bytes": 36360,
@@ -293,6 +335,12 @@
   "tris": 628,
   "bytes": 50776,
   "notes": "Game Corner slot machine",
+  "set": "furniture"
+ },
+ "heal_machine": {
+  "tris": 2920,
+  "bytes": 200180,
+  "notes": "Pokemon Center healing machine, 2 x 2 cells (six balls in cradles)",
   "set": "furniture"
  },
  "heal_cabinet": {
@@ -446,8 +494,8 @@
   "set": "furniture"
  },
  "generator": {
-  "tris": 708,
-  "bytes": 47696,
+  "tris": 504,
+  "bytes": 35492,
   "notes": "power plant generator",
   "set": "furniture"
  },
@@ -459,7 +507,7 @@
  },
  "fossil_case": {
   "tris": 678,
-  "bytes": 51780,
+  "bytes": 51812,
   "notes": "museum fossil plinth with glass hood",
   "set": "furniture"
  },
@@ -486,114 +534,6 @@
   "bytes": 33280,
   "notes": "kitchen rack with pans",
   "set": "furniture"
- },
- "table_set": {
-  "tris": 3072,
-  "bytes": 242608,
-  "set": "furniture",
-  "pieces": [
-   "m0",
-   "m1",
-   "m2",
-   "m3",
-   "m4",
-   "m5",
-   "m6",
-   "m7",
-   "m8",
-   "m9",
-   "m10",
-   "m11",
-   "m12",
-   "m13",
-   "m14",
-   "m15"
-  ],
-  "notes": "modular set of 16 meshes (m0..m15) picked by the neighbour mask"
- },
- "counter_center_set": {
-  "tris": 3328,
-  "bytes": 255368,
-  "set": "furniture",
-  "pieces": [
-   "m0",
-   "m1",
-   "m2",
-   "m3",
-   "m4",
-   "m5",
-   "m6",
-   "m7",
-   "m8",
-   "m9",
-   "m10",
-   "m11",
-   "m12",
-   "m13",
-   "m14",
-   "m15"
-  ],
-  "notes": "modular set of 16 meshes (m0..m15) picked by the neighbour mask"
- },
- "counter_mart_set": {
-  "tris": 3680,
-  "bytes": 282052,
-  "set": "furniture",
-  "pieces": [
-   "m0",
-   "m1",
-   "m2",
-   "m3",
-   "m4",
-   "m5",
-   "m6",
-   "m7",
-   "m8",
-   "m9",
-   "m10",
-   "m11",
-   "m12",
-   "m13",
-   "m14",
-   "m15"
-  ],
-  "notes": "modular set of 16 meshes (m0..m15) picked by the neighbour mask"
- },
- "bench_set": {
-  "tris": 928,
-  "bytes": 70676,
-  "set": "furniture",
-  "pieces": [
-   "m0",
-   "m1",
-   "m2",
-   "m3"
-  ],
-  "notes": "modular set of 4 meshes (m0..m3) picked by the neighbour mask"
- },
- "desk_set": {
-  "tris": 3072,
-  "bytes": 242652,
-  "set": "furniture",
-  "pieces": [
-   "m0",
-   "m1",
-   "m2",
-   "m3",
-   "m4",
-   "m5",
-   "m6",
-   "m7",
-   "m8",
-   "m9",
-   "m10",
-   "m11",
-   "m12",
-   "m13",
-   "m14",
-   "m15"
-  ],
-  "notes": "modular set of 16 meshes (m0..m15) picked by the neighbour mask"
  },
  "tree_pine": {
   "tris": 562,
@@ -879,7 +819,7 @@
  },
  "fountain": {
   "tris": 512,
-  "bytes": 35188,
+  "bytes": 35124,
   "notes": "town fountain, 2 x 2 cells",
   "set": "town"
  },
@@ -1176,5 +1116,113 @@
   "bytes": 15452,
   "notes": "gym roof ornament: earth tiers with pennant",
   "set": "building"
+ },
+ "table_set": {
+  "tris": 3072,
+  "bytes": 242608,
+  "set": "furniture",
+  "pieces": [
+   "m0",
+   "m1",
+   "m2",
+   "m3",
+   "m4",
+   "m5",
+   "m6",
+   "m7",
+   "m8",
+   "m9",
+   "m10",
+   "m11",
+   "m12",
+   "m13",
+   "m14",
+   "m15"
+  ],
+  "notes": "modular set of 16 meshes (m0..m15) picked by the neighbour mask"
+ },
+ "counter_center_set": {
+  "tris": 3328,
+  "bytes": 255368,
+  "set": "furniture",
+  "pieces": [
+   "m0",
+   "m1",
+   "m2",
+   "m3",
+   "m4",
+   "m5",
+   "m6",
+   "m7",
+   "m8",
+   "m9",
+   "m10",
+   "m11",
+   "m12",
+   "m13",
+   "m14",
+   "m15"
+  ],
+  "notes": "modular set of 16 meshes (m0..m15) picked by the neighbour mask"
+ },
+ "counter_mart_set": {
+  "tris": 3680,
+  "bytes": 282052,
+  "set": "furniture",
+  "pieces": [
+   "m0",
+   "m1",
+   "m2",
+   "m3",
+   "m4",
+   "m5",
+   "m6",
+   "m7",
+   "m8",
+   "m9",
+   "m10",
+   "m11",
+   "m12",
+   "m13",
+   "m14",
+   "m15"
+  ],
+  "notes": "modular set of 16 meshes (m0..m15) picked by the neighbour mask"
+ },
+ "bench_set": {
+  "tris": 928,
+  "bytes": 70676,
+  "set": "furniture",
+  "pieces": [
+   "m0",
+   "m1",
+   "m2",
+   "m3"
+  ],
+  "notes": "modular set of 4 meshes (m0..m3) picked by the neighbour mask"
+ },
+ "desk_set": {
+  "tris": 3072,
+  "bytes": 242652,
+  "set": "furniture",
+  "pieces": [
+   "m0",
+   "m1",
+   "m2",
+   "m3",
+   "m4",
+   "m5",
+   "m6",
+   "m7",
+   "m8",
+   "m9",
+   "m10",
+   "m11",
+   "m12",
+   "m13",
+   "m14",
+   "m15"
+  ],
+  "notes": "modular set of 16 meshes (m0..m15) picked by the neighbour mask"
  }
 }

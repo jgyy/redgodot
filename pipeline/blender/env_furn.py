@@ -151,21 +151,27 @@ def p_game_console(style):
     return P
 
 
-def p_server_rack(style):
-    """Silph Co. / lab data rack: tall graphite cabinet, bays of blinking lights and drive faces."""
-    P = Prop('server_rack', style, seed=216)
-    P.box((-0.44, -0.3, 0.0), (0.44, 0.24, 1.0), 'graphite', bevel=0.02, seg=2)
+def p_server_rack(style, bays=8, name='server_rack'):
+    """Silph Co. / lab data rack: graphite cabinet, bays of blinking lights and drive faces (`bays` 8 = tall rack)."""
+    P = Prop(name, style, seed=216)
+    top = 0.09 + bays * 0.108
+    P.box((-0.44, -0.3, 0.0), (0.44, 0.24, top), 'graphite', bevel=0.02, seg=2)
     P.box((-0.46, -0.31, 0.0), (0.46, 0.25, 0.05), 'steel', bevel=0.01)
     r = X.rs(7)
-    for i in range(8):
+    for i in range(bays):
         z = 0.09 + i * 0.108
         P.box((-0.4, -0.312, z), (0.4, -0.3, z + 0.09), 'graphite', bevel=0.004, bias=2)
         P.box((-0.37, -0.318, z + 0.03), (-0.1, -0.306, z + 0.06), 'steel', ao=False, bias=0)
         for k in range(6):
             m = r.choice(['led_green', 'led_green', 'led_amber', 'led_red', 'led_blue'])
             P.box((0.0 + k * 0.05, -0.32, z + 0.04), (0.02 + k * 0.05, -0.306, z + 0.06), m, ao=False, flat_idx=3)
-    P.box((-0.44, -0.3, 1.0), (0.44, 0.24, 1.03), 'steel', bevel=0.012, bias=1)
+    P.box((-0.44, -0.3, top), (0.44, 0.24, top + 0.03), 'steel', bevel=0.012, bias=1)
     return P
+
+
+def p_server_unit(style):
+    """Waist-high computer bank (the small Silph Co. terminals): four bays of lights under a steel top."""
+    return p_server_rack(style, bays=4, name='server_unit')
 
 
 def p_cash_register(style):
@@ -541,7 +547,7 @@ def p_floor_lamp(style):
     P.cyl(0, 0, 0, 0.04, 0.16, 0.14, 'brass', seg=10)
     P.between((0, 0, 0.04), (0, 0, 1.0), 0.018, 0.014, 'brass', seg=6)
     P.lathe(0, 0, [(0.12, 0.98), (0.18, 1.1), (0.2, 1.22), (0.12, 1.26)], 'cloth_cream', seg=12, ao=False, bias=1)
-    P.cyl(0, 0, 1.26, 1.26, 0.12, 0.12, 'yellow', seg=12, cap_top=True, flat_idx=4, ao=False)
+    P.cyl(0, 0, 1.26, 1.26, 0.12, 0.12, 'lamp_glass', seg=12, cap_top=True, flat_idx=4, ao=False)
     return P
 
 
@@ -692,9 +698,9 @@ def p_generator(style):
     """Power Plant generator: squat steel drum with coil bands, gauges, pipes and a caged fan."""
     P = Prop('generator', style, seed=242)
     P.box((-0.46, -0.32, 0.0), (0.46, 0.32, 0.1), 'graphite', bevel=0.01)
-    P.lathe(0, 0, [(0.001, 0.1), (0.4, 0.1), (0.44, 0.2), (0.44, 0.62), (0.4, 0.7), (0.001, 0.72)], 'steel', seg=12, bias=0)
-    for z in (0.26, 0.44, 0.58):
-        P.lathe(0, 0, [(0.44, z - 0.02), (0.462, z - 0.02), (0.462, z + 0.02), (0.44, z + 0.02)], 'copper', seg=12, ao=False)
+    P.lathe(0, 0, [(0.001, 0.1), (0.4, 0.1), (0.44, 0.2), (0.44, 0.62), (0.4, 0.7), (0.001, 0.72)], 'steel', seg=8, bias=0)
+    for z in (0.3, 0.52):
+        P.lathe(0, 0, [(0.44, z - 0.02), (0.462, z - 0.02), (0.462, z + 0.02), (0.44, z + 0.02)], 'copper', seg=8, ao=False)
     P.box((-0.2, -0.46, 0.34), (0.2, -0.4, 0.62), 'graphite', bevel=0.012)
     P.lathe(0, -0.5, [(0.001, 0.0), (0.09, 0.0), (0.09, 0.02), (0.001, 0.02)], 'white', seg=10, ao=False)
     P.box((-0.14, -0.462, 0.5), (0.14, -0.452, 0.58), 'led_green', ao=False, flat_idx=3)
@@ -791,6 +797,79 @@ def p_cooking_pot_shelf(style):
     return P
 
 
+# ------------------------------------------------------------------------------------------ table-top items
+def p_tableware(style):
+    """Two plates with cutlery and a mug."""
+    P = Prop('tableware', style, seed=260)
+    for x in (-0.16, 0.14):
+        P.lathe(x, 0.0, [(0.001, 0.0), (0.09, 0.0), (0.11, 0.02), (0.06, 0.016), (0.001, 0.014)], 'porcelain', seg=10, ao=False)
+        P.box((x + 0.13, -0.09, 0.0), (x + 0.145, 0.09, 0.008), 'chrome', ao=False)
+    P.lathe(0.0, 0.14, [(0.035, 0.0), (0.035, 0.07), (0.03, 0.07), (0.03, 0.006)], 'red', seg=8, ao=False)
+    return P
+
+
+def p_flower_vase(style):
+    P = Prop('flower_vase', style, seed=261)
+    P.lathe(0, 0, [(0.001, 0.0), (0.06, 0.0), (0.075, 0.07), (0.04, 0.14), (0.05, 0.16), (0.04, 0.16)], 'teal', seg=8, ao=False)
+    rg = X.rs(262)
+    for i in range(6):
+        a = i * 1.05
+        tip = (math.cos(a) * 0.09, math.sin(a) * 0.09, 0.3 + (i % 3) * 0.03)
+        P.tube([(0, 0, 0.15), (tip[0] * 0.5, tip[1] * 0.5, 0.22), tip], 0.006, 'leaf', seg=3, ao=False)
+        P.sphere(tip, 0.035, ['red', 'pink', 'yellow', 'white', 'pink', 'led_amber'][i], subdiv=1, ao=False, flat_idx=3)
+    return P
+
+
+def p_book_stack(style):
+    P = Prop('book_stack', style, seed=263)
+    z = 0.0
+    for i, (w, h, m) in enumerate(((0.26, 0.04, 'cloth_red'), (0.22, 0.035, 'cloth_blue'), (0.24, 0.04, 'cloth_green'), (0.18, 0.03, 'orange'))):
+        P.box((-w / 2 + 0.01 * (i % 2), -0.09, z), (w / 2 + 0.01 * (i % 2), 0.09, z + h), m, bevel=0.004, ao=False)
+        P.box((-w / 2 + 0.01 * (i % 2), -0.092, z + h * 0.2), (w / 2 + 0.01 * (i % 2), -0.088, z + h * 0.8), 'paper_w', ao=False)
+        z += h
+    return P
+
+
+def p_fruit_bowl(style):
+    P = Prop('fruit_bowl', style, seed=264)
+    P.lathe(0, 0, [(0.001, 0.0), (0.06, 0.0), (0.13, 0.06), (0.14, 0.07), (0.12, 0.07), (0.05, 0.01)], 'wood_light', seg=10, ao=False)
+    for i, (x, y, z, m) in enumerate(((0, 0, 0.09, 'red'), (0.06, 0.03, 0.08, 'orange'), (-0.06, 0.03, 0.08, 'yellow'), (0.0, -0.06, 0.09, 'leaf_light'), (0.02, 0.08, 0.1, 'red'))):
+        P.sphere((x, y, z), 0.045, m, subdiv=1, ao=False, flat_idx=3)
+    return P
+
+
+def p_cutting_board(style):
+    P = Prop('cutting_board', style, seed=265)
+    P.box((-0.2, -0.13, 0.0), (0.2, 0.13, 0.025), 'wood_pale', bevel=0.008, seg=2)
+    P.box((-0.12, -0.05, 0.025), (0.06, 0.03, 0.05), 'red', bevel=0.01)
+    P.box((0.08, -0.06, 0.025), (0.19, -0.04, 0.03), 'chrome', ao=False)
+    P.box((0.12, 0.02, 0.025), (0.19, 0.04, 0.03), 'graphite', ao=False)
+    return P
+
+
+def p_stew_pot(style):
+    P = Prop('stew_pot', style, seed=266)
+    P.lathe(0, 0, [(0.13, 0.0), (0.14, 0.02), (0.14, 0.17), (0.13, 0.17)], 'steel', seg=12)
+    P.cyl(0, 0, 0.16, 0.16, 0.125, 0.125, 'orange', seg=12, cap_top=True, ao=False, flat_idx=3)
+    for s_ in (-1, 1):
+        P.box((s_ * 0.16 - 0.02, -0.02, 0.1), (s_ * 0.16 + 0.02, 0.02, 0.13), 'graphite', bevel=0.004)
+    P.tube([(0.04, 0.0, 0.17), (0.02, 0.02, 0.3), (0.06, 0.0, 0.42)], 0.012, 'white', seg=4, r_end=0.004, ao=False)
+    return P
+
+
+def p_paper_pile(style):
+    P = Prop('paper_pile', style, seed=267)
+    rg = X.rs(268)
+    for i in range(5):
+        a = (rg.random() - 0.5) * 0.5
+        P.box((-0.13, -0.09, i * 0.008), (0.13, 0.09, i * 0.008 + 0.006), 'paper_w', ao=False, bias=1 if i % 2 else 0)
+    P.transform_all(rot_z(18))
+    P.box((-0.05, -0.02, 0.04), (0.06, 0.0, 0.046), 'graphite', ao=False)
+    P.box((-0.05, 0.02, 0.04), (0.02, 0.035, 0.046), 'graphite', ao=False)
+    P.cyl(0.14, -0.1, 0.04, 0.16, 0.012, 0.012, 'led_blue', seg=5, ao=False)
+    return P
+
+
 # ------------------------------------------------------------------------------------------ modular sets
 def make_table(style, mask, name='table', top_mat='wood_light', leg_mat='wood_dark', h=0.5):
     P = Prop('%s_m%d' % (name, mask), style, seed=250 + mask)
@@ -876,6 +955,10 @@ FURN = {
     'tv_game': (p_tv_game, 'CRT television with a console and pad'),
     'game_console': (p_game_console, 'retro game console with pad'),
     'server_rack': (p_server_rack, 'tall data rack with blinking bays'),
+    'server_unit': (p_server_unit, 'waist-high computer bank'),
+    'tableware': (p_tableware, 'two plates, cutlery, mug'), 'flower_vase': (p_flower_vase, 'vase of flowers'), 'book_stack': (p_book_stack, 'stack of four books'),
+    'fruit_bowl': (p_fruit_bowl, 'bowl of fruit'), 'cutting_board': (p_cutting_board, 'kitchen board with knife'), 'stew_pot': (p_stew_pot, 'steaming pot'),
+    'paper_pile': (p_paper_pile, 'paperwork with pen'),
     'cash_register': (p_cash_register, 'mart till'),
     'vending_machine': (p_vending_machine, 'red drinks vending machine'),
     'slot_machine': (p_slot_machine, 'Game Corner slot machine'),

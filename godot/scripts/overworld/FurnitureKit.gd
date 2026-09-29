@@ -49,13 +49,13 @@ static func surface_height(label: String) -> float:
 		"cabinet": return 0.7
 	return 0.0
 
-static func machine_prop(map: String) -> String:
+static func machine_prop(map: String, c: Vector2i = Vector2i.ZERO) -> String:
 	if map == "PowerPlant" or map == "VermilionDock":
 		return "generator"
 	if map.begins_with("Rocket"):
 		return "rocket_console"
 	if map.begins_with("Silph"):
-		return "server_rack"
+		return "server_rack" if PropKit._h(c.x, c.y, 610) < 0.35 else "server_unit"
 	return "lab_machine"
 
 ## `ctx`: {map: String, objs: Array}; `add`: Callable(prop, pos, yaw, cell, scale) from PropKit.build.
@@ -104,6 +104,7 @@ static func place(bake: Dictionary, overrides: Dictionary, ctx: Dictionary, add:
 			"table", "desk":
 				var pc := String(SET_LABELS[l])
 				add.call("%s/m%d" % [pc, _mask(lab, c, [l])], centre, 0.0, c, 1.0)
+				_table_item(map, c, l, ctx, add)
 			"counter":
 				var set_name := "counter_center_set" if map.contains("Pokecenter") else "counter_mart_set"
 				add.call("%s/m%d" % [set_name, _mask(lab, c, ["counter"])], centre, 0.0, c, 1.0)
@@ -145,7 +146,7 @@ static func place(bake: Dictionary, overrides: Dictionary, ctx: Dictionary, add:
 					pr = "mart_shelf"
 				_front_anchor(add, pr, c, 0.0)
 			"machine":
-				_front_anchor(add, machine_prop(map), c, 0.0)
+				_front_anchor(add, machine_prop(map, c), c, 0.0)
 			"truck":
 				pass
 			"teleport":
@@ -171,6 +172,30 @@ static func place(bake: Dictionary, overrides: Dictionary, ctx: Dictionary, add:
 			continue
 		var yawr: float = {"DOWN": 0.0, "UP": PI, "RIGHT": PI * 0.5, "LEFT": -PI * 0.5}[dn]
 		add.call("cash_register", Vector3(tc.x + 0.5, 0.6 * K, tc.y + 0.5), yawr, tc, 1.0)
+
+## Small things on a table top: plates and flowers at home, papers in offices and labs, pots and boards in the galley.
+## Never on a cell with a person / item object on it (the starter Poke Balls, a trainer).
+static func _table_item(map: String, c: Vector2i, l: String, ctx: Dictionary, add: Callable) -> void:
+	for o in ctx.get("objs", []):
+		if Vector2i(int(o.get("x", 0)), int(o.get("y", 0))) == c:
+			return
+	var r := PropKit._h(c.x, c.y, 600)
+	var list: Array
+	var p := 0.3
+	if map.contains("Kitchen"):
+		list = ["cutting_board", "stew_pot", "fruit_bowl", "tableware"]
+		p = 0.38
+	elif map.begins_with("Silph") or map.contains("Lab") or map.contains("Museum") or map.contains("Captain") or map.contains("Hideout") or l == "desk":
+		list = ["paper_pile", "book_stack", "paper_pile"]
+	else:
+		list = ["tableware", "flower_vase", "fruit_bowl", "book_stack"]
+	if r > p:
+		return
+	var prop: String = list[int(PropKit._h(c.x, c.y, 601) * list.size()) % list.size()]
+	if PropKit.mesh(prop) == null:
+		return
+	var top := surface_height(l) * WorldData.K
+	add.call(prop, Vector3(c.x + 0.3 + PropKit._h(c.x, c.y, 602) * 0.4, top, c.y + 0.3 + PropKit._h(c.x, c.y, 603) * 0.4), PropKit._h(c.x, c.y, 604) * TAU, c, 1.5)
 
 ## Front edge (Godot +Z extent) of a prop's mesh.
 static func _front(prop: String) -> float:

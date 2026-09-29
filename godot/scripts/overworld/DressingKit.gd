@@ -41,7 +41,7 @@ const SPECIES := {
 ## Hand-placed set pieces per map: [prop, x, y, yaw, scale, need, clear]  (cell coords, may lie outside the playable area;
 ## `need` = "water" (the cell and its neighbours must be water) or "any"; `clear` = radius in cells of baked trees removed).
 const LANDMARKS := {
-	"CinnabarIsland": [["lighthouse", -4.5, 5.5, 0.0, 1.0, "water", 0], ["sailboat", -7.5, 12.5, 0.5, 1.0, "water", 0], ["rowboat", 22.5, 9.5, 0.3, 1.0, "water", 0],
+	"CinnabarIsland": [["lighthouse", 3.5, 15.5, 0.0, 0.75, "water", 0], ["sailboat", -7.5, 12.5, 0.5, 1.0, "water", 0], ["rowboat", 22.5, 9.5, 0.3, 1.0, "water", 0],
 		["buoy", -2.5, 12.5, 0.0, 1.0, "water", 0], ["buoy", 23.5, 3.5, 0.0, 1.0, "water", 0], ["anchor", 3.5, 15.5, 0.6, 0.9, "water", 0]],
 	"VermilionCity": [["sailboat", -6.5, 16.5, 0.4, 1.0, "water", 0], ["rowboat", 13.5, 26.5, 1.1, 1.0, "water", 0], ["sailboat", 20.5, 33.5, -0.3, 1.0, "water", 0],
 		["buoy", 6.5, 30.5, 0.0, 1.0, "water", 0], ["buoy", 40.5, 20.5, 0.0, 1.0, "water", 0]],
@@ -49,6 +49,9 @@ const LANDMARKS := {
 	"Route19": [["sailboat", 4.5, 18.5, 0.2, 1.0, "water", 0]], "Route20": [["sailboat", 8.5, 8.5, -0.4, 1.0, "water", 0]],
 	"PalletTown": [["windmill", -5.0, 10.0, 0.0, 1.0, "any", 3], ["hay_bale", -2.0, 12.0, 0.4, 1.0, "any", 0], ["scarecrow", -3.0, 13.5, 0.0, 1.0, "any", 1]],
 	"Route1": [["scarecrow", -3.0, 20.0, 0.3, 1.0, "any", 1]],
+	"CeladonCity": [["market_stall", 12.0, 22.7, 0.0, 1.0, "any", 0], ["market_stall", 30.0, 22.7, 0.0, 1.0, "any", 0], ["water_tower", -3.0, 3.0, 0.0, 1.0, "any", 2], ["billboard", 52.5, 14.5, 0.0, 1.0, "any", 2]],
+	"Route10": [["power_pylon", -3.0, 10.0, 0.0, 1.0, "any", 2], ["power_pylon", -3.0, 24.0, 0.0, 1.0, "any", 2], ["power_pylon", 23.0, 17.0, 0.0, 1.0, "any", 2]],
+	"LavenderTown": [["telephone_pole", -2.0, 5.5, 0.0, 1.0, "any", 1], ["telephone_pole", -2.0, 12.5, 0.0, 1.0, "any", 1]],
 }
 ## Doors that get a walk-through frame in front of them: map -> [[door x, door y, prop]]
 const WARP_ARCHES := {
@@ -74,6 +77,8 @@ static func tree_species(map: String, cx: int, cy: int) -> String:
 	for e in rules:
 		acc += float(e[1])
 		if r < acc and PropKit.mesh(String(e[0])) != null:
+			if e[0] == "tree_pine" and _h(cx, cy, 402) < 0.4:
+				return "tree_pine_slim"
 			return String(e[0])
 	return ""
 
@@ -159,11 +164,20 @@ static func place(bake: Dictionary, overrides: Dictionary, ctx: Dictionary, add:
 							placed += _one(add, "ice_block", pos, yaw, c, sc * 0.8)
 					elif r < 0.06:
 						placed += _one(add, "stalagmite_a" if r < 0.03 else "stalagmite_b", pos, yaw, c, sc * 0.72)
+					elif r < 0.07:
+						placed += _one(add, "boulder_large", pos, yaw, c, sc * 0.8)
 					elif r < 0.075:
-						placed += _one(add, "rock_pile", pos, yaw, c, sc)
+						placed += _one(add, "rock_pile" if r < 0.0725 else "cairn", pos, yaw, c, sc)
 					elif r < 0.09 and (map.begins_with("MtMoon") or map.begins_with("CeruleanCave") or map.begins_with("VictoryRoad")):
 						var cry := "crystal_blue" if map.begins_with("MtMoon") else ("crystal_purple" if map.begins_with("CeruleanCave") else "crystal_green")
 						placed += _one(add, cry, pos, yaw, c, sc * 0.75)
+				elif l == "water" and inb and r < 0.09 and not bool(can_walk.call(c)):
+					var shore := false
+					for d in [Vector2i(0, -1), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(1, 0)]:
+						if String(lab.get(c + d, "water")) != "water":
+							shore = true
+					if shore:
+						placed += _one(add, "coral" if r < 0.045 else "seaweed", Vector3(x + jx, 0.0, y + jz), yaw, c, sc)
 				elif l == "cave_floor" and bool(can_walk.call(c)) and inb and r < 0.014:
 					placed += _one(add, "rock_small_a" if r < 0.007 else "rock_small_b", pos, yaw, c, sc)
 				continue
@@ -185,7 +199,12 @@ static func place(bake: Dictionary, overrides: Dictionary, ctx: Dictionary, add:
 						placed += _one(add, "buoy" if sea and r > 0.994 else ("rock_mossy" if r > 0.99 else "rock_small_a"), Vector3(x + 0.5, 0.0, y + 0.55), yaw, c, sc)
 				"sand":
 					if r < 0.022 and bool(can_walk.call(c)):
-						placed += _one(add, "driftwood" if r < 0.011 else "seashell", pos, yaw, c, sc)
+						var sand_prop := "driftwood" if r < 0.011 else "seashell"
+						if map == "CinnabarIsland" and r < 0.011:
+							sand_prop = "lava_rock"
+						elif map.begins_with("Safari") and r < 0.011:
+							sand_prop = "cactus"
+						placed += _one(add, sand_prop, pos, yaw, c, sc)
 				"grass", "flowers":
 					if not inb or not bool(can_walk.call(c)):
 						continue
@@ -199,6 +218,8 @@ static func place(bake: Dictionary, overrides: Dictionary, ctx: Dictionary, add:
 	if kind == "interior" and not is_cave:
 		placed += _interior(map, lab, can_walk, busy, w, h, add)
 	placed += _landmarks(map, lab, add)
+	if map.ends_with("City") or map.ends_with("Town"):
+		placed += _pond_fountain(lab, w, h, add)
 	placed += _nooks(lab, can_walk, busy, ctx, w, h, add)
 	placed += _bridges(lab, w, h, add)
 	placed += _buildings(bake, add)
@@ -213,6 +234,8 @@ static func _interior(map: String, lab: Dictionary, can_walk: Callable, busy: Di
 	var theme := ""
 	if map.contains("SchoolHouse"):
 		theme = "school"
+	elif map.begins_with("PokemonTower"):
+		theme = "tower"
 	elif map.contains("Lab") or map.contains("Museum"):
 		theme = "lab"
 	elif map.contains("House") or map.contains("Daycare") or map.contains("FanClub") or map.contains("Dojo"):
@@ -220,7 +243,7 @@ static func _interior(map: String, lab: Dictionary, can_walk: Callable, busy: Di
 	if theme == "":
 		return 0
 	var corner_props: Array = {"home": ["floor_lamp", "armchair", "wardrobe", "fridge", "stool", "globe"], "lab": ["microscope", "globe", "floor_lamp", "lab_machine"],
-		"school": ["school_desk", "stool", "globe"]}[theme]
+		"school": ["school_desk", "stool", "globe"], "tower": ["candle_stand", "incense_burner"]}[theme]
 	var n := 0
 	var board_done := false
 	for y in range(h):
@@ -232,13 +255,20 @@ static func _interior(map: String, lab: Dictionary, can_walk: Callable, busy: Di
 			var r := _h(x, y, 560)
 			var north := String(lab.get(c + Vector2i(0, -1), ""))
 			# ---- wall dressing on the back wall
-			if north == "wall" and l.begins_with("floor") and not busy.has(c + Vector2i(0, -1)):
+			if theme == "tower" and north == "wall" and l.begins_with("floor") and r < 0.07:
+				n += _one(add, "wall_lantern", Vector3(x + 0.5, 0.55 * WorldData.K, y - 0.02), 0.0, c, 1.0)
+				continue
+			if theme != "tower" and north == "wall" and l.begins_with("floor") and not busy.has(c + Vector2i(0, -1)):
 				if theme == "school" and not board_done and String(lab.get(c + Vector2i(1, -1), "")) == "wall" and bool(can_walk.call(c + Vector2i(1, 0))) and r < 0.5:
 					board_done = true
 					n += _one(add, "blackboard", Vector3(x + 1.0, 0.4 * WorldData.K, y - 0.02), 0.0, c, 1.0)
 					continue
 				if r < 0.16:
 					var wall_props := ["wall_clock", "poster_view", "poster_map", "painting", "poster_ball"]
+					if theme == "home":
+						wall_props = ["wall_clock", "poster_view", "painting", "kitchen_rack", "poster_map"]
+					elif theme == "lab":
+						wall_props = ["wall_clock", "poster_map", "poster_ball", "poster_view"]
 					n += _one(add, wall_props[int(_h(x, y, 561) * wall_props.size()) % wall_props.size()], Vector3(x + 0.5, 0.5 * WorldData.K, y - 0.02), 0.0, c, 1.0)
 					continue
 			# ---- corner furniture
@@ -256,12 +286,36 @@ static func _interior(map: String, lab: Dictionary, can_walk: Callable, busy: Di
 			if near_door:
 				continue
 			var prop: String = corner_props[int(_h(x, y, 562) * corner_props.size()) % corner_props.size()]
+			var ox := 0.5
+			if theme == "home" and _h(x, y, 563) < 0.3:
+				# a two-cell sofa needs the next cell along the wall to be free floor as well
+				var ec := c + Vector2i(1, 0)
+				if String(lab.get(ec, "")).begins_with("floor") and bool(can_walk.call(ec)) and not busy.has(ec) and WALLS.has(String(lab.get(ec + Vector2i(0, -1), ""))):
+					prop = "sofa"
+					ox = 1.0
 			var m := PropKit.mesh(prop)
 			if m == null:
 				continue
 			var bb := m.get_aabb()
-			n += _one(add, prop, Vector3(x + 0.5, 0.0, float(y + 1) - 0.05 - (bb.position.z + bb.size.z)), 0.0, c, 1.0)
+			n += _one(add, prop, Vector3(x + ox, 0.0, float(y + 1) - 0.05 - (bb.position.z + bb.size.z)), 0.0, c, 1.0)
 	return n
+
+## A fountain in the middle of a town pond (a small inland water body of 3 x 3 cells or more).
+static func _pond_fountain(lab: Dictionary, w: int, h: int, add: Callable) -> int:
+	var seen := {}
+	for y in range(2, h - 2):
+		for x in range(2, w - 2):
+			var c := Vector2i(x, y)
+			if seen.has(c) or String(lab.get(c, "")) != "water":
+				continue
+			var comp := FurnitureKit._flood(lab, c, "water")
+			for q in comp:
+				seen[q] = true
+			var bb := FurnitureKit._bbox(comp)
+			if comp.size() < 9 or comp.size() > 40 or bb.position.x < 1 or bb.position.y < 1 or bb.end.x > w - 1 or bb.end.y > h - 1 or bb.size.x < 3 or bb.size.y < 3:
+				continue
+			return _one(add, "fountain", Vector3(bb.position.x + bb.size.x * 0.5, 0.02, bb.position.y + bb.size.y * 0.5), 0.0, c, 1.0)
+	return 0
 
 static func _landmarks(map: String, lab: Dictionary, add: Callable) -> int:
 	var n := 0
@@ -284,9 +338,24 @@ static func _landmarks(map: String, lab: Dictionary, add: Callable) -> int:
 ## lamps, bins, hydrants, benches and hay bales face the open side.
 static func _nooks(lab: Dictionary, can_walk: Callable, busy: Dictionary, ctx: Dictionary, w: int, h: int, add: Callable) -> int:
 	var map := String(ctx.get("map", ""))
-	if not (map.ends_with("City") or map.ends_with("Town") or map.ends_with("Island")):
+	var pick: Array
+	var strict := true      # true: only real dead ends (one open side); false: corners (two open sides) as well
+	if map.ends_with("City") or map.ends_with("Town") or map.ends_with("Island"):
+		pick = ["mailbox", "lamp_post", "bin_street", "fire_hydrant", "park_bench", "mailbox", "lamp_post", "flag_pole", "street_sign", "town_sign"]
+		if map == "VermilionCity":
+			pick = pick + ["cargo_crates", "anchor", "life_ring"]
+		if map == "PewterCity" or map == "ViridianCity" or map == "PalletTown":
+			pick = pick + ["bush_flowering", "sunflower"]
+	elif map.begins_with("Route") or map == "ViridianForest" or map.begins_with("Safari"):
+		pick = ["bush_round", "bush_berry", "bush_flowering", "stump", "log_fallen", "sunflower", "grass_clump", "log_pile", "hay_bale", "telephone_pole"]
+		if map in ["Route16", "Route17", "Route18"]:
+			pick = pick + ["barricade", "traffic_cone", "billboard"]
+		strict = false
+	elif map == "VermilionDock":
+		pick = ["cargo_crates", "container", "anchor", "life_ring", "pier_post", "barricade"]
+		strict = false
+	else:
 		return 0
-	var pick := ["mailbox", "lamp_post", "bin_street", "fire_hydrant", "park_bench", "mailbox", "lamp_post", "hay_bale"]
 	var n := 0
 	for y in range(h):
 		for x in range(w):
@@ -297,11 +366,13 @@ static func _nooks(lab: Dictionary, can_walk: Callable, busy: Dictionary, ctx: D
 			for d in [Vector2i(0, 1), Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, -1)]:
 				if bool(can_walk.call(c + d)) or busy.has(c + d) and String(lab.get(c + d, "")) == "door":
 					open.append(d)
-			if open.size() != 1 or _h(x, y, 520) > 0.7:
+			if open.is_empty() or open.size() > (1 if strict else 2) or _h(x, y, 520) > (0.7 if strict else 0.32):
 				continue
 			var d0: Vector2i = open[0]
 			var yaw: float = {Vector2i(0, 1): 0.0, Vector2i(0, -1): PI, Vector2i(1, 0): PI * 0.5, Vector2i(-1, 0): -PI * 0.5}[d0]
 			var prop: String = pick[int(_h(x, y, 521) * pick.size()) % pick.size()]
+			if ["bush_round", "bush_berry", "bush_flowering", "stump", "log_fallen", "sunflower", "grass_clump", "log_pile"].has(prop):
+				yaw = _h(x, y, 523) * TAU
 			# tuck it against the blocked back wall of the nook
 			var pos := Vector3(x + 0.5 - float(d0.x) * 0.16, 0.0, y + 0.5 - float(d0.y) * 0.16)
 			n += _one(add, prop, pos, yaw, c, 1.0)
@@ -384,7 +455,8 @@ static func _buildings(bake: Dictionary, add: Callable) -> int:
 				n += _one(add, "radio_mast", Vector3((x1 - 10.0) / 16.0 - mx, top, zc), 0.0, cell, 1.0)
 				n += _one(add, "roof_hatch", Vector3((x0 + 12.0) / 16.0 - mx, top, zc - 0.1), 0.0, cell, 0.8)
 			elif _h(bseed, 3, 532) < 0.55:
-				n += _one(add, "roof_tank" if _h(bseed, 4, 533) < 0.5 else "roof_hatch", Vector3((x0 + W * (0.22 + 0.5 * _h(bseed, 5, 534))) / 16.0 - mx, top, zc), 0.0, cell, 0.9)
+				var roof_prop: String = ["roof_tank", "roof_hatch", "satellite_dish"][int(_h(bseed, 4, 533) * 3.0) % 3]
+				n += _one(add, roof_prop, Vector3((x0 + W * (0.22 + 0.5 * _h(bseed, 5, 534))) / 16.0 - mx, top, zc), 0.0, cell, 0.9)
 	return n
 
 static func _one(add: Callable, prop: String, pos: Vector3, yaw: float, c: Vector2i, sc: float) -> int:

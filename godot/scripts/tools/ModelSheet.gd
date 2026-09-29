@@ -99,7 +99,7 @@ func _ids(kind: String, args: Dictionary) -> Array:
 			for fn in da.get_files():
 				if fn.ends_with(".glb"):
 					var nm := fn.get_basename()
-					if args.get("all", "0") == "1" or not (nm.begins_with("tree_") or nm.begins_with("bld_") or nm.begins_with("emote_")):
+					if args.get("all", "0") == "1" or not (nm.begins_with("tree_tree") or nm.begins_with("bld_") or nm.begins_with("emote_") or nm.ends_with("_set")):
 						names.append(nm)
 		names.sort()
 		return names

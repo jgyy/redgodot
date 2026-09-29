@@ -84,6 +84,7 @@ K.MATS.update({
     'purple': (_ramp('#2c1850', '#4a2c84', '#6c48b8', '#9270e0', '#bc9cf8'), None, 255),
     'gold_paint': (_ramp('#8a6a1c', '#b98f2a', '#e0b83a', '#f4d046', '#fff0a0'), None, 255),
     'pk_pink': (_ramp('#8a2a4a', '#c04070', '#e86090', '#f890b0', '#ffc0d4'), None, 255),
+    'lamp_glass': (_ramp('#b8801c', '#e8a828', '#ffcc48', '#ffe88c', '#fffbd0'), None, 15),
     'pk_red_roof': (_ramp('#5c1c22', '#8f2a2c', '#bb4034', '#dc6244', '#f08a70'), None, 255),
 })
 
@@ -163,3 +164,11 @@ def sign_face(P, x0, x1, y, z0, z1, mat, lines=2, ink='dark'):
         zc = z1 - h * (0.3 + i * 0.28)
         ww = w * (0.62 - 0.14 * i)
         P.box((x0 + (w - ww) / 2, y - 0.004, zc), (x0 + (w + ww) / 2, y, zc + h * 0.09), ink, ao=False, flat_idx=1)
+
+
+# self-lit ramps: detail id 15 -> vertex alpha 15.5/16, which tree.gdshader treats as "ignore the night grade"
+for _n in ('led_green', 'led_red', 'led_amber', 'led_blue', 'crt', 'sky_glass'):
+    _r, _t, _d = K.MATS[_n]
+    K.MATS[_n] = (_r, _t, 15)
+_r, _t, _d = K.MATS['screen']
+K.MATS['screen'] = (_r, _t, 15)

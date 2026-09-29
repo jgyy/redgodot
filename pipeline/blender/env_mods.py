@@ -42,7 +42,7 @@ def p_wall_lantern(style):
     P.box((-0.03, 0.0, 0.0), (0.03, 0.03, 0.22), 'graphite', bevel=0.004)
     P.between((0, 0.02, 0.18), (0, -0.09, 0.2), 0.008, 0.008, 'graphite', seg=4)
     P.box((-0.05, -0.14, 0.0), (0.05, -0.04, 0.02), 'graphite', bevel=0.004)
-    P.box((-0.04, -0.13, 0.02), (0.04, -0.05, 0.13), 'yellow', ao=False, flat_idx=4)
+    P.box((-0.04, -0.13, 0.02), (0.04, -0.05, 0.13), 'lamp_glass', ao=False, flat_idx=4)
     for sx in (-1, 1):
         for sy in (-1, 1):
             P.box((sx * 0.04 - 0.006, -0.09 + sy * 0.04 - 0.006, 0.02), (sx * 0.04 + 0.006, -0.09 + sy * 0.04 + 0.006, 0.13), 'graphite')

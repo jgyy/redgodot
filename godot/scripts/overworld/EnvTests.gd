@@ -9,6 +9,7 @@ static func run(t: TestSuite) -> void:
 	_test_furniture(t)
 	_test_dressing(t)
 	_test_real_maps(t)
+	_test_all_maps(t)
 
 static func _load_manifest() -> Dictionary:
 	var f := FileAccess.open("res://assets/models/world/manifest.json", FileAccess.READ)
@@ -184,3 +185,32 @@ static func _test_real_maps(t: TestSuite) -> void:
 		if String(n).begins_with("counter_center_set/"):
 			counters += 1
 	t.check(counters >= 10, "the Pokemon Center counter uses the white/pink pieces (%d)" % counters)
+
+## Every one of the 223 maps builds its props (furniture, dressing, buildings) without errors, and the totals stay sane.
+static func _test_all_maps(t: TestSuite) -> void:
+	var mat := ShaderMaterial.new()
+	var built := 0
+	var total_instances := 0
+	var worst_calls := 0
+	var worst_tris := 0
+	var worst_map := ""
+	for name in GameData.maps.keys():
+		var bake := WorldBuilder.load_bake(String(name))
+		if bake.is_empty():
+			continue
+		var ml := MapLoader.new()
+		ml.load_map(String(name), false)
+		var root := PropKit.build(bake, {}, mat, {"map": name, "objs": ml.map_data.get("objs", []), "warps": ml.map_data.get("warps", []),
+			"signs": ml.map_data.get("signs", []), "passable": Callable(ml, "passable")})
+		built += 1
+		total_instances += int(PropKit.stats["instances"])
+		if int(PropKit.stats["tris"]) > worst_tris:
+			worst_tris = int(PropKit.stats["tris"])
+			worst_calls = int(PropKit.stats["draw_calls"])
+			worst_map = String(name)
+		root.free()
+		ml.free()
+	t.check(built >= 200, "props build for every baked map (%d)" % built)
+	t.check(total_instances > 3000, "the maps hold thousands of prop instances (%d)" % total_instances)
+	t.check(worst_tris < 150000 and worst_calls < 200, "the heaviest map (%s) stays within budget: %d draw calls, %d tris" % [worst_map, worst_calls, worst_tris])
+	print("[EnvTests] %d maps, %d prop instances, heaviest %s: %d draw calls / %d tris" % [built, total_instances, worst_map, worst_calls, worst_tris])

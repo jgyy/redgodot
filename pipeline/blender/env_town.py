@@ -34,8 +34,8 @@ def p_lamp_post(style):
     for sx in (-1, 1):
         for sy in (-1, 1):
             P.box((sx * 0.1 - 0.012, sy * 0.1 - 0.012, 1.48), (sx * 0.1 + 0.012, sy * 0.1 + 0.012, 1.74), 'graphite')
-    P.box((-0.09, -0.09, 1.49), (0.09, 0.09, 1.73), 'yellow', ao=False, flat_idx=3)
-    P.sphere((0, 0, 1.6), 0.05, 'white', subdiv=1, ao=False, flat_idx=4)
+    P.box((-0.09, -0.09, 1.49), (0.09, 0.09, 1.73), 'lamp_glass', ao=False, flat_idx=3)
+    P.sphere((0, 0, 1.6), 0.05, 'lamp_glass', subdiv=1, ao=False, flat_idx=4)
     P.lathe(0, 0, [(0.16, 1.74), (0.13, 1.8), (0.06, 1.86), (0.001, 1.9)], 'graphite', seg=4, rot=0.78)
     P.sphere((0, 0, 1.92), 0.025, 'brass', subdiv=1, ao=False)
     return P
@@ -62,12 +62,12 @@ def p_fountain(style):
     """Town fountain, 2 x 2 cells: octagonal basin with water, tiered bowls, a spout and jet arcs."""
     P = Prop('fountain', style, seed=404)
     P.lathe(0, 0, [(0.98, 0.0), (0.98, 0.26), (0.9, 0.3), (0.9, 0.27)], 'stone', seg=8, rot=0.39, ao=True)
-    P.cyl(0, 0, 0.25, 0.25, 0.9, 0.9, 'water', seg=8, rot=0.39, cap_top=True, ao=False, flat_idx=3)
+    P.cyl(0, 0, 0.25, 0.25, 0.9, 0.9, 'water_deep', seg=8, rot=0.39, cap_top=True, ao=False, flat_idx=2)
     P.lathe(0, 0, [(0.98, 0.26), (1.02, 0.28), (1.02, 0.32), (0.9, 0.32)], 'stone', seg=8, rot=0.39, bias=1)
     P.lathe(0, 0, [(0.001, 0.24), (0.22, 0.24), (0.2, 0.44), (0.1, 0.5), (0.08, 0.86)], 'stone', seg=8, rot=0.39)
     P.lathe(0, 0, [(0.5, 0.78), (0.5, 0.86), (0.4, 0.9), (0.001, 0.88)], 'stone', seg=8, rot=0.39, bias=1)
     P.lathe(0, 0, [(0.06, 0.86), (0.06, 1.1), (0.1, 1.16)], 'stone', seg=8)
-    P.cyl(0, 0, 0.87, 0.87, 0.44, 0.44, 'water', seg=8, cap_top=True, ao=False, flat_idx=3)
+    P.cyl(0, 0, 0.87, 0.87, 0.44, 0.44, 'water_deep', seg=8, cap_top=True, ao=False, flat_idx=2)
     for k in range(6):
         a = k * math.tau / 6 + 0.39
         pts = [(math.cos(a) * 0.04, math.sin(a) * 0.04, 1.14), (math.cos(a) * 0.16, math.sin(a) * 0.16, 1.22), (math.cos(a) * 0.3, math.sin(a) * 0.3, 1.1), (math.cos(a) * 0.4, math.sin(a) * 0.4, 0.9)]
