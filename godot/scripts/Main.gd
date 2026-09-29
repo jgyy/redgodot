@@ -34,6 +34,11 @@ func _ready() -> void:
 			starter = "PIKACHU"   # YELLOW has no starter choice: Prof. Oak gives PIKACHU
 		pt.run(starter)
 		return
+	if OS.get_cmdline_user_args().has("--scene=title_playtest"):   # title screen -> NEW GAME -> version list -> Oak's speech
+		var tp: Node = load("res://scripts/overworld/PlayTest.gd").new()
+		add_child(tp)
+		tp.run_title(GameState.version)
+		return
 	if OS.get_cmdline_user_args().has("--scene=ow_spinner_test"):
 		var t: Node = load("res://scripts/overworld/SpinnerTest.gd").new()
 		add_child(t)

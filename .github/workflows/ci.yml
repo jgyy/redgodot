@@ -85,6 +85,11 @@ jobs:
       - name: New-game playtest, YELLOW (PIKACHU from Oak, follows the player, rival EEVEE)
         run: timeout 10m /opt/godot/godot4 --headless --path godot -- --scene=ow_playtest --version=YELLOW
 
+      - name: Title screen -> NEW GAME -> version list -> Oak's speech (YELLOW, then BLUE)
+        run: |
+          timeout 5m /opt/godot/godot4 --headless --path godot -- --scene=title_playtest --version=YELLOW
+          timeout 5m /opt/godot/godot4 --headless --path godot -- --scene=title_playtest --version=BLUE
+
       - name: Spinner tiles (Viridian Gym arrow ride ends on the stop tile)
         run: timeout 5m /opt/godot/godot4 --headless --path godot -- --scene=ow_spinner_test
 

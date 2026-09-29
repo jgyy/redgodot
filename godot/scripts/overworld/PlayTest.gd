@@ -71,6 +71,48 @@ func run(starter: String) -> void:
 		ok = ok and GameState.party[0].species_id == starter
 	_done("OK" if ok else "INCOMPLETE")
 
+## Drives the real title screen with key presses: A opens the menu, NEW GAME, then the version list; ends once Prof. Oak's
+## speech has started with that version. Run: godot4 --headless --path godot -- --scene=title_playtest --version=BLUE
+func run_title(want: String) -> void:
+	_t0 = Time.get_ticks_msec()
+	GameState.pending_version = "RED"   # so the choice has to come from the menu
+	GameState.version = "RED"
+	# a plain run opens with the intro movie: skip it (any key; the first press only "turns the sound on") until the title shows
+	var waited := 0
+	while _title_scene() == null and waited < 3600:
+		await _press_action("confirm", 2)
+		await _frames(20)
+		waited += 25
+	_note("title", str(_title_scene() != null))
+	await _frames(70)
+	await _press_action("confirm", 3)
+	await _frames(12)
+	if GameState.has_save():
+		await _press_action("move_down", 2)   # CONTINUE is first when a save exists
+	await _press_action("confirm", 3)   # NEW GAME
+	await _frames(12)
+	_note("menu", "version list open")
+	for i in GameData.VERSIONS.find(want):
+		await _press_action("move_down", 2)
+	await _press_action("confirm", 3)
+	var n := 0
+	while n < 600 and get_tree().root.find_child("Intro", true, false) == null:
+		await _frames(1)
+		n += 1
+	var speech := get_tree().root.find_child("Intro", true, false)
+	_note("oak_speech", str(speech != null))
+	var ok := speech != null and GameState.version == want and GameData.active_version == want
+	if ok and speech.has_method("_intro_mon"):
+		ok = speech.call("_intro_mon") == ("PIKACHU" if want == "YELLOW" else "NIDORINO")
+	_done("OK" if ok else "INCOMPLETE")
+
+func _title_scene() -> Node:
+	for n in get_tree().root.find_children("*", "Node3D", true, false):
+		var sc: Variant = n.get_script()
+		if sc != null and str((sc as Script).resource_path).ends_with("TitleScene.gd"):
+			return n
+	return null
+
 func _story_busy() -> bool:
 	var st := get_node_or_null("/root/Story")
 	var ui := get_node_or_null("/root/UI")
