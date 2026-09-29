@@ -171,6 +171,7 @@ static func apply_to_mon(id: String, m: GameState.PartyMon, ps: PartyMenu) -> bo
 		var before := m.hp
 		if heals:
 			m.hp = mini(m.max_hp, m.hp + int(HEAL[id]))
+			PikachuBuddy.event(PikachuBuddy.HP_RESTORE, m)
 		if cures:
 			m.status = ""
 		await ps.party_say((m.nickname + " recovered by %d!" % (m.hp - before)) if heals else (m.nickname + " was cured!"))
@@ -188,6 +189,7 @@ static func apply_to_mon(id: String, m: GameState.PartyMon, ps: PartyMenu) -> bo
 			await ps.party_say("It won't have any effect.")
 			return false
 		m.level += 1
+		PikachuBuddy.event(PikachuBuddy.LEVEL_UP, m)
 		m.xp = maxi(m.xp, m.exp_this())
 		m.recalc_keep_hp()
 		for nm in m.moves_at_level(m.level):

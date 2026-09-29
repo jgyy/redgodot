@@ -77,6 +77,10 @@ func _bills_pc() -> void:
 			b.append(m2)
 			GameState.party_changed.emit()
 			await say(m2.nickname + " was stored in Box %d." % (GameState.current_box + 1))
+			if m2.buddy:   # YELLOW: PIKACHU hates being left in a box
+				PikachuBuddy.event(PikachuBuddy.DEPOSITED, m2)
+				Audio.cry(m2.species_id)
+				await say(m2.nickname + " looks lonely and sad in the BOX...")
 		elif r == 2:
 			if b.is_empty():
 				await say("What? There are no POKéMON here!")

@@ -63,7 +63,7 @@ const BOOKSHELF_FALLBACK := {"BookOrSculptureText": "Crammed full of POKéMON bo
 	"PokemonStuffText": "Wow! Tons of POKéMON stuff!", "ElevatorText": "This is an elevator.",
 	"IndigoPlateauStatues": "INDIGO PLATEAU\fThe ultimate goal of trainers! POKéMON LEAGUE HQ"}
 const SCRIPT_FILES := ["res://scripts/story/Pallet.gd", "res://scripts/story/Early.gd", "res://scripts/story/Mid.gd",
-	"res://scripts/story/Late.gd", "res://scripts/story/Extra.gd"]
+	"res://scripts/story/Late.gd", "res://scripts/story/Extra.gd", "res://scripts/story/Yellow.gd"]
 
 # ------------------------------------------------------------------ injection points (tests / integration)
 ## Optional explicit Overworld host (the Overworld may call Story.set_host(self)); tests put a fake here.
@@ -744,6 +744,20 @@ func rival_party(base: int) -> int:
 	var off := {"CHARMANDER": 1, "SQUIRTLE": 2, "BULBASAUR": 3}
 	return base + int(off.get(GameState.starter, 1)) - 1
 
+## YELLOW: the rival always has EEVEE; his later parties differ by which Eevee evolution he is heading for
+## (GameState.rival_eevee). Callers pass the RED party number (RED = base + starter offset; here starter offset is 1).
+func yellow_rival_party(cls: String, red_n: int) -> int:
+	var v := ["JOLTEON", "FLAREON", "VAPOREON"].find(GameState.rival_eevee)
+	v = maxi(v, 0)
+	match cls:
+		"RIVAL1":
+			return {1: 1, 4: 2, 7: 3}.get(red_n, red_n)
+		"RIVAL2":
+			return {1: 1, 4: 2 + v, 7: 5 + v, 10: 8 + v}.get(red_n, red_n)
+		"RIVAL3":
+			return 1 + v
+	return red_n
+
 ## S.give: "{PLAYER} received ITEM!" (or `msg`), with the right jingle.
 func give(item: String, n: int = 1, msg: String = "") -> bool:
 	if not bag_add(item, n):
@@ -903,6 +917,8 @@ func trade_animation(give_m: Object, get_m: Object) -> void:
 # ================================================================== battles
 ## S.battle(cls, n, {win_text, lose_text, no_blackout}) -> "win"|"lose"|"run"|"caught"
 func battle(cls: String, n: int = 1, opts: Dictionary = {}) -> String:
+	if GameState.is_yellow() and cls.begins_with("RIVAL"):
+		n = yellow_rival_party(cls, n)
 	var tc: Dictionary = GameData.trainer_classes.get(cls, {"name": cls, "money": 1000})
 	var is_rival := cls.begins_with("RIVAL")
 	var display: String = opts.get("display_name", GameState.rival_name if is_rival else LEADERS.get(cls, str(tc.get("name", cls))))
@@ -1122,6 +1138,8 @@ func on_step(c: Variant = null) -> bool:
 	if _scripted > 0:
 		return false
 	GameState.steps += 1
+	if GameState.steps % 256 == 0:
+		PikachuBuddy.event(PikachuBuddy.WALKING)   # YELLOW: a long walk together makes PIKACHU fonder of you
 	if not GameState.daycare.is_empty():
 		GameState.daycare["steps"] = int(GameState.daycare.get("steps", 0)) + 1
 	var m := mapname()

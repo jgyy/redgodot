@@ -315,14 +315,21 @@ SPRITE_ALIAS = {  # sprites Yellow adds that have no model of their own here -> 
 }
 
 
-def object_overlay(map_names):
+# Yellow renamed / replaced a few maps: the RED map -> the YELLOW map whose objects and text replace it
+MAP_ALIAS = {'CeruleanTradeHouse': 'CeruleanMelaniesHouse'}
+
+
+def object_overlay(map_names, species):
     out = {}
-    prefetch([(r, f'data/maps/objects/{m}.asm') for m in map_names for r in ('pokered', 'pokeyellow')])
+    prefetch([(r, f'data/maps/objects/{MAP_ALIAS.get(m, m)}.asm') for m in map_names for r in ('pokered', 'pokeyellow')])
     for m in map_names:
         r = parse_objects('pokered', m)
-        y = parse_objects('pokeyellow', m)
+        y = parse_objects('pokeyellow', MAP_ALIAS.get(m, m))
         if r is None or y is None:
             continue
+        for o in y:
+            if o['sprite'].upper() in species:   # Bulbasaur, Oddish, Sandshrew ... stand in Melanie's house as Pokemon
+                o['sprite'] = 'mon:' + o['sprite'].upper()
         rk = {o['text']: o for o in r}
         yk = {o['text']: o for o in y}
         patch, add, remove = {}, [], []
@@ -371,7 +378,7 @@ def to_text(cmds):
 
 def parse_text_file(t):
     res = {}
-    for m in re.finditer(r'^_(\w+)::\n(.*?)(?=^\w+:|\Z)', t, re.S | re.M):
+    for m in re.finditer(r'^_?(\w+)::\n(.*?)(?=^_?\w+::|\Z)', t, re.S | re.M):
         cmds = []
         for l in m.group(2).split('\n'):
             l = l.strip()
@@ -389,6 +396,7 @@ def parse_text_file(t):
 
 def text_overrides(map_names):
     """Labels whose text differs between pokered and pokeyellow (or exists only in Yellow)."""
+    map_names = list(map_names) + ['CeruleanMelaniesHouse', 'SummerBeachHouse']
     prefetch([(r, f'text/{m}.asm') for m in map_names for r in ('pokered', 'pokeyellow')])
     out = {}
     for m in map_names:
@@ -445,6 +453,11 @@ def main():
     res['parties'] = {'YELLOW': {c: py[i] for i, c in enumerate(classes)}}
     res['redPartiesMatchBase'] = all(pr[i] == pd['parties'][c] for i, c in enumerate(classes))
     res['specialMoves'] = {'YELLOW': parse_special_moves('pokeyellow')}
+    # Jessie & James are four ROCKET parties (Mt. Moon B2F, Rocket Hideout B4F, Pokemon Tower 7F, Silph Co. 11F), 1-based
+    rk = res['parties']['YELLOW']['ROCKET']
+    jj = [[14, 'EKANS'], [14, 'MEOWTH'], [14, 'KOFFING']]
+    first = rk.index(jj) + 1
+    res['jessieJames'] = {'MtMoonB2F': first, 'RocketHideoutB4F': first + 1, 'PokemonTower7F': first + 2, 'SilphCo11F': first + 3}
 
     # species overrides for YELLOW
     sr, sy = parse_species('pokered'), parse_species('pokeyellow')
@@ -477,7 +490,7 @@ def main():
     res['species'] = {'YELLOW': over}
 
     # map objects (trainers / items / added and removed NPCs)
-    res['objects'] = {'YELLOW': object_overlay(list(md['maps'].keys()))}
+    res['objects'] = {'YELLOW': object_overlay(list(md['maps'].keys()), set(pd['species'].keys()))}
     res['text'] = {'YELLOW': text_overrides(list(md['maps'].keys()))}
     print('yellow text overrides:', len(res['text']['YELLOW']))
 

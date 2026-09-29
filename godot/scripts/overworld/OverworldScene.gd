@@ -631,8 +631,11 @@ func _try_interact() -> void:
 		follower.face(OPP[player.facing])
 		interacted.emit("follower", {"species": _follower_species})
 		var mon: GameState.PartyMon = GameState.party[0] if not GameState.party.is_empty() else null
+		if GameState.is_yellow() and PikachuBuddy.buddy() != null:
+			mon = PikachuBuddy.buddy()   # YELLOW: the partner is always the starter PIKACHU, wherever it stands in the party
 		if mon:
-			var mood := follower_mood(mon, _map_loader.map_name, _map_loader.is_tall_grass(player.cell), _rng)
+			var mood: Array = PikachuBuddy.mood(mon, _map_loader.map_name, _map_loader.is_tall_grass(player.cell), _rng) if mon.buddy \
+				else follower_mood(mon, _map_loader.map_name, _map_loader.is_tall_grass(player.cell), _rng)
 			var au := get_node_or_null("/root/Audio")
 			if au and au.has_method("cry"):
 				au.cry(mon.species_id)
@@ -785,6 +788,9 @@ static func follower_mood(m: GameState.PartyMon, map_name: String, in_grass: boo
 func _lead_species() -> String:
 	if bool(GameState.get_meta("no_follower", false)) or not bool(GameState.options.get("follower", true)) or GameState.party.is_empty():
 		return ""
+	if GameState.is_yellow():   # YELLOW: PIKACHU walks behind you (and only PIKACHU), while it is up
+		var b := PikachuBuddy.buddy()
+		return b.species_id if b != null and b.hp > 0 else ""
 	var pm: GameState.PartyMon = GameState.party[0]
 	return pm.species_id if pm.hp > 0 else ""
 

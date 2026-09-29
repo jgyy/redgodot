@@ -46,6 +46,7 @@ func _draw() -> void:
 	Px.menu_bg(self, Color("#d8b060"), Color("#cca050"), t)
 	Px.frame(self, 12, 8, 296, 164, "red", Color("#fff8e8"))
 	Px.text(self, "TRAINER CARD", 26, 18, Color("#c04040"))
+	Px.text_r(self, GameState.version, 296, 18, GameState.version_color(GameState.version).darkened(0.1))   # RED / BLUE / YELLOW
 	var rows := [["NAME", GameState.player_name], ["ID No.", "%05d" % GameState.trainer_id],
 		["MONEY", "$%d" % GameState.money], ["POKéDEX", str(GameState.caught_species.size())],
 		["TIME", GameState.play_time_text()]]

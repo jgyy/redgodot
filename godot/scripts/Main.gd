@@ -9,10 +9,15 @@ extends Node3D
 ## Extra flags (all optional): --player=SPECIES --enemy=SPECIES --level=N
 ## --map=MapName --pc=x,y --time=day|dusk|night --text="custom dialogue line"
 ## --save=showcase (reference-screenshot save: RED, 6-mon party, 126/75 dex...)
+## --version=RED|BLUE|YELLOW (game version; default RED). --scene=version_menu shows the title with the NEW GAME version list.
 
 const MENU_SCENES := ["start_menu", "party", "summary", "bag", "pokedex", "trainer_card", "town_map", "options"]
 
 func _ready() -> void:
+	# --version=RED|BLUE|YELLOW picks the game version for any scene / playtest / test (NEW GAME on the title asks instead)
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--version="):
+			GameState.set_version(a.substr(10).to_upper())
 	SceneRouter.register_root(self)
 	SceneRouter.goto_title()
 	if OS.get_cmdline_user_args().has("--run-tests"):
@@ -25,6 +30,8 @@ func _ready() -> void:
 		for a in OS.get_cmdline_user_args():
 			if a.begins_with("--starter="):
 				starter = a.substr(10)
+		if GameState.is_yellow():
+			starter = "PIKACHU"   # YELLOW has no starter choice: Prof. Oak gives PIKACHU
 		pt.run(starter)
 		return
 	if OS.get_cmdline_user_args().has("--scene=ow_spinner_test"):
