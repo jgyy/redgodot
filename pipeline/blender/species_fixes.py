@@ -483,3 +483,14 @@ def shellder(d, look):
             p['iris'] = '#3aa0c0'
             p['x'] += 0.5
             p['y'] += 0.3
+
+
+# ----------------------------------------------------------------------------- per-range fix modules
+# Hand-tuned fixes live in fixes_dex001_050.py / fixes_dex051_100.py / fixes_dex101_151.py; each registers
+# into FIXES with the same @fix decorator (later modules win over the generic ones above).
+for _mod in ('fixes_dex001_050', 'fixes_dex051_100', 'fixes_dex101_151'):
+    try:
+        __import__(_mod)
+    except ModuleNotFoundError as _e:   # optional
+        if _e.name != _mod:
+            raise
