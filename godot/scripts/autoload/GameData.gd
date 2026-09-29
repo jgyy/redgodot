@@ -194,6 +194,29 @@ func apply_version(v: String) -> void:
 	if st:
 		sync_story(st.pokedata)
 
+## POKeDEX > AREA: where `sp` shows up in the wild in the active version, as display names ("ROUTE 2", "VIRIDIAN FOREST" ...).
+## Fishing spots come with a " (ROD)" tag. Gifts, trades and evolutions are not "areas", like in the games.
+func habitats(sp: String) -> Array:
+	var by_cnst := {}
+	for k in maps.keys():
+		by_cnst[str(maps[k].get("cnst", ""))] = k
+	var names := {}
+	var story := get_node_or_null("/root/Story")
+	for cnst in wild.keys():
+		var e: Dictionary = wild[cnst]
+		for kind in ["grass", "water"]:
+			for m in (e[kind] as Dictionary).get("mons", []):
+				if str(m[1]) == sp:
+					names[story.display_name(by_cnst.get(cnst, cnst)) if story else str(cnst)] = true
+	var rods: Dictionary = pokedata_extra.get("superRod", {})
+	for cnst in rods.keys():
+		for m in rods[cnst]:
+			if str(m[1]) == sp:
+				names[(story.display_name(by_cnst.get(cnst, cnst)) if story else str(cnst)) + " (ROD)"] = true
+	var out: Array = names.keys()
+	out.sort()
+	return out
+
 ## Copies the active version's trades / rods / prizes / marts into Story's own pokedata dictionary.
 func sync_story(story_pokedata: Dictionary) -> void:
 	for k in pokedata_extra.keys():

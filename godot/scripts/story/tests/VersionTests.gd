@@ -120,6 +120,15 @@ static func _wild(t: TestSuite) -> void:
 					if int(e[0]) < 2 or int(e[0]) > 70 or not GameData.species.has(str(e[1])):
 						bad += 1
 		t.check(n > 50 and bad == 0, "%s: %d wild tables well-formed (10 slots, valid species/levels)" % [v, n])
+	# POKeDEX > AREA follows the version
+	GameState.set_version("RED")
+	t.check(GameData.habitats("WEEDLE").has("ROUTE 2") and not GameData.habitats("CATERPIE").has("ROUTE 2"), "AREA (RED): WEEDLE is on Route 2, CATERPIE is not")
+	GameState.set_version("BLUE")
+	t.check(GameData.habitats("CATERPIE").has("ROUTE 2") and not GameData.habitats("WEEDLE").has("ROUTE 2"), "AREA (BLUE): CATERPIE is on Route 2, WEEDLE is not")
+	t.check(GameData.habitats("EKANS").is_empty() and not GameData.habitats("SANDSHREW").is_empty(), "AREA (BLUE): no EKANS anywhere, SANDSHREW has a habitat")
+	GameState.set_version("YELLOW")
+	t.check(GameData.habitats("NIDORAN_M").has("ROUTE 2") and GameData.habitats("MAGIKARP").any(func(x): return str(x).ends_with("(ROD)")), "AREA (YELLOW): NIDORAN on Route 2, MAGIKARP by rod")
+	t.check(GameData.habitats("MEW").is_empty() and GameData.habitats("CHARIZARD").is_empty(), "AREA: MEW and CHARIZARD have no wild habitat")
 	# the EncounterSystem rolls from the active version's table
 	GameState.set_version("YELLOW")
 	var rng := RandomNumberGenerator.new()
