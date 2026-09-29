@@ -18,7 +18,7 @@ var _frame_m := 0.0  # --sprite_frame=M: size Pokemon like upstream sprites, fix
 func run(args: Dictionary, out_path: String) -> void:
 	var kind: String = args.get("kind", "pokemon")
 	var ids: Array = _ids(kind, args)
-	var cols := int(args.get("cols", "12"))
+	var cols := maxi(1, int(args.get("cols", "12")))
 	var cell := int(args.get("cell", "160"))
 	var view: String = args.get("view", "front")
 	var yaw := float(args.get("yaw", "-25"))

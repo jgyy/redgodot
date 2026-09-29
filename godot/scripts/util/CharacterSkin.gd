@@ -132,6 +132,9 @@ static func apply(model: Node3D, cast_entry: Dictionary) -> void:
 			if not DEFAULTS.has(slot):
 				continue
 			var field: String = SLOT_FIELD[slot]
+			# body=coat characters (Oak, scientists): the torso region codes are X/x = the coat colour, not the shirt
+			if slot == "mat_top" and cast_entry.get("body", "") == "coat" and cast_entry.has("coat"):
+				field = "coat"
 			var hex: String = cast_entry.get(field, DEFAULTS[slot])
 			var new_mat: StandardMaterial3D = (mat.duplicate() if mat is StandardMaterial3D else StandardMaterial3D.new())
 			new_mat.albedo_color = Color(hex)

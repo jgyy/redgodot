@@ -22,7 +22,7 @@ func _files(dir_path: String) -> Array:
 	var out: Array = []
 	if _args.has("only"):
 		for n in String(_args["only"]).split(",", false):
-			out.append(n + ".glb")
+			out.append(n if n.ends_with(".glb") else n + ".glb")
 		return out
 	var d := DirAccess.open(dir_path)
 	if d == null:
@@ -36,7 +36,7 @@ func _files(dir_path: String) -> Array:
 func _run() -> void:
 	var dir_path: String = _args.get("dir", "res://assets/models/world")
 	var mode: String = _args.get("mode", "kit")
-	var cols := int(_args.get("cols", "6"))
+	var cols := maxi(1, int(_args.get("cols", "6")))
 	var cell := int(_args.get("cell", "200"))
 	var yaw := float(_args.get("yaw", "-25"))
 	var files := _files(dir_path)
@@ -56,6 +56,8 @@ func _run() -> void:
 		if not ResourceLoader.exists(path):
 			continue
 		var ps: PackedScene = load(path)
+		if ps == null:
+			continue
 		var model: Node3D = ps.instantiate()
 		var holder := Node3D.new()
 		_stage.add_child(holder)

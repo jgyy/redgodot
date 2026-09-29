@@ -146,6 +146,14 @@ func use_item_field(id: String) -> void:
 		visible = true
 		busy = false
 		return
+	if id in ["BICYCLE", "OLD_ROD", "GOOD_ROD", "SUPER_ROD", "ESCAPE_ROPE", "REPEL", "SUPER_REPEL", "MAX_REPEL", "POKE_FLUTE", "ITEMFINDER", "COIN_CASE"]:
+		busy = true
+		close()
+		var used: bool = await Story.use_field_item(id)
+		busy = false
+		if not used:
+			open()
+		return
 	if id.ends_with("BALL") or id.begins_with("X_") or id in ["POKE_DOLL", "GUARD_SPEC", "DIRE_HIT"]:
 		await bag_say("That can't be used now.")
 		return

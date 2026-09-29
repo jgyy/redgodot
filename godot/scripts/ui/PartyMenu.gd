@@ -170,7 +170,12 @@ func _field_move(mv: String, m: GameState.PartyMon) -> void:
 			tgt.hp = mini(tgt.max_hp, tgt.hp + cost)
 			await party_say("%s recovered by %d!" % [tgt.nickname, tgt.hp - before])
 		_:
-			await party_say("There's no place to use %s here." % GameData.get_move(mv).get("name", mv))
+			# CUT / SURF / STRENGTH / FLASH / FLY / DIG / TELEPORT run through Story (dialogue, effects, warps) with the
+			# menus out of the way; if the move can't be used here we come back to the party screen
+			close()
+			var used: bool = await Story.use_field_move(m, mv)
+			if not used:
+				open()
 
 ## PartyScreen.say(): shows a message in the party's own box until A/B.
 func party_say(text: String) -> void:

@@ -308,15 +308,18 @@ def build_cheer(P, hair):
     w = TAU * t
     hop = np.sin(math.pi * ((t * 2) % 1.0))
     crouch = 1 - hop
-    c.l('hips')[:, 2] = 1.9 * hop - 0.7 * crouch ** 3
+    drop = 0.7 * crouch ** 3
+    c.l('hips')[:, 2] = 1.9 * hop - drop
+    # the crouch has to bend the knees by exactly as much as the pelvis drops (isosceles leg: thigh -a, shin +2a),
+    # otherwise the feet sink into the floor at the bottom of each hop
+    knee = np.degrees(np.arccos(np.clip(1.0 - drop / (P.hip - P.ankle), -1.0, 1.0)))
     for side, sg in (('L', 1), ('R', -1)):
-        c.r('upper_arm_' + side)[:, 1] = -sg * (-(150 + 8 * np.sin(w * 2)) + 0) * -1
         c.r('upper_arm_' + side)[:, 1] = -sg * (150 + 8 * np.sin(w * 2))
         c.r('upper_arm_' + side)[:, 0] = -10
         c.r('forearm_' + side)[:, 0] = -10 - 12 * hop
-        c.r('thigh_' + side)[:, 0] = -(12 * crouch ** 2) - 4 * hop
-        c.r('shin_' + side)[:, 0] = 24 * crouch ** 2 + 2
-        c.r('foot_' + side)[:, 0] = -8 * crouch ** 2 + 10 * hop
+        c.r('thigh_' + side)[:, 0] = -knee - 4 * hop
+        c.r('shin_' + side)[:, 0] = 2 * knee + 2
+        c.r('foot_' + side)[:, 0] = -(knee - 4 * hop + 2) + 10 * hop
     c.r('head')[:, 0] = -6 * hop
     c.r('spine')[:, 0] = -2 * hop
     add_face(c, t, blinks=())
@@ -424,7 +427,7 @@ def build_bow(P, hair):
     c.r('chest')[:, 0] += 14 * b
     c.r('neck')[:, 0] += 8 * b
     c.r('head')[:, 0] += 8 * b
-    c.l('hips')[:, 0] += -0.25 * b
+    c.l('hips')[:, 1] += 0.5 * b          # pelvis moves BACK (+Y) so the feet stay planted as the legs tilt forward (X was a sideways shift)
     for side, sg in (('L', 1), ('R', -1)):
         c.r('upper_arm_' + side)[:, 0] += 10 * b
         c.r('thigh_' + side)[:, 0] += -6 * b
@@ -582,11 +585,19 @@ ONE_SHOT = ['Bow', 'Surprised']
 
 def build_all(P, hair):
     base = [build_idle(P, hair), build_walk(P, hair), build_run(P, hair), build_talk(P, hair), build_wave(P, hair),
-            build_cheer(P, hair)]
+            build_cheer(P, hair), build_surf(P, hair)]
     extra = [build_nod(P, hair), build_shake(P, hair), build_think(P, hair), build_laugh(P, hair), build_bow(P, hair),
              build_point(P, hair), build_sleep(P, hair), build_surprised(P, hair), build_salute(P, hair),
              build_stretch(P, hair), build_dance(P, hair), build_sad(P, hair), build_shiver(P, hair)]
-    return base + extra
+    clips = base + extra
+    # build.stoop (old people): a constant forward hunch layered on every clip, the head counter-rotates to keep the gaze up
+    st = float(getattr(P, 'stoop', 0.0))
+    if st:
+        for c in clips:
+            c.r('spine')[:, 0] += 5.0 * st
+            c.r('chest')[:, 0] += 4.0 * st
+            c.r('head')[:, 0] -= 6.0 * st
+    return clips
 
 
 # ----------------------------------------------------------------------------- writing

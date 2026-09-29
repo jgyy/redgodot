@@ -99,7 +99,7 @@ def main():
                 'Walk': {'seconds': 0.2667, 'loop': True, 'note': 'one full 2-step gait per 16-frame cell (feet plant at walk speed)'},
                 'Run': {'seconds': 0.2667, 'loop': True},
                 'Talk': {'seconds': 1.2, 'loop': True}, 'Wave': {'seconds': 0.8, 'loop': True},
-                'Cheer': {'seconds': 0.6667, 'loop': True},
+                'Cheer': {'seconds': 0.6667, 'loop': True}, 'Surf': {'seconds': 1.5, 'loop': True},
                 **{n: {'loop': n not in ('Bow', 'Surprised'), 'note': 'NPC gesture'} for n in
                    ('Nod', 'Shake', 'Think', 'Laugh', 'Bow', 'Point', 'Sleep', 'Surprised', 'Salute', 'Stretch', 'Dance', 'Sad', 'Shiver')}},
             'conventions': {'front': 'Blender -Y == glTF/Godot +Z', 'origin': 'feet at origin',
