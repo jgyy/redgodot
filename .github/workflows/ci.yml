@@ -58,6 +58,9 @@ jobs:
       - name: New-game playtest (Pallet -> Oak -> starter -> rival battle)
         run: timeout 10m /opt/godot/godot4 --headless --path godot -- --scene=ow_playtest
 
+      - name: Spinner tiles (Viridian Gym arrow ride ends on the stop tile)
+        run: timeout 5m /opt/godot/godot4 --headless --path godot -- --scene=ow_spinner_test
+
       - name: Capture screenshots (core scenes, menus, battle, overworld)
         run: |
           mkdir -p artifacts/screenshots

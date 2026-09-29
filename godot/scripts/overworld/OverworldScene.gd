@@ -1,3 +1,4 @@
+class_name OverworldScene
 extends Node3D
 ## The 3D overworld: current map (MapLoader, built from the upstream bake), the player, NPCs, the walking
 ## partner Pokémon, the camera and day/night. Movement, collision, ledges, warps, connections and NPC idling
@@ -605,7 +606,15 @@ func _try_interact() -> void:
 		interacted.emit("follower", {"species": _follower_species})
 		var mon: GameState.PartyMon = GameState.party[0] if not GameState.party.is_empty() else null
 		if mon:
-			_dialogue.show_lines(["%s is happy to be walking with you!" % mon.nickname])
+			var mood := follower_mood(mon, _map_loader.map_name, _map_loader.is_tall_grass(player.cell), _rng)
+			var au := get_node_or_null("/root/Audio")
+			if au and au.has_method("cry"):
+				au.cry(mon.species_id)
+			var pa := _follower_actor()
+			if pa:
+				pa.play_once("Talk" if pa.has_anim("Talk") else "Idle")
+			emote_on(follower, str(mood[1]))
+			_dialogue.show_lines([str(mood[0])])
 		return
 	var story := get_node_or_null("/root/Story")
 	if a:
@@ -652,6 +661,58 @@ func _npcs_idle(dt: float) -> void:
 			act.face(["up", "down", "left", "right"][_rng.randi() % 4])
 
 # ---------------------------------------------------------------- walking partner (upstream follower.js)
+## The follower's PokemonActor (its model node), if it has one.
+func _follower_actor() -> PokemonActor:
+	for n in follower.find_children("*", "Node3D", true, false):
+		if n is PokemonActor:
+			return n
+	return null
+
+## upstream follower.js mood(): what your partner says (and which emote it shows) when you talk to it, from status, HP,
+## the place you are in, its type and level.  Returns [text, emote].
+static func follower_mood(m: GameState.PartyMon, map_name: String, in_grass: bool, rng: RandomNumberGenerator) -> Array:
+	var n := m.display_name()
+	var st := {"PSN": [n + " is shivering from the poison!", "..."], "BRN": [n + " is hurting from its burn.", "..."],
+		"PAR": [n + " is paralyzed. It can barely move!", "..."], "SLP": [n + " is fast asleep... zzz", "..."],
+		"FRZ": [n + " is frozen solid!", "..."]}
+	if st.has(m.status):
+		return st[m.status]
+	if float(m.hp) / maxf(1.0, float(m.max_hp)) < 0.25:
+		return [n + " looks exhausted. Maybe rest at a POKéMON CENTER?", "..."]
+	var lines: Array = []
+	if map_name.contains("Pokecenter") or map_name.contains("PokemonCenter"):
+		lines.append([n + " looks relaxed here.", "heart"])
+	if map_name.ends_with("Gym"):
+		lines.append([n + " is fired up for a GYM battle!", "!"])
+	if map_name.begins_with("PokemonTower"):
+		lines.append([n + " is trembling... it senses something.", "..."])
+	for cave in ["MtMoon", "RockTunnel", "DiglettsCave", "SeafoamIslands", "CeruleanCave", "VictoryRoad"]:
+		if map_name.begins_with(cave):
+			lines.append([n + " is sticking close to you in the dark.", "..."])
+	if map_name.begins_with("SafariZone"):
+		lines.append([n + " is excited by all the wild POKéMON!", "!"])
+	if map_name == "PalletTown":
+		lines.append([n + " seems to like PALLET TOWN.", "heart"])
+	if in_grass:
+		lines.append([n + " is rustling around in the tall grass!", "!"])
+	var by_type := {"FIRE": " is giving off a gentle warmth.", "WATER": " wants to go for a swim!",
+		"ELECTRIC": "'s cheeks are crackling with electricity!", "GRASS": " is soaking up the sunshine.",
+		"GHOST": " is floating around mischievously.", "PSYCHIC_TYPE": " is staring into the distance...",
+		"ICE": " is chilling the air around it.", "DRAGON": " looks proud and powerful.",
+		"FIGHTING": " is throwing punches at the air!", "BUG": " is chasing a butterfly.",
+		"FLYING": " is watching the birds overhead.", "POISON": " is sniffing the air.",
+		"ROCK": " is sitting as still as a stone.", "GROUND": " is digging at the ground."}
+	for t in GameData.get_species(m.species_id).get("types", []):
+		if by_type.has(t):
+			lines.append([n + by_type[t], "..."])
+	lines.append([n + " is happy to be walking with you!", "heart"])
+	lines.append([n + " is looking around curiously.", "?"])
+	lines.append([n + " seems to be enjoying the walk!", "heart"])
+	lines.append([n + " is keeping a close eye on you.", "..."])
+	if m.level >= 50:
+		lines.append([n + " looks strong and confident!", "!"])
+	return lines[rng.randi_range(0, lines.size() - 1)]
+
 ## upstream follower.js lead(): the first party Pokémon, while it hasn't fainted (OPTION > FOLLOWER off hides it)
 func _lead_species() -> String:
 	if bool(GameState.get_meta("no_follower", false)) or GameState.party.is_empty():
@@ -846,8 +907,9 @@ func warp_to(map_name: String, cell: Vector2i, facing: String = "") -> void:
 ## use blinds, big buildings a diagonal wipe, everything else a plain fade.
 static func style_for_map(map_name: String, entering_door: bool) -> int:
 	var n := map_name.to_lower()
-	if "cave" in n or "tunnel" in n or "mountain" in n or "hideout" in n:
-		return 4
+	for k in ["cave", "tunnel", "mtmoon", "seafoam", "victoryroad", "diglett", "hideout", "powerplant", "underground"]:
+		if k in n:
+			return 4
 	if "tower" in n or "mansion" in n or "silph" in n or "ssanne" in n:
 		return 2
 	if "gym" in n or "lab" in n or "league" in n or "indigo" in n or "lorelei" in n or "bruno" in n or "agatha" in n or "lance" in n:
@@ -887,7 +949,9 @@ func fade_in(frames: int = 10) -> void:
 
 ## Emote bubble ("!", "?", "...", "heart") above an actor for ~1 s.
 func emote(id: String, kind: String = "!") -> void:
-	var a := get_actor(id) as OwActor
+	await emote_on(get_actor(id) as OwActor, kind)
+
+func emote_on(a: OwActor, kind: String) -> void:
 	if a == null:
 		return
 	var l := _emote_node(kind)

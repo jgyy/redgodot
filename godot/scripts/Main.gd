@@ -27,6 +27,11 @@ func _ready() -> void:
 				starter = a.substr(10)
 		pt.run(starter)
 		return
+	if OS.get_cmdline_user_args().has("--scene=ow_spinner_test"):
+		var t: Node = load("res://scripts/overworld/SpinnerTest.gd").new()
+		add_child(t)
+		t.run()
+		return
 	_maybe_capture_screenshot()
 
 func _run_tests() -> void:

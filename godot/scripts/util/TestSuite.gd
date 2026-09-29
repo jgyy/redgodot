@@ -36,6 +36,7 @@ func run_all(tree: SceneTree) -> void:
 	_test_new_game_defaults()
 	AudioTests.run(self)
 	_test_models_3d(tree)
+	_test_new_features()
 	StoryTests.run(self)
 	MotionTests.run(self, tree.current_scene if tree.current_scene else tree.root)  # overworld motion continuity
 	BattleTests.run(self)  # battle engine / stage / UI (scripts/battle/BattleTests.gd)
@@ -312,6 +313,49 @@ func _test_new_game_defaults() -> void:
 
 ## Generated Pokemon / character models: every species has a glb with all clips, the cel
 ## shader applies, sprite-frame sizing works, and characters resolve to their own model.
+## Debris physics, follower moods, transitions and the Who's That Pokémon quiz.
+func _test_new_features() -> void:
+	var d := Debris.new()
+	d.ground_y = 1.0
+	d.spawn({"pos": Vector3(0, 3.0, 0), "vel": Vector3(0.5, 2.0, 0), "size": Vector3.ONE * 0.05, "life": 3.0, "bounce": 0.5})
+	var min_y := 99.0
+	var bounced := false
+	var last_vy := 0.0
+	for i in 400:
+		d._process(1.0 / 60.0)
+		if d.active_count() == 0:
+			break
+		var c: Dictionary = d._live[0]
+		min_y = minf(min_y, (c["node"] as Node3D).position.y)
+		if float(c["vel"].y) > last_vy + 1.0 and last_vy < 0.0:
+			bounced = true
+		last_vy = float(c["vel"].y)
+	check(min_y >= 1.0 - 0.001, "debris never falls through the ground (min y %f)" % min_y)
+	check(bounced, "debris bounces off the ground")
+	check(d.active_count() == 0, "debris fades out and is released")
+	d.free()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 5
+	var m := GameState.PartyMon.new("PIKACHU", 30)
+	m.status = "PSN"
+	check("poison" in str(OverworldScene.follower_mood(m, "Route1", false, rng)[0]), "poisoned follower says so")
+	m.status = ""
+	m.hp = 1
+	check("exhausted" in str(OverworldScene.follower_mood(m, "Route1", false, rng)[0]), "weak follower looks exhausted")
+	m.hp = m.max_hp
+	var mood: Array = OverworldScene.follower_mood(m, "PalletTown", false, rng)
+	check(mood.size() == 2 and ["heart", "!", "?", "..."].has(mood[1]), "follower mood has a text and an emote")
+	check(BattleTransition.FRAMES.size() == 3 and BattleTransition.KINDS.has("boss"), "wild / trainer / boss transitions exist")
+	check(OverworldScene.style_for_map("MtMoonB1F", false) == 4 and OverworldScene.style_for_map("PewterMart", true) == 1 and OverworldScene.style_for_map("Route1", false) == 0, "warp transition styles by destination")
+	var w := WtpScreen.new()
+	var ch := w.choices_for("SNORLAX")
+	check(ch.size() == 4 and ch.has("SNORLAX"), "quiz offers four species including the answer")
+	var uniq := {}
+	for c2 in ch:
+		uniq[c2] = true
+	check(uniq.size() == 4, "quiz choices are distinct")
+	w.free()
+
 func _test_models_3d(_tree: SceneTree) -> void:
 	var missing: Array = []
 	for sid in GameData.species.keys():
