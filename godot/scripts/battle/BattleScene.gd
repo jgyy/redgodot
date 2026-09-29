@@ -186,6 +186,8 @@ func _process(dt: float) -> void:
 		_step()
 	if n > 0:
 		_inp.clear()
+	# ticks are 60 Hz; what is shown is blended between the last two, so any display rate looks smooth
+	vfx.interpolate(clampf(_acc * 60.0, 0.0, 1.0))
 
 func _poll_input() -> void:
 	for a in ["confirm", "cancel", "move_up", "move_down", "move_left", "move_right"]:
@@ -205,6 +207,7 @@ func _step() -> void:
 		hud.t = _t
 	vfx.step()
 	_apply_visuals()
+	_capture_interp()
 	tick.emit()
 
 func wait(n: int) -> void:
@@ -214,12 +217,25 @@ func wait(n: int) -> void:
 ## Freezes the whole scene (screenshots): no more ticks.
 func freeze() -> void:
 	_frozen = true
+	vfx.interpolate(1.0)
+
+## The nodes the tick loop moves (platforms, holders, trainers, ball): remember this tick's pose for interpolation.
+func _capture_interp() -> void:
+	var it := vfx.interp
+	for n in [stage.enemy_anchor, stage.player_anchor, stage.enemy_platform, stage.player_platform]:
+		it.capture(n)
+	for k in _holders:
+		it.capture(_holders[k])
+	for n in [_trainer_node, _player_trainer, _ball]:
+		if n != null and is_instance_valid(n):
+			it.capture(n, true)
 
 func _apply_visuals() -> void:
 	var sh := 0.0
 	if shake > 0.0:
-		sh = roundf((randf() - 0.5) * shake * 2.0)
-		shake = maxf(0.0, shake - 0.5)
+		# a decaying wobble (two incommensurate sines) instead of white noise: reads as a shake, not as jitter
+		sh = (sin(_t * 2.3) * 0.6 + sin(_t * 3.7 + 1.3) * 0.4) * shake * 1.6
+		shake = maxf(0.0, shake - 0.35 - shake * 0.03)
 	if stage.camera:
 		stage.camera.h_offset = -sh * 0.012
 	if flash > 0.0:
@@ -268,7 +284,7 @@ func _apply_actor(k: String) -> void:
 	var o: Vector2 = offs[k]
 	var idle := 0.0
 	if show[k] and _actors.has(k) and not _mon(k).is_fainted() and _mon(k).status != "SLP":
-		idle = roundf(sin(_t / (22.0 if k == "e" else 26.0) + (0.0 if k == "e" else 2.0)) * 0.8)
+		idle = sin(_t / (22.0 if k == "e" else 26.0) + (0.0 if k == "e" else 2.0)) * 1.1
 	var sink: float = (1.0 - float(clip[k])) * float(_model_h[k])
 	h.position = (cb.x * o.x * w + cb.y * (-(o.y + idle)) * w) * anchor.global_transform.basis.inverse() - Vector3(0, sink, 0)
 	h.scale = Vector3.ONE * maxf(0.001, float(scale_k[k]))
@@ -658,7 +674,8 @@ func ball_open(k: String) -> void:
 	scale_k[k] = 0.1
 	set_tint(k, Color.WHITE, 1.0)
 	for i in range(1, 13):
-		scale_k[k] = i / 12.0
+		# pops out of the ball with a small overshoot
+		scale_k[k] = 0.1 + 0.9 * Smooth.ease_out_back(i / 12.0, 1.9)
 		set_tint(k, Color("#ffd0f0"), 1.0 - i / 14.0)
 		await tick
 	scale_k[k] = 1.0
@@ -927,11 +944,16 @@ func sync_hp(side: Variant) -> void:
 func hit_flash(side: Variant, eff: float) -> void:
 	var k := key(side)
 	_sfx("hit_super" if eff > 1.0 else ("hit_weak" if eff < 1.0 and eff > 0.0 else "hit"))
-	if eff > 1.0:
-		shake = 5.0
+	vfx.hit_react(k, eff)
+	var pa: PokemonActor = _actors[k] as PokemonActor if _actors.get(k) is PokemonActor else null
+	if pa:
+		pa.play_once("Hurt")
+	var away := 1.0 if k == "e" else -1.0
 	for i in 16:
 		vis[k] = 0.0 if (i / 2) % 2 == 1 else 1.0
-		offs[k] = Vector2((2.0 if i % 2 else -2.0) if i < 8 else 0.0, offs[k].y)
+		# recoil: knocked back, then a damped rattle back to the spot
+		var r := exp(-i * 0.28) * cos(i * 1.15)
+		offs[k] = Vector2(away * (4.0 if eff > 1.0 else 2.6) * r if i < 12 else 0.0, offs[k].y)
 		await tick
 	vis[k] = 1.0
 	offs[k] = Vector2(0, offs[k].y)
@@ -939,8 +961,11 @@ func hit_flash(side: Variant, eff: float) -> void:
 func faint(side: Variant) -> void:
 	var k := key(side)
 	_cry(_mon(k).species_id, "faint")
+	if _actors.get(k) is PokemonActor:
+		(_actors[k] as PokemonActor).play("Faint")
+	vfx.faint_fx(k)
 	for i in 20:
-		clip[k] = 1.0 - i / 20.0
+		clip[k] = 1.0 - Smooth.ease_in(i / 20.0, 1.7)   # slumps slowly, then drops out of sight
 		await tick
 	show[k] = false
 	clip[k] = 1.0
@@ -951,7 +976,7 @@ func withdraw(side: Variant) -> void:
 	if k == "p":
 		await msg(_mon(k).display_name() + ", come back!", {"auto": 8})
 	for i in range(12, -1, -1):
-		scale_k[k] = i / 12.0
+		scale_k[k] = 1.0 - Smooth.ease_in(1.0 - i / 12.0, 1.8)   # sucked into the ball: slow start, fast finish
 		set_tint(k, Color("#ff8080"), 1.0 - i / 12.0)
 		await tick
 	show[k] = false
@@ -988,6 +1013,8 @@ func exp_bar(m: GameState.PartyMon, from: int, to: int) -> void:
 
 func level_stats(m: GameState.PartyMon, old: Dictionary) -> void:
 	_sfx("levelup")
+	if m == _mon("p"):
+		vfx.levelup_fx("p")
 	hud.stats_box = {"m": m, "old": old, "phase": 0}
 	await _wait_a()
 	hud.stats_box["phase"] = 1
@@ -1013,11 +1040,14 @@ func stat_anim(side: Variant, up: bool) -> void:
 
 func anim(move_id: String, side: Variant, hit: int) -> void:
 	var k := key(side)
-	if _actors.has(k) and _actors[k] is PokemonActor and hit == 0:
-		(_actors[k] as PokemonActor).play("Attack")
+	var pa: PokemonActor = _actors[k] as PokemonActor if _actors.get(k) is PokemonActor else null
+	if pa and hit == 0:
+		# damaging moves swing the Attack clip, self-targeting ones the Special clip; both hand back to Idle
+		# with a crossfade by themselves (PokemonActor.play_once queues it)
+		pa.play_once("Special" if BattleVfx.is_status_move(move_id) and pa.has_anim("Special") else "Attack")
 	await vfx.move(move_id, k, hit)
-	if _actors.has(k) and _actors[k] is PokemonActor:
-		(_actors[k] as PokemonActor).play("Idle")
+	if pa and is_instance_valid(pa) and pa.current_clip() not in ["Idle", "Attack", "Special", "Hurt"]:
+		pa.play("Idle")
 
 func hide_side(side: Variant, h: bool) -> void:
 	hidden[key(side)] = h
@@ -1302,12 +1332,30 @@ func pose(state: String, o: Dictionary) -> void:
 	if state == "vfx":
 		await _pose_vfx(str(o.get("move", "TACKLE")), str(o.get("attacker", "p")), float(o.get("vfx_t", 0.55)))
 
+## A move id, or "status:PSN" / "stat:up" / "stat:down" / "levelup" / "faint" / "hit:2.0" to preview those effects.
+func _run_vfx(move_id: String, k: String) -> void:
+	if move_id.begins_with("status:"):
+		await vfx.status(k, move_id.substr(7))
+	elif move_id.begins_with("stat:"):
+		await vfx.stat(k, move_id.substr(5) == "up")
+	elif move_id == "levelup":
+		vfx.levelup_fx(k)
+		await vfx.wait(60)
+	elif move_id == "faint":
+		vfx.faint_fx(k)
+		await vfx.wait(30)
+	elif move_id.begins_with("hit:"):
+		vfx.hit_react(k, float(move_id.substr(4)))
+		await vfx.wait(24)
+	else:
+		await vfx.move(move_id, k, 0)
+
 ## Runs a move animation to completion synchronously; returns its length in
 ## frames, or -1 if it never finishes (used by the tests on every move).
 func vfx_frames(move_id: String, k: String) -> int:
 	var done := [false]
 	var run1 := func() -> void:
-		await vfx.move(move_id, k, 0)
+		await _run_vfx(move_id, k)
 		done[0] = true
 	run1.call()
 	var total := 0
@@ -1327,7 +1375,7 @@ func _pose_vfx(move_id: String, k: String, frac: float) -> void:
 	var total := 0
 	var done := [false]
 	var run1 := func() -> void:
-		await vfx.move(move_id, k, 0)
+		await _run_vfx(move_id, k)
 		done[0] = true
 	run1.call()
 	while not done[0] and total < 600:
@@ -1347,7 +1395,7 @@ func _pose_vfx(move_id: String, k: String, frac: float) -> void:
 	vfx.rng.seed = 7
 	var cap := maxi(1, int(floor(total * frac)))
 	var run2 := func() -> void:
-		await vfx.move(move_id, k, 0)
+		await _run_vfx(move_id, k)
 	run2.call()
 	for i in cap:
 		_step()

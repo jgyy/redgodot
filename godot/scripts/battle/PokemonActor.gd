@@ -51,9 +51,13 @@ func play(anim_name: String) -> void:
 func play_once(anim_name: String) -> void:
 	if _anim == null or not _anim.has_animation(anim_name):
 		return
-	_anim.play(anim_name)
+	_anim.play(anim_name, 0.06)   # quick lead-in, the hand-back to Idle uses the longer blend from AnimUtil
 	if anim_name != "Faint":
 		_anim.queue("Idle")
+
+## Name of the clip that is playing now ("" if none).
+func current_clip() -> String:
+	return _anim.current_animation if _anim else ""
 
 func has_anim(anim_name: String) -> bool:
 	return _anim != null and _anim.has_animation(anim_name)
