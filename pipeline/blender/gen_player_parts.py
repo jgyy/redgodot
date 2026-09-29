@@ -231,7 +231,8 @@ def main():
     if jobs > 1 and len(names) > 1:
         procs = [subprocess.Popen([sys.executable, os.path.abspath(__file__), '--only', ','.join(names[i::jobs]), '--out', out_dir])
                  for i in range(jobs) if names[i::jobs]]
-        if any(p.wait() for p in procs):
+        codes = [p.wait() for p in procs]   # wait for every worker (any(generator) stopped at the first failure and orphaned the rest)
+        if any(codes):
             sys.exit(1)
     else:
         os.makedirs(out_dir, exist_ok=True)

@@ -73,7 +73,13 @@ static func _texture(mi: MeshInstance3D, path: String, colors: Dictionary) -> vo
 		return
 	for i in mi.mesh.get_surface_count():
 		var m := mi.get_surface_override_material(i) as ShaderMaterial
-		if m == null:
+		if m == null:   # toon = false: plain StandardMaterial3D, give it its own copy carrying the recoloured atlas
+			var sm := mi.mesh.surface_get_material(i) as StandardMaterial3D
+			if sm != null:
+				var own := sm.duplicate() as StandardMaterial3D
+				own.albedo_texture = tex
+				own.albedo_color = Color.WHITE
+				mi.set_surface_override_material(i, own)
 			continue
 		m.set_shader_parameter("albedo_tex", tex)
 		m.set_shader_parameter("use_texture", true)

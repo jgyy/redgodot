@@ -9,6 +9,8 @@ def _natural(p):  # row2 before row10 (plain sorted() puts row10 first)
     return [int(t) if t.isdigit() else t for t in re.split(r'(\d+)', p)]
 
 
+if len(sys.argv) < 3:
+    sys.exit('usage: stitch_rows.py OUT.png ROW1.png [ROW2.png ...]')
 out, rows = sys.argv[1], sorted(sys.argv[2:], key=_natural)
 ims = [Image.open(p).convert('RGB') for p in rows]
 w = max(i.width for i in ims)

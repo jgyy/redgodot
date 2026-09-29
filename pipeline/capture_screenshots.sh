@@ -180,7 +180,7 @@ shot "121-creator-girl"   --scene=creator --gender=girl --row=3 --wait=2
 shot "122-creator-random" --scene=creator --random=1 --seed=3 --row=8 --wait=2
 shot "123-overworld-custom-look" --scene=overworld --map=PalletTown --pc=10,9 --look=random --seed=21 --follower=none --wait=2
 shot "124-battle-custom-look" --scene=battle --look=girl --wait=1.5
-NPC_CAST="oak,misty,brock,nurse,youngster,rocket,sailor,lass"
+NPC_CAST="oak,misty,brock,nurse,youngster,rocket,sailor,girl"   # every id must be a cast.json key ("lass" is not: it renders the untinted humanoid)
 i=0
 for clip in "Nod 0.1" "Think 0.5" "Laugh 0.1" "Bow 0.5" "Point 0.5" "Surprised 0.15" "Salute 0.5" "Stretch 0.5" "Dance 0.15" "Sad 0.5" "Shiver 0.1" "Sleep 0.5"; do
   set -- $clip

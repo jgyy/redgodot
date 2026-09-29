@@ -53,7 +53,7 @@ void fragment() {
 		float l = length(q);
 		if (l < R) {
 			vec3 ball = q.y < 0.0 ? vec3(0.86, 0.13, 0.13) : vec3(0.97, 0.97, 0.97);
-			float shine = smoothstep(0.55 * R, 0.35 * R, length(q - vec2(-0.45, -0.45) * R));
+			float shine = 1.0 - smoothstep(0.35 * R, 0.55 * R, length(q - vec2(-0.45, -0.45) * R));   // (edge0 < edge1: reversed edges are undefined in GLSL)
 			if (q.y < 0.0) ball = mix(ball, vec3(1.0, 0.55, 0.55), shine * 0.7);
 			if (abs(q.y) < 0.09 * R) ball = vec3(0.04);
 			float bl = length(q);
