@@ -238,6 +238,8 @@ func _bench(_h: Dictionary, label: String) -> void:
 ## cable club receptionist (engine/link/cable_club_npc.asm, no link partner)
 func _cable_club(_o: Dictionary) -> void:
 	await Story.say("CableClubNPCWelcomeText")
+	if Story.flag("EVENT_GOT_POKEDEX"):
+		await Story.solo_trade_center()   # port extension: trade evolution without a second Game Boy
 	await Story.wait(60)
 	await Story.say("CableClubNPCAreaReservedFor2FriendsLinkedByCableText" if Story.flag("EVENT_GOT_POKEDEX") else "CableClubNPCMakingPreparationsText")
 

@@ -206,6 +206,7 @@ func _cable_club(_o: Dictionary) -> void:
 		await Story.say("CableClubNPCAreaReservedFor2FriendsLinkedByCableText")
 		return
 	await Story.say("CableClubNPCWelcomeText")
+	await Story.solo_trade_center()   # port extension: trade evolution without a second Game Boy
 	await Story.say("CableClubNPCLinkClosedBecauseOfInactivityText")
 
 func _show_dex(sp: String) -> void:

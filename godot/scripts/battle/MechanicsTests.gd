@@ -5,6 +5,23 @@ extends RefCounted
 ## boosts, the single SPECIAL stat, trapping moves, MIRROR MOVE, METRONOME, TRANSFORM, SUBSTITUTE, HAZE, MIST,
 ## LEECH SEED, RAGE, COUNTER, BIDE, DISABLE, EXPLOSION, DREAM EATER, PSYWAVE, OHKO, multi-hit, two-turn moves ...
 
+class FakePS extends RefCounted:
+	var said: Array = []
+	var answers: Array = []
+	var picks: Array = []
+
+	func party_say(text: String) -> void:
+		said.append(text)
+
+	func ask(_text: String) -> bool:
+		return bool(answers.pop_front()) if not answers.is_empty() else true
+
+	func choose(_items: Array, _opts: Dictionary = {}) -> int:
+		return int(picks.pop_front()) if not picks.is_empty() else 0
+
+	func said_has(s: String) -> bool:
+		return said.any(func(x): return str(x).contains(s))
+
 static func _eng(pl: String, plv: int, en: String, elv: int, seed_v: int = 1) -> Array:
 	GameState.party = [GameState.PartyMon.new(pl, plv, {"atk": 8, "def": 8, "spd": 8, "spc": 8})]
 	var foe_mon := GameState.PartyMon.new(en, elv, {"atk": 8, "def": 8, "spd": 8, "spc": 8})
@@ -30,6 +47,7 @@ static func run(t: TestSuite) -> void:
 	_field_effects(t)
 	_counter_bide_rage(t)
 	_two_turn(t)
+	_field_items(t)
 	_status(t)
 	_misc(t)
 	GameState.party = saved_party
@@ -418,6 +436,96 @@ static func _two_turn(t: TestSuite) -> void:
 	b = a[0]
 	_use(b, b.p, "THRASH")
 	t.check(not (b.p.v["thrash"] as Dictionary).is_empty(), "THRASH locks the user in for 2-3 turns")
+
+# ---------------------------------------------------------------- bag items used on a POKeMON outside battle
+static func _field_items(t: TestSuite) -> void:
+	var ps := FakePS.new()
+	# TM: compatible / already known / not compatible / a full moveset asks what to forget
+	var m := GameState.PartyMon.new("CHARMANDER", 20)
+	t.check(BagMenu.needs_target("TM_BODY_SLAM") and BagMenu.needs_target("FIRE_STONE") and BagMenu.needs_target("PP_UP") and BagMenu.needs_target("PROTEIN"),
+		"TMs, stones, vitamins and PP UP go to the party pick")
+	m.moves = ["SCRATCH", "GROWL"]
+	var r: int = _use_item("TM_BODY_SLAM", m, ps)
+	t.check(r == FieldItems.USED and m.moves.has("BODY_SLAM"), "a TM teaches a compatible move and is used up")
+	r = _use_item("TM_BODY_SLAM", m, ps)
+	t.check(r == FieldItems.NOTHING and ps.said_has("knows"), "a TM for a known move does nothing")
+	var p := GameState.PartyMon.new("PIDGEY", 10)
+	r = _use_item("TM_BLIZZARD", p, ps)
+	t.check(r == FieldItems.NOTHING and ps.said_has("not compatible"), "PIDGEY is not compatible with BLIZZARD")
+	m.moves = ["SCRATCH", "GROWL", "EMBER", "LEER"]
+	m.pp = {"SCRATCH": 35, "GROWL": 40, "EMBER": 25, "LEER": 30}
+	m.pp_max = m.pp.duplicate()
+	ps.answers = [true]
+	ps.picks = [1]
+	r = _use_item("TM_SWORDS_DANCE", m, ps)
+	t.check(r == FieldItems.USED and m.moves == ["SCRATCH", "SWORDS_DANCE", "EMBER", "LEER"], "a full moveset forgets the chosen move (%s)" % str(m.moves))
+	ps.answers = [false]
+	r = _use_item("TM_SWIFT", m, ps)
+	t.check(r == FieldItems.NOTHING and not m.moves.has("SWIFT"), "declining to forget keeps the TM")
+	# HM: taught but never used up; can't be forgotten
+	m.moves = ["SCRATCH", "GROWL", "EMBER", "SWORDS_DANCE"]
+	ps.answers = [true]
+	ps.picks = [0]
+	r = _use_item("HM_CUT", m, ps)
+	t.check(r == FieldItems.KEPT and m.moves.has("CUT"), "an HM is taught and stays in the bag")
+	# evolution stones
+	var ev := GameState.PartyMon.new("EEVEE", 20)
+	r = _use_item("MOON_STONE", ev, ps)
+	t.check(r == FieldItems.NOTHING and ev.species_id == "EEVEE", "the wrong stone does nothing")
+	r = _use_item("WATER_STONE", ev, ps)
+	t.check(r == FieldItems.USED and ev.species_id == "VAPOREON" and GameState.caught_species.has("VAPOREON"), "WATER STONE: EEVEE -> VAPOREON")
+	var pk := GameState.PartyMon.new("PIKACHU", 20)
+	r = _use_item("THUNDER_STONE", pk, ps)
+	t.check(r == FieldItems.USED and pk.species_id == "RAICHU", "THUNDER STONE: PIKACHU -> RAICHU")
+	for pair in [["GROWLITHE", "FIRE_STONE", "ARCANINE"], ["NIDORINA", "MOON_STONE", "NIDOQUEEN"], ["GLOOM", "LEAF_STONE", "VILEPLUME"],
+			["POLIWHIRL", "WATER_STONE", "POLIWRATH"], ["STARYU", "WATER_STONE", "STARMIE"], ["EXEGGCUTE", "LEAF_STONE", "EXEGGUTOR"],
+			["SHELLDER", "WATER_STONE", "CLOYSTER"], ["CLEFAIRY", "MOON_STONE", "CLEFABLE"], ["JIGGLYPUFF", "MOON_STONE", "WIGGLYTUFF"],
+			["VULPIX", "FIRE_STONE", "NINETALES"], ["WEEPINBELL", "LEAF_STONE", "VICTREEBEL"], ["NIDORINO", "MOON_STONE", "NIDOKING"]]:
+		var sm := GameState.PartyMon.new(pair[0], 30)
+		_use_item(pair[1], sm, ps)
+		t.check(sm.species_id == pair[2], "%s + %s -> %s" % [pair[0], pair[1], pair[2]])
+	# trade evolutions (the TRADE CENTER)
+	var kd := GameState.PartyMon.new("KADABRA", 30)
+	t.check(FieldItems.trade_target(kd) == "ALAKAZAM" and FieldItems.trade_target(GameState.PartyMon.new("HAUNTER", 30)) == "GENGAR"
+		and FieldItems.trade_target(GameState.PartyMon.new("MACHOKE", 30)) == "MACHAMP" and FieldItems.trade_target(GameState.PartyMon.new("GRAVELER", 30)) == "GOLEM"
+		and FieldItems.trade_target(GameState.PartyMon.new("PIDGEY", 5)) == "", "trade evolutions: KADABRA, MACHOKE, GRAVELER, HAUNTER")
+	Callable(FieldItems, "evolve").call(kd, "ALAKAZAM", ps)
+	t.check(kd.species_id == "ALAKAZAM" and ps.said_has("evolved into ALAKAZAM"), "evolving announces the new form")
+	# vitamins: +2560 stat exp, at most 25600
+	var v := GameState.PartyMon.new("MACHOP", 30)
+	var atk0 := v.stat("atk")
+	r = _use_item("PROTEIN", v, ps)
+	t.check(r == FieldItems.USED and int(v.sexp["atk"]) == 2560 and v.stat("atk") >= atk0, "PROTEIN adds 2560 stat exp")
+	for i in 12:
+		_use_item("PROTEIN", v, ps)
+	t.check(int(v.sexp["atk"]) == 25600, "vitamins stop at 25600 stat exp (%d)" % int(v.sexp["atk"]))
+	r = _use_item("PROTEIN", v, ps)
+	t.check(r == FieldItems.NOTHING, "a maxed stat refuses more vitamins")
+	var hp0 := v.max_hp
+	_use_item("HP_UP", v, ps)
+	t.check(v.max_hp >= hp0 and v.hp == v.max_hp - (v.max_hp - v.hp), "HP UP raises max HP")
+	# PP UP: +1/5 of base PP, three times, current PP untouched; ETHER / ELIXER restore
+	var pm := GameState.PartyMon.new("PIKACHU", 30)
+	pm.moves = ["THUNDERSHOCK", "GROWL"]
+	pm.pp = {"THUNDERSHOCK": 10, "GROWL": 40}
+	pm.pp_max = {"THUNDERSHOCK": 30, "GROWL": 40}
+	ps.picks = [0, 0, 0, 0, 0]
+	for i in 3:
+		r = _use_item("PP_UP", pm, ps)
+	t.check(pm.max_pp("THUNDERSHOCK") == 30 + 3 * 6 and pm.pp["THUNDERSHOCK"] == 10, "PP UP x3 on a 30 PP move: 48 max (%d)" % pm.max_pp("THUNDERSHOCK"))
+	r = _use_item("PP_UP", pm, ps)
+	t.check(r == FieldItems.NOTHING, "a 4th PP UP does nothing")
+	ps.picks = [0]
+	_use_item("ETHER", pm, ps)
+	t.check(pm.pp["THUNDERSHOCK"] == 20, "ETHER restores 10 PP")
+	pm.pp["GROWL"] = 5
+	_use_item("MAX_ELIXER", pm, ps)
+	t.check(pm.pp["GROWL"] == 40 and pm.pp["THUNDERSHOCK"] == 48, "MAX ELIXER restores every move")
+
+## FieldItems.use() is a coroutine; against FakePS nothing ever suspends, so Callable.call() hands back its result.
+static func _use_item(id: String, m: GameState.PartyMon, ps: Object) -> int:
+	var r: Variant = Callable(FieldItems, "use").call(id, m, ps)
+	return int(r) if r is int else -1
 
 # ---------------------------------------------------------------- major status rules
 static func _status(t: TestSuite) -> void:

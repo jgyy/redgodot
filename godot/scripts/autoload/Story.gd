@@ -906,6 +906,25 @@ func in_game_trade(idx: int, texts: Dictionary) -> void:
 	await say(GameState.player_name + " traded " + mon_name(m) + " for " + str(tr["nick"]) + "!")
 	await say(texts.get("done", "Thanks!"))
 
+## Cable Club TRADE CENTER with nobody on the other end of the link cable. The cartridges need a second Game Boy to
+## trade, which is the only way KADABRA, MACHOKE, GRAVELER and HAUNTER evolve; this port lets you send one of your own
+## POKeMON through the machine (to yourself) so those four lines, and everything that needs them, stay reachable.
+func solo_trade_center() -> void:
+	if not await ask("Use the TRADE CENTER by yourself?\fA POKéMON sent through the link comes back changed, if it evolves by trading."):
+		return
+	var i := await party_screen("Send which POKéMON?")
+	if i < 0:
+		return
+	var m: GameState.PartyMon = GameState.party[i]
+	var to := FieldItems.trade_target(m)
+	if to == "":
+		await say("Nothing happened. %s doesn't evolve by trading." % m.display_name())
+		return
+	await fade_out(10)
+	await wait(40)
+	await fade_in(10)
+	await FieldItems.evolve(m, to, FieldItems.StoryPS.new())
+
 func trade_animation(give_m: Object, get_m: Object) -> void:
 	var u := get_ui()
 	if u and u.has_method("trade_animation"):
