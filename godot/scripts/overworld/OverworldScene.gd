@@ -60,6 +60,14 @@ var flashed := false         # FLASH used (dark caves)
 var _pending_land := false
 var _exit_redirect: Array = []   # [to_map, warp_index] for every exit warp of this map (elevators)
 var _shake := 0.0
+var _shake_t := 0.0
+var ow_fx: OwFx
+# camera: critically damped follow with the player's velocity fed forward (no lag at a steady pace, no overshoot
+# when it stops), snapped on warps and map changes
+const CAM_OMEGA := 22.0
+var _cam_pos := Vector3.ZERO
+var _cam_vel := Vector3.ZERO
+var _cam_snap := true
 var _flash_rect: ColorRect
 var _heal_count := 0
 
@@ -79,14 +87,18 @@ func _ready() -> void:
 	_setup_camera()
 	_build_fade()
 	_build_ambient()
+	ow_fx = OwFx.new()
+	add_child(ow_fx)
 	player = OwActor.new()
 	player.name = "Player"
 	add_child(player)
+	player.fx = ow_fx
 	player.setup("red")
 	player.step_finished.connect(_on_player_step)
 	follower = OwActor.new()
 	follower.name = "Follower"
 	add_child(follower)
+	follower.fx = ow_fx
 	_load_map(GameState.current_map, GameState.player_cell, GameState.player_facing)
 	_dialogue = DialogueBox.new()
 	add_child(_dialogue)
@@ -216,7 +228,9 @@ func _load_map(map_name: String, cell: Vector2i, facing: String) -> void:
 	_light_key = ""
 	_update_lighting()
 	_apply_ambient_env()
-	_update_camera()
+	ow_fx.clear()
+	_cam_snap = true
+	_update_camera(0.0)
 	entered_map.emit(map_name)
 	var story := get_node_or_null("/root/Story")
 	# captures of a location (--story=off) show the map as it stands, without its enter scripts
@@ -254,6 +268,7 @@ func _update_lighting() -> void:
 	var cloudy_env := (_map_loader.outdoor and not mn.begins_with("PokemonTower")) or mn.begins_with("SafariZone")
 	_map_loader.set_clouds(cloudy_env and float(td.night) < 0.5)
 	LightingRig.apply_3d(_sun, _world_env.environment, g, _map_loader.interior)
+	ow_fx.set_grade(g)
 
 # ---------------------------------------------------------------- per frame
 func _process(dt: float) -> void:
@@ -261,24 +276,50 @@ func _process(dt: float) -> void:
 		return
 	_update_lighting()
 	var ui_open := _start_menu.is_open() or _dialogue.visible or _ui_busy()
+	# the d-pad let go (or a menu opened) while a step runs: the walkers ease into the stop instead of halting dead
+	var held := _input_dir() != "" and not ui_open
+	if not held:
+		var st := _story()
+		held = st != null and st.has_method("forced_direction") and String(st.forced_direction()) != ""
+	player.stop_hint = not held
+	follower.stop_hint = not held
 	if not ui_open and _locks == 0 and not _busy:
 		_player_control(dt)
 		_npcs_idle(dt)
 	elif not player.moving:
 		_was_moving = false
-	_update_camera()
+	_update_camera(dt)
 	_update_follower_visibility()
 
-func _update_camera() -> void:
+func _update_camera(dt: float) -> void:
 	if player == null:
 		return
 	var target := player.position + Vector3(0.0, 0.0, 0.5 - OwActor.FOOT_Z)
-	_camera_rig.position = target
+	if _cam_snap or dt <= 0.0 or (target - _cam_pos).length() > 6.0:
+		_cam_pos = target
+		_cam_vel = Vector3.ZERO
+		_cam_snap = false
+	else:
+		# Aim slightly ahead along the player's velocity. A critically damped spring lags v * 2 / omega behind a
+		# target moving at v; leading by half of that leaves a lag of v / omega, which is exactly the most the
+		# camera can trail by and still never overshoot when the player stops dead.
+		var lead := player.velocity * (1.0 / CAM_OMEGA)
+		lead.y = 0.0
+		var aim := target + lead
+		var r := Smooth.damp3(_cam_pos, _cam_vel, aim, CAM_OMEGA, dt)
+		_cam_pos = r[0]
+		_cam_vel = r[1]
+	_camera_rig.position = _cam_pos
 	if _shake > 0.0:
-		_camera_rig.position += Vector3(randf_range(-0.5, 0.5), 0.0, randf_range(-0.5, 0.5)) * _shake / 16.0
-		_shake = _shake * 0.9 if _shake > 0.5 else 0.0
+		_shake_t += dt
+		# smooth two-axis wobble instead of white noise, decaying at upstream's 0.9 per 60 Hz frame
+		var w := Vector3(sin(_shake_t * 131.0), 0.0, sin(_shake_t * 97.0 + 1.7))
+		_camera_rig.position += w * _shake / 16.0
+		_shake *= pow(0.9, dt * 60.0)
+		if _shake <= 0.5:
+			_shake = 0.0
 	if _amb_rect and _amb_rect.visible:
-		_amb_mat.set_shader_parameter("cam_px", Vector2(target.x * 16.0 - 160.0, target.z * 16.0 - 90.0))
+		_amb_mat.set_shader_parameter("cam_px", Vector2(_cam_pos.x * 16.0 - 160.0, _cam_pos.z * 16.0 - 90.0))
 
 func _input_dir() -> String:
 	if Input.is_action_pressed("move_up"):
@@ -332,13 +373,19 @@ func _step_player(d: String, speed: float, r: Dictionary) -> void:
 	var jump: bool = r.get("jump", false)
 	_pending_conn = r.get("conn", {})
 	_pending_land = bool(r.get("land", false))
-	player.start_move(d, 2.0 if jump else speed, jump)
+	# a held d-pad means the next step follows straight away: don't slow down at the end of this one
+	var story := _story()
+	var forced: String = String(story.forced_direction()) if story and story.has_method("forced_direction") else ""
+	var more := (_input_dir() == d or forced == d) and not jump
+	var target: Vector2i = from + OwActor.DIRS[d]
+	_set_ground_fx(player, target)
+	player.start_move(d, 2.0 if jump else speed, jump, more)
 	_was_moving = true
 	_arrived_dir = ""
-	var target: Vector2i = from + OwActor.DIRS[d]
 	if _map_loader.is_tall_grass(target):
 		TileKit.rustle(_map_loader.grass_node, target)
-	_follower_follow(from, speed, jump)
+		ow_fx.grass(OwActor.cell_pos(target), 4)
+	_follower_follow(from, speed, jump, more)
 
 ## upstream Overworld.canMove -> {ok, jump, conn}
 func can_move(who: OwActor, dir: String) -> Dictionary:
@@ -582,7 +629,18 @@ func _follower_px(sp: String) -> float:
 	var size := clampf(roundf(10.0 + 9.0 * sqrt(feet)), 16.0, 42.0) if feet > 0.0 else 28.0
 	return size * 0.8
 
-func _follower_follow(from: Vector2i, speed: float, jump: bool) -> void:
+## What an actor kicks up while stepping onto `target`: nothing indoors or on water, blades in tall grass, dust on
+## open ground.
+func _set_ground_fx(a: OwActor, target: Vector2i) -> void:
+	var m := _map_loader
+	if m == null or not m.outdoor or m.is_water(target):
+		a.fx_kind = ""
+	elif m.is_tall_grass(target):
+		a.fx_kind = ""
+	else:
+		a.fx_kind = "dust"
+
+func _follower_follow(from: Vector2i, speed: float, jump: bool, more: bool = false) -> void:
 	if _follower_species == "":
 		return
 	var dv := from - follower.cell
@@ -591,7 +649,8 @@ func _follower_follow(from: Vector2i, speed: float, jump: bool) -> void:
 	if far == 0:
 		follower.face(player.facing)
 	elif far == 1:
-		follower.start_move(dir, speed)
+		_set_ground_fx(follower, from)
+		follower.start_move(dir, speed, false, more)
 	elif far == 2 and (dv.x == 0 or dv.y == 0):
 		follower.start_move(dir, 2.0, true)
 	else:
@@ -649,14 +708,15 @@ func move_actor(id: String, path: String) -> void:
 	if a == null:
 		return
 	a.scripted = true
-	for ch in path:
-		var d: String = LETTER.get(ch.to_upper(), "")
+	for idx in path.length():
+		var d: String = LETTER.get(path[idx].to_upper(), "")
 		if d == "":
 			continue
 		var from := a.cell
-		a.start_move(d, 1.0)
+		var more := idx < path.length() - 1
+		a.start_move(d, 1.0, false, more)
 		if a == player:
-			_follower_follow(from, 1.0, false)
+			_follower_follow(from, 1.0, false, more)
 		await a.step_finished
 		if a == player:
 			GameState.player_cell = a.cell

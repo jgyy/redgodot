@@ -98,6 +98,21 @@ func _setup_scene(scene: String, args: Dictionary) -> void:
 			add_child(sheet)
 			await sheet.run(args, out)
 			await get_tree().create_timer(3600.0).timeout
+		"motion_lab":
+			# scripts/tools/MotionLab.gd: walk the real player along --path and record what is on screen
+			GameState.new_game(args.get("player", "CHARMANDER"))
+			args["map"] = args.get("map", "PalletTown")
+			args["pc"] = args.get("pc", "10,9")
+			_apply_overrides(args)
+			SceneRouter.goto_overworld()
+			await get_tree().process_frame
+			var lab: Node = load("res://scripts/tools/MotionLab.gd").new()
+			add_child(lab)
+			var lab_out := ""
+			for a in OS.get_cmdline_user_args():
+				if a.begins_with("--screenshot="):
+					lab_out = a.substr("--screenshot=".length())
+			await lab.run(args, lab_out)
 		"battle":
 			await _setup_battle(args)
 		"dialogue":
