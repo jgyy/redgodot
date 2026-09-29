@@ -88,8 +88,28 @@ def mask_poly(R, pts):
     return inside
 
 
-def stroke_segments(pts, w1, w2):
-    lens = [math.hypot(pts[k + 1][0] - pts[k][0], pts[k + 1][1] - pts[k][1]) for k in range(len(pts) - 1)]
+def smooth_polyline(pts, per_seg=4):
+    """Catmull-Rom resampling of a polyline (passes through every original point): the sprite's few
+    control points become a smooth curve, so tails / serpents / tentacles bend instead of kinking."""
+    n = len(pts)
+    if n < 3:
+        return list(pts)
+    P = [pts[0]] + list(pts) + [pts[-1]]
+    out = [pts[0]]
+    for i in range(1, n):
+        p0, p1, p2, p3 = P[i - 1], P[i], P[i + 1], P[i + 2]
+        for s in range(1, per_seg + 1):
+            t = s / float(per_seg)
+            t2, t3 = t * t, t * t * t
+            out.append(tuple(0.5 * ((2 * p1[k]) + (-p0[k] + p2[k]) * t + (2 * p0[k] - 5 * p1[k] + 4 * p2[k] - p3[k]) * t2
+                                    + (-p0[k] + 3 * p1[k] - 3 * p2[k] + p3[k]) * t3) for k in (0, 1)))
+    return out
+
+
+def stroke_segments(pts, w1, w2, smooth=True):
+    if smooth and 3 <= len(pts) <= 12:
+        pts = smooth_polyline(pts)
+    lens =[math.hypot(pts[k + 1][0] - pts[k][0], pts[k + 1][1] - pts[k][1]) for k in range(len(pts) - 1)]
     total = sum(lens) or 1.0
     out, acc = [], 0.0
     for k, l in enumerate(lens):

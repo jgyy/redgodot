@@ -161,40 +161,50 @@
    "height_m": 0.711,
    "px_height": 43.48,
    "groups": 7,
-   "tris": 8514,
+   "tris": 8560,
    "bones": 7,
    "materials": 1,
-   "bytes_tex": 20704,
+   "bytes_tex": 27278,
    "file": "BULBASAUR.glb",
-   "bytes": 311528,
+   "bytes": 316172,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x384",
+   "palette_delta_e": 4.5,
+   "missing_features": [
+    "ear",
+    "claw"
+   ]
   },
   "CHARMANDER": {
    "height_m": 0.61,
-   "px_height": 46.54,
+   "px_height": 46.86,
    "groups": 9,
-   "tris": 6212,
-   "bones": 14,
+   "tris": 6303,
+   "bones": 15,
    "materials": 1,
-   "bytes_tex": 17722,
+   "bytes_tex": 28490,
    "file": "CHARMANDER.glb",
-   "bytes": 293320,
+   "bytes": 303264,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 4.5,
+   "missing_features": [
+    "claw"
+   ]
   },
   "SQUIRTLE": {
    "height_m": 0.508,
-   "px_height": 51.47,
+   "px_height": 51.45,
    "groups": 7,
-   "tris": 7612,
+   "tris": 7632,
    "bones": 10,
    "materials": 1,
-   "bytes_tex": 18368,
+   "bytes_tex": 18588,
    "file": "SQUIRTLE.glb",
-   "bytes": 308660,
+   "bytes": 309492,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 5.9
   },
   "CATERPIE": {
    "height_m": 0.305,
@@ -203,11 +213,12 @@
    "tris": 5000,
    "bones": 8,
    "materials": 1,
-   "bytes_tex": 8886,
+   "bytes_tex": 9802,
    "file": "CATERPIE.glb",
-   "bytes": 202452,
+   "bytes": 203760,
    "status": "generated",
-   "texture": "1024x192"
+   "texture": "1024x192",
+   "palette_delta_e": 6.4
   },
   "WEEDLE": {
    "height_m": 0.305,
@@ -216,24 +227,29 @@
    "tris": 5000,
    "bones": 8,
    "materials": 1,
-   "bytes_tex": 5514,
+   "bytes_tex": 6690,
    "file": "WEEDLE.glb",
-   "bytes": 200548,
+   "bytes": 202496,
    "status": "generated",
-   "texture": "1024x192"
+   "texture": "1024x192",
+   "palette_delta_e": 9.0,
+   "missing_features": [
+    "tail"
+   ]
   },
   "PIDGEY": {
    "height_m": 0.305,
-   "px_height": 37.28,
+   "px_height": 37.29,
    "groups": 9,
    "tris": 5000,
    "bones": 14,
    "materials": 1,
-   "bytes_tex": 17722,
+   "bytes_tex": 17280,
    "file": "PIDGEY.glb",
-   "bytes": 251376,
+   "bytes": 251196,
    "status": "generated",
-   "texture": "1024x192"
+   "texture": "1024x192",
+   "palette_delta_e": 11.3
   },
   "RATTATA": {
    "height_m": 0.305,
@@ -242,24 +258,26 @@
    "tris": 5000,
    "bones": 14,
    "materials": 1,
-   "bytes_tex": 22388,
+   "bytes_tex": 23102,
    "file": "RATTATA.glb",
-   "bytes": 254740,
+   "bytes": 254504,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 3.0
   },
   "FEAROW": {
    "height_m": 1.194,
-   "px_height": 60.0,
+   "px_height": 60.26,
    "groups": 12,
-   "tris": 7388,
+   "tris": 7452,
    "bones": 20,
    "materials": 1,
-   "bytes_tex": 47274,
+   "bytes_tex": 47726,
    "file": "FEAROW.glb",
-   "bytes": 359240,
+   "bytes": 361620,
    "status": "generated",
-   "texture": "1024x448"
+   "texture": "1024x448",
+   "palette_delta_e": 10.9
   },
   "PIKACHU": {
    "height_m": 0.406,
@@ -268,11 +286,12 @@
    "tris": 6558,
    "bones": 18,
    "materials": 1,
-   "bytes_tex": 40862,
+   "bytes_tex": 39682,
    "file": "PIKACHU.glb",
    "bytes": 332724,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 0.0
   },
   "SANDSLASH": {
    "height_m": 0.991,
@@ -281,11 +300,12 @@
    "tris": 8259,
    "bones": 22,
    "materials": 1,
-   "bytes_tex": 46550,
+   "bytes_tex": 46268,
    "file": "SANDSLASH.glb",
    "bytes": 401964,
    "status": "generated",
-   "texture": "1024x448"
+   "texture": "1024x448",
+   "palette_delta_e": 13.4
   },
   "NIDOQUEEN": {
    "height_m": 1.295,
@@ -294,50 +314,57 @@
    "tris": 8348,
    "bones": 18,
    "materials": 1,
-   "bytes_tex": 39584,
+   "bytes_tex": 40204,
    "file": "NIDOQUEEN.glb",
-   "bytes": 385080,
+   "bytes": 385424,
    "status": "generated",
-   "texture": "1024x448"
+   "texture": "1024x448",
+   "palette_delta_e": 4.4
   },
   "NIDOKING": {
    "height_m": 1.397,
    "px_height": 58.88,
    "groups": 13,
-   "tris": 8770,
+   "tris": 8776,
    "bones": 15,
    "materials": 1,
-   "bytes_tex": 45566,
+   "bytes_tex": 46614,
    "file": "NIDOKING.glb",
-   "bytes": 385708,
+   "bytes": 385000,
    "status": "generated",
-   "texture": "1024x512"
+   "texture": "1024x512",
+   "palette_delta_e": 9.7
   },
   "VULPIX": {
    "height_m": 0.61,
    "px_height": 40.96,
    "groups": 16,
-   "tris": 5842,
-   "bones": 35,
+   "tris": 5986,
+   "bones": 34,
    "materials": 1,
-   "bytes_tex": 47094,
+   "bytes_tex": 48854,
    "file": "VULPIX.glb",
-   "bytes": 358408,
+   "bytes": 402264,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x448",
+   "palette_delta_e": 5.6
   },
   "WIGGLYTUFF": {
    "height_m": 0.991,
    "px_height": 52.01,
    "groups": 10,
-   "tris": 6889,
+   "tris": 6919,
    "bones": 14,
    "materials": 1,
-   "bytes_tex": 34468,
+   "bytes_tex": 34676,
    "file": "WIGGLYTUFF.glb",
-   "bytes": 310888,
+   "bytes": 310668,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x384",
+   "palette_delta_e": 5.8,
+   "missing_features": [
+    "tail"
+   ]
   },
   "ODDISH": {
    "height_m": 0.508,
@@ -346,11 +373,12 @@
    "tris": 5000,
    "bones": 8,
    "materials": 1,
-   "bytes_tex": 26382,
+   "bytes_tex": 26740,
    "file": "ODDISH.glb",
-   "bytes": 211576,
+   "bytes": 222448,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 3.5
   },
   "PARAS": {
    "height_m": 0.305,
@@ -359,37 +387,40 @@
    "tris": 5628,
    "bones": 15,
    "materials": 1,
-   "bytes_tex": 24762,
+   "bytes_tex": 24690,
    "file": "PARAS.glb",
    "bytes": 260056,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 10.8
   },
   "VENOMOTH": {
    "height_m": 1.499,
    "px_height": 50.14,
    "groups": 12,
-   "tris": 6670,
+   "tris": 6676,
    "bones": 19,
    "materials": 1,
-   "bytes_tex": 35718,
+   "bytes_tex": 37000,
    "file": "VENOMOTH.glb",
-   "bytes": 314936,
+   "bytes": 316760,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x384",
+   "palette_delta_e": 7.9
   },
   "MEOWTH": {
    "height_m": 0.406,
    "px_height": 45.61,
    "groups": 11,
    "tris": 5000,
-   "bones": 18,
+   "bones": 19,
    "materials": 1,
-   "bytes_tex": 33518,
+   "bytes_tex": 32990,
    "file": "MEOWTH.glb",
-   "bytes": 289372,
+   "bytes": 297248,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 7.2
   },
   "GOLDUCK": {
    "height_m": 1.702,
@@ -398,11 +429,12 @@
    "tris": 6540,
    "bones": 20,
    "materials": 1,
-   "bytes_tex": 20544,
+   "bytes_tex": 20608,
    "file": "GOLDUCK.glb",
    "bytes": 341600,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x384",
+   "palette_delta_e": 2.7
   },
   "GROWLITHE": {
    "height_m": 0.711,
@@ -411,11 +443,12 @@
    "tris": 5000,
    "bones": 16,
    "materials": 1,
-   "bytes_tex": 32548,
+   "bytes_tex": 35262,
    "file": "GROWLITHE.glb",
-   "bytes": 262260,
+   "bytes": 261932,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 4.1
   },
   "POLIWHIRL": {
    "height_m": 0.991,
@@ -424,24 +457,26 @@
    "tris": 7136,
    "bones": 8,
    "materials": 1,
-   "bytes_tex": 9970,
+   "bytes_tex": 11360,
    "file": "POLIWHIRL.glb",
    "bytes": 286340,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 4.1
   },
   "KADABRA": {
    "height_m": 1.295,
    "px_height": 57.73,
    "groups": 14,
-   "tris": 7950,
+   "tris": 8036,
    "bones": 23,
    "materials": 1,
-   "bytes_tex": 45148,
+   "bytes_tex": 45872,
    "file": "KADABRA.glb",
-   "bytes": 398324,
+   "bytes": 400880,
    "status": "generated",
-   "texture": "1024x448"
+   "texture": "1024x448",
+   "palette_delta_e": 4.7
   },
   "MACHOKE": {
    "height_m": 1.499,
@@ -450,11 +485,12 @@
    "tris": 7458,
    "bones": 13,
    "materials": 1,
-   "bytes_tex": 21986,
+   "bytes_tex": 22488,
    "file": "MACHOKE.glb",
    "bytes": 320348,
    "status": "generated",
-   "texture": "1024x448"
+   "texture": "1024x448",
+   "palette_delta_e": 14.4
   },
   "WEEPINBELL": {
    "height_m": 0.991,
@@ -463,11 +499,15 @@
    "tris": 5000,
    "bones": 6,
    "materials": 1,
-   "bytes_tex": 19996,
+   "bytes_tex": 20146,
    "file": "WEEPINBELL.glb",
-   "bytes": 194820,
+   "bytes": 196080,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 6.5,
+   "missing_features": [
+    "arm"
+   ]
   },
   "TENTACRUEL": {
    "height_m": 1.6,
@@ -476,11 +516,12 @@
    "tris": 7094,
    "bones": 27,
    "materials": 1,
-   "bytes_tex": 11926,
+   "bytes_tex": 13232,
    "file": "TENTACRUEL.glb",
-   "bytes": 344528,
+   "bytes": 350672,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x384",
+   "palette_delta_e": 13.4
   },
   "GOLEM": {
    "height_m": 1.397,
@@ -489,11 +530,12 @@
    "tris": 10146,
    "bones": 5,
    "materials": 1,
-   "bytes_tex": 33176,
+   "bytes_tex": 33524,
    "file": "GOLEM.glb",
    "bytes": 347192,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x384",
+   "palette_delta_e": 5.0
   },
   "SLOWPOKE": {
    "height_m": 1.194,
@@ -502,37 +544,40 @@
    "tris": 5000,
    "bones": 12,
    "materials": 1,
-   "bytes_tex": 15586,
+   "bytes_tex": 15754,
    "file": "SLOWPOKE.glb",
-   "bytes": 242736,
+   "bytes": 242536,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 4.9
   },
   "MAGNETON": {
    "height_m": 0.991,
    "px_height": 39.34,
    "groups": 20,
-   "tris": 5372,
-   "bones": 28,
+   "tris": 5386,
+   "bones": 26,
    "materials": 1,
-   "bytes_tex": 8226,
+   "bytes_tex": 10146,
    "file": "MAGNETON.glb",
-   "bytes": 290364,
+   "bytes": 296164,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 2.6
   },
   "DODRIO": {
    "height_m": 1.803,
-   "px_height": 57.51,
+   "px_height": 57.7,
    "groups": 16,
-   "tris": 6418,
-   "bones": 27,
+   "tris": 6524,
+   "bones": 25,
    "materials": 1,
-   "bytes_tex": 23678,
+   "bytes_tex": 23504,
    "file": "DODRIO.glb",
-   "bytes": 358492,
+   "bytes": 353964,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x384",
+   "palette_delta_e": 11.3
   },
   "GRIMER": {
    "height_m": 0.889,
@@ -541,11 +586,12 @@
    "tris": 5064,
    "bones": 5,
    "materials": 1,
-   "bytes_tex": 4788,
+   "bytes_tex": 5876,
    "file": "GRIMER.glb",
-   "bytes": 192616,
+   "bytes": 192480,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 12.2
   },
   "CLOYSTER": {
    "height_m": 1.499,
@@ -554,24 +600,29 @@
    "tris": 10496,
    "bones": 3,
    "materials": 1,
-   "bytes_tex": 9746,
+   "bytes_tex": 10614,
    "file": "CLOYSTER.glb",
    "bytes": 349068,
    "status": "generated",
-   "texture": "1024x576"
+   "texture": "1024x576",
+   "palette_delta_e": 8.4
   },
   "GENGAR": {
    "height_m": 1.499,
-   "px_height": 57.22,
+   "px_height": 57.65,
    "groups": 6,
-   "tris": 9716,
+   "tris": 9800,
    "bones": 8,
    "materials": 1,
-   "bytes_tex": 22208,
+   "bytes_tex": 24828,
    "file": "GENGAR.glb",
-   "bytes": 366156,
+   "bytes": 369872,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x448",
+   "palette_delta_e": 2.4,
+   "missing_features": [
+    "ear"
+   ]
   },
   "HYPNO": {
    "height_m": 1.6,
@@ -580,11 +631,12 @@
    "tris": 7146,
    "bones": 11,
    "materials": 1,
-   "bytes_tex": 20326,
+   "bytes_tex": 20438,
    "file": "HYPNO.glb",
    "bytes": 297132,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 7.8
   },
   "VOLTORB": {
    "height_m": 0.508,
@@ -593,24 +645,26 @@
    "tris": 5000,
    "bones": 1,
    "materials": 1,
-   "bytes_tex": 7082,
+   "bytes_tex": 7486,
    "file": "VOLTORB.glb",
    "bytes": 162996,
    "status": "generated",
-   "texture": "1024x192"
+   "texture": "1024x192",
+   "palette_delta_e": 7.1
   },
   "EXEGGUTOR": {
    "height_m": 2.007,
-   "px_height": 59.8,
+   "px_height": 59.79,
    "groups": 12,
-   "tris": 10372,
+   "tris": 10364,
    "bones": 14,
    "materials": 1,
-   "bytes_tex": 64226,
+   "bytes_tex": 64536,
    "file": "EXEGGUTOR.glb",
-   "bytes": 408936,
+   "bytes": 418076,
    "status": "generated",
-   "texture": "1024x576"
+   "texture": "1024x576",
+   "palette_delta_e": 3.6
   },
   "HITMONLEE": {
    "height_m": 1.499,
@@ -619,11 +673,12 @@
    "tris": 5878,
    "bones": 13,
    "materials": 1,
-   "bytes_tex": 20380,
+   "bytes_tex": 20436,
    "file": "HITMONLEE.glb",
    "bytes": 269780,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 3.3
   },
   "KOFFING": {
    "height_m": 0.61,
@@ -632,37 +687,40 @@
    "tris": 7020,
    "bones": 9,
    "materials": 1,
-   "bytes_tex": 7468,
+   "bytes_tex": 8810,
    "file": "KOFFING.glb",
    "bytes": 257428,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 16.0
   },
   "RHYDON": {
    "height_m": 1.905,
    "px_height": 57.99,
    "groups": 11,
-   "tris": 8443,
+   "tris": 8437,
    "bones": 17,
    "materials": 1,
-   "bytes_tex": 41862,
+   "bytes_tex": 41922,
    "file": "RHYDON.glb",
-   "bytes": 382884,
+   "bytes": 381936,
    "status": "generated",
-   "texture": "1024x448"
+   "texture": "1024x448",
+   "palette_delta_e": 12.2
   },
   "KANGASKHAN": {
    "height_m": 2.21,
    "px_height": 58.89,
    "groups": 12,
-   "tris": 9065,
+   "tris": 9061,
    "bones": 18,
    "materials": 1,
-   "bytes_tex": 24766,
+   "bytes_tex": 25316,
    "file": "KANGASKHAN.glb",
-   "bytes": 411352,
+   "bytes": 411700,
    "status": "generated",
-   "texture": "1024x448"
+   "texture": "1024x448",
+   "palette_delta_e": 3.4
   },
   "GOLDEEN": {
    "height_m": 0.61,
@@ -671,11 +729,12 @@
    "tris": 5000,
    "bones": 9,
    "materials": 1,
-   "bytes_tex": 36284,
+   "bytes_tex": 35522,
    "file": "GOLDEEN.glb",
-   "bytes": 211080,
+   "bytes": 211220,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 3.8
   },
   "STARMIE": {
    "height_m": 1.092,
@@ -684,11 +743,12 @@
    "tris": 5000,
    "bones": 3,
    "materials": 1,
-   "bytes_tex": 4444,
+   "bytes_tex": 6100,
    "file": "STARMIE.glb",
    "bytes": 187060,
    "status": "generated",
-   "texture": "1024x448"
+   "texture": "1024x448",
+   "palette_delta_e": 8.5
   },
   "JYNX": {
    "height_m": 1.397,
@@ -697,11 +757,12 @@
    "tris": 8108,
    "bones": 9,
    "materials": 1,
-   "bytes_tex": 33312,
+   "bytes_tex": 32712,
    "file": "JYNX.glb",
-   "bytes": 310248,
+   "bytes": 316740,
    "status": "generated",
-   "texture": "1024x640"
+   "texture": "1024x640",
+   "palette_delta_e": 23.4
   },
   "PINSIR": {
    "height_m": 1.499,
@@ -710,24 +771,26 @@
    "tris": 6455,
    "bones": 10,
    "materials": 1,
-   "bytes_tex": 32232,
+   "bytes_tex": 31404,
    "file": "PINSIR.glb",
    "bytes": 273432,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 2.8
   },
   "GYARADOS": {
    "height_m": 6.502,
-   "px_height": 60.72,
+   "px_height": 60.97,
    "groups": 13,
-   "tris": 9128,
+   "tris": 9180,
    "bones": 14,
    "materials": 1,
-   "bytes_tex": 53388,
+   "bytes_tex": 57856,
    "file": "GYARADOS.glb",
-   "bytes": 363152,
+   "bytes": 364388,
    "status": "generated",
-   "texture": "1024x512"
+   "texture": "1024x512",
+   "palette_delta_e": 7.6
   },
   "EEVEE": {
    "height_m": 0.305,
@@ -736,11 +799,12 @@
    "tris": 5768,
    "bones": 15,
    "materials": 1,
-   "bytes_tex": 31828,
+   "bytes_tex": 31952,
    "file": "EEVEE.glb",
    "bytes": 284976,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 3.3
   },
   "FLAREON": {
    "height_m": 0.889,
@@ -749,63 +813,71 @@
    "tris": 6490,
    "bones": 18,
    "materials": 1,
-   "bytes_tex": 32944,
+   "bytes_tex": 31666,
    "file": "FLAREON.glb",
    "bytes": 311536,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x384",
+   "palette_delta_e": 3.6
   },
   "OMASTAR": {
    "height_m": 0.991,
    "px_height": 53.54,
    "groups": 9,
-   "tris": 7226,
+   "tris": 7228,
    "bones": 21,
    "materials": 1,
-   "bytes_tex": 12212,
+   "bytes_tex": 14182,
    "file": "OMASTAR.glb",
-   "bytes": 322344,
+   "bytes": 349052,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x384",
+   "palette_delta_e": 9.3
   },
   "AERODACTYL": {
    "height_m": 1.803,
-   "px_height": 48.72,
+   "px_height": 48.75,
    "groups": 8,
-   "tris": 5668,
+   "tris": 5672,
    "bones": 16,
    "materials": 1,
-   "bytes_tex": 31448,
+   "bytes_tex": 32922,
    "file": "AERODACTYL.glb",
-   "bytes": 289160,
+   "bytes": 289560,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x384",
+   "palette_delta_e": 6.5
   },
   "ZAPDOS": {
    "height_m": 1.6,
-   "px_height": 58.44,
+   "px_height": 58.74,
    "groups": 9,
-   "tris": 6928,
+   "tris": 7036,
    "bones": 18,
    "materials": 1,
-   "bytes_tex": 50560,
+   "bytes_tex": 51478,
    "file": "ZAPDOS.glb",
-   "bytes": 328088,
+   "bytes": 330840,
    "status": "generated",
-   "texture": "1024x448"
+   "texture": "1024x448",
+   "palette_delta_e": 4.4
   },
   "DRAGONAIR": {
    "height_m": 3.988,
-   "px_height": 56.59,
+   "px_height": 56.62,
    "groups": 8,
-   "tris": 5128,
+   "tris": 5164,
    "bones": 12,
    "materials": 1,
-   "bytes_tex": 34248,
+   "bytes_tex": 31076,
    "file": "DRAGONAIR.glb",
-   "bytes": 231168,
+   "bytes": 232128,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x384",
+   "palette_delta_e": 2.2,
+   "missing_features": [
+    "fin"
+   ]
   },
   "MEW": {
    "height_m": 0.406,
@@ -814,37 +886,46 @@
    "tris": 5000,
    "bones": 14,
    "materials": 1,
-   "bytes_tex": 22390,
+   "bytes_tex": 21910,
    "file": "MEW.glb",
-   "bytes": 245116,
+   "bytes": 245292,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 0.0
   },
   "IVYSAUR": {
    "height_m": 0.991,
    "px_height": 52.18,
    "groups": 12,
-   "tris": 9434,
+   "tris": 9470,
    "bones": 12,
    "materials": 1,
-   "bytes_tex": 25672,
+   "bytes_tex": 35464,
    "file": "IVYSAUR.glb",
-   "bytes": 374396,
+   "bytes": 387208,
    "status": "generated",
-   "texture": "1024x448"
+   "texture": "1024x448",
+   "palette_delta_e": 11.3,
+   "missing_features": [
+    "ear"
+   ]
   },
   "CHARMELEON": {
    "height_m": 1.092,
    "px_height": 52.55,
    "groups": 10,
-   "tris": 6086,
+   "tris": 6202,
    "bones": 16,
    "materials": 1,
-   "bytes_tex": 18892,
+   "bytes_tex": 29254,
    "file": "CHARMELEON.glb",
-   "bytes": 298424,
+   "bytes": 307580,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 5.7,
+   "missing_features": [
+    "claw"
+   ]
   },
   "WARTORTLE": {
    "height_m": 0.991,
@@ -853,11 +934,12 @@
    "tris": 8144,
    "bones": 12,
    "materials": 1,
-   "bytes_tex": 26688,
+   "bytes_tex": 27040,
    "file": "WARTORTLE.glb",
    "bytes": 336628,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 13.5
   },
   "METAPOD": {
    "height_m": 0.711,
@@ -866,11 +948,12 @@
    "tris": 5000,
    "bones": 1,
    "materials": 1,
-   "bytes_tex": 5492,
+   "bytes_tex": 6212,
    "file": "METAPOD.glb",
    "bytes": 165460,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 8.1
   },
   "KAKUNA": {
    "height_m": 0.61,
@@ -879,63 +962,68 @@
    "tris": 5000,
    "bones": 9,
    "materials": 1,
-   "bytes_tex": 4980,
+   "bytes_tex": 6238,
    "file": "KAKUNA.glb",
-   "bytes": 210624,
+   "bytes": 210484,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 6.2
   },
   "PIDGEOTTO": {
    "height_m": 1.092,
-   "px_height": 52.78,
+   "px_height": 52.99,
    "groups": 11,
-   "tris": 6176,
+   "tris": 6222,
    "bones": 20,
    "materials": 1,
-   "bytes_tex": 31326,
+   "bytes_tex": 30672,
    "file": "PIDGEOTTO.glb",
-   "bytes": 310456,
+   "bytes": 311812,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 5.7
   },
   "RATICATE": {
    "height_m": 0.711,
    "px_height": 44.86,
    "groups": 15,
-   "tris": 6474,
+   "tris": 6486,
    "bones": 21,
    "materials": 1,
-   "bytes_tex": 35736,
+   "bytes_tex": 36450,
    "file": "RATICATE.glb",
-   "bytes": 340452,
+   "bytes": 341680,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x384",
+   "palette_delta_e": 8.3
   },
   "EKANS": {
    "height_m": 2.007,
-   "px_height": 40.48,
+   "px_height": 40.46,
    "groups": 6,
    "tris": 5000,
-   "bones": 15,
+   "bones": 14,
    "materials": 1,
-   "bytes_tex": 29900,
+   "bytes_tex": 28934,
    "file": "EKANS.glb",
-   "bytes": 262912,
+   "bytes": 259384,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 3.1
   },
   "RAICHU": {
    "height_m": 0.787,
    "px_height": 55.96,
    "groups": 10,
-   "tris": 7462,
+   "tris": 7472,
    "bones": 19,
    "materials": 1,
-   "bytes_tex": 41982,
+   "bytes_tex": 41080,
    "file": "RAICHU.glb",
-   "bytes": 372248,
+   "bytes": 360920,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x384",
+   "palette_delta_e": 6.5
   },
   "NIDORAN_F": {
    "height_m": 0.406,
@@ -944,11 +1032,12 @@
    "tris": 4999,
    "bones": 14,
    "materials": 1,
-   "bytes_tex": 17168,
+   "bytes_tex": 17162,
    "file": "NIDORAN_F.glb",
    "bytes": 243852,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 13.8
   },
   "NIDORAN_M": {
    "height_m": 0.508,
@@ -957,11 +1046,12 @@
    "tris": 4999,
    "bones": 16,
    "materials": 1,
-   "bytes_tex": 17610,
+   "bytes_tex": 17192,
    "file": "NIDORAN_M.glb",
-   "bytes": 261376,
+   "bytes": 260440,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 6.9
   },
   "CLEFAIRY": {
    "height_m": 0.61,
@@ -970,24 +1060,26 @@
    "tris": 5000,
    "bones": 17,
    "materials": 1,
-   "bytes_tex": 17852,
+   "bytes_tex": 17826,
    "file": "CLEFAIRY.glb",
-   "bytes": 271176,
+   "bytes": 274120,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 2.0
   },
   "NINETALES": {
    "height_m": 1.092,
-   "px_height": 50.21,
+   "px_height": 50.16,
    "groups": 21,
-   "tris": 7648,
-   "bones": 50,
+   "tris": 8295,
+   "bones": 53,
    "materials": 1,
-   "bytes_tex": 89008,
+   "bytes_tex": 96098,
    "file": "NINETALES.glb",
-   "bytes": 501596,
+   "bytes": 579784,
    "status": "generated",
-   "texture": "1024x704"
+   "texture": "1024x768",
+   "palette_delta_e": 6.5
   },
   "ZUBAT": {
    "height_m": 0.787,
@@ -996,11 +1088,12 @@
    "tris": 4999,
    "bones": 13,
    "materials": 1,
-   "bytes_tex": 13644,
+   "bytes_tex": 13864,
    "file": "ZUBAT.glb",
-   "bytes": 243488,
+   "bytes": 244276,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 6.8
   },
   "GLOOM": {
    "height_m": 0.787,
@@ -1009,11 +1102,12 @@
    "tris": 8088,
    "bones": 13,
    "materials": 1,
-   "bytes_tex": 34374,
+   "bytes_tex": 34418,
    "file": "GLOOM.glb",
-   "bytes": 332116,
+   "bytes": 344172,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x384",
+   "palette_delta_e": 3.0
   },
   "PARASECT": {
    "height_m": 0.991,
@@ -1022,11 +1116,12 @@
    "tris": 9520,
    "bones": 14,
    "materials": 1,
-   "bytes_tex": 38908,
+   "bytes_tex": 38854,
    "file": "PARASECT.glb",
    "bytes": 387092,
    "status": "generated",
-   "texture": "1024x512"
+   "texture": "1024x512",
+   "palette_delta_e": 11.4
   },
   "DIGLETT": {
    "height_m": 0.203,
@@ -1035,24 +1130,26 @@
    "tris": 5000,
    "bones": 4,
    "materials": 1,
-   "bytes_tex": 8666,
+   "bytes_tex": 8744,
    "file": "DIGLETT.glb",
-   "bytes": 182624,
+   "bytes": 188168,
    "status": "generated",
-   "texture": "1024x192"
+   "texture": "1024x192",
+   "palette_delta_e": 3.1
   },
   "PERSIAN": {
    "height_m": 0.991,
    "px_height": 49.75,
    "groups": 11,
-   "tris": 6768,
+   "tris": 6780,
    "bones": 22,
    "materials": 1,
-   "bytes_tex": 42992,
+   "bytes_tex": 43688,
    "file": "PERSIAN.glb",
-   "bytes": 355120,
+   "bytes": 359928,
    "status": "generated",
-   "texture": "1024x448"
+   "texture": "1024x448",
+   "palette_delta_e": 2.5
   },
   "MANKEY": {
    "height_m": 0.508,
@@ -1061,24 +1158,26 @@
    "tris": 5000,
    "bones": 12,
    "materials": 1,
-   "bytes_tex": 21064,
+   "bytes_tex": 21276,
    "file": "MANKEY.glb",
-   "bytes": 246436,
+   "bytes": 246364,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 6.9
   },
   "ARCANINE": {
    "height_m": 1.905,
    "px_height": 53.32,
    "groups": 16,
-   "tris": 8708,
+   "tris": 8716,
    "bones": 23,
    "materials": 1,
-   "bytes_tex": 57414,
+   "bytes_tex": 57010,
    "file": "ARCANINE.glb",
-   "bytes": 416716,
+   "bytes": 417368,
    "status": "generated",
-   "texture": "1024x512"
+   "texture": "1024x512",
+   "palette_delta_e": 3.4
   },
   "POLIWRATH": {
    "height_m": 1.295,
@@ -1087,24 +1186,26 @@
    "tris": 10530,
    "bones": 7,
    "materials": 1,
-   "bytes_tex": 10924,
+   "bytes_tex": 12402,
    "file": "POLIWRATH.glb",
    "bytes": 379108,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x384",
+   "palette_delta_e": 8.7
   },
   "ALAKAZAM": {
    "height_m": 1.499,
-   "px_height": 58.38,
+   "px_height": 58.37,
    "groups": 14,
-   "tris": 7831,
-   "bones": 19,
+   "tris": 7985,
+   "bones": 18,
    "materials": 1,
-   "bytes_tex": 39748,
+   "bytes_tex": 40740,
    "file": "ALAKAZAM.glb",
-   "bytes": 367836,
+   "bytes": 366188,
    "status": "generated",
-   "texture": "1024x448"
+   "texture": "1024x448",
+   "palette_delta_e": 0.0
   },
   "MACHAMP": {
    "height_m": 1.6,
@@ -1113,24 +1214,26 @@
    "tris": 9728,
    "bones": 16,
    "materials": 1,
-   "bytes_tex": 27610,
+   "bytes_tex": 27668,
    "file": "MACHAMP.glb",
    "bytes": 402276,
    "status": "generated",
-   "texture": "1024x512"
+   "texture": "1024x512",
+   "palette_delta_e": 4.6
   },
   "VICTREEBEL": {
    "height_m": 1.702,
-   "px_height": 57.45,
+   "px_height": 57.46,
    "groups": 8,
-   "tris": 7403,
+   "tris": 7419,
    "bones": 13,
    "materials": 1,
-   "bytes_tex": 34070,
+   "bytes_tex": 33680,
    "file": "VICTREEBEL.glb",
-   "bytes": 309588,
+   "bytes": 310356,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 12.6
   },
   "GEODUDE": {
    "height_m": 0.406,
@@ -1139,11 +1242,12 @@
    "tris": 5680,
    "bones": 7,
    "materials": 1,
-   "bytes_tex": 21138,
+   "bytes_tex": 21780,
    "file": "GEODUDE.glb",
    "bytes": 229872,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 7.2
   },
   "PONYTA": {
    "height_m": 0.991,
@@ -1152,11 +1256,12 @@
    "tris": 5000,
    "bones": 23,
    "materials": 1,
-   "bytes_tex": 37960,
+   "bytes_tex": 36628,
    "file": "PONYTA.glb",
    "bytes": 286736,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x384",
+   "palette_delta_e": 6.0
   },
   "SLOWBRO": {
    "height_m": 1.6,
@@ -1165,24 +1270,26 @@
    "tris": 7400,
    "bones": 14,
    "materials": 1,
-   "bytes_tex": 23068,
+   "bytes_tex": 22872,
    "file": "SLOWBRO.glb",
    "bytes": 318944,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 4.9
   },
   "FARFETCHD": {
    "height_m": 0.787,
-   "px_height": 57.02,
+   "px_height": 57.03,
    "groups": 9,
-   "tris": 5776,
-   "bones": 13,
+   "tris": 5828,
+   "bones": 12,
    "materials": 1,
-   "bytes_tex": 27484,
+   "bytes_tex": 28048,
    "file": "FARFETCHD.glb",
-   "bytes": 278164,
+   "bytes": 275728,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 10.6
   },
   "SEEL": {
    "height_m": 1.092,
@@ -1191,11 +1298,12 @@
    "tris": 5308,
    "bones": 13,
    "materials": 1,
-   "bytes_tex": 4120,
+   "bytes_tex": 5112,
    "file": "SEEL.glb",
-   "bytes": 258428,
+   "bytes": 257016,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 1.2
   },
   "MUK": {
    "height_m": 1.194,
@@ -1204,24 +1312,26 @@
    "tris": 9390,
    "bones": 5,
    "materials": 1,
-   "bytes_tex": 6904,
+   "bytes_tex": 8594,
    "file": "MUK.glb",
    "bytes": 318900,
    "status": "generated",
-   "texture": "1024x512"
+   "texture": "1024x512",
+   "palette_delta_e": 11.5
   },
   "GASTLY": {
    "height_m": 1.295,
-   "px_height": 48.49,
+   "px_height": 48.71,
    "groups": 1,
-   "tris": 7322,
+   "tris": 7318,
    "bones": 1,
    "materials": 1,
-   "bytes_tex": 14208,
+   "bytes_tex": 15188,
    "file": "GASTLY.glb",
-   "bytes": 235968,
+   "bytes": 236420,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 42.8
   },
   "ONIX": {
    "height_m": 8.788,
@@ -1230,11 +1340,12 @@
    "tris": 8082,
    "bones": 11,
    "materials": 1,
-   "bytes_tex": 33074,
+   "bytes_tex": 31776,
    "file": "ONIX.glb",
    "bytes": 305548,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 4.6
   },
   "KRABBY": {
    "height_m": 0.406,
@@ -1243,11 +1354,12 @@
    "tris": 5000,
    "bones": 14,
    "materials": 1,
-   "bytes_tex": 28162,
+   "bytes_tex": 28408,
    "file": "KRABBY.glb",
    "bytes": 237232,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 2.5
   },
   "ELECTRODE": {
    "height_m": 1.194,
@@ -1256,11 +1368,12 @@
    "tris": 7516,
    "bones": 1,
    "materials": 1,
-   "bytes_tex": 11388,
+   "bytes_tex": 11796,
    "file": "ELECTRODE.glb",
    "bytes": 233940,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 1.4
   },
   "CUBONE": {
    "height_m": 0.406,
@@ -1269,11 +1382,12 @@
    "tris": 5000,
    "bones": 13,
    "materials": 1,
-   "bytes_tex": 14568,
+   "bytes_tex": 15008,
    "file": "CUBONE.glb",
    "bytes": 248848,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 5.4
   },
   "HITMONCHAN": {
    "height_m": 1.397,
@@ -1282,11 +1396,12 @@
    "tris": 6218,
    "bones": 10,
    "materials": 1,
-   "bytes_tex": 14870,
+   "bytes_tex": 15586,
    "file": "HITMONCHAN.glb",
    "bytes": 271428,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 8.3
   },
   "WEEZING": {
    "height_m": 1.194,
@@ -1295,11 +1410,12 @@
    "tris": 9296,
    "bones": 12,
    "materials": 1,
-   "bytes_tex": 9870,
+   "bytes_tex": 11288,
    "file": "WEEZING.glb",
-   "bytes": 340760,
+   "bytes": 342496,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x384",
+   "palette_delta_e": 16.0
   },
   "CHANSEY": {
    "height_m": 1.092,
@@ -1308,24 +1424,26 @@
    "tris": 7238,
    "bones": 10,
    "materials": 1,
-   "bytes_tex": 15038,
+   "bytes_tex": 15648,
    "file": "CHANSEY.glb",
    "bytes": 294484,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 1.5
   },
   "HORSEA": {
    "height_m": 0.406,
-   "px_height": 44.5,
+   "px_height": 44.52,
    "groups": 5,
    "tris": 5000,
    "bones": 8,
    "materials": 1,
-   "bytes_tex": 17946,
+   "bytes_tex": 18044,
    "file": "HORSEA.glb",
-   "bytes": 218832,
+   "bytes": 218280,
    "status": "generated",
-   "texture": "1024x192"
+   "texture": "1024x192",
+   "palette_delta_e": 7.7
   },
   "SEAKING": {
    "height_m": 1.295,
@@ -1334,76 +1452,82 @@
    "tris": 6734,
    "bones": 15,
    "materials": 1,
-   "bytes_tex": 42322,
+   "bytes_tex": 41036,
    "file": "SEAKING.glb",
-   "bytes": 310696,
+   "bytes": 310832,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 4.3
   },
   "MR_MIME": {
    "height_m": 1.295,
    "px_height": 55.16,
    "groups": 16,
-   "tris": 5909,
+   "tris": 5913,
    "bones": 20,
    "materials": 1,
-   "bytes_tex": 19272,
+   "bytes_tex": 19410,
    "file": "MR_MIME.glb",
-   "bytes": 304544,
+   "bytes": 303968,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 10.5
   },
   "ELECTABUZZ": {
    "height_m": 1.092,
    "px_height": 58.29,
    "groups": 9,
-   "tris": 7192,
+   "tris": 7190,
    "bones": 15,
    "materials": 1,
-   "bytes_tex": 54690,
+   "bytes_tex": 53198,
    "file": "ELECTABUZZ.glb",
-   "bytes": 326688,
+   "bytes": 327120,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 2.4
   },
   "TAUROS": {
    "height_m": 1.397,
    "px_height": 51.57,
    "groups": 13,
-   "tris": 8288,
+   "tris": 8306,
    "bones": 23,
    "materials": 1,
-   "bytes_tex": 47864,
+   "bytes_tex": 48714,
    "file": "TAUROS.glb",
-   "bytes": 401376,
+   "bytes": 407116,
    "status": "generated",
-   "texture": "1024x448"
+   "texture": "1024x448",
+   "palette_delta_e": 12.9
   },
   "LAPRAS": {
    "height_m": 2.489,
    "px_height": 54.83,
    "groups": 10,
-   "tris": 7210,
+   "tris": 7216,
    "bones": 12,
    "materials": 1,
-   "bytes_tex": 26144,
+   "bytes_tex": 25928,
    "file": "LAPRAS.glb",
-   "bytes": 286584,
+   "bytes": 295176,
    "status": "generated",
-   "texture": "1024x448"
+   "texture": "1024x448",
+   "palette_delta_e": 13.6
   },
   "VAPOREON": {
    "height_m": 0.991,
    "px_height": 47.29,
    "groups": 13,
-   "tris": 5783,
+   "tris": 5791,
    "bones": 22,
    "materials": 1,
-   "bytes_tex": 21480,
+   "bytes_tex": 22590,
    "file": "VAPOREON.glb",
-   "bytes": 331744,
+   "bytes": 331008,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x384",
+   "palette_delta_e": 14.8
   },
   "PORYGON": {
    "height_m": 0.787,
@@ -1412,24 +1536,26 @@
    "tris": 5000,
    "bones": 13,
    "materials": 1,
-   "bytes_tex": 6726,
+   "bytes_tex": 8116,
    "file": "PORYGON.glb",
    "bytes": 238408,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 6.1
   },
   "KABUTO": {
    "height_m": 0.508,
-   "px_height": 25.08,
+   "px_height": 25.09,
    "groups": 1,
    "tris": 5000,
    "bones": 1,
    "materials": 1,
-   "bytes_tex": 7672,
+   "bytes_tex": 7946,
    "file": "KABUTO.glb",
-   "bytes": 165136,
+   "bytes": 164568,
    "status": "generated",
-   "texture": "1024x192"
+   "texture": "1024x192",
+   "palette_delta_e": 7.8
   },
   "SNORLAX": {
    "height_m": 2.108,
@@ -1438,63 +1564,74 @@
    "tris": 11000,
    "bones": 7,
    "materials": 1,
-   "bytes_tex": 35228,
+   "bytes_tex": 34706,
    "file": "SNORLAX.glb",
    "bytes": 393392,
    "status": "generated",
-   "texture": "1024x512"
+   "texture": "1024x512",
+   "palette_delta_e": 10.9,
+   "missing_features": [
+    "ear"
+   ]
   },
   "MOLTRES": {
    "height_m": 2.007,
    "px_height": 59.31,
    "groups": 9,
-   "tris": 7081,
+   "tris": 7163,
    "bones": 13,
    "materials": 1,
-   "bytes_tex": 48076,
+   "bytes_tex": 45820,
    "file": "MOLTRES.glb",
-   "bytes": 310848,
+   "bytes": 313792,
    "status": "generated",
-   "texture": "1024x448"
+   "texture": "1024x448",
+   "palette_delta_e": 2.5
   },
   "DRAGONITE": {
    "height_m": 2.21,
    "px_height": 60.81,
    "groups": 10,
-   "tris": 8528,
+   "tris": 8590,
    "bones": 18,
    "materials": 1,
-   "bytes_tex": 54892,
+   "bytes_tex": 53472,
    "file": "DRAGONITE.glb",
-   "bytes": 386948,
+   "bytes": 385288,
    "status": "generated",
-   "texture": "1024x448"
+   "texture": "1024x448",
+   "palette_delta_e": 8.1
   },
   "VENUSAUR": {
    "height_m": 2.007,
-   "px_height": 55.69,
+   "px_height": 55.7,
    "groups": 17,
    "tris": 11000,
    "bones": 19,
    "materials": 1,
-   "bytes_tex": 45408,
+   "bytes_tex": 51640,
    "file": "VENUSAUR.glb",
-   "bytes": 440656,
+   "bytes": 456252,
    "status": "generated",
-   "texture": "1024x768"
+   "texture": "1024x768",
+   "palette_delta_e": 12.0
   },
   "CHARIZARD": {
    "height_m": 1.702,
-   "px_height": 58.25,
+   "px_height": 58.98,
    "groups": 13,
-   "tris": 8854,
-   "bones": 19,
+   "tris": 8962,
+   "bones": 20,
    "materials": 1,
-   "bytes_tex": 54732,
+   "bytes_tex": 62560,
    "file": "CHARIZARD.glb",
-   "bytes": 406972,
+   "bytes": 411592,
    "status": "generated",
-   "texture": "1024x448"
+   "texture": "1024x448",
+   "palette_delta_e": 0.0,
+   "missing_features": [
+    "claw"
+   ]
   },
   "BLASTOISE": {
    "height_m": 1.6,
@@ -1503,76 +1640,82 @@
    "tris": 11000,
    "bones": 9,
    "materials": 1,
-   "bytes_tex": 26530,
+   "bytes_tex": 26490,
    "file": "BLASTOISE.glb",
-   "bytes": 404428,
+   "bytes": 408496,
    "status": "generated",
-   "texture": "1024x512"
+   "texture": "1024x512",
+   "palette_delta_e": 8.5
   },
   "BUTTERFREE": {
    "height_m": 1.092,
    "px_height": 49.66,
    "groups": 10,
-   "tris": 6436,
+   "tris": 6434,
    "bones": 18,
    "materials": 1,
-   "bytes_tex": 26078,
+   "bytes_tex": 27288,
    "file": "BUTTERFREE.glb",
-   "bytes": 310440,
+   "bytes": 309792,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x384",
+   "palette_delta_e": 24.2
   },
   "BEEDRILL": {
    "height_m": 0.991,
    "px_height": 55.5,
    "groups": 14,
-   "tris": 6678,
+   "tris": 6682,
    "bones": 22,
    "materials": 1,
-   "bytes_tex": 17422,
+   "bytes_tex": 19758,
    "file": "BEEDRILL.glb",
-   "bytes": 346580,
+   "bytes": 347196,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x384",
+   "palette_delta_e": 4.9
   },
   "PIDGEOT": {
    "height_m": 1.499,
-   "px_height": 59.15,
+   "px_height": 59.43,
    "groups": 12,
-   "tris": 9487,
+   "tris": 9573,
    "bones": 23,
    "materials": 1,
-   "bytes_tex": 56612,
+   "bytes_tex": 62240,
    "file": "PIDGEOT.glb",
-   "bytes": 423632,
+   "bytes": 429748,
    "status": "generated",
-   "texture": "1024x576"
+   "texture": "1024x576",
+   "palette_delta_e": 6.0
   },
   "SPEAROW": {
    "height_m": 0.305,
-   "px_height": 37.09,
+   "px_height": 37.04,
    "groups": 10,
    "tris": 5000,
    "bones": 16,
    "materials": 1,
-   "bytes_tex": 20576,
+   "bytes_tex": 20756,
    "file": "SPEAROW.glb",
-   "bytes": 267748,
+   "bytes": 268876,
    "status": "generated",
-   "texture": "1024x192"
+   "texture": "1024x192",
+   "palette_delta_e": 10.9
   },
   "ARBOK": {
    "height_m": 3.505,
    "px_height": 55.99,
    "groups": 6,
-   "tris": 8260,
+   "tris": 8266,
    "bones": 23,
    "materials": 1,
-   "bytes_tex": 36330,
+   "bytes_tex": 35960,
    "file": "ARBOK.glb",
-   "bytes": 402664,
+   "bytes": 406888,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x384",
+   "palette_delta_e": 5.0
   },
   "SANDSHREW": {
    "height_m": 0.61,
@@ -1581,11 +1724,12 @@
    "tris": 5000,
    "bones": 10,
    "materials": 1,
-   "bytes_tex": 23452,
+   "bytes_tex": 23828,
    "file": "SANDSHREW.glb",
    "bytes": 233140,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 11.9
   },
   "NIDORINA": {
    "height_m": 0.787,
@@ -1594,50 +1738,54 @@
    "tris": 6520,
    "bones": 16,
    "materials": 1,
-   "bytes_tex": 21106,
+   "bytes_tex": 21360,
    "file": "NIDORINA.glb",
    "bytes": 307444,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x384",
+   "palette_delta_e": 7.7
   },
   "NIDORINO": {
    "height_m": 0.889,
    "px_height": 56.73,
    "groups": 10,
-   "tris": 7986,
+   "tris": 7990,
    "bones": 16,
    "materials": 1,
-   "bytes_tex": 21272,
+   "bytes_tex": 22014,
    "file": "NIDORINO.glb",
-   "bytes": 353388,
+   "bytes": 353372,
    "status": "generated",
-   "texture": "1024x448"
+   "texture": "1024x448",
+   "palette_delta_e": 11.8
   },
   "CLEFABLE": {
    "height_m": 1.295,
    "px_height": 57.59,
    "groups": 11,
-   "tris": 7932,
+   "tris": 7944,
    "bones": 22,
    "materials": 1,
-   "bytes_tex": 22658,
+   "bytes_tex": 23066,
    "file": "CLEFABLE.glb",
-   "bytes": 388824,
+   "bytes": 390180,
    "status": "generated",
-   "texture": "1024x448"
+   "texture": "1024x448",
+   "palette_delta_e": 2.0
   },
   "JIGGLYPUFF": {
    "height_m": 0.508,
-   "px_height": 36.55,
+   "px_height": 36.58,
    "groups": 8,
    "tris": 5000,
-   "bones": 8,
+   "bones": 11,
    "materials": 1,
-   "bytes_tex": 22696,
+   "bytes_tex": 22604,
    "file": "JIGGLYPUFF.glb",
-   "bytes": 222648,
+   "bytes": 242072,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 4.4
   },
   "GOLBAT": {
    "height_m": 1.6,
@@ -1646,11 +1794,12 @@
    "tris": 7586,
    "bones": 13,
    "materials": 1,
-   "bytes_tex": 20860,
+   "bytes_tex": 21374,
    "file": "GOLBAT.glb",
-   "bytes": 317264,
+   "bytes": 317128,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 19.3
   },
   "VILEPLUME": {
    "height_m": 1.194,
@@ -1659,11 +1808,12 @@
    "tris": 10244,
    "bones": 11,
    "materials": 1,
-   "bytes_tex": 45338,
+   "bytes_tex": 45336,
    "file": "VILEPLUME.glb",
-   "bytes": 382092,
+   "bytes": 390688,
    "status": "generated",
-   "texture": "1024x448"
+   "texture": "1024x448",
+   "palette_delta_e": 6.1
   },
   "VENONAT": {
    "height_m": 0.991,
@@ -1672,11 +1822,15 @@
    "tris": 5000,
    "bones": 8,
    "materials": 1,
-   "bytes_tex": 13488,
+   "bytes_tex": 13478,
    "file": "VENONAT.glb",
-   "bytes": 214152,
+   "bytes": 213796,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 10.6,
+   "missing_features": [
+    "arm"
+   ]
   },
   "DUGTRIO": {
    "height_m": 0.711,
@@ -1685,24 +1839,26 @@
    "tris": 7006,
    "bones": 18,
    "materials": 1,
-   "bytes_tex": 23376,
+   "bytes_tex": 23216,
    "file": "DUGTRIO.glb",
-   "bytes": 286456,
+   "bytes": 305024,
    "status": "generated",
-   "texture": "1024x512"
+   "texture": "1024x512",
+   "palette_delta_e": 6.2
   },
   "PSYDUCK": {
    "height_m": 0.787,
-   "px_height": 46.66,
+   "px_height": 46.67,
    "groups": 10,
    "tris": 5000,
    "bones": 11,
    "materials": 1,
-   "bytes_tex": 13648,
+   "bytes_tex": 13496,
    "file": "PSYDUCK.glb",
-   "bytes": 239372,
+   "bytes": 240524,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 9.6
   },
   "PRIMEAPE": {
    "height_m": 0.991,
@@ -1711,11 +1867,12 @@
    "tris": 7390,
    "bones": 7,
    "materials": 1,
-   "bytes_tex": 26456,
+   "bytes_tex": 26916,
    "file": "PRIMEAPE.glb",
    "bytes": 290456,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x384",
+   "palette_delta_e": 1.5
   },
   "POLIWAG": {
    "height_m": 0.61,
@@ -1724,24 +1881,26 @@
    "tris": 5000,
    "bones": 9,
    "materials": 1,
-   "bytes_tex": 7186,
+   "bytes_tex": 8554,
    "file": "POLIWAG.glb",
-   "bytes": 221532,
+   "bytes": 221564,
    "status": "generated",
-   "texture": "1024x192"
+   "texture": "1024x192",
+   "palette_delta_e": 3.9
   },
   "ABRA": {
    "height_m": 0.889,
-   "px_height": 44.72,
+   "px_height": 44.7,
    "groups": 10,
    "tris": 5000,
    "bones": 16,
    "materials": 1,
-   "bytes_tex": 26520,
+   "bytes_tex": 26850,
    "file": "ABRA.glb",
-   "bytes": 250772,
+   "bytes": 250464,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 4.5
   },
   "MACHOP": {
    "height_m": 0.787,
@@ -1750,24 +1909,26 @@
    "tris": 5000,
    "bones": 14,
    "materials": 1,
-   "bytes_tex": 13532,
+   "bytes_tex": 14186,
    "file": "MACHOP.glb",
    "bytes": 255360,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 4.2
   },
   "BELLSPROUT": {
    "height_m": 0.711,
-   "px_height": 42.59,
+   "px_height": 42.6,
    "groups": 7,
    "tris": 5000,
    "bones": 13,
    "materials": 1,
-   "bytes_tex": 14954,
+   "bytes_tex": 15116,
    "file": "BELLSPROUT.glb",
-   "bytes": 244696,
+   "bytes": 244592,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 11.8
   },
   "TENTACOOL": {
    "height_m": 0.889,
@@ -1776,11 +1937,15 @@
    "tris": 5000,
    "bones": 9,
    "materials": 1,
-   "bytes_tex": 7540,
+   "bytes_tex": 8542,
    "file": "TENTACOOL.glb",
-   "bytes": 212372,
+   "bytes": 211748,
    "status": "generated",
-   "texture": "1024x192"
+   "texture": "1024x192",
+   "palette_delta_e": 8.4,
+   "missing_features": [
+    "beak"
+   ]
   },
   "GRAVELER": {
    "height_m": 0.991,
@@ -1789,11 +1954,12 @@
    "tris": 8590,
    "bones": 14,
    "materials": 1,
-   "bytes_tex": 31232,
+   "bytes_tex": 32814,
    "file": "GRAVELER.glb",
    "bytes": 368008,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x384",
+   "palette_delta_e": 5.1
   },
   "RAPIDASH": {
    "height_m": 1.702,
@@ -1802,11 +1968,12 @@
    "tris": 6764,
    "bones": 36,
    "materials": 1,
-   "bytes_tex": 56400,
+   "bytes_tex": 54108,
    "file": "RAPIDASH.glb",
-   "bytes": 413172,
+   "bytes": 419336,
    "status": "generated",
-   "texture": "1024x576"
+   "texture": "1024x576",
+   "palette_delta_e": 1.3
   },
   "MAGNEMITE": {
    "height_m": 0.305,
@@ -1815,24 +1982,29 @@
    "tris": 5000,
    "bones": 16,
    "materials": 1,
-   "bytes_tex": 3996,
+   "bytes_tex": 5352,
    "file": "MAGNEMITE.glb",
-   "bytes": 232780,
+   "bytes": 242028,
    "status": "generated",
-   "texture": "1024x192"
+   "texture": "1024x192",
+   "palette_delta_e": 2.6
   },
   "DODUO": {
    "height_m": 1.397,
-   "px_height": 51.6,
+   "px_height": 51.68,
    "groups": 9,
    "tris": 4999,
    "bones": 15,
    "materials": 1,
-   "bytes_tex": 19966,
+   "bytes_tex": 19900,
    "file": "DODUO.glb",
-   "bytes": 239440,
+   "bytes": 239860,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 5.6,
+   "missing_features": [
+    "wing"
+   ]
   },
   "DEWGONG": {
    "height_m": 1.702,
@@ -1841,11 +2013,12 @@
    "tris": 6670,
    "bones": 10,
    "materials": 1,
-   "bytes_tex": 3202,
+   "bytes_tex": 4464,
    "file": "DEWGONG.glb",
-   "bytes": 281704,
+   "bytes": 280400,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 1.0
   },
   "SHELLDER": {
    "height_m": 0.305,
@@ -1854,11 +2027,12 @@
    "tris": 5000,
    "bones": 4,
    "materials": 1,
-   "bytes_tex": 6386,
+   "bytes_tex": 8252,
    "file": "SHELLDER.glb",
-   "bytes": 182584,
+   "bytes": 182500,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 18.4
   },
   "HAUNTER": {
    "height_m": 1.6,
@@ -1867,24 +2041,26 @@
    "tris": 7211,
    "bones": 4,
    "materials": 1,
-   "bytes_tex": 6018,
+   "bytes_tex": 8428,
    "file": "HAUNTER.glb",
    "bytes": 254312,
    "status": "generated",
-   "texture": "1024x448"
+   "texture": "1024x448",
+   "palette_delta_e": 11.0
   },
   "DROWZEE": {
    "height_m": 0.991,
-   "px_height": 50.43,
+   "px_height": 50.45,
    "groups": 8,
-   "tris": 6624,
+   "tris": 6628,
    "bones": 8,
    "materials": 1,
-   "bytes_tex": 19362,
+   "bytes_tex": 19338,
    "file": "DROWZEE.glb",
-   "bytes": 271464,
+   "bytes": 270772,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 0.0
   },
   "KINGLER": {
    "height_m": 1.295,
@@ -1893,11 +2069,12 @@
    "tris": 8158,
    "bones": 15,
    "materials": 1,
-   "bytes_tex": 41846,
+   "bytes_tex": 41728,
    "file": "KINGLER.glb",
    "bytes": 347900,
    "status": "generated",
-   "texture": "1024x448"
+   "texture": "1024x448",
+   "palette_delta_e": 1.0
   },
   "EXEGGCUTE": {
    "height_m": 0.406,
@@ -1906,11 +2083,12 @@
    "tris": 5018,
    "bones": 6,
    "materials": 1,
-   "bytes_tex": 13400,
+   "bytes_tex": 15726,
    "file": "EXEGGCUTE.glb",
-   "bytes": 193300,
+   "bytes": 204252,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 3.5
   },
   "MAROWAK": {
    "height_m": 0.991,
@@ -1919,24 +2097,26 @@
    "tris": 7432,
    "bones": 13,
    "materials": 1,
-   "bytes_tex": 19104,
+   "bytes_tex": 19442,
    "file": "MAROWAK.glb",
    "bytes": 327036,
    "status": "generated",
-   "texture": "1024x448"
+   "texture": "1024x448",
+   "palette_delta_e": 1.4
   },
   "LICKITUNG": {
    "height_m": 1.194,
    "px_height": 46.6,
    "groups": 7,
-   "tris": 7140,
+   "tris": 7154,
    "bones": 12,
    "materials": 1,
-   "bytes_tex": 19982,
+   "bytes_tex": 19604,
    "file": "LICKITUNG.glb",
-   "bytes": 304488,
+   "bytes": 305852,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x384",
+   "palette_delta_e": 3.8
   },
   "RHYHORN": {
    "height_m": 0.991,
@@ -1945,37 +2125,43 @@
    "tris": 6962,
    "bones": 10,
    "materials": 1,
-   "bytes_tex": 29158,
+   "bytes_tex": 29410,
    "file": "RHYHORN.glb",
    "bytes": 289856,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 9.1,
+   "missing_features": [
+    "arm"
+   ]
   },
   "TANGELA": {
    "height_m": 0.991,
    "px_height": 47.68,
    "groups": 9,
-   "tris": 6914,
+   "tris": 6920,
    "bones": 9,
    "materials": 1,
-   "bytes_tex": 28586,
+   "bytes_tex": 28470,
    "file": "TANGELA.glb",
-   "bytes": 272304,
+   "bytes": 281780,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 10.1
   },
   "SEADRA": {
    "height_m": 1.194,
-   "px_height": 58.0,
+   "px_height": 58.01,
    "groups": 7,
-   "tris": 5704,
+   "tris": 5714,
    "bones": 11,
    "materials": 1,
-   "bytes_tex": 27630,
+   "bytes_tex": 27544,
    "file": "SEADRA.glb",
-   "bytes": 256820,
+   "bytes": 257644,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 10.5
   },
   "STARYU": {
    "height_m": 0.787,
@@ -1984,11 +2170,12 @@
    "tris": 5000,
    "bones": 1,
    "materials": 1,
-   "bytes_tex": 2654,
+   "bytes_tex": 3752,
    "file": "STARYU.glb",
    "bytes": 170404,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 7.5
   },
   "SCYTHER": {
    "height_m": 1.499,
@@ -1997,37 +2184,40 @@
    "tris": 7117,
    "bones": 13,
    "materials": 1,
-   "bytes_tex": 52912,
+   "bytes_tex": 52168,
    "file": "SCYTHER.glb",
-   "bytes": 315792,
+   "bytes": 315928,
    "status": "generated",
-   "texture": "1024x448"
+   "texture": "1024x448",
+   "palette_delta_e": 9.7
   },
   "MAGMAR": {
    "height_m": 1.295,
    "px_height": 58.48,
    "groups": 13,
-   "tris": 6964,
+   "tris": 6970,
    "bones": 21,
    "materials": 1,
-   "bytes_tex": 25956,
+   "bytes_tex": 25988,
    "file": "MAGMAR.glb",
-   "bytes": 359676,
+   "bytes": 368932,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x384",
+   "palette_delta_e": 9.2
   },
   "MAGIKARP": {
    "height_m": 0.889,
-   "px_height": 40.42,
+   "px_height": 40.53,
    "groups": 8,
-   "tris": 5344,
+   "tris": 5348,
    "bones": 13,
    "materials": 1,
-   "bytes_tex": 32196,
+   "bytes_tex": 32502,
    "file": "MAGIKARP.glb",
-   "bytes": 256276,
+   "bytes": 257104,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 6.6
   },
   "DITTO": {
    "height_m": 0.305,
@@ -2036,11 +2226,12 @@
    "tris": 5000,
    "bones": 1,
    "materials": 1,
-   "bytes_tex": 1332,
+   "bytes_tex": 2044,
    "file": "DITTO.glb",
    "bytes": 163776,
    "status": "generated",
-   "texture": "1024x192"
+   "texture": "1024x192",
+   "palette_delta_e": 5.0
   },
   "JOLTEON": {
    "height_m": 0.787,
@@ -2049,24 +2240,26 @@
    "tris": 5364,
    "bones": 16,
    "materials": 1,
-   "bytes_tex": 32580,
+   "bytes_tex": 31134,
    "file": "JOLTEON.glb",
    "bytes": 277212,
    "status": "generated",
-   "texture": "1024x320"
+   "texture": "1024x320",
+   "palette_delta_e": 2.5
   },
   "OMANYTE": {
    "height_m": 0.406,
-   "px_height": 35.5,
+   "px_height": 35.54,
    "groups": 6,
-   "tris": 5000,
+   "tris": 4998,
    "bones": 14,
    "materials": 1,
-   "bytes_tex": 8072,
+   "bytes_tex": 9304,
    "file": "OMANYTE.glb",
-   "bytes": 224008,
+   "bytes": 241052,
    "status": "generated",
-   "texture": "1024x192"
+   "texture": "1024x192",
+   "palette_delta_e": 2.7
   },
   "KABUTOPS": {
    "height_m": 1.295,
@@ -2075,50 +2268,57 @@
    "tris": 6800,
    "bones": 28,
    "materials": 1,
-   "bytes_tex": 41566,
+   "bytes_tex": 41436,
    "file": "KABUTOPS.glb",
-   "bytes": 376256,
+   "bytes": 375544,
    "status": "generated",
-   "texture": "1024x448"
+   "texture": "1024x448",
+   "palette_delta_e": 4.0
   },
   "ARTICUNO": {
    "height_m": 1.702,
-   "px_height": 60.85,
+   "px_height": 60.87,
    "groups": 10,
-   "tris": 7416,
+   "tris": 7522,
    "bones": 24,
    "materials": 1,
-   "bytes_tex": 9368,
+   "bytes_tex": 11728,
    "file": "ARTICUNO.glb",
-   "bytes": 379852,
+   "bytes": 365748,
    "status": "generated",
-   "texture": "1024x448"
+   "texture": "1024x448",
+   "palette_delta_e": 12.0
   },
   "DRATINI": {
    "height_m": 1.803,
-   "px_height": 42.56,
+   "px_height": 43.21,
    "groups": 4,
    "tris": 5000,
    "bones": 5,
    "materials": 1,
-   "bytes_tex": 24480,
+   "bytes_tex": 23186,
    "file": "DRATINI.glb",
-   "bytes": 193836,
+   "bytes": 193660,
    "status": "generated",
-   "texture": "1024x256"
+   "texture": "1024x256",
+   "palette_delta_e": 4.0,
+   "missing_features": [
+    "ear"
+   ]
   },
   "MEWTWO": {
    "height_m": 2.007,
    "px_height": 60.21,
    "groups": 10,
-   "tris": 6696,
+   "tris": 6716,
    "bones": 15,
    "materials": 1,
-   "bytes_tex": 22588,
+   "bytes_tex": 23392,
    "file": "MEWTWO.glb",
-   "bytes": 303416,
+   "bytes": 303176,
    "status": "generated",
-   "texture": "1024x384"
+   "texture": "1024x384",
+   "palette_delta_e": 5.9
   },
   "MISSINGNO": {
    "height_m": 1.6,
@@ -2167,5 +2367,5 @@
   "rig": "one bone per 2D art group in a parent tree under 'root', plus chains along tails / necks / serpent bodies (<group>_1, <group>_2 ...); smooth skin weights",
   "texture": "one anti-aliased albedo atlas per species (front/back sprite projections per art group); vertex colour COLOR_0 = baked ambient occlusion; shade with assets/shaders/toon.gdshader"
  },
- "elapsed_seconds": 246.4
+ "elapsed_seconds": 277.8
 }

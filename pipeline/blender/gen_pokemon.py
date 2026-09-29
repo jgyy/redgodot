@@ -72,6 +72,7 @@ TEX_SS = 3             # supersampling factor per axis for anti-aliasing
 GRID_H = 0.26          # SDF grid spacing in sprite px
 MIN_TRIS, MAX_TRIS = 5000, 11000
 AO_STRENGTH = 0.9
+GRAD_AMP = 0.16        # top-to-bottom albedo gradient (+8% at the top, -8% at the bottom of the model)
 TEX_WEBP_Q = 95        # lossy WebP quality of the atlas (smooth palette art: keeps glb + texture small)
 
 
@@ -125,14 +126,24 @@ def build_layers(defn, groups, decals, pal, micro_kind, seed):
             if g:
                 target[order] = ('feat', g)
         elif p.get('g') in decals and t in MP.SOLID_TYPES:
-            x0, y0, x1, y1 = RS.part_bbox(p)
-            g = group_at((x0 + x1) * 0.5, (y0 + y1) * 0.5)
+            # the group under most of the decal's area (a limb overlapping the corner of a grin must not steal it)
+            mk = RS.part_mask(R, p)
+            cand = gid[mk]
+            cand = cand[cand != '']
+            if len(cand):
+                vals, cnt = np.unique(cand, return_counts=True)
+                g = vals[int(np.argmax(cnt))]
+            else:
+                x0, y0, x1, y1 = RS.part_bbox(p)
+                g = group_at((x0 + x1) * 0.5, (y0 + y1) * 0.5)
             if g:
                 target[order] = ('decal', g)
         elif p.get('on') is not None and t not in FEATURE_TYPES and order not in part_group:
             target[order] = ('on', p.get('on'))
 
     layers = {}
+    gy0 = min(q.by0 for G in groups for q in G.parts)
+    gy1 = max(q.by1 for G in groups for q in G.parts)
     for G in groups:
         x0 = min(q.bx0 for q in G.parts) - 2.5
         y0 = min(q.by0 for q in G.parts) - 2.5
@@ -185,6 +196,10 @@ def build_layers(defn, groups, decals, pal, micro_kind, seed):
             weight = np.clip(1.0 - fa * 1.5, 0.0, 1.0)
             rgb = _bleed(rgb, alpha, main, S)
             rgb = RS.micro_detail(rgb, weight, micro_kind, S, seed + (7 if side == 'back' else 0))
+            # gentle top-light / underside-shade gradient across the whole model (countershading), not on face detail
+            ys = Rg.y0 + (np.arange(rgb.shape[0]) + 0.5) / S
+            gy = 1.0 + GRAD_AMP * (0.5 - np.clip((ys - gy0) / max(gy1 - gy0, 1e-6), 0.0, 1.0))
+            rgb = np.clip(rgb * (1.0 + (gy[:, None, None] - 1.0) * weight[..., None]), 0.0, 1.0)
             layers[(G.name, side)] = (Rg, rgb)
     return layers
 
@@ -444,10 +459,58 @@ def build_species(name, defn, sp, warnings, tmpdir, look):
             uv[sel, :, 1] = 1.0 - (ay + (sy - Rg.y0) * TEX_S) / H
     mat = make_textured_material('mon_' + name.lower(), png)
     return dict(B=B, NB=NB, tris=tris, ao=ao, uv=uv, rig=rig, mat=mat, tex=(W, H), groups=gnames, model=model,
-                P=P)
+                P=P, palette_de=palette_delta_e(groups, look))
 
 
 # ============================================================================ rig + export
+def _lab(rgb):
+    c = np.asarray(rgb, dtype=float)
+    c = np.where(c > 0.04045, ((c + 0.055) / 1.055) ** 2.4, c / 12.92)
+    M = np.array([[0.4124, 0.3576, 0.1805], [0.2126, 0.7152, 0.0722], [0.0193, 0.1192, 0.9505]])
+    xyz = M @ c / np.array([0.95047, 1.0, 1.08883])
+    f = np.where(xyz > 0.008856, np.cbrt(xyz), 7.787 * xyz + 16 / 116)
+    return np.array([116 * f[1] - 16, 500 * (f[0] - f[1]), 200 * (f[2] * -1 + f[1]) * 1.0])
+
+
+def palette_delta_e(groups, look):
+    """How far the sprite's dominant colours are from the researched official main colour (CIE-Lab distance to the
+    nearest of the three biggest painted colours).  Recorded in the manifest; a `pal` map in species_looks.json
+    corrects a palette that is off."""
+    if not look or 'colors' not in look:
+        return None
+    acc = {}
+    for G in groups:
+        for q in G.parts:
+            acc[q.color] = acc.get(q.color, 0.0) + q.area
+    top = sorted(acc.items(), key=lambda kv: -kv[1])[:3]
+    if not top:
+        return None
+    main = _lab(RS.hex_rgb(look['colors']['main']))
+    return round(float(min(np.linalg.norm(_lab(RS.hex_rgb(c)) - main) for c, _ in top)), 1)
+
+
+FEATURE_TOKENS = {           # words in species_looks.json `features` -> group-name / role patterns that must exist
+    'ear': r'ear|ant', 'tail': r'tail|^t\d|nt\d|curl|rattle|coil|ten\d|tent|vine|root|whip', 'wing': r'wing|^w[A-Z]|^w\d',
+    'horn': r'horn|crest|spike|spk|sp\d|cap', 'fin': r'fin|dorsal|pelv|pect|ridge|frill|crest', 'antenna': r'ant',
+    'shell': r'shell|carapace|dome', 'mane': r'mane|ruff|hair|tuft|fluff|collar|crest', 'claw': r'claw|blade|hand|fist|scythe|pincer',
+    'flame': r'^fl|flame|tail|mane', 'leaf': r'leaf|lf|petal|frond|ant', 'arm': r'arm|hand|claw|fist', 'beak': r'beak|bill|mouth|lip|snout|head',
+    'trunk': r'nose|snout|trunk',
+}
+
+
+def feature_check(look, group_names):
+    """Words in the researched `features` that have no matching group in the model (fed to the manifest warnings)."""
+    import re
+    if not look:
+        return []
+    text = ' '.join(look.get('features', [])).lower()
+    missing = []
+    for word, pat in FEATURE_TOKENS.items():
+        if re.search(r'\b%s' % word, text) and not any(re.search(pat, g, re.I) for g in group_names):
+            missing.append(word)
+    return missing
+
+
 def ht_metres(sp):
     ht = sp.get('ht') or [1, 0]
     try:
@@ -571,6 +634,11 @@ def run_one(name, defn, sp, out_dir, tmpdir, animate=True):
     info['bytes'] = os.path.getsize(out_path)
     info['status'] = 'generated'
     info['texture'] = '%dx%d' % built['tex']
+    if built.get('palette_de') is not None:
+        info['palette_delta_e'] = built['palette_de']
+    miss = feature_check(look, built['groups'])
+    if miss:
+        info['missing_features'] = miss
     print('%-12s %5.2fs h=%.2fm groups=%d bones=%d tris=%d tex=%s %dKB %s' % (
         name, time.time() - t0, info['height_m'], info['groups'], info['bones'], info['tris'], info['texture'],
         info['bytes'] // 1024, ('warn=%d' % len(warnings)) if warnings else ''), flush=True)

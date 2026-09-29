@@ -34,13 +34,24 @@ def fix(*names):
 
 def apply(name, defn, look):
     d = copy.deepcopy(defn)
+    look = look or {}
+    _generic(d, look)
     fn = FIXES.get(name)
     if fn is not None:
-        fn(d, look or {})
+        fn(d, look)
     pal = (look or {}).get('pal')
     if pal:
         d.setdefault('pal', {}).update(pal)
     return d
+
+
+def _generic(d, look):
+    """Rules driven by the researched body plan (species_looks.json `shape`) before the per-species fix runs."""
+    shape = look.get('shape')
+    if shape == 'bird':                       # spindly stick legs read badly in 3D
+        for g in {p.get('g') for p in d['parts'] if p.get('g')}:
+            if g.lower().startswith('leg'):
+                thick(d, g, 1.35)
 
 
 # ----------------------------------------------------------------------------- helpers
@@ -307,6 +318,7 @@ def charizard(d, look):
     for g in ('wingL', 'wingR'):
         for p in parts(d, g):
             p['T'] = 2.0
+    charmander_line(d, look)
 
 
 @fix('BLASTOISE')
@@ -384,3 +396,90 @@ def eevee(d, look):
     for p in parts(d, 'earB'):
         if p['t'] == 'p':
             p['pts'] = [27, 25, 30.5, 14, 37.5, 4.6, 39.5, 12.5, 37.6, 20.5, 35.5, 27.5]
+
+
+def claws(d, groups, n=3, length=2.6, r=0.95, color='#f4efe0', z=None):
+    """Small tapered claws / toes fanned out from the tip of each limb group's last capsule."""
+    for g in groups:
+        caps = [p for p in parts(d, g) if p['t'] == 'c']
+        if not caps:
+            continue
+        c = caps[-1]
+        x1, y1, x2, y2 = c['x1'], c['y1'], c['x2'], c['y2']
+        L = math.hypot(x2 - x1, y2 - y1) or 1.0
+        ux, uy = (x2 - x1) / L, (y2 - y1) / L
+        px, py = -uy, ux
+        rr = c.get('r2') if c.get('r2') is not None else c.get('r1', 2)
+        for i in range(n):
+            f = (i - (n - 1) / 2.0)
+            sx = x2 + px * f * rr * 0.55 - ux * 0.4
+            sy = y2 + py * f * rr * 0.55 - uy * 0.4
+            ex = x2 + px * f * rr * 0.9 + ux * length
+            ey = y2 + py * f * rr * 0.9 + uy * length
+            add(d, Cap(g, sx, sy, ex, ey, r, 0.35, color, z=c.get('z', 0) + 0.01, d1=f * 0.5, d2=f * 1.3))
+
+
+@fix('CHARMANDER', 'CHARMELEON')
+def charmander_line(d, look):
+    claws(d, [g for g in ('armF', 'armB', 'legL', 'legR') if parts(d, g)], n=3, length=2.4, r=0.85)
+
+
+@fix('BULBASAUR', 'IVYSAUR', 'VENUSAUR')
+def bulbasaur_line(d, look):
+    claws(d, [g for g in ('legF', 'legF2', 'legB', 'legB2') if parts(d, g)], n=3, length=2.0, r=0.8)
+
+
+@fix('DRAGONITE')
+def dragonite(d, look):
+    claws(d, [g for g in ('armF', 'legF', 'legB') if parts(d, g)], n=3, length=2.4, r=0.85)
+
+
+@fix('NINETALES')
+def ninetales(d, look):
+    for i in range(9):
+        thick(d, 'nt%d' % i, 1.35)
+
+
+@fix('VULPIX')
+def vulpix(d, look):
+    for i in range(1, 7):
+        thick(d, 't%d' % i, 1.3)
+
+
+@fix('GENGAR')
+def gengar(d, look):
+    # squat spiky ball -> a ball with proper legs and feet, and hands that grip
+    for g in ('legF', 'legB'):
+        thick(d, g, 1.1)
+        c = [p for p in parts(d, g) if p['t'] == 'c'][0]
+        add(d, E(g, c['x2'] - 0.5, 58.2, 5.8, 2.6, 'body', z=c.get('z', 0)))
+    thick(d, 'armF', 1.25)
+    thick(d, 'armB', 1.25)
+    claws(d, ['armF'], n=3, length=2.2, r=0.9, color='#8a70bc')
+
+
+@fix('ALAKAZAM', 'KADABRA')
+def alakazam(d, look):
+    # the long moustache is cream-white and fluffy, not two sticks of fur
+    for g in ('must', 'must2'):
+        for p in parts(d, g):
+            p['c'] = '#f6efdc'
+            p['w'] = 3.8
+            p['w2'] = 2.0
+
+
+@fix('SHELLDER')
+def shellder(d, look):
+    # the dark face is a real bulge (not a decal on the shell) with proper big eyes
+    for p in parts(d, 'body'):
+        p['solid'] = True
+        p['rd'] = 5.2
+        p['rx'], p['ry'] = 9.5, 6.6
+    for p in d['parts']:
+        if p['t'] == 'eye':
+            p['s'] = 2.7
+            p['sclera'] = True
+            p['style'] = 'round'
+            p['iris'] = '#3aa0c0'
+            p['x'] += 0.5
+            p['y'] += 0.3

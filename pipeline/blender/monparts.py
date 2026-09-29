@@ -269,7 +269,8 @@ def solve_depth(groups):
     def place(G, sign):
         cov = coverage(G)
         face = all(q.p.get('face') or q.p.get('frontOnly') for q in G.parts)
-        G.lens = all(q.t == 'e' for q in G.parts) and (cov >= 0.92 or (face and cov >= 0.6))
+        G.lens = all(q.t == 'e' for q in G.parts) and (cov >= 0.92 or (face and cov >= 0.6)) and \
+            not any(q.p.get('solid') for q in G.parts)
         if G.lens:
             for q in G.parts:
                 q.rd = max(0.6, min(q.rd, 0.42 * min(q.rx, q.ry)))

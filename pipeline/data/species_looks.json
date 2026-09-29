@@ -365,7 +365,8 @@
    "https://bulbapedia.bulbagarden.net/wiki/Butterfree_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Butterfree"
   ],
-  "view": "front"
+  "view": "front",
+  "flutter": true
  },
  "WEEDLE": {
   "dex": 13,
@@ -439,7 +440,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Beedrill_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Beedrill"
-  ]
+  ],
+  "flutter": true
  },
  "PIDGEY": {
   "dex": 16,
@@ -1262,7 +1264,8 @@
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Venomoth_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Venomoth"
-  ]
+  ],
+  "flutter": true
  },
  "DIGLETT": {
   "dex": 50,

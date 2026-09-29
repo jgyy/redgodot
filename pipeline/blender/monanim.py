@@ -240,6 +240,12 @@ class Skel:
             pg = self.bone[self.groups[g][0]]['parent']
             pgroup = self.bone[pg]['group'] if pg in self.bone else None
             self.leg_phase[g] = self.leg_phase.get(pgroup, 0.0)
+        self.sib_off = {}
+        for r in ('tail', 'leaf', 'other'):
+            gs = sorted(self.by_role.get(r, []))
+            if len(gs) > 2:
+                for i, g in enumerate(gs):
+                    self.sib_off[g] = 0.7 * i
         self.arm_phase = {}
         lp = self.leg_phase
         for g in self.arms:
@@ -312,6 +318,7 @@ def wave(P, S, g, u, amp_deg, axis, cycles=1.0, lag=0.5, phase=0.0, ramp=(0.35, 
     """Travelling wave down a chain (or a single bone) of group g."""
     bl = S.chain(g)
     n = len(bl)
+    phase = phase + S.sib_off.get(g, 0.0)          # sibling tails / tentacles / leaves don't move in unison
     for i, b in enumerate(bl):
         k = ramp[0] + (ramp[1] - ramp[0]) * (i / max(1, n - 1)) if n > 1 else 1.0
         a = rad(amp_deg) * k * math.sin(TAU * cycles * u - i * lag + phase) + rad(bias) * k
@@ -404,7 +411,7 @@ def idle_pose(S, P, u, gait):
             wave(P, S, g, u, 3, Z, 1.0, 0.75, phase=1.2)
         if not chains:
             # segments: ripple through the parent chain
-            _segment_wave(P, S, u, 5, cycles=1.0, lag=0.5)
+            _segment_wave(P, S, u, 9, cycles=1.0, lag=0.5)
         P.move('root', (0, 0, 0.012 * h * math.sin(ph)))
         for g in S.heads:
             P.rot(S.first(g), S.a_sw, rad(3) * math.sin(ph + 0.9))
@@ -459,7 +466,7 @@ def _flap(P, S, g, u, amp_deg, cycles=2, phase=0.0, lagv=0.9):
     sg = S.sign_toward(g, ax, Z)
     bl = S.chain(g)
     for i, b in enumerate(bl):
-        a = sg * rad(amp_deg) * (1.0 + 0.5 * i) * math.sin(TAU * cycles * u + phase - i * lagv)
+        a = sg * rad(amp_deg) * (1.0 + 0.3 * i) * math.sin(TAU * cycles * u + phase - i * lagv)
         P.rot(b, ax, a)
 
 
@@ -484,7 +491,9 @@ def walk_pose(S, P, u, gait):
     body = S.body_b
     heavy = S.look.get('weight') == 'heavy'
     light = S.look.get('weight') == 'light'
-    if gait in ('biped', 'waddle', 'quad', 'stomp', 'bound', 'scuttle', 'crawl'):
+    if gait == 'crawl' and not S.legs:
+        _inch(S, P, u)
+    elif gait in ('biped', 'waddle', 'quad', 'stomp', 'bound', 'scuttle', 'crawl'):
         _walk_legged(S, P, u, gait, heavy, light)
     elif gait in ('serpent', 'slither'):
         chains = [g for g in S.groups if len(S.chain(g)) >= 3]
@@ -502,18 +511,19 @@ def walk_pose(S, P, u, gait):
             if S.role[g] in ('wing',):
                 wave(P, S, g, u, 12, Y, 1.0, 0.5, phase=-1)
     elif gait in ('flap', 'fly'):
+        nfl = 2 if S.look.get('flutter') else 1          # beats per stride cycle (moths / bees flutter faster)
         for g in S.wings:
-            _flap(P, S, g, u, 38, cycles=2, phase=0)
-        P.move('root', (0, 0, 0.05 * h * math.sin(TAU * 2 * u + 1.2)))
-        P.rot(body, S.a_sw, rad(-6) + rad(3) * math.sin(TAU * 2 * u))
+            _flap(P, S, g, u, 26 if nfl == 2 else 42, cycles=nfl, phase=0)
+        P.move('root', (0, 0, 0.05 * h * math.sin(TAU * nfl * u + 1.2)))
+        P.rot(body, S.a_sw, rad(-6) + rad(3) * math.sin(TAU * nfl * u))
         for g in S.legs:
             P.rot(S.first(g), S.a_sw, rad(-30))
             knee(P, S, g, rad(20))
         for g in S.arms + S.hands:
-            wave(P, S, g, u, 12, Y, 2.0, 0.4, phase=-1)
-        secondary(P, S, u, 1.4, rate=2.0)
+            wave(P, S, g, u, 12, Y, float(nfl), 0.4, phase=-1)
+        secondary(P, S, u, 1.4, rate=float(nfl))
         for g in S.heads:
-            P.rot(S.first(g), S.a_sw, rad(-4) - rad(3) * math.sin(TAU * 2 * u + 0.5))
+            P.rot(S.first(g), S.a_sw, rad(-4) - rad(3) * math.sin(TAU * nfl * u + 0.5))
     elif gait in ('float', 'hover'):
         P.move('root', (0, 0, 0.045 * h * math.sin(ph)))
         P.rot(body, S.fwd, rad(6) * math.sin(ph))
@@ -521,7 +531,7 @@ def walk_pose(S, P, u, gait):
         for g in S.arms + S.hands + S.tails + S.leaves + S.others + S.ears:
             wave(P, S, g, u, 14, Y, 1.0, 0.55, phase=-1.4)
         for g in S.wings:
-            _flap(P, S, g, u, 20, cycles=2, phase=0.2)
+            _flap(P, S, g, u, 20, cycles=1, phase=0.2)
         for g in S.heads:
             P.rot(S.first(g), S.a_sw, rad(4) * math.sin(ph - 0.6))
     elif gait in ('hop', 'blob', 'roll'):
@@ -598,6 +608,9 @@ def _walk_legged(S, P, u, gait, heavy, light):
         P.rot(S.first(g), S.a_sw, rad(3.0) * math.sin(2 * ph + 1.4))
     for g in S.necks:
         wave(P, S, g, u, 5, S.a_sw, 2.0, 0.5, phase=1.0)
+    if S.look.get('shape') == 'bird':            # pecking-order head bob: thrust forward with each step
+        for g in S.heads + S.necks:
+            P.move(S.first(g), S.fwd * (0.03 * h * math.sin(2 * ph + 0.5)))
     # ---- follow-through
     for g in S.tails:
         wave(P, S, g, u, 13 if not heavy else 8, Y, 1.0, 0.6, phase=-0.9)
@@ -612,9 +625,34 @@ def _walk_legged(S, P, u, gait, heavy, light):
         if S.role[g] in ('leaf', 'other'):
             wave(P, S, g, u, 5, Y, 2.0, 0.5, phase=-1.0)
     for g in S.wings:
-        _flap(P, S, g, u, 9, cycles=2, phase=0.4)
+        _flap(P, S, g, u, 9, cycles=1, phase=0.4)
     for g in S.jaws:
         P.rot(S.first(g), S.a_sw, rad(2.0) * (0.5 + 0.5 * math.sin(2 * ph)))
+
+
+def _inch(S, P, u):
+    """Caterpillars / worms built from one group per segment: a hump travels from tail to head."""
+    h = S.h
+    ph = TAU * u
+    depth = {}
+    for g in S.groups:
+        d, b = 0, S.first(g)
+        while S.bone[b]['parent'] in S.bone:
+            b = S.bone[b]['parent']
+            d += 1
+        depth[g] = d
+    for g, d in depth.items():
+        if g == S.anchor:
+            continue
+        w = max(0.0, math.sin(ph - d * 0.8)) ** 1.5
+        P.move(S.first(g), (0, 0, 0.05 * h * w))
+        P.rot(S.first(g), Y, rad(5) * math.sin(ph - d * 0.8))
+        P.scale(S.first(g), 1 - 0.05 * w, 1 - 0.05 * w, 1 + 0.10 * w)
+    P.move('root', (0, 0, 0.012 * h * math.sin(2 * ph)))
+    for g in S.ears:
+        wave(P, S, g, u, 10, Y, 1.0, 0.5, phase=-1)
+    for g in S.heads:
+        P.rot(S.first(g), S.a_sw, rad(5) * math.sin(ph - 0.3))
 
 
 def _walk_hop(S, P, u, gait, heavy):
@@ -639,13 +677,15 @@ def _walk_hop(S, P, u, gait, heavy):
         knee(P, S, g, rad(30) * (crouch if crouch > 0 else 0))
     for g in S.arms + S.hands + S.wings:
         if S.role[g] == 'wing':
-            _flap(P, S, g, u, 20, cycles=2, phase=0)
+            _flap(P, S, g, u, 20, cycles=1, phase=0)
         else:
-            P.rot(S.first(g), S.a_sw, rad(-40) * air + rad(10) * crouch)
+            P.rot(S.first(g), S.a_sw, rad(-30) * air + rad(7) * crouch)
     if gait == 'roll':
         P.rot(body, S.fwd, rad(12) * math.sin(TAU * u))
     for g in S.tails + S.ears + S.leaves + S.others:
         wave(P, S, g, u, 12, Y, 2.0, 0.5, phase=-1.6)
+    for g in S.necks:
+        wave(P, S, g, u, 9, Y, 2.0, 0.6, phase=-0.8)
     for g in S.heads:
         P.rot(S.first(g), S.a_sw, rad(4) * math.sin(TAU * v + 0.8))
 
@@ -669,6 +709,10 @@ def _walk_swim(S, P, u, gait):
         for g in S.groups:
             if S.role[g] in ('wing', 'leaf', 'other', 'ear'):
                 wave(P, S, g, u, 20, Y, 2.0, 0.6, phase=-0.8)
+        for g in S.necks:
+            wave(P, S, g, u, 9, Y, 1.0, 0.7, phase=-0.5)
+        for g in S.legs + S.arms + S.hands:            # flippers paddle
+            P.rot(S.first(g), S.a_sw, rad(22) * math.sin(2 * ph + S.leg_phase.get(g, 0.0)))
     for g in S.heads:
         P.rot(S.first(g), Y, -rad(6) * math.sin(ph))
 
