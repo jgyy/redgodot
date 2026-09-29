@@ -274,7 +274,7 @@ def _flower(style, name, petal, centre='yellow', seed=40):
     for i, (x, y, h) in enumerate(((-0.05, 0.0, 0.34), (0.12, -0.06, 0.26), (-0.14, 0.09, 0.22))):
         P.box((x - 0.009, y - 0.009, 0.0), (x + 0.009, y + 0.009, h), 'leaf', ao=False)
         P.blade(x + 0.03, y, 0.14, 0.05, 0.05, 'leaf_light', ao=False)
-        P.cyl(x, y - 0.012, h - 0.005, h + 0.025, 0.07, 0.05, petal, seg=6, rot=i * 0.5, ao=False, cap_top=True)
+        P.cyl(x, y - 0.012, h - 0.005, h + 0.03, 0.09, 0.065, petal, seg=6, rot=i * 0.5, ao=False, cap_top=True, bias=1)
         P.cyl(x, y - 0.014, h + 0.02, h + 0.04, 0.025, 0.02, centre, seg=5, ao=False, cap_top=True)
     return P
 

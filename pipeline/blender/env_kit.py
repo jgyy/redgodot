@@ -117,6 +117,7 @@ class Prop:
         self.uv = self.bm.loops.layers.uv.new('UVMap') if style == 'tex' else None
         self.mat_names = []
         self.rnd = random.Random(seed)
+        self.vcol_name = 'prop'     # material name of the single vertex-colour material (battle uses 'unlit_*')
         self.tex_scale = 2.0     # texture repeats per unit (0.5 unit / tile)
 
     # ---------------------------------------------------------------- painting
@@ -344,6 +345,27 @@ class Prop:
     def merge_dupes(self, dist=1e-5):
         bmesh.ops.remove_doubles(self.bm, verts=list(self.bm.verts), dist=dist)
 
+    def absorb(self, other):
+        """Append every face of another (vcol) Prop, colours included, and free it."""
+        bm = self.bm
+        self.mi('vcol')
+        other.bm.verts.index_update()
+        vmap = {}
+        for f in other.bm.faces:
+            vs = []
+            for v in f.verts:
+                if v.index not in vmap:
+                    vmap[v.index] = bm.verts.new(v.co)
+                vs.append(vmap[v.index])
+            try:
+                nf = bm.faces.new(vs)
+            except ValueError:
+                continue
+            nf.material_index = 0
+            for la, lb in zip(f.loops, nf.loops):
+                lb[self.col] = la[other.col]
+        other.bm.free()
+
     def tri_count(self):
         return sum(len(f.verts) - 2 for f in self.bm.faces)
 
@@ -354,7 +376,7 @@ class Prop:
         self.bm.to_mesh(me)
         self.bm.free()
         for nm in self.mat_names or ['dark']:
-            me.materials.append(_material(nm, self.style))
+            me.materials.append(_material(nm, self.style, self.vcol_name))
         for a in list(me.color_attributes):
             if a.name != 'Col':
                 me.color_attributes.remove(a)
@@ -369,9 +391,9 @@ class Prop:
 _MAT_CACHE = {}
 
 
-def _material(name, style):
+def _material(name, style, vname='prop'):
     if name == 'vcol':
-        m = bpy.data.materials.new('prop')
+        m = bpy.data.materials.new(vname)
         m.use_nodes = True
         b = m.node_tree.nodes.get('Principled BSDF')
         b.inputs['Roughness'].default_value = 0.95
