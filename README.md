@@ -4,7 +4,7 @@ A Godot 4 / **3D** port of **[Pokémon Claude Red](https://github.com/levy-stree
 — the from-scratch, zero-image-files Pokémon Red remake by Levy Street. The world, trainers, battle stages and
 effects are generated from upstream's own data and procedural painters by **headless Blender** and a Node bake of the
 upstream renderer; the Pokémon are the public [`Pokemon-3D-api/assets`](https://github.com/Pokemon-3D-api/assets)
-models, **rigged and animated here with headless Blender** (17-bone skeleton, 18 clips each). Everything is then
+models, **rigged and animated here with headless Blender** (a skeleton fitted to each species, 30 clips each). Everything is then
 assembled into real 3D in Godot.
 
 Fan project, unofficial, not affiliated with Nintendo / Game Freak / Creatures
@@ -32,6 +32,86 @@ assets from Nintendo's Pokémon Red are included or redistributed.
 Compatibility / `opengl3` renderer, headless for CI) and **Blender 5.0.1**
 headless via the official [`bpy` PyPI package](https://pypi.org/project/bpy/)
 — no GUI, ever. Node 22 runs the upstream game headlessly for the bakes.
+
+## Realism, rigs and Red / Blue / Yellow
+
+This release reworks the characters, the Pokémon, the environment and the game content.
+
+```mermaid
+flowchart LR
+    subgraph Blender["Headless Blender (bpy 5.0.1)"]
+        H["Humans\none implicit-surface body, real hands and face,\nscalp-cap hair, shell garments"]
+        M["Pokémon mesh fix\niris baked into eye atlas,\nmatte materials, stray parts removed"]
+        R["Pokémon rig\n152 species-specific skeletons (7-39 bones),\nbaked natural rest pose, 30 clips each"]
+        E["Environment\n153 new prop / nature / town / building glbs"]
+    end
+    subgraph Godot["Godot 4.7.2"]
+        V["RED / BLUE / YELLOW\nversions.json from pret disassemblies"]
+        F["FurnitureKit + DressingKit\nlabel grid to real 3D props"]
+        A["PokemonActor\nmove-specific clips + idle variety"]
+    end
+    M --> R --> A
+    H --> P["NPCs, player creator, battle back view"]
+    E --> F
+    V --> G["Wild tables, trainers, story, Pikachu follower"]
+```
+
+| | Before | After |
+|---|---|---|
+| **Humans** | ![](docs/showcase/humans-before.png) | ![](docs/showcase/humans-after.png) |
+| **Pokémon pose** | ![](docs/showcase/pokemon-tpose-before.png)<br>*T-pose in every clip* | ![](docs/showcase/pokemon-idle-after.png)<br>*natural rest pose* |
+| **Pokémon eyes** | ![](docs/showcase/eyes-before.png) | ![](docs/showcase/eyes-after.png) |
+| **Props (PC)** | ![](docs/showcase/env-before-pokecenter-pc.png) | ![](docs/showcase/env-after-pokecenter-pc.png) |
+| **Props (Oak's Lab)** | ![](docs/showcase/env-before-oaks-lab.png) | ![](docs/showcase/env-after-oaks-lab.png) |
+
+### Humans
+
+Bodies are one welded surface (about 6.8 heads tall, fingers, sculpted face, painted eyes with lids), hair is
+attached to a scalp cap (Blue's and Brock's spikes are soft tousled clumps now), and garments are shells cut from the
+body, so they follow the skin. `pipeline/blender/char_clip.py` pose-tests every character over the 19 clips and
+`check_clipping_report.py` guards the numbers in CI. **Honest status:** at rest, 305 vertices poke through in total
+across all 60 characters (0-31 each); during animation there are still some (about 233 per character on average, worst
+about 590 for long hair and skirts, 18-100 mm deep), and CI enforces a budget of 600, not zero.
+
+### Pokémon: eyes
+
+The "off" eyes came from the cel shader ignoring alpha: the source models draw the iris as a separate alpha overlay
+that rendered as a black box on about 26 species. The iris is now baked into the eye atlas. About 120 species use
+the game's own eye textures shipped in the mesh source; Snorlax's closed-eye strokes come from
+[PokeMiners/pogo_assets](https://github.com/PokeMiners/pogo_assets) (`pipeline/data/eye_tex/SOURCES.md` has the
+licence caveats: neither that repository nor the Sketchfab-derived models carry a clear redistribution licence).
+`pipeline/scripts/check_pokemon_eyes.py` audits all 152 in CI.
+
+### Pokémon: rigs and animation
+
+```mermaid
+flowchart LR
+    S["source glb"] --> G["geodesic protrusion search\narms, legs, tails, ears, wings, fins, leaves"]
+    G --> K["species skeleton\n(body plan table for all 152)"]
+    K --> W["smooth radius-aware weights"]
+    W --> B["bake corrective pose\nno T-pose"]
+    B --> C["30 clips: 18 game clips + 3 idle variants\n+ 9 signature move clips from its own learnset"]
+    C --> X["glb"]
+```
+
+All 152 skeletons have distinct bone-name sets except one pair (Psyduck and Hitmonchan share theirs); bone counts run 7 to 39.
+The T-pose detector finds 0 sideways-level arms (it was 24 of 64 armed species). A few limbs still point forward
+or up (Grimer, Muk, Krabby, Kingler). `PokemonActor` plays the species' own clip for the matching move.
+
+### Environment
+
+The PC, healing machine, TVs, shelves, counters, tables and machines used to be flat boxes extruded from the 2D sprites.
+They are now real models, and there are 153 new glbs (furniture, nature, town, building modules) placed by
+`FurnitureKit` and `DressingKit`. Contact sheet: `docs/gallery/props-sheet.png`.
+
+### Red, Blue and Yellow
+
+NEW GAME asks for a version. Wild tables, trades, prizes, and Yellow's trainer parties, gifts, Pikachu follower and
+friendship, rival Eevee branch and Jessie & James come from the pret `pokered` / `pokeyellow` disassemblies
+(`pipeline/scripts/extract_versions.py`). `docs/CONTENT_AUDIT.md` lists 107 checklist rows: 97 done, 5 partial, 5 missing
+(MEW has no in-game source; Yellow map tile changes, Pikachu's Beach and Surfing Pikachu are not built).
+
+![Yellow: Pikachu follows the player](docs/showcase/versions-yellow-pikachu-follower.png)
 
 ## 2D → 3D, side by side
 

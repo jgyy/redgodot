@@ -79,6 +79,9 @@ jobs:
       - name: Check the character clipping report (nothing pokes through at rest, animated penetrations within budget)
         run: python3 pipeline/blender/check_clipping_report.py
 
+      - name: Verify environment prop glbs
+        run: python3 pipeline/blender/verify_glb.py godot/assets/models/world --min-kb 1 --max-kb 300 --max-tris 4000 --meshes table_set=16,desk_set=16,counter_center_set=16,counter_mart_set=16,bench_set=4
+
       - name: Import project
         run: timeout 20m /opt/godot/godot4 --headless --path godot --import
 
