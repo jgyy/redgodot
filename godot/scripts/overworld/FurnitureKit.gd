@@ -40,6 +40,15 @@ static func replaced(label: String) -> bool:
 		return PropKit.mesh(String(CELL_PROPS[label])) != null
 	return PropKit.mesh(label) != null
 
+## Height (sprite units) of the top surface of a piece of furniture, for things standing on it.
+static func surface_height(label: String) -> float:
+	match label:
+		"table": return 0.5
+		"desk": return 0.55
+		"counter": return 0.6
+		"cabinet": return 0.7
+	return 0.0
+
 static func machine_prop(map: String) -> String:
 	if map == "PowerPlant" or map == "VermilionDock":
 		return "generator"
@@ -142,7 +151,9 @@ static func place(bake: Dictionary, overrides: Dictionary, ctx: Dictionary, add:
 			"teleport":
 				add.call("teleporter_pad", Vector3(c.x + 0.5, 0.0, c.y + 0.5), 0.0, c, 1.0)
 			"mat":
-				add.call("doormat", Vector3(c.x + 0.5, 0.0, c.y + 0.5), 0.0, c, 1.0)
+				# door mats only (one or two cells); a big field of 'mat' cells is a carpet, which stays ground art
+				if _flood(lab, c, "mat").size() <= 2:
+					add.call("doormat", Vector3(c.x + 0.5, 0.0, c.y + 0.5), 0.0, c, 1.0)
 			_:
 				if CELL_PROPS.has(l):
 					_front_anchor(add, String(CELL_PROPS[l]), c, 0.0)

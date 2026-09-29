@@ -1092,5 +1092,89 @@
   "bytes": 25148,
   "notes": "S.S. Anne funnel",
   "set": "town"
+ },
+ "tv_antenna": {
+  "tris": 164,
+  "bytes": 13184,
+  "notes": "roof TV aerial",
+  "set": "building"
+ },
+ "weather_vane": {
+  "tris": 92,
+  "bytes": 8128,
+  "notes": "roof-ridge weather vane",
+  "set": "building"
+ },
+ "wall_lantern": {
+  "tris": 180,
+  "bytes": 14356,
+  "notes": "porch wall lantern",
+  "set": "building"
+ },
+ "radio_mast": {
+  "tris": 304,
+  "bytes": 22324,
+  "notes": "red/white radio mast with beacon",
+  "set": "building"
+ },
+ "roof_hatch": {
+  "tris": 240,
+  "bytes": 18804,
+  "notes": "rooftop stair hatch",
+  "set": "building"
+ },
+ "roof_tank": {
+  "tris": 256,
+  "bytes": 18660,
+  "notes": "rooftop water tank",
+  "set": "building"
+ },
+ "gym_top_rock": {
+  "tris": 228,
+  "bytes": 22196,
+  "notes": "gym roof ornament: rock",
+  "set": "building"
+ },
+ "gym_top_water": {
+  "tris": 216,
+  "bytes": 16172,
+  "notes": "gym roof ornament: wave and droplet",
+  "set": "building"
+ },
+ "gym_top_electric": {
+  "tris": 212,
+  "bytes": 16920,
+  "notes": "gym roof ornament: lightning rod",
+  "set": "building"
+ },
+ "gym_top_grass": {
+  "tris": 548,
+  "bytes": 54076,
+  "notes": "gym roof ornament: topiary",
+  "set": "building"
+ },
+ "gym_top_poison": {
+  "tris": 344,
+  "bytes": 27564,
+  "notes": "gym roof ornament: bubbling cauldron",
+  "set": "building"
+ },
+ "gym_top_psychic": {
+  "tris": 300,
+  "bytes": 26468,
+  "notes": "gym roof ornament: crystal eye orb",
+  "set": "building"
+ },
+ "gym_top_fire": {
+  "tris": 384,
+  "bytes": 27224,
+  "notes": "gym roof ornament: flame brazier",
+  "set": "building"
+ },
+ "gym_top_ground": {
+  "tris": 192,
+  "bytes": 15452,
+  "notes": "gym roof ornament: earth tiers with pennant",
+  "set": "building"
  }
 }

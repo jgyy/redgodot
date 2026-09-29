@@ -161,6 +161,7 @@ static func build(bake: Dictionary, overrides: Dictionary, mat: ShaderMaterial, 
 		groups[key3].append([Transform3D(Basis.from_scale(Vector3(sxw, WorldData.K, szl)), Vector3(cxp, 0.0, czp)), Color(0, 0, 0, 0)])
 	# ---- furniture / appliances / machines (label cells; see FurnitureKit)
 	FurnitureKit.place(bake, overrides, ctx, add)
+	DressingKit.place(bake, overrides, ctx, add)
 	for b in bake.get("blocks", []):
 		var bl: String = String(b.get("lbl", ""))
 		if BLOCK_MODELS.has(bl) and mesh(String(BLOCK_MODELS[bl])) != null:

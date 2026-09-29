@@ -276,9 +276,21 @@ func _cell_fx(cell: Vector2i, label: String) -> void:
 		fx.name = n
 		add_child(fx)
 
+## Baked label of a cell (script overrides applied), "" outside the grid.
+func cell_label(c: Vector2i) -> String:
+	if label_override.has(c):
+		return String(label_override[c])
+	var legend: Array = bake.get("legend", [])
+	var labels: Array = bake.get("labels", [])
+	var i := (c.y + int(bake.get("my", 0))) * int(bake.get("cw", 0)) + c.x + int(bake.get("mx", 0))
+	if i >= 0 and i < labels.size():
+		return String(legend[int(labels[i])])
+	return ""
+
 ## What PropKit / FurnitureKit need to know about this map beyond the bake (clerks for the till, passability for dressing).
 func _prop_ctx() -> Dictionary:
-	return {"map": map_name, "objs": map_data.get("objs", []), "passable": Callable(self, "passable")}
+	return {"map": map_name, "objs": map_data.get("objs", []), "warps": map_data.get("warps", []), "signs": map_data.get("signs", []),
+		"passable": Callable(self, "passable")}
 
 func _rebuild_objects() -> void:
 	if bake.is_empty() or obj_mat == null or not is_inside_tree():
@@ -315,6 +327,10 @@ func spawn_actor(o: Dictionary) -> OwActor:
 	if ["UP", "DOWN", "LEFT", "RIGHT"].has(od):
 		dir = od.to_lower()
 	a.place(Vector2i(int(o.get("x", 0)), int(o.get("y", 0))), dir)
+	if a.is_object:   # a Poke Ball / Pokedex on a table or counter rests on its top
+		var lift := FurnitureKit.surface_height(cell_label(a.cell))
+		if lift > 0.0:
+			a.lift_object(lift * WorldData.K)
 	a.home = a.cell
 	a.idle_t = randf_range(0.0, 2.0)
 	actors.append(a)

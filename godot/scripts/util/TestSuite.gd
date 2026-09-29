@@ -41,6 +41,7 @@ func run_all(tree: SceneTree) -> void:
 	StoryTests.run(self)
 	MotionTests.run(self, tree.current_scene if tree.current_scene else tree.root)  # overworld motion continuity
 	BattleTests.run(self)  # battle engine / stage / UI (scripts/battle/BattleTests.gd)
+	EnvTests.run(self)  # environment props: furniture / dressing placement (scripts/overworld/EnvTests.gd)
 
 func _test_type_chart() -> void:
 	check(GameData.type_multiplier("WATER", ["FIRE"]) == 2.0, "WATER is super effective vs FIRE")

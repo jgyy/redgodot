@@ -114,10 +114,20 @@ static func build_decor(bake: Dictionary, mx: int, my: int) -> Node3D:
 	var all_trees: Array = (bake.get("trees", []) as Array).duplicate()
 	if String(bake.get("map", "")) == "ViridianForest":
 		all_trees.append_array(_margin_forest(bake))
+	var clearings := DressingKit.tree_clearings(String(bake.get("map", "")))
 	for t in all_trees:
 		var cx := int(t[0])
 		var cy := int(t[1])
+		var cleared := false
+		for cl in clearings:
+			if Vector2(cx - mx - float(cl[0]), cy - my - float(cl[1])).length() <= float(cl[2]):
+				cleared = true
+		if cleared:
+			continue
 		var key := "%d,%d|%d|%d" % [cx / CHUNK, cy / CHUNK, int(t[2]), int(t[3])]
+		var species := DressingKit.tree_species(String(bake.get("map", "")), cx, cy)   # pines, oaks, palms ... by region
+		if species != "":
+			key = "%d,%d|sp|%s" % [cx / CHUNK, cy / CHUNK, species]
 		if not groups.has(key):
 			groups[key] = []
 		var xf := Transform3D(Basis.from_scale(Vector3(1.0, WorldData.K, 1.0)), Vector3(cx - mx + 0.5 + 1.0 / 16.0, 0.0, cy - my + 1.0))
@@ -130,7 +140,7 @@ static func build_decor(bake: Dictionary, mx: int, my: int) -> Node3D:
 		var parts: PackedStringArray = String(key).split("|")
 		var mm := MultiMesh.new()
 		mm.transform_format = MultiMesh.TRANSFORM_3D
-		mm.mesh = tree_mesh(int(parts[1]), int(parts[2]))
+		mm.mesh = PropKit.mesh(parts[2]) if parts[1] == "sp" else tree_mesh(int(parts[1]), int(parts[2]))
 		mm.use_colors = true          # (GLES3: vertex COLOR is multiplied by the instance colour, which must be white)
 		mm.use_custom_data = true
 		var xfs: Array = groups[key]
