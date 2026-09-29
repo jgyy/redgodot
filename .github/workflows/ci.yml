@@ -46,6 +46,9 @@ jobs:
           python3 pipeline/blender/verify_glb.py godot/assets/models/pokemon --require-skin --min-kb 20 \
             --anims Idle,Walk,Run,Attack,Special,Hurt,Faint,Victory,Sleep,Roar,Dodge,Spin,Hop,Charge,Taunt,Spawn,Hover,Talk
 
+      - name: Verify Pokémon eyes and materials (no alpha layers, non-metallic, eyes present, textures <= 512)
+        run: python3 pipeline/scripts/check_pokemon_eyes.py
+
       - name: Verify NPC glbs (rigged, 19 clips each)
         run: |
           python3 pipeline/blender/verify_glb.py godot/assets/models/characters --require-skin --min-kb 20 --skip humanoid.glb \
