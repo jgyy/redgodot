@@ -320,8 +320,17 @@ func _test_models_3d(_tree: SceneTree) -> void:
 	check(missing.is_empty(), "every species has a glb (missing %s)" % [missing])
 	var actor := PokemonActor.new()  # not added to the tree (root is busy during boot)
 	actor.setup("PIKACHU")
-	for clip in ["Idle", "Walk", "Attack", "Hurt", "Faint", "Special"]:
+	check(PokemonActor.CLIPS.size() >= 10, "at least 10 Pokemon clips are defined")
+	for clip in PokemonActor.CLIPS:
 		check(actor.has_anim(clip), "PIKACHU has clip %s" % clip)
+	check(actor.model.find_child("Skeleton3D", true, false) != null, "PIKACHU is rigged (Skeleton3D)")
+	actor.sleeping = true
+	check(actor.idle_clip() == "Sleep", "sleeping mons rest in the Sleep clip")
+	actor.sleeping = false
+	var bird := PokemonActor.new()
+	bird.setup("PIDGEY")
+	check(bird.idle_clip() == "Hover", "fliers idle in Hover")
+	bird.free()
 	var mi: MeshInstance3D = Toon._mesh_instances(actor)[0]
 	var mat := mi.get_surface_override_material(0) as ShaderMaterial
 	check(mat != null and mat.shader == Toon.TOON_SHADER and mat.next_pass != null, "PIKACHU uses toon + outline")

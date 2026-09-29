@@ -282,6 +282,8 @@ func _apply_actor(k: String) -> void:
 	var w := vfx.px_world(anchor.global_position)
 	var cb := stage.camera.global_transform.basis
 	var o: Vector2 = offs[k]
+	if _actors.get(k) is PokemonActor:
+		(_actors[k] as PokemonActor).sleeping = _mon(k).status == "SLP" and not _mon(k).is_fainted()
 	var idle := 0.0
 	if show[k] and _actors.has(k) and not _mon(k).is_fainted() and _mon(k).status != "SLP":
 		idle = sin(_t / (22.0 if k == "e" else 26.0) + (0.0 if k == "e" else 2.0)) * 1.1
@@ -670,6 +672,8 @@ func ball_open(k: String) -> void:
 	_ball_hide()
 	_sfx("ballpop")
 	vfx.burst(tx, ty, "release")
+	if _actors.get(k) is PokemonActor:
+		(_actors[k] as PokemonActor).play_once("Spawn")
 	show[k] = true
 	scale_k[k] = 0.1
 	set_tint(k, Color.WHITE, 1.0)
@@ -963,6 +967,9 @@ func faint(side: Variant) -> void:
 	_cry(_mon(k).species_id, "faint")
 	if _actors.get(k) is PokemonActor:
 		(_actors[k] as PokemonActor).play("Faint")
+	var other := "p" if k == "e" else "e"
+	if _actors.get(other) is PokemonActor and not _mon(other).is_fainted():
+		(_actors[other] as PokemonActor).play_once("Victory")
 	vfx.faint_fx(k)
 	for i in 20:
 		clip[k] = 1.0 - Smooth.ease_in(i / 20.0, 1.7)   # slumps slowly, then drops out of sight
@@ -1041,13 +1048,26 @@ func stat_anim(side: Variant, up: bool) -> void:
 func anim(move_id: String, side: Variant, hit: int) -> void:
 	var k := key(side)
 	var pa: PokemonActor = _actors[k] as PokemonActor if _actors.get(k) is PokemonActor else null
-	if pa and hit == 0:
+	if pa and hit == 0 and (move_id == "CHARGE" or move_id.ends_with("_CHARGE")):
+		pa.play("Charge")
+	elif pa and hit == 0:
 		# damaging moves swing the Attack clip, self-targeting ones the Special clip; both hand back to Idle
 		# with a crossfade by themselves (PokemonActor.play_once queues it)
 		pa.play_once("Special" if BattleVfx.is_status_move(move_id) and pa.has_anim("Special") else "Attack")
 	await vfx.move(move_id, k, hit)
 	if pa and is_instance_valid(pa) and pa.current_clip() not in ["Idle", "Attack", "Special", "Hurt"]:
 		pa.play("Idle")
+
+## The target of a missed move sidesteps it (Dodge clip + a slide on the stage).
+func dodge(side: Variant) -> void:
+	var k := key(side)
+	if _actors.get(k) is PokemonActor:
+		(_actors[k] as PokemonActor).play_once("Dodge")
+	var away := 1.0 if k == "e" else -1.0
+	for i in 14:
+		offs[k] = Vector2(away * 7.0 * sin(i / 13.0 * PI), offs[k].y)
+		await tick
+	offs[k] = Vector2(0, offs[k].y)
 
 func hide_side(side: Variant, h: bool) -> void:
 	hidden[key(side)] = h

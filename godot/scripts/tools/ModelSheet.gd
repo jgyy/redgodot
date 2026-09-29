@@ -42,11 +42,12 @@ func run(args: Dictionary, out_path: String) -> void:
 		var ap := _find_anim(model)
 		if ap:
 			AnimUtil.fix_looping(ap)
+			ap.playback_default_blend_time = 0.0   # paused poses: a pending cross-fade would hide the clip
 			var nm := anim_name if ap.has_animation(anim_name) else "Idle"
 			if ap.has_animation(nm):
 				ap.play(nm)
 				ap.seek(anim_t, true)
-				ap.pause()
+				ap.speed_scale = 0.0
 		match view:
 			"back":
 				holder.rotation_degrees.y = 180.0 - yaw * 0.5

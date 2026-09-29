@@ -75,6 +75,9 @@ func stat_anim(_side: Variant, _up: bool) -> void:
 func anim(move: String, _side: Variant, _hit: int) -> void:
 	anims.append(move)
 
+func dodge(_side: Variant) -> void:
+	pass
+
 func hide_side(_side: Variant, _h: bool) -> void:
 	pass
 

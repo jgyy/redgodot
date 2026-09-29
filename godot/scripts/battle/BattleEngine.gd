@@ -562,6 +562,7 @@ func execute_move(side: BattleSide, md: Dictionary) -> void:
 		await status_move(side, md)
 		return
 	if not accuracy_check(side, md):
+		await ui.dodge(fs)
 		await ui.msg(nm + "'s attack missed!")
 		if eff == "JUMP_KICK":
 			await ui.msg(nm + " kept going and crashed!")
