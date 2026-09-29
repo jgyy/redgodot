@@ -10,8 +10,12 @@ const DIR := "res://assets/models/characters/"
 static func build(cast_key: String) -> Node3D:
 	# the character pipeline's cel-shaded model (with humanoid fallback)
 	var best := CharacterSkin.instantiate(cast_key)
-	if best:
+	# instantiate() never returns null: with no model at all it hands back an empty Node3D, which would skip the
+	# fallbacks below and leave the menu/intro with an invisible character
+	if best and best.get_child_count() > 0:
 		return best
+	if best:
+		best.free()
 	var entry: Dictionary = GameData.cast.get(cast_key, {})
 	for path in [DIR + cast_key + ".glb", DIR + "humanoid.glb"]:
 		if ResourceLoader.exists(path):
