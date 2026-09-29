@@ -1675,9 +1675,10 @@
   },
   "features": [
    "blue-grey muscular kid",
-   "red-ish head ridge",
+   "three brown-pink ridges on the head",
+   "rib lines on the sides",
    "short tail",
-   "stubby legs"
+   "stubby legs (no belt: only Machoke and Machamp wear one)"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Machop_%28Pok%C3%A9mon%29",
@@ -2379,6 +2380,7 @@
    "https://bulbapedia.bulbagarden.net/wiki/Onix_%28Pok%C3%A9mon%29",
    "https://pokemon.fandom.com/wiki/Onix"
   ],
+  "blend": 0.4,
   "view": "side",
   "face": "left"
  },
@@ -2397,9 +2399,9 @@
   },
   "features": [
    "yellow tapir humanoid",
-   "trunk-like snout",
-   "brown lower body and collar",
-   "holds a pendulum"
+   "trunk-like snout with a dark ring",
+   "brown lower body",
+   "sleepy half-closed eyes, hands with three digits"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Drowzee_%28Pok%C3%A9mon%29",
