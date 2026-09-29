@@ -38,8 +38,10 @@ func _rand(a: float, b: float) -> float:
 	return _rng.randf_range(a, b)
 
 func _take() -> MeshInstance3D:
-	if not _pool.is_empty():
-		return _pool.pop_back()
+	while not _pool.is_empty():
+		var pn: MeshInstance3D = _pool.pop_back()
+		if is_instance_valid(pn):
+			return pn
 	var m := MeshInstance3D.new()
 	var mat := StandardMaterial3D.new()
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
@@ -110,6 +112,10 @@ func _process(dt: float) -> void:
 	while i >= 0:
 		var c: Dictionary = _live[i]
 		var n: MeshInstance3D = c["node"]
+		if not is_instance_valid(n):   # freed from outside (scene teardown): drop the chunk instead of touching it
+			_live.remove_at(i)
+			i -= 1
+			continue
 		c["age"] += dt
 		var v: Vector3 = c["vel"]
 		if not c["rest"]:
@@ -120,7 +126,9 @@ func _process(dt: float) -> void:
 			var floor_y: float = ground_y + float(c["half"])
 			if n.position.y <= floor_y:
 				n.position.y = floor_y
-				if absf(v.y) > 0.45:
+				if v.y > 0.0:
+					pass   # spawned below the floor and rising: just clamp to the floor, don't flip it into the ground
+				elif absf(v.y) > 0.45:
 					v.y = -v.y * float(c["bounce"])
 					v.x *= 0.7
 					v.z *= 0.7

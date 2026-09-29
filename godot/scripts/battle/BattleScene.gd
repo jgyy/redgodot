@@ -1185,6 +1185,8 @@ func ball_throw(item: String, shakes: int, caught: bool) -> void:
 	var y := ty
 	var vy := 0.0
 	var rolled := 0.0
+	var spin := 0.0
+	var bx := tx
 	for i in 70:
 		vy += 0.42
 		y += vy
@@ -1196,16 +1198,18 @@ func ball_throw(item: String, shakes: int, caught: bool) -> void:
 				rolled += 0.9
 			else:
 				vy = 0.0
-		_ball_at(item, Vector2(tx + rolled * (1.0 - exp(-i * 0.12)) * 2.0, y), rolled * i * 0.05)
+		bx = tx + rolled * (1.0 - exp(-i * 0.12)) * 2.0
+		spin += rolled * 0.05   # accumulated, so a bounce doesn't snap the ball's angle
+		_ball_at(item, Vector2(bx, y), spin)
 		await tick
 		if vy == 0.0 and y >= gy and i > 12:
 			break
-	tx += rolled * 2.0
+	tx = bx   # the shake / catch / release below start exactly where the ball came to rest (no jump)
 	await wait(20)
 	for k in mini(3, shakes):
 		for i in 16:
 			var a := sin(i / 16.0 * TAU) * 3.0
-			_ball_at(item, Vector2(tx + a, gy), 0.0, a * 0.2)
+			_ball_at(item, Vector2(tx + a, gy), spin, a * 0.2)
 			await tick
 		_sfx("shake")
 		await wait(24)

@@ -313,6 +313,7 @@ func _process(dt: float) -> void:
 		_player_gestures(dt, false)
 	elif not player.moving:
 		_was_moving = false
+		_player_idle = 0.0   # menus / dialogue count as activity: no fidget the instant they close
 	_update_camera(dt)
 	_update_follower_visibility()
 
@@ -638,6 +639,10 @@ func _try_interact() -> void:
 			var pa := _follower_actor()
 			if pa:
 				pa.play_once("Talk" if pa.has_anim("Talk") else "Idle")
+				if pa.has_anim("Talk"):   # Talk is a looping clip: play_once's queued Idle never comes, hand back by hand
+					get_tree().create_timer(1.6).timeout.connect(func() -> void:
+						if is_instance_valid(pa) and pa.current_clip() == "Talk":
+							pa.play("Idle"))
 			emote_on(follower, str(mood[1]))
 			_dialogue.show_lines([str(mood[0])])
 		return
@@ -1064,7 +1069,7 @@ func _emote_node(kind: String) -> Node3D:
 			return holder
 		inst.free()
 	var l := Label3D.new()
-	l.text = kind
+	l.text = {"heart": "♥", "...": "…"}.get(kind, kind)   # (the glyph-less fallback must not print the word "heart")
 	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	l.no_depth_test = true
 	l.font_size = 64
@@ -1195,7 +1200,7 @@ func poison_flash() -> void:
 func heal_machine(count: int, glow: bool) -> void:
 	if _map_loader:
 		for na in _map_loader.actors:
-			if (na as OwActor).sprite == "nurse":
+			if (na as OwActor).sprite == "nurse" and not (na as OwActor).is_gesturing():   # called once per ball: don't restart the bow
 				(na as OwActor).gesture("Bow")
 	_heal_count = count
 	if glow:

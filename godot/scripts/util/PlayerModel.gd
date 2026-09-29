@@ -38,6 +38,8 @@ static func build(look: PlayerLook, toon: bool = true) -> Node3D:
 	body_mi.skeleton = NodePath("..")
 	body_root.free()
 	var colors := _resolved_colors(look)
+	if CharacterSkin.fit_bounds:   # like every other character: tall hair / a beanie must not shrink the player in OwActor._fit_height
+		CharacterSkin._fit_bounds(root)
 	if toon:
 		Toon.apply(root, 1.3, 0.02)
 		Toon.set_param(root, "ramp_bias", 0.28)

@@ -109,7 +109,7 @@ static func from_dict(d: Variant) -> PlayerLook:
 	var c: Variant = dd.get("colors", {})
 	if c is Dictionary:
 		for k in l.colors.keys():
-			if (c as Dictionary).has(k) and str((c as Dictionary)[k]).begins_with("#"):
+			if (c as Dictionary).has(k) and str((c as Dictionary)[k]).begins_with("#") and Color.html_is_valid(str((c as Dictionary)[k])):
 				l.colors[k] = str((c as Dictionary)[k])
 	return l
 

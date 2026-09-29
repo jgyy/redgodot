@@ -190,6 +190,7 @@ func _run() -> void:
 func _rebuild_player_model() -> void:
 	var holder: Node3D = _models["red"]
 	for c in holder.get_children():
+		holder.remove_child(c)   # out of the tree now: play_anim() below must find the NEW model's AnimationPlayer
 		c.queue_free()
 	holder.add_child(CharacterModel.build("red"))
 	Diorama.play_anim(holder, ["Idle"])

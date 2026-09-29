@@ -42,6 +42,7 @@ func _on_open() -> void:
 
 func _rebuild() -> void:
 	_view.show_look(look)
+	_view.play_clip(PREVIEW_CLIPS[_clip_i])   # the rebuilt model starts in Idle; keep the clip the label names
 	_bump = 1.0
 
 ## Row definitions for the current look: {key, label, kind ("opt" | "col" | "act"), off}.
@@ -129,6 +130,9 @@ func step_value(d: int) -> bool:
 			var pal: Array = _palette(r["key"])
 			var slot := _color_slot(r["key"])
 			var i2 := pal.find(look.colors.get(slot, ""))
+			if i2 < 0:   # a colour outside the palette (old save / hand-edited): land on the first / last swatch
+				look.colors[slot] = pal[0 if d > 0 else pal.size() - 1]
+				return true
 			look.colors[slot] = pal[posmod(i2 + d, pal.size())]
 			return true
 	return false
@@ -221,5 +225,5 @@ func _draw() -> void:
 func _arrow(x: float, y: float, dir: int) -> void:
 	for i in 3:
 		var h := 1 + i * 2
-		var cx := x + (2 - i if dir < 0 else i)
+		var cx := x + (i if dir < 0 else 2 - i)
 		Px.rect(self, cx, y + 3 - i, 1, h, Px.INK)

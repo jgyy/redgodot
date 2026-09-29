@@ -105,6 +105,7 @@ var _overlay: Node = null
 var _own_text: Dictionary = {}
 var _own_text_loaded := false
 var _cur_map := ""
+var _flags_ref: Variant = null   # GameState.flags instance the runtime state below belongs to
 var _last_enc: Dictionary = {}   # the encounter of the battle overlay currently open (SceneRouter.battle_started)
 
 func _ready() -> void:
@@ -1060,8 +1061,25 @@ func trainer_sighted(id: String, dist: int) -> void:
 	await trainer_battle_flow(o)
 
 # ================================================================== dispatch hooks (called by the Overworld)
+## Runtime-only story state (cell overrides, elevator exits, Mt.Moon sight, ride flags) is not part of the save: when
+## GameState hands out a fresh `flags` dictionary (NEW GAME / CONTINUE after another run) it must not leak into it.
+func _sync_runtime_state() -> void:
+	if _flags_ref != null and not is_same(_flags_ref, GameState.flags):
+		cell_overrides.clear()
+		warp_redirects.clear()
+		sight_off.clear()
+		surfing = false
+		biking = false
+		strength = false
+		flashed = false
+		busy = 0
+		prev_map = ""
+		_cur_map = ""
+	_flags_ref = GameState.flags
+
 ## Map loaded (called after actors spawn). Runs global hooks + the map's enter scripts.
 func on_enter(map_name: Variant = "") -> void:
+	_sync_runtime_state()
 	var m := ""
 	if map_name is String:
 		m = map_name

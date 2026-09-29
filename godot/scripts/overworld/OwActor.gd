@@ -118,6 +118,9 @@ func setup(sprite_key: String, px_height: float = CHAR_PX, o: Dictionary = {}) -
 	for c in get_children():
 		c.queue_free()
 	_anim = null
+	_gesture = ""            # a re-skinned actor has no gesture playing on its new model
+	_gesture_left = 0.0
+	gesture_wait = -1.0
 	_body = null
 	_lean = null
 	_mount = null
@@ -371,6 +374,7 @@ func place(c: Vector2i, dir: String = "") -> void:
 	if dir != "":
 		face(dir, true)
 	_clip = ""
+	_gesture = ""   # placed = teleported: whatever it was gesturing is over (an Idle pose is playing now)
 	if _anim and _anim.has_animation("Idle"):
 		_anim.speed_scale = 1.0
 		_anim.play("Idle", 0.0)
@@ -561,7 +565,7 @@ func _update_gait(dt: float) -> void:
 		gait += v * dt / (1.0 if is_mon else 2.0)
 	_amp = move_toward(_amp, 1.0 if moving and not _jump else 0.0, dt * 7.0)
 	if _anim:
-		var walking := (moving or _since_end < IDLE_GRACE) and _clip != ""
+		var walking := (moving or (_since_end < IDLE_GRACE and _gesture == "")) and _clip != ""
 		if walking:
 			if _anim.current_animation != _clip:
 				_anim.play(_clip, BLEND_WALK)
