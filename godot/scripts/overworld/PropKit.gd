@@ -12,7 +12,7 @@ const CHUNK := 8
 const REPLACED := ["sign", "plant", "fence", "crate", "barrel", "grave", "cut_tree", "statue", "gym_statue", "brazier"]
 ## label cells -> one prop per cell: label -> [prop, foot z offset inside the cell, yaw jitter]
 const CELL_PROPS := {
-	"sign": ["sign", 0.82, 0.10], "plant": ["plant", 0.86, 0.6], "crate": ["crate", 0.6, 0.16], "barrel": ["barrel", 0.62, 0.5],
+	"sign": ["sign", 0.82, 0.10], "plant": ["plant", 0.86, 0.6], "crate": ["crate", 0.6, 0.16], "barrel": ["barrel", 0.66, 0.5],
 }
 ## card blocks -> prop
 const BLOCK_PROPS := {"cut_tree": "bush", "statue": "statue", "gym_statue": "statue"}
@@ -125,6 +125,70 @@ static func build(bake: Dictionary, overrides: Dictionary, mat: ShaderMaterial) 
 	_flush(root, groups, mat)
 	return root
 
+## Grass tufts on plain grass / path-edge cells and stones along ledge feet (visual sprinkles, windy material).
+static func build_tufts(bake: Dictionary, mat: ShaderMaterial, stones_mat: ShaderMaterial) -> Array:
+	var cw := int(bake.get("cw", 0))
+	var ch := int(bake.get("ch", 0))
+	var mx := int(bake.get("mx", 0))
+	var my := int(bake.get("my", 0))
+	var legend: Array = bake.get("legend", [])
+	var labels: Array = bake.get("labels", [])
+	var w := int(bake.get("w", 0))
+	var h := int(bake.get("h", 0))
+	if String(bake.get("kind", "")) == "interior" or legend.is_empty() or labels.size() < cw * ch:
+		return []
+	var prob := {}
+	for i in range(legend.size()):
+		match String(legend[i]):
+			"grass": prob[i] = 0.16
+			"path_tufts": prob[i] = 0.42
+			"flowers": prob[i] = 0.0
+			"ledge_d", "ledge_l", "ledge_r": prob[i] = -1.0
+	var tufts := {}
+	var stones := {}
+	for i in range(cw * ch):
+		var li := int(labels[i])
+		if not prob.has(li):
+			continue
+		var x := i % cw
+		var y := i / cw
+		# only near the playable area (the far margin is never seen closely)
+		if x < mx - 8 or x >= mx + w + 8 or y < my - 8 or y >= my + h + 8:
+			continue
+		var c := Vector2i(x - mx, y - my)
+		var p: float = prob[li]
+		var key_chunk := "%d,%d" % [floori(float(c.x) / CHUNK), floori(float(c.y) / CHUNK)]
+		if p < 0.0:
+			for k in range(2):
+				var jx := 0.2 + _h(x, y, 90 + k) * 0.6
+				var b := Basis.from_scale(Vector3.ONE * (0.8 + _h(x, y, 92 + k) * 0.7)) * Basis(Vector3.UP, _h(x, y, 94 + k) * TAU)
+				b = Basis.from_scale(Vector3(1.0, WorldData.K, 1.0)) * b
+				var key := "%s|pebbles" % key_chunk
+				if not stones.has(key):
+					stones[key] = []
+				if _h(x, y, 96 + k) < 0.5:
+					stones[key].append([Transform3D(b, Vector3(c.x + jx, 0.0, c.y + 0.9)), Color(0, 0, 0, 0)])
+			var kt := "%s|tuft" % key_chunk
+			if not tufts.has(kt):
+				tufts[kt] = []
+			if _h(x, y, 98) < 0.5:
+				tufts[kt].append([Transform3D(Basis.from_scale(Vector3(1.0, WorldData.K, 1.0)), Vector3(c.x + 0.2 + _h(x, y, 99) * 0.6, 0.0, c.y + 0.12)), Color(0, _h(x, y, 100) * TAU, 0, 0)])
+			continue
+		if _h(x, y, 60) < p:
+			var kt2 := "%s|tuft" % key_chunk
+			if not tufts.has(kt2):
+				tufts[kt2] = []
+			var sc := 0.8 + _h(x, y, 61) * 0.7
+			var bb := Basis.from_scale(Vector3(sc, WorldData.K * sc, sc)) * Basis(Vector3.UP, _h(x, y, 62) * TAU)
+			tufts[kt2].append([Transform3D(bb, Vector3(c.x + 0.15 + _h(x, y, 63) * 0.7, 0.0, c.y + 0.2 + _h(x, y, 64) * 0.7)), Color((_h(x, y, 65) - 0.5) * 0.1, _h(x, y, 66) * TAU, _h(x, y, 67) - 0.5, 0.0)])
+	var t := Node3D.new()
+	t.name = "GrassTufts"
+	_flush(t, tufts, mat)
+	var s := Node3D.new()
+	s.name = "LedgeStones"
+	_flush(s, stones, stones_mat)
+	return [t, s]
+
 ## Flower tufts on the bake's flower cells (windy: own material).
 static func build_flowers(bake: Dictionary, mat: ShaderMaterial) -> Node3D:
 	var root := Node3D.new()
@@ -139,11 +203,11 @@ static func build_flowers(bake: Dictionary, mat: ShaderMaterial) -> Node3D:
 		var key := "%d,%d|%s" % [floori(float(cx - mx) / CHUNK), floori(float(cy - my) / CHUNK), FLOWER_MESHES[col]]
 		if not groups.has(key):
 			groups[key] = []
-		var spots := [Vector2(0.27, 0.3), Vector2(0.72, 0.26), Vector2(0.3, 0.74), Vector2(0.74, 0.7)]
+		var spots := [Vector2(0.2, 0.25), Vector2(0.62, 0.2), Vector2(0.86, 0.45), Vector2(0.28, 0.66), Vector2(0.68, 0.78), Vector2(0.48, 0.5)]
 		for s in range(spots.size()):
 			var jx := (_h(cx, cy, 20 + s) - 0.5) * 0.14
 			var jz := (_h(cx, cy, 30 + s) - 0.5) * 0.14
-			var sc := 0.85 + _h(cx, cy, 40 + s) * 0.35
+			var sc := 1.05 + _h(cx, cy, 40 + s) * 0.45
 			var b := Basis.from_scale(Vector3(sc, WorldData.K * sc, sc)) * Basis(Vector3.UP, _h(cx, cy, 50 + s) * TAU)
 			var p := Vector3(cx - mx + spots[s].x + jx, 0.0, cy - my + spots[s].y + jz)
 			groups[key].append([Transform3D(b, p), Color(0.0, float(fl[3]) * 0.7 + s * 1.9, 0.0, 0.0)])

@@ -100,6 +100,7 @@ def p_barrel(style):
         rr = 0.235 if z < 0.3 else 0.2
         P.lathe(0, 0, [(rr, z - 0.03), (rr + 0.012, z - 0.03), (rr + 0.012, z + 0.03), (rr, z + 0.03)], 'metal', seg=10, ao=False)
     P.cyl(0, 0, 0.6, 0.6, 0.165, 0.165, 'wood', seg=10, cap_top=True)
+    P.transform_all(Matrix.Scale(1.3, 4))
     return P
 
 
@@ -295,6 +296,27 @@ def p_flower_pink(style):
     return _flower(style, 'flower_pink', 'pink', seed=44)
 
 
+def p_tuft(style):
+    """A wind-swept grass tuft (scattered on plain grass and along ledges)."""
+    P = Prop('tuft', style, seed=45)
+    rs = random.Random(45)
+    for i in range(9):
+        a = rs.random() * math.tau
+        r = rs.random() * 0.07
+        P.blade(math.cos(a) * r, math.sin(a) * r, 0.11 + rs.random() * 0.13, 0.045, (rs.random() - 0.5) * 0.14, 'blade',
+                lean_y=(rs.random() - 0.5) * 0.06, ao=False, bias=1 if i % 3 else 2)
+    return P
+
+
+def p_pebbles(style):
+    """Two or three small stones (ledge feet, path edges)."""
+    P = Prop('pebbles', style, seed=46)
+    P.blob((-0.07, 0.0, 0.03), (0.085, 0.07, 0.05), 'stone', subdiv=1, jag=0.25, seed=1, squash_below=0.0, ao=False, bias=1)
+    P.blob((0.09, 0.03, 0.025), (0.055, 0.05, 0.035), 'stone', subdiv=1, jag=0.25, seed=2, squash_below=0.0, ao=False, bias=1)
+    P.blob((0.02, -0.07, 0.02), (0.04, 0.035, 0.028), 'stone', subdiv=1, jag=0.25, seed=3, squash_below=0.0, ao=False, bias=1)
+    return P
+
+
 PROPS = {
     'sign': (p_sign, 'wooden sign on a post with nails and text lines'),
     'fence_x': (p_fence_x, 'white picket fence cell running along X'),
@@ -313,6 +335,8 @@ PROPS = {
     'rail_x': (p_rail_x, 'wooden ship railing along X'),
     'rail_z': (p_rail_z, 'wooden ship railing along Z'),
     'rail_post': (p_rail_post, 'railing post'),
+    'tuft': (p_tuft, 'grass tuft (wind sway in game)'),
+    'pebbles': (p_pebbles, 'small stones'),
     'flower_red': (p_flower_red, 'flower tuft (3 blooms)'),
     'flower_yellow': (p_flower_yellow, 'flower tuft (3 blooms)'),
     'flower_white': (p_flower_white, 'flower tuft (3 blooms)'),
@@ -322,4 +346,4 @@ PROPS = {
 
 # exported to godot/assets/models/world (used by PropKit / OwActor); the rest only go into the tiles/ kit
 GAME = ['sign', 'fence_x', 'fence_z', 'fence_post', 'plant', 'barrel', 'crate', 'boulder', 'pokeball', 'grave_a', 'grave_b',
-        'brazier', 'bush', 'statue', 'flower_red', 'flower_yellow', 'flower_white', 'flower_pink']
+        'brazier', 'bush', 'statue', 'tuft', 'pebbles', 'flower_red', 'flower_yellow', 'flower_white', 'flower_pink']

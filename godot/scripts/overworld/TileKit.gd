@@ -174,11 +174,14 @@ static func build_decor(bake: Dictionary, mx: int, my: int) -> Node3D:
 		mmi.set_meta("index", index)
 		root.add_child(mmi)
 	var flowers: Array = bake.get("flowers", [])
+	var wind_mat := _prop_shader_material(bake, 0.06, Color.BLACK, 0.0)
+	wind_mat.set_shader_parameter("sway_from", 0.06)
+	wind_mat.set_shader_parameter("sway_range", 0.3)
+	if PropKit.mesh("tuft") != null:
+		for n in PropKit.build_tufts(bake, wind_mat, _prop_mat):
+			root.add_child(n)
 	if not flowers.is_empty() and PropKit.mesh("flower_red") != null:
-		var flower_mat := _prop_shader_material(bake, 0.06, Color.BLACK, 0.0)
-		flower_mat.set_shader_parameter("sway_from", 0.08)
-		flower_mat.set_shader_parameter("sway_range", 0.3)
-		root.add_child(PropKit.build_flowers(bake, flower_mat))
+		root.add_child(PropKit.build_flowers(bake, wind_mat))
 	elif not flowers.is_empty():
 		var fm := _register(ShaderMaterial.new(), bake)
 		fm.shader = DECOR_SHADER

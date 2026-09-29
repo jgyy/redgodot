@@ -86,7 +86,7 @@
  },
  "barrel": {
   "tris": 276,
-  "bytes": 18504,
+  "bytes": 18532,
   "notes": "banded wooden barrel"
  },
  "crate": {
@@ -129,9 +129,19 @@
   "bytes": 55116,
   "notes": "gym / mansion guardian statue"
  },
+ "tuft": {
+  "tris": 54,
+  "bytes": 5580,
+  "notes": "grass tuft (wind sway in game)"
+ },
+ "pebbles": {
+  "tris": 60,
+  "bytes": 7348,
+  "notes": "small stones"
+ },
  "flower_red": {
   "tris": 141,
-  "bytes": 11012,
+  "bytes": 11008,
   "notes": "flower tuft (3 blooms)"
  },
  "flower_yellow": {
@@ -141,7 +151,7 @@
  },
  "flower_white": {
   "tris": 141,
-  "bytes": 10952,
+  "bytes": 10948,
   "notes": "flower tuft (3 blooms)"
  },
  "flower_pink": {
