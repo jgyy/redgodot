@@ -296,6 +296,15 @@ def p_flower_pink(style):
     return _flower(style, 'flower_pink', 'pink', seed=44)
 
 
+def p_rockcell(style):
+    """A knee-high rounded rock filling one cell (cave / gym obstacles)."""
+    P = Prop('rockcell', style, seed=47)
+    P.blob((0.0, 0.0, 0.2), (0.44, 0.38, 0.26), 'cave_stone', subdiv=2, jag=0.16, seed=5, squash_below=0.0, bias=0)
+    P.blob((-0.2, -0.08, 0.3), (0.2, 0.18, 0.15), 'cave_stone', subdiv=1, jag=0.2, seed=6, ao=False, bias=1)
+    P.blob((0.22, 0.1, 0.24), (0.18, 0.16, 0.13), 'cave_stone', subdiv=1, jag=0.2, seed=7, ao=False, bias=0)
+    return P
+
+
 def p_tuft(style):
     """A wind-swept grass tuft (scattered on plain grass and along ledges)."""
     P = Prop('tuft', style, seed=45)
@@ -342,6 +351,7 @@ PROPS = {
     'rail_z': (p_rail_z, 'wooden ship railing along Z'),
     'rail_post': (p_rail_post, 'railing post'),
     'bed': (p_bed_game, 'bed, head toward +Y (fitted to the 14 x 32 px sprite footprint by PropKit)'),
+    'rockcell': (p_rockcell, 'small rock filling a cell'),
     'tuft': (p_tuft, 'grass tuft (wind sway in game)'),
     'pebbles': (p_pebbles, 'small stones'),
     'flower_red': (p_flower_red, 'flower tuft (3 blooms)'),
@@ -353,4 +363,4 @@ PROPS = {
 
 # exported to godot/assets/models/world (used by PropKit / OwActor); the rest only go into the tiles/ kit
 GAME = ['sign', 'fence_x', 'fence_z', 'fence_post', 'plant', 'barrel', 'crate', 'boulder', 'pokeball', 'grave_a', 'grave_b',
-        'brazier', 'bush', 'statue', 'bed', 'tuft', 'pebbles', 'flower_red', 'flower_yellow', 'flower_white', 'flower_pink']
+        'brazier', 'bush', 'statue', 'bed', 'rockcell', 'tuft', 'pebbles', 'flower_red', 'flower_yellow', 'flower_white', 'flower_pink']

@@ -134,6 +134,11 @@
   "bytes": 31272,
   "notes": "bed, head toward +Y (fitted to the 14 x 32 px sprite footprint by PropKit)"
  },
+ "rockcell": {
+  "tris": 120,
+  "bytes": 13184,
+  "notes": "small rock filling a cell"
+ },
  "tuft": {
   "tris": 54,
   "bytes": 5580,

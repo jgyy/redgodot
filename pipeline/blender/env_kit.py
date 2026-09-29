@@ -88,6 +88,7 @@ MATS = {
     'pink': ([hx(c) for c in ('#8a2a4a', '#c04070', '#e86090', '#f890b0', '#ffc0d4')], None, 255),
     'white': ([hx(c) for c in ('#9a9ab0', '#c0c0d4', '#dcdce8', '#f0f0f8', '#ffffff')], None, 255),
     'tower': (_r5('tower'), 'stone', 8),
+    'cave_stone': ([hx(c) for c in ('#1e1816', '#362c28', '#4e4038', '#66564c', '#86766a')], 'cave', 4),
     'boulder': ([hx(c) for c in ('#56463c', '#786454', '#a08c78', '#c8b8a4', '#e8dccc')], None, 255),
     'ball_red': ([hx(c) for c in ('#7a1c28', '#a82838', '#e04848', '#f06a5c', '#ff9a8a')], None, 255),
     'ball_white': ([hx(c) for c in ('#8c8ca8', '#c8c8d8', '#e6e6f0', '#f8f8f8', '#ffffff')], None, 255),

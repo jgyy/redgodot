@@ -9,10 +9,10 @@ extends RefCounted
 
 const CHUNK := 8
 ## baked block labels that a 3D prop replaces (WorldBuilder skips them)
-const REPLACED := ["sign", "plant", "fence", "crate", "barrel", "grave", "cut_tree", "statue", "gym_statue", "brazier", "bed"]
+const REPLACED := ["sign", "plant", "fence", "crate", "barrel", "grave", "cut_tree", "statue", "gym_statue", "brazier", "bed", "cave_rock"]
 ## label cells -> one prop per cell: label -> [prop, foot z offset inside the cell, yaw jitter]
 const CELL_PROPS := {
-	"sign": ["sign", 0.82, 0.10], "plant": ["plant", 0.86, 0.6], "crate": ["crate", 0.6, 0.16], "barrel": ["barrel", 0.66, 0.5],
+	"sign": ["sign", 0.82, 0.10], "cave_rock": ["rockcell", 0.56, 1.5], "plant": ["plant", 0.86, 0.6], "crate": ["crate", 0.6, 0.16], "barrel": ["barrel", 0.66, 0.5],
 }
 ## card blocks -> prop
 const BLOCK_PROPS := {"cut_tree": "bush", "statue": "statue", "gym_statue": "statue"}
