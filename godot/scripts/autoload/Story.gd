@@ -416,6 +416,8 @@ func is_shown(id: String, map_name: String = "") -> bool:
 	var m := map_name if map_name != "" else mapname()
 	var k := key(m, id)
 	var o := obj(id, m)
+	if o.get("removed", false):   # an NPC this version's map doesn't have (the YELLOW overlay): scripts can't bring it back
+		return false
 	if o.has("item") and flag("GOT_" + k):
 		return false
 	if GameState.toggles.has(k):
@@ -445,7 +447,7 @@ func show(id: String, map_name: String = "", pos: Vector2i = Vector2i(-1, -1)) -
 	if m != mapname():
 		return id
 	var o := obj(id, m)
-	if o.is_empty():
+	if o.is_empty() or o.get("removed", false):
 		return ""
 	if not actor(id):
 		var c := pos if pos.x >= 0 else Vector2i(int(o.get("x", 0)), int(o.get("y", 0)))

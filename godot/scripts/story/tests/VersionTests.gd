@@ -237,6 +237,11 @@ static func _yellow_data(t: TestSuite) -> void:
 	t.check(_has_obj("Route24", "ROUTE24_COOLTRAINER_M4"), "YELLOW Route 24: Damian")
 	t.check(_has_obj("MtMoonB2F", "MTMOONB2F_JESSIE") and _has_obj("SilphCo11F", "SILPHCO11F_JAMES"), "YELLOW: Jessie and James are placed")
 	t.check(Story.raw("OaksLabOakChooseMonText").contains("that ball"), "YELLOW dialogue replaces RED's ('see that ball on the table')")
+	# an NPC YELLOW's map doesn't have stays gone even when a RED script "shows" it
+	GameState.toggles["SaffronCity:SAFFRONCITY_ROCKET9"] = true
+	t.check(Story.obj("SAFFRONCITY_ROCKET9", "SaffronCity").get("removed", false) and not Story.is_shown("SAFFRONCITY_ROCKET9", "SaffronCity"),
+		"YELLOW: SAFFRONCITY_ROCKET9 is removed and can't be shown again")
+	GameState.toggles.erase("SaffronCity:SAFFRONCITY_ROCKET9")
 	GameState.set_version("RED")
 	t.check(not _has_obj("MtMoonB2F", "MTMOONB2F_JESSIE"), "RED has no Jessie")
 	var red_lab: int = 0
