@@ -89,7 +89,7 @@
    "accent": "#2c8a4a"
   },
   "features": [
-   "squat four-legged dinosaur-toad body with stout legs, 3 claws per foot",
+   "squat four-legged dinosaur-toad body with stout legs, 3 sharp toe nails per foot",
    "green bulb with a pointed sprout on its back",
    "darker blue-green patches on the skin",
    "wide flat toad-like muzzle, two small pointed ears",
@@ -115,7 +115,7 @@
    "accent": "#e05088"
   },
   "features": [
-   "four-legged, sturdier than Bulbasaur; 3 claws per foot",
+   "four-legged, sturdier than Bulbasaur; 3 sharp toe nails per foot",
    "large pink flower bud on a woody stem over a green bulb",
    "two broad leaves either side of the bud",
    "dark green spots on the skin, small pointed ears, red eyes"
@@ -140,7 +140,7 @@
    "accent": "#e04868"
   },
   "features": [
-   "huge four-legged bulk, thick short legs, 3 claws per foot",
+   "huge four-legged bulk, thick short legs, 3 sharp toe nails per foot",
    "big pink-red flower (yellow centre) on a woody stem",
    "broad dark leaves around the stem",
    "dark spots on the skin, small ears, red eyes"
@@ -167,7 +167,7 @@
   "features": [
    "upright orange lizard, big round head with short snout and two nostrils",
    "cream belly with horizontal plates",
-   "short arms and legs, three clawed digits on each",
+   "short arms and legs, three sharp-nailed digits on each",
    "flame burning on the tail tip",
    "big blue eyes"
   ],
@@ -192,7 +192,7 @@
   },
   "features": [
    "red lizard, longer snout and a curved horn sweeping back from the head",
-   "cream belly plates, clawed hands and feet",
+   "cream belly plates, sharp-nailed hands and feet",
    "flame on the tail tip",
    "angry blue eyes, sharp look"
   ],
@@ -219,7 +219,7 @@
    "orange winged dragon, long neck and snout with nostrils",
    "teal-blue wing membranes on orange wing bones",
    "cream belly with plates; two horns sweeping back",
-   "flame on the tail tip; clawed hands and feet",
+   "flame on the tail tip; sharp-nailed hands and feet",
    "teal eyes"
   ],
   "sources": [
@@ -245,7 +245,7 @@
    "small upright light-blue turtle, big round head",
    "brown shell on the back with a cream rim and hex scutes",
    "cream-yellow plastron",
-   "curly tail, three toes / three fingers",
+   "curly tail, three toes / three digits",
    "big red-brown eyes"
   ],
   "sources": [
@@ -268,10 +268,10 @@
    "accent": "#a06838"
   },
   "features": [
-   "blue turtle with big furry white ears (white fins with a blue tinge)",
+   "blue turtle with big furry white ears with a blue tinge",
    "brown shell with cream rim, cream plastron",
    "large fluffy white tail curling up",
-   "fangless smile, brown eyes, three claws per limb"
+   "fangless smile, brown eyes, three sharp nails per limb"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Wartortle_%28Pok%C3%A9mon%29",
@@ -296,7 +296,7 @@
    "large bipedal blue turtle, thick short limbs",
    "brown shell with a cream rim and two silver water cannons over the shoulders",
    "cream plastron; small pointed ears",
-   "three claws per limb, short stubby tail"
+   "three sharp nails per limb, short stubby tail"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Blastoise_%28Pok%C3%A9mon%29",
@@ -394,7 +394,7 @@
   "features": [
    "brown-yellow caterpillar with a big head",
    "red-pink round nose, small black eyes",
-   "cream stinger horn on the head and one on the tail",
+   "cream stinger horn on the head and one at the rear",
    "small pink feet along the body"
   ],
   "sources": [
@@ -571,7 +571,7 @@
    "brown rodent standing upright, cream belly",
    "huge front teeth, long whiskers",
    "round ears, long thin tail",
-   "clawed hands and feet, fierce eyes"
+   "sharp-nailed hands and feet, fierce eyes"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Raticate_%28Pok%C3%A9mon%29",
@@ -757,7 +757,7 @@
   },
   "features": [
    "yellowish armadillo-like, round body with brown bands",
-   "big white claws on hands (3) and feet (3)",
+   "big white nails on hands (3) and feet (3)",
    "small pointed ears and snout",
    "cream belly, short thick tail"
   ],
@@ -782,7 +782,7 @@
   },
   "features": [
    "spiny armadillo with a fan of brown spines on the back",
-   "long white claws, cream belly with folds",
+   "long white nails, cream belly with folds",
    "pointed snout, small ears",
    "yellow-tan skin"
   ],
@@ -1108,9 +1108,9 @@
   },
   "features": [
    "blue bat with no eyes",
-   "purple wing membranes on blue arms",
+   "purple wing membranes over blue wing bones",
    "big pointed ears and a fanged mouth",
-   "small spindly legs with claws"
+   "small spindly legs with sharp toe nails"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Zubat_%28Pok%C3%A9mon%29",
@@ -1233,7 +1233,7 @@
   "features": [
    "orange crab-bug",
    "two red-capped mushrooms on its back",
-   "big cream claws",
+   "big cream pincers",
    "round eyes without pupils, six small legs"
   ],
   "sources": [
@@ -1334,7 +1334,7 @@
   "features": [
    "brown mole only head and pink nose visible",
    "small dark eyes close together",
-   "half emerged from a mound of earth"
+   "half emerged from a mound of dirt"
   ],
   "sources": [
    "https://bulbapedia.bulbagarden.net/wiki/Diglett_%28Pok%C3%A9mon%29",

@@ -14,7 +14,7 @@ CLAW = '#f6f0dc'
 
 
 # ============================================================================ helpers
-def _tame(c, top=0xe8):
+def _tame(c, top=0xdc):
     """Near-white palette colours blow out under the cel shader's brightest ramp step (and its top-light gradient):
     keep the brightest channel <= `top` so creams and whites stay cream / white-ish instead of pure white."""
     r, g, b = int(c[1:3], 16), int(c[3:5], 16), int(c[5:7], 16)
@@ -1197,7 +1197,8 @@ def tail_fan(names, base, angles, L, w0, w1, c, tipc=None, curl=0.0, depth=(12.0
         mx, my = base[0] + L * 0.5 * math.sin(a), base[1] - L * 0.5 * math.cos(a)
         a2 = a - math.radians(curl) * sgn + math.radians(wave) * (1 if i % 2 else -1)
         tx, ty = mx + L * 0.5 * math.sin(a2), my - L * 0.5 * math.cos(a2)
-        out.append(Stroke(nm, [base[0], base[1], mx, my, tx, ty], w0, c, z=z - i * 0.05, w2=w1, d1=depth[0], d2=depth[1],
+        dd = depth[i % len(depth)] if isinstance(depth[0], (tuple, list)) else depth
+        out.append(Stroke(nm, [base[0], base[1], mx, my, tx, ty], w0, c, z=z - i * 0.05, w2=w1, d1=dd[0], d2=dd[1],
                           cd=0.0))
         if tipc:
             out.append(Spot(nm, tx, ty, tip_r, tip_r, tipc))
@@ -1219,8 +1220,9 @@ def _fox_legs(body, paw, by, leg_r=2.7, front=4.5, back=8.5, gnd=58.6, top_f=Non
 def vulpix(d, look):
     body, tail, curl, paw, inner = '#cc5c34', '#e87838', '#f4a050', '#f0d4a4', '#6a3020'
     parts = []
-    parts += tail_fan(['t1', 't2', 't3', 't4', 't5', 't6'], (32, 47.0), [-104, -64, -24, 24, 64, 104], 23.0, 8.0, 3.4, tail,
-                      tipc=curl, curl=100, depth=(10.0, 13.0), tip_r=2.8)
+    parts += tail_fan(['tail1', 'tail2', 'tail3', 'tail4', 'tail5', 'tail6'], (32, 47.0), [-100, -66, -30, 30, 66, 100], 20.0, 6.2, 2.6, tail,
+                      tipc=curl, curl=95, depth=[(9.0, 8.0), (14.0, 15.0), (10.0, 10.0), (10.0, 10.0), (14.0, 15.0), (9.0, 8.0)],
+                      tip_r=2.4)
     parts.append(E('body', 32, 49.0, 8.8, 7.4, body, z=0, rd=10.0, d=4.0, cd=0.0))
     parts.append(E('chest', 32, 47.5, 4.8, 4.6, paw, z=0.5, rd=5.0, d=-5.0, cd=0.0, frontOnly=True))
     parts += _fox_legs(body, paw, 49.0)
@@ -1242,16 +1244,16 @@ def ninetales(d, look):
     body, tip, mane, paw, inner = '#f2e2a4', '#ee9a44', '#fbf3d0', '#e4c888', '#c89858'
     parts = []
     names = ['nt%d' % i for i in range(9)]
-    parts += tail_fan(names, (32, 44.0), [-92, -70, -48, -26, 0, 26, 48, 70, 92], 26.0, 8.0, 3.0, body, tipc=tip,
-                      curl=-10, depth=(11.0, 13.0), wave=14, tip_r=3.0)
+    parts += tail_fan(names, (32, 44.0), [-92, -70, -48, -26, 0, 26, 48, 70, 92], 27.0, 9.0, 3.2, body, tipc=tip,
+                      curl=-28, depth=(11.0, 13.0), wave=12, tip_r=3.2)
     parts.append(E('body', 32, 46.0, 8.8, 7.8, body, z=0, rd=11.0, d=4.0, cd=0.0))
     parts += _fox_legs(body, paw, 46.0, leg_r=2.8, gnd=58.6, top_f=48.0)
     # long neck with a fluffy mane
     parts.append(Cap('neck', 32, 44.0, 32, 33.0, 6.0, 4.8, body, z=3, d1=-4.0, d2=-7.0, cd=0.0))
     parts.append(E('mane', 32, 39.0, 7.4, 6.4, mane, z=3.5, rd=6.0, d=-9.0, cd=0.0, frontOnly=True))
     hy = 30.5
-    parts.append(E('head', 32, hy, 8.4, 7.2, body, z=4, rd=7.4, cd=-8.5))
-    parts.append(E('head', 32, hy + 3.8, 3.7, 3.2, body, z=4, rd=5.4, d=-6.2, cd=-8.5))
+    parts.append(E('head', 32, hy, 9.4, 8.0, body, z=4, rd=8.2, cd=-8.5))
+    parts.append(E('head', 32, hy + 4.0, 4.0, 3.4, body, z=4, rd=5.8, d=-6.8, cd=-8.5))
     parts.append(E('nose', 32, hy + 3.0, 1.3, 1.1, '#1b1a2e', z=6, rd=1.2, d=-12.0, cd=-8.5, solid=True))
     for side, g in ((-1, 'earL'), (1, 'earR')):
         parts += cone(g, 32 + side * 5.6, hy - 3.8, 32 + side * 9.4, hy - 15.5, 4.4, 0.8, body, z=1, cd=-8.5)
