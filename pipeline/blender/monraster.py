@@ -39,11 +39,14 @@ def col(c, pal):
 
 
 class Region:
-    def __init__(self, x0, y0, x1, y1, S):
+    def __init__(self, x0, y0, x1, y1, S, mult=1):
         self.S = S
         self.x0, self.y0 = x0, y0
+        self.x1, self.y1 = x1, y1
         self.w = max(1, int(math.ceil((x1 - x0) * S)))
         self.h = max(1, int(math.ceil((y1 - y0) * S)))
+        self.w = -(-self.w // mult) * mult      # multiples of the supersampling factor
+        self.h = -(-self.h // mult) * mult
         xs = x0 + (np.arange(self.w) + 0.5) / S
         ys = y0 + (np.arange(self.h) + 0.5) / S
         self.X, self.Y = np.meshgrid(xs, ys)   # [h, w]
@@ -85,8 +88,28 @@ def mask_poly(R, pts):
     return inside
 
 
-def stroke_segments(pts, w1, w2):
-    lens = [math.hypot(pts[k + 1][0] - pts[k][0], pts[k + 1][1] - pts[k][1]) for k in range(len(pts) - 1)]
+def smooth_polyline(pts, per_seg=4):
+    """Catmull-Rom resampling of a polyline (passes through every original point): the sprite's few
+    control points become a smooth curve, so tails / serpents / tentacles bend instead of kinking."""
+    n = len(pts)
+    if n < 3:
+        return list(pts)
+    P = [pts[0]] + list(pts) + [pts[-1]]
+    out = [pts[0]]
+    for i in range(1, n):
+        p0, p1, p2, p3 = P[i - 1], P[i], P[i + 1], P[i + 2]
+        for s in range(1, per_seg + 1):
+            t = s / float(per_seg)
+            t2, t3 = t * t, t * t * t
+            out.append(tuple(0.5 * ((2 * p1[k]) + (-p0[k] + p2[k]) * t + (2 * p0[k] - 5 * p1[k] + 4 * p2[k] - p3[k]) * t2
+                                    + (-p0[k] + 3 * p1[k] - 3 * p2[k] + p3[k]) * t3) for k in (0, 1)))
+    return out
+
+
+def stroke_segments(pts, w1, w2, smooth=True):
+    if smooth and 3 <= len(pts) <= 12:
+        pts = smooth_polyline(pts)
+    lens =[math.hypot(pts[k + 1][0] - pts[k][0], pts[k + 1][1] - pts[k][1]) for k in range(len(pts) - 1)]
     total = sum(lens) or 1.0
     out, acc = [], 0.0
     for k, l in enumerate(lens):
@@ -238,16 +261,21 @@ class Layer:
             iris = p.get('iris')
             if iris:
                 ic = hex_rgb(col(iris, pal))
-                self.rgb[pm & (dd > 0.35)] = ic
-                self.rgb[pm & (dd <= 0.35)] = dark
+                # iris: darker at the top, lighter toward the lower rim (a glassy look), black pupil
+                g = np.clip((Y - (py - pr)) / (2.0 * pr + 1e-6), 0.0, 1.0)[..., None]
+                ig = np.clip(ic[None, None, :] * (0.72 + 0.55 * g), 0.0, 1.0)
+                ring = pm & (dd > 0.33)
+                self.rgb[ring] = ig[ring]
+                self.rgb[pm & (dd <= 0.33)] = dark
             else:
                 self.rgb[pm] = dark
-            hx, hy = round(px - pr * 0.5) + 0.5, round(py - pr * 0.6) + 0.5
-            if sz >= 3.5:
-                hm = (((X - hx - 0.5) / 1.05) ** 2 + ((Y - hy) / 0.62) ** 2) <= 1
-            else:
-                hm = np.hypot(X - hx, Y - hy) <= 0.62
+            # continuous (not pixel-snapped) glints: a big one up-left, a tiny one low-right
+            gr = max(0.5, pr * 0.34)
+            hm = np.hypot(X - (px - pr * 0.42), Y - (py - pr * 0.5)) <= gr
             self.rgb[hm & drawn] = white
+            if sz >= 2.4:
+                hm2 = np.hypot(X - (px + pr * 0.5), Y - (py + pr * 0.5)) <= gr * 0.45
+                self.rgb[hm2 & drawn] = white
             return
         if t == 'mouth':
             w = max(1, round(float(p.get('w', 4) or 4)))
@@ -312,3 +340,80 @@ class Layer:
             # fill the remainder with the mean covered colour
             rgb[~known] = rgb[self.cov].mean(axis=0) if self.cov.any() else hex_rgb(fill_color)
         return rgb
+
+
+# ----------------------------------------------------------------------------- anti-aliasing + micro detail
+def box_down(rgb, painted, ss):
+    """Average an (H, W) supersampled layer down by `ss`, un-premultiplying colour by coverage.
+    Returns (rgb[h, w, 3], alpha[h, w])."""
+    H, W = painted.shape
+    h, w = H // ss, W // ss
+    a = painted.astype(np.float64)
+    prem = rgb * a[..., None]
+    A = a.reshape(h, ss, w, ss).sum(axis=(1, 3))
+    C = prem.reshape(h, ss, w, ss, 3).sum(axis=(1, 3))
+    out = C / np.maximum(A, 1e-9)[..., None]
+    return out, A / float(ss * ss)
+
+
+def value_noise(shape, cell, seed):
+    """Smooth 2D value noise in [0, 1]; `cell` is the lattice spacing in texels."""
+    rng = np.random.RandomState(seed & 0x7fffffff)
+    h, w = shape
+    gh, gw = int(h / cell) + 3, int(w / cell) + 3
+    g = rng.rand(gh, gw)
+    ys = np.arange(h) / cell
+    xs = np.arange(w) / cell
+    yi, xi = ys.astype(int), xs.astype(int)
+    ty, tx = ys - yi, xs - xi
+    ty = ty * ty * (3 - 2 * ty)
+    tx = tx * tx * (3 - 2 * tx)
+    a = g[yi][:, xi] * (1 - tx)[None, :] + g[yi][:, xi + 1] * tx[None, :]
+    b = g[yi + 1][:, xi] * (1 - tx)[None, :] + g[yi + 1][:, xi + 1] * tx[None, :]
+    return a * (1 - ty)[:, None] + b * ty[:, None]
+
+
+def micro_detail(rgb, weight, kind, S, seed):
+    """Subtle surface texture multiplied into the albedo: fur, scales, rock, skin.
+    `weight` (0..1) masks where it applies (0 on eyes / mouths)."""
+    if kind in (None, '', 'smooth', 'none'):
+        return rgb
+    h, w = weight.shape
+    if kind == 'fur':
+        n = 0.55 * value_noise((h, w), 0.55 * S, seed) + 0.45 * value_noise((h, w), 1.6 * S, seed + 1)
+        amp = 0.05
+    elif kind == 'scale':
+        # hex-ish scale cells: distance to the nearest of jittered lattice points
+        cell = 1.5 * S
+        rng = np.random.RandomState(seed & 0x7fffffff)
+        gy, gx = int(h / cell) + 3, int(w / cell) + 3
+        jy = rng.rand(gy, gx)
+        jx = rng.rand(gy, gx)
+        yy, xx = np.mgrid[0:h, 0:w]
+        cy, cx = (yy / cell).astype(int), (xx / cell).astype(int)
+        best = np.full((h, w), 9.0)
+        for oy in (-1, 0, 1):
+            for ox in (-1, 0, 1):
+                py = np.clip(cy + oy, 0, gy - 1)
+                px = np.clip(cx + ox, 0, gx - 1)
+                dy = (py + jy[py, px]) - yy / cell
+                dx = (px + jx[py, px]) - xx / cell
+                best = np.minimum(best, np.sqrt(dx * dx + dy * dy))
+        n = np.clip(best * 1.25, 0, 1)
+        n = 1.0 - n
+        amp = 0.06
+    elif kind == 'rock':
+        n = 0.5 * value_noise((h, w), 1.2 * S, seed) + 0.3 * value_noise((h, w), 3.0 * S, seed + 1) + \
+            0.2 * value_noise((h, w), 0.5 * S, seed + 2)
+        amp = 0.10
+    elif kind == 'plant':
+        n = 0.6 * value_noise((h, w), 1.0 * S, seed) + 0.4 * value_noise((h, w), 0.4 * S, seed + 1)
+        amp = 0.06
+    elif kind == 'skin':
+        n = value_noise((h, w), 1.5 * S, seed)
+        amp = 0.04
+    else:
+        return rgb
+    n = (n - n.mean()) / (n.std() + 1e-6) * 0.35
+    f = 1.0 + amp * n * weight
+    return np.clip(rgb * f[..., None], 0.0, 1.0)

@@ -456,7 +456,7 @@ def stash_actions(arm, actions):
     ad.action = None
 
 
-def export_glb(path, animations=True):
+def export_glb(path, animations=True, **extra):
     ensure_dir(os.path.dirname(path))
     kw = dict(filepath=path, export_format='GLB', check_existing=False, use_selection=False,
               export_apply=False, export_yup=True, export_materials='EXPORT',
@@ -465,6 +465,7 @@ def export_glb(path, animations=True):
         kw.update(export_animation_mode='ACTIONS', export_skins=True, export_force_sampling=True,
                   export_reset_pose_bones=True, export_anim_slide_to_zero=True,
                   export_optimize_animation_size=True)
+    kw.update(extra)
     bpy.ops.export_scene.gltf(**kw)
 
 

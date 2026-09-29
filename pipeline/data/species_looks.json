@@ -1,0 +1,3703 @@
+{
+ "_meta": {
+  "about": "Researched look of every Gen-1 species (body plan, official colours, identifying features, gait) used by pipeline/blender/gen_pokemon.py (surface micro-texture, animation archetype, chain hints) and species_fixes.py (per-species anatomy patches). Compiled from Bulbapedia / Pokemon Fandom / PokemonDB species descriptions (see `sources`), not from any game asset.",
+  "shape": [
+   "quadruped",
+   "biped",
+   "serpent",
+   "bird",
+   "winged",
+   "fish",
+   "blob",
+   "insect",
+   "plant",
+   "floater",
+   "ball",
+   "shell",
+   "multi",
+   "mineral"
+  ],
+  "gait": [
+   "biped",
+   "waddle",
+   "quad",
+   "bound",
+   "stomp",
+   "scuttle",
+   "crawl",
+   "serpent",
+   "flap",
+   "float",
+   "hop",
+   "roll",
+   "swim",
+   "flop",
+   "sway"
+  ],
+  "attack": [
+   "tackle",
+   "charge",
+   "bite",
+   "headbutt",
+   "punch",
+   "slash",
+   "tail",
+   "rear",
+   "beam",
+   "slam",
+   "peck",
+   "coil",
+   "psychic"
+  ],
+  "special": [
+   "spin",
+   "roar",
+   "pulse",
+   "dance",
+   "shake",
+   "hop"
+  ],
+  "surface": [
+   "fur",
+   "scale",
+   "rock",
+   "skin",
+   "smooth",
+   "plant"
+  ],
+  "optional": {
+   "view": "'side' | 'front' (override of the automatic sprite-orientation guess)",
+   "face": "'left' | 'right' for side views",
+   "chains": "{group: n_bones}",
+   "roles": "{group: role}",
+   "blend": "scales the smooth-union fillet radius",
+   "pal": "{palette key: hex} colour corrections",
+   "fall": "'left' | 'right': side a fainted body topples to"
+  }
+ },
+ "BULBASAUR": {
+  "dex": 1,
+  "shape": "quadruped",
+  "gait": "quad",
+  "attack": "tackle",
+  "special": "hop",
+  "weight": "normal",
+  "surface": "skin",
+  "colors": {
+   "main": "#78c8a0",
+   "secondary": "#a8e0c0",
+   "accent": "#2c8a4a"
+  },
+  "features": [
+   "squat four-legged dinosaur-frog body",
+   "large green plant bulb on its back",
+   "dark green patches on skin",
+   "wide flat head, small pointed ears",
+   "red eyes, three claws per foot"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Bulbasaur_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Bulbasaur"
+  ]
+ },
+ "IVYSAUR": {
+  "dex": 2,
+  "shape": "quadruped",
+  "gait": "quad",
+  "attack": "tackle",
+  "special": "roar",
+  "weight": "normal",
+  "surface": "skin",
+  "colors": {
+   "main": "#68b898",
+   "secondary": "#98d0b0",
+   "accent": "#e05088"
+  },
+  "features": [
+   "four-legged, sturdier than Bulbasaur",
+   "large pink flower bud on a green bulb",
+   "leaf-like ears",
+   "dark green spots"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Ivysaur_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Ivysaur"
+  ]
+ },
+ "VENUSAUR": {
+  "dex": 3,
+  "shape": "quadruped",
+  "gait": "stomp",
+  "attack": "slam",
+  "special": "roar",
+  "weight": "heavy",
+  "surface": "skin",
+  "colors": {
+   "main": "#58a888",
+   "secondary": "#88c0a0",
+   "accent": "#e04868"
+  },
+  "features": [
+   "huge four-legged bulk",
+   "big pink-red flower with yellow centre and 4 leaves on its back",
+   "thick short legs",
+   "dark spots on skin"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Venusaur_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Venusaur"
+  ]
+ },
+ "CHARMANDER": {
+  "dex": 4,
+  "shape": "biped",
+  "gait": "biped",
+  "attack": "tackle",
+  "special": "hop",
+  "weight": "normal",
+  "surface": "skin",
+  "colors": {
+   "main": "#f08030",
+   "secondary": "#f8d090",
+   "accent": "#f8d030"
+  },
+  "features": [
+   "upright lizard, big head, short arms",
+   "cream belly plates",
+   "flame burning on the tail tip",
+   "blue eyes, small toes with claws"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Charmander_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Charmander"
+  ]
+ },
+ "CHARMELEON": {
+  "dex": 5,
+  "shape": "biped",
+  "gait": "biped",
+  "attack": "slash",
+  "special": "roar",
+  "weight": "normal",
+  "surface": "skin",
+  "colors": {
+   "main": "#d84828",
+   "secondary": "#f0d090",
+   "accent": "#f8c030"
+  },
+  "features": [
+   "red lizard, longer snout with a horn-like head crest",
+   "clawed hands, cream belly",
+   "flame on tail tip",
+   "sharp fangs"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Charmeleon_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Charmeleon"
+  ]
+ },
+ "CHARIZARD": {
+  "dex": 6,
+  "shape": "winged",
+  "gait": "biped",
+  "attack": "slash",
+  "special": "roar",
+  "weight": "normal",
+  "surface": "scale",
+  "colors": {
+   "main": "#f08830",
+   "secondary": "#f8dc98",
+   "accent": "#3a88b0"
+  },
+  "features": [
+   "orange winged dragon, long neck",
+   "teal-blue wing membranes",
+   "cream belly and underside",
+   "two horns, flame on tail tip",
+   "clawed hands and feet"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Charizard_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Charizard"
+  ]
+ },
+ "SQUIRTLE": {
+  "dex": 7,
+  "shape": "biped",
+  "gait": "biped",
+  "attack": "tackle",
+  "special": "hop",
+  "weight": "normal",
+  "surface": "skin",
+  "colors": {
+   "main": "#78b8e8",
+   "secondary": "#f8e8b0",
+   "accent": "#a06838"
+  },
+  "features": [
+   "small upright turtle",
+   "brown shell on back, cream-yellow plastron",
+   "curly tail",
+   "big red-brown eyes"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Squirtle_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Squirtle"
+  ]
+ },
+ "WARTORTLE": {
+  "dex": 8,
+  "shape": "biped",
+  "gait": "biped",
+  "attack": "tackle",
+  "special": "roar",
+  "weight": "normal",
+  "surface": "skin",
+  "colors": {
+   "main": "#5898d8",
+   "secondary": "#f0e0b0",
+   "accent": "#a06838"
+  },
+  "features": [
+   "blue turtle with furry white-tipped ears and tail",
+   "brown shell, cream plastron",
+   "fluffy tail"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Wartortle_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Wartortle"
+  ]
+ },
+ "BLASTOISE": {
+  "dex": 9,
+  "shape": "biped",
+  "gait": "stomp",
+  "attack": "beam",
+  "special": "roar",
+  "weight": "heavy",
+  "surface": "skin",
+  "colors": {
+   "main": "#4888c8",
+   "secondary": "#e8d8a0",
+   "accent": "#a06838"
+  },
+  "features": [
+   "large bipedal turtle",
+   "brown shell with two water cannons on top",
+   "cream plastron",
+   "short thick limbs"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Blastoise_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Blastoise"
+  ]
+ },
+ "CATERPIE": {
+  "dex": 10,
+  "shape": "insect",
+  "gait": "crawl",
+  "attack": "tackle",
+  "special": "hop",
+  "weight": "light",
+  "surface": "smooth",
+  "colors": {
+   "main": "#68c048",
+   "secondary": "#f8e878",
+   "accent": "#e04030"
+  },
+  "features": [
+   "green segmented caterpillar",
+   "red forked antenna on head",
+   "yellow ring marks on sides",
+   "many tiny feet"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Caterpie_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Caterpie"
+  ],
+  "view": "side",
+  "face": "left"
+ },
+ "METAPOD": {
+  "dex": 11,
+  "shape": "shell",
+  "gait": "hop",
+  "attack": "headbutt",
+  "special": "shake",
+  "weight": "light",
+  "surface": "smooth",
+  "colors": {
+   "main": "#78c850",
+   "secondary": "#a8e070",
+   "accent": "#2c7838"
+  },
+  "features": [
+   "green chrysalis shell",
+   "crescent body, tapering segments",
+   "small eyes"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Metapod_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Metapod"
+  ],
+  "view": "front"
+ },
+ "BUTTERFREE": {
+  "dex": 12,
+  "shape": "winged",
+  "gait": "flap",
+  "attack": "psychic",
+  "special": "pulse",
+  "weight": "light",
+  "surface": "smooth",
+  "colors": {
+   "main": "#a080c0",
+   "secondary": "#f8f8f8",
+   "accent": "#e02838"
+  },
+  "features": [
+   "purple insectoid body",
+   "four white veined wings",
+   "large red eyes, black antennae",
+   "two small arms, two legs"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Butterfree_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Butterfree"
+  ],
+  "view": "front",
+  "flutter": true
+ },
+ "WEEDLE": {
+  "dex": 13,
+  "shape": "insect",
+  "gait": "crawl",
+  "attack": "peck",
+  "special": "hop",
+  "weight": "light",
+  "surface": "smooth",
+  "colors": {
+   "main": "#d8a850",
+   "secondary": "#f8d870",
+   "accent": "#e04030"
+  },
+  "features": [
+   "brown-yellow caterpillar",
+   "red nose",
+   "sharp stinger on head and tail",
+   "spherical body segments"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Weedle_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Weedle"
+  ],
+  "view": "side",
+  "face": "left"
+ },
+ "KAKUNA": {
+  "dex": 14,
+  "shape": "shell",
+  "gait": "hop",
+  "attack": "headbutt",
+  "special": "shake",
+  "weight": "light",
+  "surface": "smooth",
+  "colors": {
+   "main": "#f0d040",
+   "secondary": "#d8b030",
+   "accent": "#503010"
+  },
+  "features": [
+   "yellow cocoon",
+   "small black eyes with glowing pupils",
+   "two little scythe-like arms"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Kakuna_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Kakuna"
+  ],
+  "view": "front"
+ },
+ "BEEDRILL": {
+  "dex": 15,
+  "shape": "winged",
+  "gait": "flap",
+  "attack": "peck",
+  "special": "spin",
+  "weight": "light",
+  "surface": "smooth",
+  "colors": {
+   "main": "#f0c030",
+   "secondary": "#302820",
+   "accent": "#e03830"
+  },
+  "features": [
+   "yellow and black wasp body",
+   "two big stinger lances on the arms + one on the abdomen",
+   "four transparent wings",
+   "red compound eyes"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Beedrill_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Beedrill"
+  ],
+  "flutter": true
+ },
+ "PIDGEY": {
+  "dex": 16,
+  "shape": "bird",
+  "gait": "biped",
+  "attack": "peck",
+  "special": "spin",
+  "weight": "light",
+  "surface": "fur",
+  "colors": {
+   "main": "#b89058",
+   "secondary": "#f0e0c0",
+   "accent": "#d84830"
+  },
+  "features": [
+   "round little brown bird",
+   "cream face and belly",
+   "small crest",
+   "short beak, thin legs"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Pidgey_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Pidgey"
+  ]
+ },
+ "PIDGEOTTO": {
+  "dex": 17,
+  "shape": "bird",
+  "gait": "flap",
+  "attack": "peck",
+  "special": "spin",
+  "weight": "normal",
+  "surface": "fur",
+  "colors": {
+   "main": "#b08048",
+   "secondary": "#f0e0c0",
+   "accent": "#e05038"
+  },
+  "features": [
+   "brown raptor bird",
+   "red-pink crest",
+   "cream belly",
+   "long tail feathers red/yellow"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Pidgeotto_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Pidgeotto"
+  ]
+ },
+ "PIDGEOT": {
+  "dex": 18,
+  "shape": "bird",
+  "gait": "flap",
+  "attack": "peck",
+  "special": "spin",
+  "weight": "normal",
+  "surface": "fur",
+  "colors": {
+   "main": "#b08048",
+   "secondary": "#f0e0c0",
+   "accent": "#f0c030"
+  },
+  "features": [
+   "large brown eagle",
+   "long crest yellow and red",
+   "big wings",
+   "sharp talons and hooked beak"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Pidgeot_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Pidgeot"
+  ]
+ },
+ "RATTATA": {
+  "dex": 19,
+  "shape": "quadruped",
+  "gait": "bound",
+  "attack": "bite",
+  "special": "hop",
+  "weight": "light",
+  "surface": "fur",
+  "colors": {
+   "main": "#a870b8",
+   "secondary": "#f0e0c0",
+   "accent": "#f8f8f8"
+  },
+  "features": [
+   "small purple rat",
+   "cream belly and paws",
+   "two big front teeth",
+   "long thin curved tail, whiskers"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Rattata_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Rattata"
+  ]
+ },
+ "RATICATE": {
+  "dex": 20,
+  "shape": "quadruped",
+  "gait": "bound",
+  "attack": "bite",
+  "special": "roar",
+  "weight": "normal",
+  "surface": "fur",
+  "colors": {
+   "main": "#b08850",
+   "secondary": "#f0e0c0",
+   "accent": "#f8f8f8"
+  },
+  "features": [
+   "brown rodent, upright posture",
+   "cream belly",
+   "huge front teeth",
+   "whiskers, long tail"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Raticate_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Raticate"
+  ]
+ },
+ "SPEAROW": {
+  "dex": 21,
+  "shape": "bird",
+  "gait": "biped",
+  "attack": "peck",
+  "special": "spin",
+  "weight": "light",
+  "surface": "fur",
+  "colors": {
+   "main": "#b08860",
+   "secondary": "#e8d0b0",
+   "accent": "#d84838"
+  },
+  "features": [
+   "small brown bird",
+   "sharp beak",
+   "short tail red-tipped",
+   "fierce eyes"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Spearow_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Spearow"
+  ]
+ },
+ "FEAROW": {
+  "dex": 22,
+  "shape": "bird",
+  "gait": "biped",
+  "attack": "peck",
+  "special": "spin",
+  "weight": "normal",
+  "surface": "fur",
+  "colors": {
+   "main": "#b08860",
+   "secondary": "#e8d0b0",
+   "accent": "#d84838"
+  },
+  "features": [
+   "long-necked brown bird",
+   "long beak",
+   "red crest",
+   "long tail feathers"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Fearow_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Fearow"
+  ]
+ },
+ "EKANS": {
+  "dex": 23,
+  "shape": "serpent",
+  "gait": "serpent",
+  "attack": "bite",
+  "special": "roar",
+  "weight": "normal",
+  "surface": "scale",
+  "colors": {
+   "main": "#9868b8",
+   "secondary": "#f0d850",
+   "accent": "#f8f8f8"
+  },
+  "features": [
+   "purple snake coiled",
+   "yellow belly and throat",
+   "rattle at the tail tip",
+   "yellow ring around neck"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Ekans_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Ekans"
+  ]
+ },
+ "ARBOK": {
+  "dex": 24,
+  "shape": "serpent",
+  "gait": "serpent",
+  "attack": "coil",
+  "special": "roar",
+  "weight": "normal",
+  "surface": "scale",
+  "colors": {
+   "main": "#9060a8",
+   "secondary": "#f0d850",
+   "accent": "#d84850"
+  },
+  "features": [
+   "large cobra with a hood",
+   "face-like pattern on the hood",
+   "yellow belly",
+   "rattle tail"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Arbok_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Arbok"
+  ]
+ },
+ "PIKACHU": {
+  "dex": 25,
+  "shape": "biped",
+  "gait": "waddle",
+  "attack": "tackle",
+  "special": "hop",
+  "weight": "light",
+  "surface": "fur",
+  "colors": {
+   "main": "#f8d030",
+   "secondary": "#f8f0a0",
+   "accent": "#e83828"
+  },
+  "features": [
+   "yellow mouse with two brown back stripes",
+   "red cheek pouches",
+   "long pointed ears with black tips",
+   "lightning-bolt tail with brown base"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Pikachu_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Pikachu"
+  ],
+  "view": "front"
+ },
+ "RAICHU": {
+  "dex": 26,
+  "shape": "biped",
+  "gait": "biped",
+  "attack": "tail",
+  "special": "spin",
+  "weight": "normal",
+  "surface": "fur",
+  "colors": {
+   "main": "#f0a030",
+   "secondary": "#f8d090",
+   "accent": "#f8d030"
+  },
+  "features": [
+   "orange rodent, upright",
+   "long rounded ears with yellow",
+   "yellow cheek pouches",
+   "long thin tail ending in a lightning bolt"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Raichu_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Raichu"
+  ]
+ },
+ "SANDSHREW": {
+  "dex": 27,
+  "shape": "biped",
+  "gait": "biped",
+  "attack": "slash",
+  "special": "spin",
+  "weight": "normal",
+  "surface": "scale",
+  "colors": {
+   "main": "#e0b868",
+   "secondary": "#f8e8b8",
+   "accent": "#a88848"
+  },
+  "features": [
+   "yellowish armadillo-like",
+   "brick-like tough hide",
+   "round body, short limbs with claws",
+   "short tail"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Sandshrew_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Sandshrew"
+  ]
+ },
+ "SANDSLASH": {
+  "dex": 28,
+  "shape": "biped",
+  "gait": "biped",
+  "attack": "slash",
+  "special": "spin",
+  "weight": "normal",
+  "surface": "scale",
+  "colors": {
+   "main": "#d8a850",
+   "secondary": "#f8e0a0",
+   "accent": "#a06838"
+  },
+  "features": [
+   "spiny armadillo",
+   "brown quills covering the back",
+   "long claws",
+   "yellow-cream belly"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Sandslash_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Sandslash"
+  ]
+ },
+ "NIDORAN_F": {
+  "dex": 29,
+  "shape": "quadruped",
+  "gait": "quad",
+  "attack": "bite",
+  "special": "hop",
+  "weight": "light",
+  "surface": "skin",
+  "colors": {
+   "main": "#78a0d8",
+   "secondary": "#98c0e8",
+   "accent": "#4868b0"
+  },
+  "features": [
+   "small blue quadruped",
+   "big spiny ears",
+   "large front teeth",
+   "dark blue spots, red eyes"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Nidoran%E2%99%80_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Nidoran%E2%99%80"
+  ]
+ },
+ "NIDORINA": {
+  "dex": 30,
+  "shape": "quadruped",
+  "gait": "quad",
+  "attack": "bite",
+  "special": "hop",
+  "weight": "normal",
+  "surface": "skin",
+  "colors": {
+   "main": "#78a0d8",
+   "secondary": "#98c0e8",
+   "accent": "#4868b0"
+  },
+  "features": [
+   "blue quadruped, bigger",
+   "large spiny ears",
+   "spikes on back",
+   "two pointed teeth"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Nidorina_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Nidorina"
+  ]
+ },
+ "NIDOQUEEN": {
+  "dex": 31,
+  "shape": "biped",
+  "gait": "stomp",
+  "attack": "slam",
+  "special": "roar",
+  "weight": "heavy",
+  "surface": "scale",
+  "colors": {
+   "main": "#5890c8",
+   "secondary": "#e8e0c8",
+   "accent": "#a06838"
+  },
+  "features": [
+   "large bipedal blue",
+   "cream belly plate",
+   "spikes on back",
+   "thick tail, ears with brown inside"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Nidoqueen_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Nidoqueen"
+  ]
+ },
+ "NIDORAN_M": {
+  "dex": 32,
+  "shape": "quadruped",
+  "gait": "quad",
+  "attack": "headbutt",
+  "special": "hop",
+  "weight": "light",
+  "surface": "skin",
+  "colors": {
+   "main": "#b878c8",
+   "secondary": "#d098d8",
+   "accent": "#38b0a8"
+  },
+  "features": [
+   "small purple quadruped",
+   "big spiny ears with teal insides",
+   "small horn on forehead",
+   "spines on back"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Nidoran%E2%99%82_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Nidoran%E2%99%82"
+  ]
+ },
+ "NIDORINO": {
+  "dex": 33,
+  "shape": "quadruped",
+  "gait": "quad",
+  "attack": "headbutt",
+  "special": "roar",
+  "weight": "normal",
+  "surface": "skin",
+  "colors": {
+   "main": "#a868c0",
+   "secondary": "#c090d0",
+   "accent": "#38b0a8"
+  },
+  "features": [
+   "purple quadruped",
+   "longer horn",
+   "spiny back ridge",
+   "big ears teal inside"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Nidorino_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Nidorino"
+  ]
+ },
+ "NIDOKING": {
+  "dex": 34,
+  "shape": "biped",
+  "gait": "stomp",
+  "attack": "headbutt",
+  "special": "roar",
+  "weight": "heavy",
+  "surface": "scale",
+  "colors": {
+   "main": "#a058b8",
+   "secondary": "#d8d0d8",
+   "accent": "#38b0a8"
+  },
+  "features": [
+   "large purple bipedal",
+   "grey belly plates",
+   "horn on forehead",
+   "thick tail, ridge of spikes"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Nidoking_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Nidoking"
+  ]
+ },
+ "CLEFAIRY": {
+  "dex": 35,
+  "shape": "biped",
+  "gait": "waddle",
+  "attack": "punch",
+  "special": "dance",
+  "weight": "light",
+  "surface": "skin",
+  "colors": {
+   "main": "#f8b8c8",
+   "secondary": "#f8e0e8",
+   "accent": "#a05868"
+  },
+  "features": [
+   "pink round fairy",
+   "pointed ears with dark tips",
+   "small wings on back",
+   "curled tuft on head and curly tail"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Clefairy_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Clefairy"
+  ],
+  "view": "front"
+ },
+ "CLEFABLE": {
+  "dex": 36,
+  "shape": "biped",
+  "gait": "waddle",
+  "attack": "punch",
+  "special": "dance",
+  "weight": "normal",
+  "surface": "skin",
+  "colors": {
+   "main": "#f8b0c0",
+   "secondary": "#f8e0e8",
+   "accent": "#a05868"
+  },
+  "features": [
+   "larger pink fairy",
+   "pointy ears with dark tips",
+   "wings on back",
+   "curled tuft on head, tail"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Clefable_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Clefable"
+  ],
+  "view": "front"
+ },
+ "VULPIX": {
+  "dex": 37,
+  "shape": "quadruped",
+  "gait": "quad",
+  "attack": "bite",
+  "special": "dance",
+  "weight": "light",
+  "surface": "fur",
+  "colors": {
+   "main": "#d06840",
+   "secondary": "#f0d0a0",
+   "accent": "#f0a050"
+  },
+  "features": [
+   "red-brown fox",
+   "six curled tails",
+   "three curls of fur on head",
+   "cream underbelly"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Vulpix_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Vulpix"
+  ]
+ },
+ "NINETALES": {
+  "dex": 38,
+  "shape": "quadruped",
+  "gait": "quad",
+  "attack": "bite",
+  "special": "dance",
+  "weight": "normal",
+  "surface": "fur",
+  "colors": {
+   "main": "#f0d890",
+   "secondary": "#f8f0d0",
+   "accent": "#d84040"
+  },
+  "features": [
+   "golden-cream fox",
+   "nine flowing tails",
+   "red eyes",
+   "crest of fur on head"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Ninetales_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Ninetales"
+  ]
+ },
+ "JIGGLYPUFF": {
+  "dex": 39,
+  "shape": "blob",
+  "gait": "hop",
+  "attack": "headbutt",
+  "special": "dance",
+  "weight": "light",
+  "surface": "fur",
+  "colors": {
+   "main": "#f8b8d0",
+   "secondary": "#f8e8f0",
+   "accent": "#38a0c0"
+  },
+  "features": [
+   "round pink balloon",
+   "big blue-green eyes",
+   "pointed ears",
+   "curled tuft on forehead"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Jigglypuff_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Jigglypuff"
+  ],
+  "view": "front"
+ },
+ "WIGGLYTUFF": {
+  "dex": 40,
+  "shape": "blob",
+  "gait": "hop",
+  "attack": "headbutt",
+  "special": "dance",
+  "weight": "normal",
+  "surface": "fur",
+  "colors": {
+   "main": "#f8e0e8",
+   "secondary": "#f8b0c0",
+   "accent": "#38a0c0"
+  },
+  "features": [
+   "round white-pink body",
+   "long ears",
+   "big blue eyes",
+   "curled fluffy tuft and tail"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Wigglytuff_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Wigglytuff"
+  ],
+  "view": "front"
+ },
+ "ZUBAT": {
+  "dex": 41,
+  "shape": "winged",
+  "gait": "flap",
+  "attack": "bite",
+  "special": "shake",
+  "weight": "light",
+  "surface": "skin",
+  "colors": {
+   "main": "#6890d0",
+   "secondary": "#a880c8",
+   "accent": "#d8d8f0"
+  },
+  "features": [
+   "blue bat with no eyes",
+   "purple wing membranes",
+   "big ears and fanged mouth",
+   "small feet"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Zubat_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Zubat"
+  ],
+  "view": "front"
+ },
+ "GOLBAT": {
+  "dex": 42,
+  "shape": "winged",
+  "gait": "flap",
+  "attack": "bite",
+  "special": "roar",
+  "weight": "normal",
+  "surface": "skin",
+  "colors": {
+   "main": "#5878c8",
+   "secondary": "#a070c0",
+   "accent": "#f8f8f8"
+  },
+  "features": [
+   "big blue bat",
+   "huge mouth with 4 fangs",
+   "purple wings",
+   "little triangular ears"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Golbat_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Golbat"
+  ],
+  "view": "front"
+ },
+ "ODDISH": {
+  "dex": 43,
+  "shape": "plant",
+  "gait": "hop",
+  "attack": "tackle",
+  "special": "dance",
+  "weight": "light",
+  "surface": "plant",
+  "colors": {
+   "main": "#4860a0",
+   "secondary": "#5878b8",
+   "accent": "#48a840"
+  },
+  "features": [
+   "round blue-navy radish body",
+   "five green leaves on head",
+   "small feet",
+   "red eyes"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Oddish_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Oddish"
+  ]
+ },
+ "GLOOM": {
+  "dex": 44,
+  "shape": "plant",
+  "gait": "waddle",
+  "attack": "tackle",
+  "special": "roar",
+  "weight": "normal",
+  "surface": "plant",
+  "colors": {
+   "main": "#5070b0",
+   "secondary": "#6088c0",
+   "accent": "#d84040"
+  },
+  "features": [
+   "blue bipedal plant",
+   "large red flower with white spots",
+   "drooling mouth",
+   "small hands and feet"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Gloom_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Gloom"
+  ]
+ },
+ "VILEPLUME": {
+  "dex": 45,
+  "shape": "plant",
+  "gait": "waddle",
+  "attack": "slam",
+  "special": "pulse",
+  "weight": "normal",
+  "surface": "plant",
+  "colors": {
+   "main": "#4860a8",
+   "secondary": "#5878b8",
+   "accent": "#d83040"
+  },
+  "features": [
+   "giant red flower on head",
+   "blue body",
+   "small red eyes"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Vileplume_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Vileplume"
+  ]
+ },
+ "PARAS": {
+  "dex": 46,
+  "shape": "insect",
+  "gait": "scuttle",
+  "attack": "slash",
+  "special": "shake",
+  "weight": "light",
+  "surface": "skin",
+  "colors": {
+   "main": "#e87830",
+   "secondary": "#f8d8a0",
+   "accent": "#d84030"
+  },
+  "features": [
+   "orange crab-bug",
+   "two red mushrooms on back",
+   "big claws",
+   "eyeless dots"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Paras_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Paras"
+  ],
+  "view": "side",
+  "face": "left"
+ },
+ "PARASECT": {
+  "dex": 47,
+  "shape": "insect",
+  "gait": "scuttle",
+  "attack": "slash",
+  "special": "roar",
+  "weight": "normal",
+  "surface": "skin",
+  "colors": {
+   "main": "#e07030",
+   "secondary": "#f8c890",
+   "accent": "#d83030"
+  },
+  "features": [
+   "orange crab",
+   "huge red mushroom covering the body",
+   "big pincers"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Parasect_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Parasect"
+  ]
+ },
+ "VENONAT": {
+  "dex": 48,
+  "shape": "insect",
+  "gait": "hop",
+  "attack": "headbutt",
+  "special": "shake",
+  "weight": "light",
+  "surface": "fur",
+  "colors": {
+   "main": "#7858a0",
+   "secondary": "#a080c0",
+   "accent": "#e03030"
+  },
+  "features": [
+   "round purple furry ball",
+   "big red compound eyes",
+   "small feet and arms",
+   "antennae"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Venonat_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Venonat"
+  ]
+ },
+ "VENOMOTH": {
+  "dex": 49,
+  "shape": "winged",
+  "gait": "flap",
+  "attack": "psychic",
+  "special": "pulse",
+  "weight": "light",
+  "surface": "fur",
+  "colors": {
+   "main": "#a080c8",
+   "secondary": "#f0e8f0",
+   "accent": "#e04040"
+  },
+  "features": [
+   "purple moth",
+   "large wings with dusty patterns",
+   "red eyes",
+   "feathery antennae"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Venomoth_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Venomoth"
+  ],
+  "flutter": true
+ },
+ "DIGLETT": {
+  "dex": 50,
+  "shape": "blob",
+  "gait": "hop",
+  "attack": "headbutt",
+  "special": "shake",
+  "weight": "light",
+  "surface": "skin",
+  "colors": {
+   "main": "#a86838",
+   "secondary": "#e0a898",
+   "accent": "#d05860"
+  },
+  "features": [
+   "brown mole only head and pink nose visible",
+   "small dark eyes",
+   "half emerged from the ground"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Diglett_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Diglett"
+  ],
+  "view": "front"
+ },
+ "DUGTRIO": {
+  "dex": 51,
+  "shape": "multi",
+  "gait": "hop",
+  "attack": "headbutt",
+  "special": "shake",
+  "weight": "normal",
+  "surface": "skin",
+  "colors": {
+   "main": "#a06030",
+   "secondary": "#e0a898",
+   "accent": "#d05860"
+  },
+  "features": [
+   "three Diglett heads",
+   "pink noses",
+   "brown heads sprouting from ground"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Dugtrio_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Dugtrio"
+  ],
+  "view": "front"
+ },
+ "MEOWTH": {
+  "dex": 52,
+  "shape": "quadruped",
+  "gait": "biped",
+  "attack": "slash",
+  "special": "dance",
+  "weight": "light",
+  "surface": "fur",
+  "colors": {
+   "main": "#f0e0b8",
+   "secondary": "#f8f0d8",
+   "accent": "#a06830"
+  },
+  "features": [
+   "cream cat",
+   "gold coin on forehead",
+   "long whiskers",
+   "black-brown ears, long curled tail"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Meowth_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Meowth"
+  ],
+  "view": "front"
+ },
+ "PERSIAN": {
+  "dex": 53,
+  "shape": "quadruped",
+  "gait": "quad",
+  "attack": "slash",
+  "special": "roar",
+  "weight": "normal",
+  "surface": "fur",
+  "colors": {
+   "main": "#f0dcb0",
+   "secondary": "#f8f0d0",
+   "accent": "#a06830"
+  },
+  "features": [
+   "slender cream cat",
+   "red jewel on forehead",
+   "long whiskers",
+   "dark ears, curled tail"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Persian_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Persian"
+  ]
+ },
+ "PSYDUCK": {
+  "dex": 54,
+  "shape": "biped",
+  "gait": "waddle",
+  "attack": "psychic",
+  "special": "shake",
+  "weight": "light",
+  "surface": "skin",
+  "colors": {
+   "main": "#f8d038",
+   "secondary": "#f8f0d0",
+   "accent": "#302820"
+  },
+  "features": [
+   "yellow duck-like",
+   "three black hairs on head",
+   "flat cream bill",
+   "holds its head in pain, webbed hands"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Psyduck_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Psyduck"
+  ],
+  "view": "side",
+  "face": "left"
+ },
+ "GOLDUCK": {
+  "dex": 55,
+  "shape": "biped",
+  "gait": "biped",
+  "attack": "beam",
+  "special": "spin",
+  "weight": "normal",
+  "surface": "skin",
+  "colors": {
+   "main": "#4890d8",
+   "secondary": "#f8f0d0",
+   "accent": "#d84850"
+  },
+  "features": [
+   "blue duck-platypus",
+   "red gem on forehead",
+   "flat cream bill",
+   "webbed hands and feet"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Golduck_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Golduck"
+  ],
+  "view": "side",
+  "face": "left"
+ },
+ "MANKEY": {
+  "dex": 56,
+  "shape": "biped",
+  "gait": "biped",
+  "attack": "punch",
+  "special": "shake",
+  "weight": "light",
+  "surface": "fur",
+  "colors": {
+   "main": "#f0e8d0",
+   "secondary": "#f8f8f0",
+   "accent": "#d09070"
+  },
+  "features": [
+   "white-cream pig monkey",
+   "pig-like nose",
+   "tuft of fur",
+   "small tail, angry face"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Mankey_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Mankey"
+  ],
+  "view": "front"
+ },
+ "PRIMEAPE": {
+  "dex": 57,
+  "shape": "biped",
+  "gait": "biped",
+  "attack": "punch",
+  "special": "roar",
+  "weight": "normal",
+  "surface": "fur",
+  "colors": {
+   "main": "#f0e0c0",
+   "secondary": "#d8b090",
+   "accent": "#e05040"
+  },
+  "features": [
+   "cream ape with pig nose",
+   "red wristbands",
+   "furious expression",
+   "muscular"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Primeape_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Primeape"
+  ],
+  "view": "front"
+ },
+ "GROWLITHE": {
+  "dex": 58,
+  "shape": "quadruped",
+  "gait": "quad",
+  "attack": "bite",
+  "special": "roar",
+  "weight": "normal",
+  "surface": "fur",
+  "colors": {
+   "main": "#f08830",
+   "secondary": "#f8e0b0",
+   "accent": "#302820"
+  },
+  "features": [
+   "orange puppy with black stripes",
+   "cream mane and belly",
+   "floppy ears",
+   "curled fluffy tail"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Growlithe_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Growlithe"
+  ]
+ },
+ "ARCANINE": {
+  "dex": 59,
+  "shape": "quadruped",
+  "gait": "bound",
+  "attack": "charge",
+  "special": "roar",
+  "weight": "heavy",
+  "surface": "fur",
+  "colors": {
+   "main": "#f08830",
+   "secondary": "#f8e0b0",
+   "accent": "#302820"
+  },
+  "features": [
+   "large orange tiger-dog with black stripes",
+   "cream mane and tail tuft",
+   "powerful legs"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Arcanine_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Arcanine"
+  ]
+ },
+ "POLIWAG": {
+  "dex": 60,
+  "shape": "blob",
+  "gait": "hop",
+  "attack": "tackle",
+  "special": "spin",
+  "weight": "light",
+  "surface": "smooth",
+  "colors": {
+   "main": "#5088d0",
+   "secondary": "#f8f8f8",
+   "accent": "#302850"
+  },
+  "features": [
+   "blue round tadpole",
+   "white swirl on belly",
+   "pink lips",
+   "small tail"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Poliwag_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Poliwag"
+  ],
+  "view": "side",
+  "face": "left"
+ },
+ "POLIWHIRL": {
+  "dex": 61,
+  "shape": "biped",
+  "gait": "waddle",
+  "attack": "punch",
+  "special": "dance",
+  "weight": "normal",
+  "surface": "smooth",
+  "colors": {
+   "main": "#5080d0",
+   "secondary": "#f8f8f8",
+   "accent": "#302850"
+  },
+  "features": [
+   "blue frog",
+   "white swirl belly",
+   "white gloves",
+   "small feet"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Poliwhirl_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Poliwhirl"
+  ]
+ },
+ "POLIWRATH": {
+  "dex": 62,
+  "shape": "biped",
+  "gait": "stomp",
+  "attack": "punch",
+  "special": "roar",
+  "weight": "heavy",
+  "surface": "smooth",
+  "colors": {
+   "main": "#4878c8",
+   "secondary": "#f8f8f8",
+   "accent": "#302850"
+  },
+  "features": [
+   "muscular blue frog",
+   "swirl belly",
+   "white gloves"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Poliwrath_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Poliwrath"
+  ]
+ },
+ "ABRA": {
+  "dex": 63,
+  "shape": "biped",
+  "gait": "float",
+  "attack": "psychic",
+  "special": "pulse",
+  "weight": "light",
+  "surface": "fur",
+  "colors": {
+   "main": "#e0b040",
+   "secondary": "#a87838",
+   "accent": "#302820"
+  },
+  "features": [
+   "yellow fox-like sleeper",
+   "brown torso armour",
+   "long ears, sleeping eyes",
+   "long tail"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Abra_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Abra"
+  ]
+ },
+ "KADABRA": {
+  "dex": 64,
+  "shape": "biped",
+  "gait": "biped",
+  "attack": "psychic",
+  "special": "pulse",
+  "weight": "normal",
+  "surface": "fur",
+  "colors": {
+   "main": "#e0b040",
+   "secondary": "#a87838",
+   "accent": "#c0c8d8"
+  },
+  "features": [
+   "yellow fox-humanoid",
+   "brown chest armour",
+   "star on forehead",
+   "holds a silver spoon",
+   "long moustache"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Kadabra_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Kadabra"
+  ]
+ },
+ "ALAKAZAM": {
+  "dex": 65,
+  "shape": "biped",
+  "gait": "biped",
+  "attack": "psychic",
+  "special": "pulse",
+  "weight": "normal",
+  "surface": "fur",
+  "colors": {
+   "main": "#e0b848",
+   "secondary": "#a87838",
+   "accent": "#c0c8d8"
+  },
+  "features": [
+   "yellow fox-humanoid",
+   "brown armour",
+   "two silver spoons",
+   "long white moustache",
+   "pointed ears, closed eyes"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Alakazam_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Alakazam"
+  ]
+ },
+ "MACHOP": {
+  "dex": 66,
+  "shape": "biped",
+  "gait": "biped",
+  "attack": "punch",
+  "special": "shake",
+  "weight": "normal",
+  "surface": "skin",
+  "colors": {
+   "main": "#a0b0d0",
+   "secondary": "#c8d0e8",
+   "accent": "#d05050"
+  },
+  "features": [
+   "blue-grey muscular kid",
+   "red-ish head ridge",
+   "short tail",
+   "stubby legs"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Machop_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Machop"
+  ],
+  "view": "front"
+ },
+ "MACHOKE": {
+  "dex": 67,
+  "shape": "biped",
+  "gait": "biped",
+  "attack": "punch",
+  "special": "roar",
+  "weight": "normal",
+  "surface": "skin",
+  "colors": {
+   "main": "#9088c0",
+   "secondary": "#c0b8e0",
+   "accent": "#e0c030"
+  },
+  "features": [
+   "purple muscular",
+   "championship belt",
+   "ridged head",
+   "large fists"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Machoke_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Machoke"
+  ],
+  "view": "front"
+ },
+ "MACHAMP": {
+  "dex": 68,
+  "shape": "biped",
+  "gait": "stomp",
+  "attack": "punch",
+  "special": "roar",
+  "weight": "heavy",
+  "surface": "skin",
+  "colors": {
+   "main": "#98a8c8",
+   "secondary": "#c0c8e0",
+   "accent": "#e0c030"
+  },
+  "features": [
+   "grey-blue with four arms",
+   "championship belt",
+   "ridges on head",
+   "huge muscles"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Machamp_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Machamp"
+  ],
+  "view": "front"
+ },
+ "BELLSPROUT": {
+  "dex": 69,
+  "shape": "plant",
+  "gait": "sway",
+  "attack": "peck",
+  "special": "dance",
+  "weight": "light",
+  "surface": "plant",
+  "colors": {
+   "main": "#f0d050",
+   "secondary": "#68b848",
+   "accent": "#e08090"
+  },
+  "features": [
+   "yellow bell head on thin stem",
+   "green leaves",
+   "root feet",
+   "pink lips"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Bellsprout_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Bellsprout"
+  ],
+  "view": "side",
+  "face": "left"
+ },
+ "WEEPINBELL": {
+  "dex": 70,
+  "shape": "plant",
+  "gait": "sway",
+  "attack": "slam",
+  "special": "dance",
+  "weight": "normal",
+  "surface": "plant",
+  "colors": {
+   "main": "#f0d048",
+   "secondary": "#68b848",
+   "accent": "#e08090"
+  },
+  "features": [
+   "yellow pitcher plant",
+   "wide gaping mouth",
+   "two leaves as arms",
+   "brown tongue"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Weepinbell_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Weepinbell"
+  ],
+  "view": "side",
+  "face": "left"
+ },
+ "VICTREEBEL": {
+  "dex": 71,
+  "shape": "plant",
+  "gait": "sway",
+  "attack": "bite",
+  "special": "roar",
+  "weight": "normal",
+  "surface": "plant",
+  "colors": {
+   "main": "#70b850",
+   "secondary": "#d8c848",
+   "accent": "#c03050"
+  },
+  "features": [
+   "green trumpet pitcher",
+   "huge mouth with teeth",
+   "long vine and leaves",
+   "yellow-green"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Victreebel_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Victreebel"
+  ],
+  "view": "side",
+  "face": "left"
+ },
+ "TENTACOOL": {
+  "dex": 72,
+  "shape": "floater",
+  "gait": "float",
+  "attack": "tackle",
+  "special": "pulse",
+  "weight": "light",
+  "surface": "smooth",
+  "colors": {
+   "main": "#68a8e0",
+   "secondary": "#c0e0f8",
+   "accent": "#e03040"
+  },
+  "features": [
+   "blue jellyfish",
+   "red crystal orbs",
+   "two long tentacles",
+   "beak"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Tentacool_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Tentacool"
+  ]
+ },
+ "TENTACRUEL": {
+  "dex": 73,
+  "shape": "floater",
+  "gait": "float",
+  "attack": "coil",
+  "special": "pulse",
+  "weight": "normal",
+  "surface": "smooth",
+  "colors": {
+   "main": "#5898d8",
+   "secondary": "#c0e0f8",
+   "accent": "#e03040"
+  },
+  "features": [
+   "bigger blue jellyfish",
+   "red orbs",
+   "many tentacles",
+   "sharp beak"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Tentacruel_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Tentacruel"
+  ]
+ },
+ "GEODUDE": {
+  "dex": 74,
+  "shape": "mineral",
+  "gait": "hop",
+  "attack": "punch",
+  "special": "shake",
+  "weight": "heavy",
+  "surface": "rock",
+  "colors": {
+   "main": "#a09080",
+   "secondary": "#c8b8a0",
+   "accent": "#503820"
+  },
+  "features": [
+   "grey boulder head",
+   "two strong arms",
+   "heavy brow",
+   "no legs"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Geodude_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Geodude"
+  ]
+ },
+ "GRAVELER": {
+  "dex": 75,
+  "shape": "mineral",
+  "gait": "stomp",
+  "attack": "punch",
+  "special": "shake",
+  "weight": "heavy",
+  "surface": "rock",
+  "colors": {
+   "main": "#a09080",
+   "secondary": "#c8b8a0",
+   "accent": "#503820"
+  },
+  "features": [
+   "grey rock body with four arms",
+   "heavy brow",
+   "small legs"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Graveler_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Graveler"
+  ]
+ },
+ "GOLEM": {
+  "dex": 76,
+  "shape": "shell",
+  "gait": "stomp",
+  "attack": "charge",
+  "special": "roar",
+  "weight": "heavy",
+  "surface": "rock",
+  "colors": {
+   "main": "#a09078",
+   "secondary": "#78a068",
+   "accent": "#503820"
+  },
+  "features": [
+   "huge boulder tortoise",
+   "rocky shell",
+   "thick legs, small head"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Golem_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Golem"
+  ]
+ },
+ "PONYTA": {
+  "dex": 77,
+  "shape": "quadruped",
+  "gait": "bound",
+  "attack": "charge",
+  "special": "dance",
+  "weight": "normal",
+  "surface": "fur",
+  "colors": {
+   "main": "#f8e8c0",
+   "secondary": "#f0a030",
+   "accent": "#e04820"
+  },
+  "features": [
+   "cream horse with fiery mane and tail",
+   "flame at fetlocks",
+   "hooves"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Ponyta_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Ponyta"
+  ]
+ },
+ "RAPIDASH": {
+  "dex": 78,
+  "shape": "quadruped",
+  "gait": "bound",
+  "attack": "charge",
+  "special": "roar",
+  "weight": "normal",
+  "surface": "fur",
+  "colors": {
+   "main": "#f8f0d0",
+   "secondary": "#f0a030",
+   "accent": "#e04820"
+  },
+  "features": [
+   "cream unicorn horse",
+   "fiery mane/tail",
+   "horn on forehead"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Rapidash_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Rapidash"
+  ]
+ },
+ "SLOWPOKE": {
+  "dex": 79,
+  "shape": "quadruped",
+  "gait": "stomp",
+  "attack": "headbutt",
+  "special": "hop",
+  "weight": "heavy",
+  "surface": "skin",
+  "colors": {
+   "main": "#f098a8",
+   "secondary": "#f8e0c0",
+   "accent": "#f8f8f8"
+  },
+  "features": [
+   "pink hippo-like",
+   "tan muzzle",
+   "long tail with white tip",
+   "sleepy eyes"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Slowpoke_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Slowpoke"
+  ]
+ },
+ "SLOWBRO": {
+  "dex": 80,
+  "shape": "biped",
+  "gait": "waddle",
+  "attack": "headbutt",
+  "special": "psychic",
+  "weight": "heavy",
+  "surface": "skin",
+  "colors": {
+   "main": "#f098a8",
+   "secondary": "#f8e0c0",
+   "accent": "#a0a0b0"
+  },
+  "features": [
+   "pink bipedal",
+   "Shellder on tail",
+   "tan muzzle",
+   "vacant eyes"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Slowbro_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Slowbro"
+  ],
+  "view": "side",
+  "face": "left"
+ },
+ "MAGNEMITE": {
+  "dex": 81,
+  "shape": "ball",
+  "gait": "float",
+  "attack": "psychic",
+  "special": "pulse",
+  "weight": "light",
+  "surface": "smooth",
+  "colors": {
+   "main": "#b8c0c8",
+   "secondary": "#d8dce0",
+   "accent": "#d84040"
+  },
+  "features": [
+   "steel ball with one eye",
+   "two U-magnets on sides",
+   "three screws"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Magnemite_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Magnemite"
+  ]
+ },
+ "MAGNETON": {
+  "dex": 82,
+  "shape": "multi",
+  "gait": "float",
+  "attack": "psychic",
+  "special": "pulse",
+  "weight": "normal",
+  "surface": "smooth",
+  "colors": {
+   "main": "#b8c0c8",
+   "secondary": "#d8dce0",
+   "accent": "#d84040"
+  },
+  "features": [
+   "three Magnemite joined",
+   "magnets and screws"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Magneton_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Magneton"
+  ]
+ },
+ "FARFETCHD": {
+  "dex": 83,
+  "shape": "bird",
+  "gait": "biped",
+  "attack": "slash",
+  "special": "spin",
+  "weight": "normal",
+  "surface": "fur",
+  "colors": {
+   "main": "#a87840",
+   "secondary": "#f0e0c0",
+   "accent": "#68b848"
+  },
+  "features": [
+   "brown duck",
+   "holds a leek",
+   "white eyebrows"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Farfetch%27d_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Farfetch%27d"
+  ]
+ },
+ "DODUO": {
+  "dex": 84,
+  "shape": "bird",
+  "gait": "biped",
+  "attack": "peck",
+  "special": "spin",
+  "weight": "normal",
+  "surface": "fur",
+  "colors": {
+   "main": "#a87840",
+   "secondary": "#e8d0a0",
+   "accent": "#302820"
+  },
+  "features": [
+   "two-headed brown bird",
+   "long legs",
+   "small wings"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Doduo_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Doduo"
+  ],
+  "view": "side",
+  "face": "left"
+ },
+ "DODRIO": {
+  "dex": 85,
+  "shape": "bird",
+  "gait": "biped",
+  "attack": "peck",
+  "special": "roar",
+  "weight": "normal",
+  "surface": "fur",
+  "colors": {
+   "main": "#906030",
+   "secondary": "#e0c890",
+   "accent": "#302820"
+  },
+  "features": [
+   "three-headed brown bird",
+   "long legs",
+   "sharp beaks"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Dodrio_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Dodrio"
+  ],
+  "view": "side",
+  "face": "left"
+ },
+ "SEEL": {
+  "dex": 86,
+  "shape": "quadruped",
+  "gait": "crawl",
+  "attack": "headbutt",
+  "special": "dance",
+  "weight": "normal",
+  "surface": "smooth",
+  "colors": {
+   "main": "#f0f4f8",
+   "secondary": "#e0e8f0",
+   "accent": "#a8c0e0"
+  },
+  "features": [
+   "white seal",
+   "small horn",
+   "flippers"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Seel_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Seel"
+  ]
+ },
+ "DEWGONG": {
+  "dex": 87,
+  "shape": "quadruped",
+  "gait": "crawl",
+  "attack": "headbutt",
+  "special": "dance",
+  "weight": "heavy",
+  "surface": "smooth",
+  "colors": {
+   "main": "#f0f4f8",
+   "secondary": "#e0e8f0",
+   "accent": "#a8c0e0"
+  },
+  "features": [
+   "white sea lion",
+   "horn",
+   "flippers, tail"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Dewgong_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Dewgong"
+  ]
+ },
+ "GRIMER": {
+  "dex": 88,
+  "shape": "blob",
+  "gait": "hop",
+  "attack": "slam",
+  "special": "shake",
+  "weight": "heavy",
+  "surface": "smooth",
+  "colors": {
+   "main": "#a860b8",
+   "secondary": "#7848a0",
+   "accent": "#f8f8f8"
+  },
+  "features": [
+   "purple sludge",
+   "two arms",
+   "dripping mouth"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Grimer_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Grimer"
+  ]
+ },
+ "MUK": {
+  "dex": 89,
+  "shape": "blob",
+  "gait": "hop",
+  "attack": "slam",
+  "special": "shake",
+  "weight": "heavy",
+  "surface": "smooth",
+  "colors": {
+   "main": "#a058b0",
+   "secondary": "#7040a0",
+   "accent": "#f8f8f8"
+  },
+  "features": [
+   "big purple sludge",
+   "arms",
+   "gaping mouth"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Muk_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Muk"
+  ]
+ },
+ "SHELLDER": {
+  "dex": 90,
+  "shape": "shell",
+  "gait": "hop",
+  "attack": "bite",
+  "special": "shake",
+  "weight": "normal",
+  "surface": "smooth",
+  "colors": {
+   "main": "#b878c8",
+   "secondary": "#f0e0f0",
+   "accent": "#e07898"
+  },
+  "features": [
+   "purple bivalve shell",
+   "tongue",
+   "eyes inside"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Shellder_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Shellder"
+  ],
+  "view": "side",
+  "face": "left"
+ },
+ "CLOYSTER": {
+  "dex": 91,
+  "shape": "shell",
+  "gait": "hop",
+  "attack": "bite",
+  "special": "shake",
+  "weight": "heavy",
+  "surface": "smooth",
+  "colors": {
+   "main": "#605898",
+   "secondary": "#f0e0f0",
+   "accent": "#e07898"
+  },
+  "features": [
+   "dark spiked shell",
+   "face in the shell",
+   "long spikes"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Cloyster_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Cloyster"
+  ]
+ },
+ "GASTLY": {
+  "dex": 92,
+  "shape": "floater",
+  "gait": "float",
+  "attack": "psychic",
+  "special": "pulse",
+  "weight": "light",
+  "surface": "smooth",
+  "colors": {
+   "main": "#302848",
+   "secondary": "#8868b0",
+   "accent": "#f8f8f8"
+  },
+  "features": [
+   "gaseous black orb",
+   "purple gas",
+   "wide grin, big eyes"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Gastly_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Gastly"
+  ]
+ },
+ "HAUNTER": {
+  "dex": 93,
+  "shape": "floater",
+  "gait": "float",
+  "attack": "psychic",
+  "special": "pulse",
+  "weight": "light",
+  "surface": "smooth",
+  "colors": {
+   "main": "#5848a0",
+   "secondary": "#7868b8",
+   "accent": "#f8f8f8"
+  },
+  "features": [
+   "purple ghost",
+   "floating hands",
+   "wide grin with tongue"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Haunter_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Haunter"
+  ]
+ },
+ "GENGAR": {
+  "dex": 94,
+  "shape": "biped",
+  "gait": "waddle",
+  "attack": "punch",
+  "special": "pulse",
+  "weight": "normal",
+  "surface": "fur",
+  "colors": {
+   "main": "#6a54a0",
+   "secondary": "#8a78c0",
+   "accent": "#e03040"
+  },
+  "features": [
+   "round purple shadow body",
+   "spiked ears and back",
+   "red eyes",
+   "wide white grin",
+   "short arms and legs, small tail"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Gengar_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Gengar"
+  ],
+  "view": "front"
+ },
+ "ONIX": {
+  "dex": 95,
+  "shape": "serpent",
+  "gait": "serpent",
+  "attack": "charge",
+  "special": "roar",
+  "weight": "heavy",
+  "surface": "rock",
+  "colors": {
+   "main": "#a0a0a8",
+   "secondary": "#c0c0c8",
+   "accent": "#603030"
+  },
+  "features": [
+   "giant grey rock snake",
+   "boulder segments",
+   "horn on head"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Onix_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Onix"
+  ],
+  "view": "side",
+  "face": "left"
+ },
+ "DROWZEE": {
+  "dex": 96,
+  "shape": "biped",
+  "gait": "biped",
+  "attack": "psychic",
+  "special": "pulse",
+  "weight": "normal",
+  "surface": "skin",
+  "colors": {
+   "main": "#f0c840",
+   "secondary": "#a87838",
+   "accent": "#f0f0e0"
+  },
+  "features": [
+   "yellow tapir humanoid",
+   "trunk-like snout",
+   "brown lower body and collar",
+   "holds a pendulum"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Drowzee_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Drowzee"
+  ],
+  "view": "front"
+ },
+ "HYPNO": {
+  "dex": 97,
+  "shape": "biped",
+  "gait": "biped",
+  "attack": "psychic",
+  "special": "pulse",
+  "weight": "normal",
+  "surface": "skin",
+  "colors": {
+   "main": "#f0d050",
+   "secondary": "#f8f8f0",
+   "accent": "#a87838"
+  },
+  "features": [
+   "yellow tapir humanoid",
+   "white ruff",
+   "pendulum in hand"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Hypno_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Hypno"
+  ]
+ },
+ "KRABBY": {
+  "dex": 98,
+  "shape": "insect",
+  "gait": "scuttle",
+  "attack": "slash",
+  "special": "shake",
+  "weight": "normal",
+  "surface": "scale",
+  "colors": {
+   "main": "#e05838",
+   "secondary": "#f8d8a0",
+   "accent": "#f8f8f8"
+  },
+  "features": [
+   "red crab",
+   "big claws",
+   "small"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Krabby_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Krabby"
+  ],
+  "view": "front"
+ },
+ "KINGLER": {
+  "dex": 99,
+  "shape": "insect",
+  "gait": "scuttle",
+  "attack": "slash",
+  "special": "roar",
+  "weight": "normal",
+  "surface": "scale",
+  "colors": {
+   "main": "#e05838",
+   "secondary": "#f8d8a0",
+   "accent": "#f8f8f8"
+  },
+  "features": [
+   "big red crab",
+   "gigantic claw",
+   "spiked"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Kingler_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Kingler"
+  ],
+  "view": "front"
+ },
+ "VOLTORB": {
+  "dex": 100,
+  "shape": "ball",
+  "gait": "roll",
+  "attack": "charge",
+  "special": "shake",
+  "weight": "normal",
+  "surface": "smooth",
+  "colors": {
+   "main": "#e04838",
+   "secondary": "#f8f8f8",
+   "accent": "#302820"
+  },
+  "features": [
+   "red-white ball",
+   "angry eyes"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Voltorb_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Voltorb"
+  ]
+ },
+ "ELECTRODE": {
+  "dex": 101,
+  "shape": "ball",
+  "gait": "roll",
+  "attack": "charge",
+  "special": "shake",
+  "weight": "normal",
+  "surface": "smooth",
+  "colors": {
+   "main": "#f8f8f8",
+   "secondary": "#e04838",
+   "accent": "#302820"
+  },
+  "features": [
+   "white-red ball",
+   "angry eyes and mouth"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Electrode_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Electrode"
+  ]
+ },
+ "EXEGGCUTE": {
+  "dex": 102,
+  "shape": "multi",
+  "gait": "hop",
+  "attack": "tackle",
+  "special": "shake",
+  "weight": "light",
+  "surface": "smooth",
+  "colors": {
+   "main": "#f8d0c8",
+   "secondary": "#e8a8a0",
+   "accent": "#d05860"
+  },
+  "features": [
+   "six pinkish eggs",
+   "faces on eggs"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Exeggcute_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Exeggcute"
+  ]
+ },
+ "EXEGGUTOR": {
+  "dex": 103,
+  "shape": "plant",
+  "gait": "stomp",
+  "attack": "headbutt",
+  "special": "dance",
+  "weight": "heavy",
+  "surface": "plant",
+  "colors": {
+   "main": "#c8a060",
+   "secondary": "#68b848",
+   "accent": "#e8c860"
+  },
+  "features": [
+   "tall palm tree body",
+   "three heads",
+   "leafy crown"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Exeggutor_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Exeggutor"
+  ]
+ },
+ "CUBONE": {
+  "dex": 104,
+  "shape": "biped",
+  "gait": "biped",
+  "attack": "slash",
+  "special": "shake",
+  "weight": "light",
+  "surface": "skin",
+  "colors": {
+   "main": "#b88850",
+   "secondary": "#e8d8c0",
+   "accent": "#f8f0e0"
+  },
+  "features": [
+   "brown lizard-kid",
+   "skull helmet",
+   "bone club"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Cubone_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Cubone"
+  ]
+ },
+ "MAROWAK": {
+  "dex": 105,
+  "shape": "biped",
+  "gait": "biped",
+  "attack": "slash",
+  "special": "roar",
+  "weight": "normal",
+  "surface": "skin",
+  "colors": {
+   "main": "#b08048",
+   "secondary": "#e8d8c0",
+   "accent": "#f8f0e0"
+  },
+  "features": [
+   "brown, skull helmet",
+   "bone club",
+   "tail"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Marowak_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Marowak"
+  ]
+ },
+ "HITMONLEE": {
+  "dex": 106,
+  "shape": "biped",
+  "gait": "biped",
+  "attack": "slash",
+  "special": "spin",
+  "weight": "normal",
+  "surface": "skin",
+  "colors": {
+   "main": "#b88850",
+   "secondary": "#e8d0a8",
+   "accent": "#302820"
+  },
+  "features": [
+   "brown kickboxer",
+   "extendable legs",
+   "small arms"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Hitmonlee_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Hitmonlee"
+  ],
+  "view": "front"
+ },
+ "HITMONCHAN": {
+  "dex": 107,
+  "shape": "biped",
+  "gait": "biped",
+  "attack": "punch",
+  "special": "shake",
+  "weight": "normal",
+  "surface": "skin",
+  "colors": {
+   "main": "#b88850",
+   "secondary": "#d05050",
+   "accent": "#f0e8d0"
+  },
+  "features": [
+   "brown boxer",
+   "red gloves",
+   "purple shorts"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Hitmonchan_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Hitmonchan"
+  ],
+  "view": "front"
+ },
+ "LICKITUNG": {
+  "dex": 108,
+  "shape": "biped",
+  "gait": "waddle",
+  "attack": "slam",
+  "special": "shake",
+  "weight": "heavy",
+  "surface": "skin",
+  "colors": {
+   "main": "#f0a8b8",
+   "secondary": "#f8d0d8",
+   "accent": "#e05070"
+  },
+  "features": [
+   "pink round body",
+   "long tongue",
+   "small limbs"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Lickitung_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Lickitung"
+  ],
+  "view": "front"
+ },
+ "KOFFING": {
+  "dex": 109,
+  "shape": "floater",
+  "gait": "float",
+  "attack": "tackle",
+  "special": "pulse",
+  "weight": "light",
+  "surface": "smooth",
+  "colors": {
+   "main": "#7060a8",
+   "secondary": "#a898c8",
+   "accent": "#f0f0e8"
+  },
+  "features": [
+   "purple gas ball",
+   "skull and crossbones",
+   "craters"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Koffing_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Koffing"
+  ]
+ },
+ "WEEZING": {
+  "dex": 110,
+  "shape": "floater",
+  "gait": "float",
+  "attack": "tackle",
+  "special": "pulse",
+  "weight": "normal",
+  "surface": "smooth",
+  "colors": {
+   "main": "#7060a8",
+   "secondary": "#a898c8",
+   "accent": "#f0f0e8"
+  },
+  "features": [
+   "two connected gas balls",
+   "skulls"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Weezing_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Weezing"
+  ]
+ },
+ "RHYHORN": {
+  "dex": 111,
+  "shape": "quadruped",
+  "gait": "stomp",
+  "attack": "charge",
+  "special": "roar",
+  "weight": "heavy",
+  "surface": "rock",
+  "colors": {
+   "main": "#98989c",
+   "secondary": "#c8c8cc",
+   "accent": "#605858"
+  },
+  "features": [
+   "grey rhino",
+   "horn on nose",
+   "rocky armour"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Rhyhorn_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Rhyhorn"
+  ]
+ },
+ "RHYDON": {
+  "dex": 112,
+  "shape": "biped",
+  "gait": "stomp",
+  "attack": "charge",
+  "special": "roar",
+  "weight": "heavy",
+  "surface": "rock",
+  "colors": {
+   "main": "#908890",
+   "secondary": "#c8c0c8",
+   "accent": "#605858"
+  },
+  "features": [
+   "big bipedal grey rhino",
+   "drill horn",
+   "armored"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Rhydon_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Rhydon"
+  ]
+ },
+ "CHANSEY": {
+  "dex": 113,
+  "shape": "biped",
+  "gait": "waddle",
+  "attack": "slam",
+  "special": "dance",
+  "weight": "normal",
+  "surface": "skin",
+  "colors": {
+   "main": "#f8b8c8",
+   "secondary": "#f8e0e0",
+   "accent": "#f0f0e0"
+  },
+  "features": [
+   "pink round egg-carrier",
+   "pouch with egg",
+   "short limbs"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Chansey_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Chansey"
+  ],
+  "view": "front"
+ },
+ "TANGELA": {
+  "dex": 114,
+  "shape": "multi",
+  "gait": "waddle",
+  "attack": "coil",
+  "special": "shake",
+  "weight": "normal",
+  "surface": "plant",
+  "colors": {
+   "main": "#3858a0",
+   "secondary": "#5888c8",
+   "accent": "#e05868"
+  },
+  "features": [
+   "mass of blue vines",
+   "red feet",
+   "eyes barely visible"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Tangela_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Tangela"
+  ]
+ },
+ "KANGASKHAN": {
+  "dex": 115,
+  "shape": "biped",
+  "gait": "stomp",
+  "attack": "punch",
+  "special": "roar",
+  "weight": "heavy",
+  "surface": "skin",
+  "colors": {
+   "main": "#b08858",
+   "secondary": "#e8d8b0",
+   "accent": "#d09070"
+  },
+  "features": [
+   "brown kangaroo",
+   "baby in pouch",
+   "strong tail"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Kangaskhan_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Kangaskhan"
+  ]
+ },
+ "HORSEA": {
+  "dex": 116,
+  "shape": "fish",
+  "gait": "swim",
+  "attack": "beam",
+  "special": "pulse",
+  "weight": "light",
+  "surface": "scale",
+  "colors": {
+   "main": "#60a8e0",
+   "secondary": "#e8f0f8",
+   "accent": "#f0e0a0"
+  },
+  "features": [
+   "blue seahorse",
+   "curled tail",
+   "snout"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Horsea_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Horsea"
+  ],
+  "view": "side",
+  "face": "left"
+ },
+ "SEADRA": {
+  "dex": 117,
+  "shape": "fish",
+  "gait": "swim",
+  "attack": "beam",
+  "special": "pulse",
+  "weight": "normal",
+  "surface": "scale",
+  "colors": {
+   "main": "#4890d0",
+   "secondary": "#f0e8c0",
+   "accent": "#f0d868"
+  },
+  "features": [
+   "blue seahorse",
+   "spikes",
+   "long snout"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Seadra_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Seadra"
+  ],
+  "view": "side",
+  "face": "left"
+ },
+ "GOLDEEN": {
+  "dex": 118,
+  "shape": "fish",
+  "gait": "swim",
+  "attack": "headbutt",
+  "special": "dance",
+  "weight": "light",
+  "surface": "scale",
+  "colors": {
+   "main": "#f0f0f0",
+   "secondary": "#e04838",
+   "accent": "#e8c8a0"
+  },
+  "features": [
+   "white and red goldfish",
+   "unicorn horn",
+   "big tail fin"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Goldeen_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Goldeen"
+  ],
+  "view": "side",
+  "face": "left"
+ },
+ "SEAKING": {
+  "dex": 119,
+  "shape": "fish",
+  "gait": "swim",
+  "attack": "headbutt",
+  "special": "dance",
+  "weight": "normal",
+  "surface": "scale",
+  "colors": {
+   "main": "#f0f0f0",
+   "secondary": "#e04838",
+   "accent": "#e8c8a0"
+  },
+  "features": [
+   "white and red fish",
+   "horn",
+   "fins"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Seaking_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Seaking"
+  ],
+  "view": "side",
+  "face": "left"
+ },
+ "STARYU": {
+  "dex": 120,
+  "shape": "floater",
+  "gait": "roll",
+  "attack": "tackle",
+  "special": "spin",
+  "weight": "light",
+  "surface": "smooth",
+  "colors": {
+   "main": "#c89048",
+   "secondary": "#e8c078",
+   "accent": "#e04848"
+  },
+  "features": [
+   "brown star",
+   "red core gem"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Staryu_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Staryu"
+  ],
+  "view": "front"
+ },
+ "STARMIE": {
+  "dex": 121,
+  "shape": "floater",
+  "gait": "roll",
+  "attack": "psychic",
+  "special": "spin",
+  "weight": "normal",
+  "surface": "smooth",
+  "colors": {
+   "main": "#8858a8",
+   "secondary": "#a880c8",
+   "accent": "#e04848"
+  },
+  "features": [
+   "purple double star",
+   "red core"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Starmie_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Starmie"
+  ]
+ },
+ "MR_MIME": {
+  "dex": 122,
+  "shape": "biped",
+  "gait": "biped",
+  "attack": "psychic",
+  "special": "dance",
+  "weight": "normal",
+  "surface": "skin",
+  "colors": {
+   "main": "#f8d8e0",
+   "secondary": "#e05878",
+   "accent": "#4870c8"
+  },
+  "features": [
+   "pink and white mime",
+   "blue hands",
+   "red spots"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Mr._Mime_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Mr._Mime"
+  ],
+  "view": "front"
+ },
+ "SCYTHER": {
+  "dex": 123,
+  "shape": "biped",
+  "gait": "biped",
+  "attack": "slash",
+  "special": "spin",
+  "weight": "normal",
+  "surface": "scale",
+  "colors": {
+   "main": "#78c048",
+   "secondary": "#d8e8b8",
+   "accent": "#c8d8e0"
+  },
+  "features": [
+   "green mantis",
+   "two scythes",
+   "wings"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Scyther_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Scyther"
+  ]
+ },
+ "JYNX": {
+  "dex": 124,
+  "shape": "biped",
+  "gait": "waddle",
+  "attack": "punch",
+  "special": "dance",
+  "weight": "normal",
+  "surface": "skin",
+  "colors": {
+   "main": "#d02858",
+   "secondary": "#f0c0a0",
+   "accent": "#f0d868"
+  },
+  "features": [
+   "red dress",
+   "blonde hair",
+   "purple face",
+   "big lips"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Jynx_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Jynx"
+  ],
+  "view": "front"
+ },
+ "ELECTABUZZ": {
+  "dex": 125,
+  "shape": "biped",
+  "gait": "biped",
+  "attack": "punch",
+  "special": "shake",
+  "weight": "normal",
+  "surface": "fur",
+  "colors": {
+   "main": "#f8d838",
+   "secondary": "#302820",
+   "accent": "#302820"
+  },
+  "features": [
+   "yellow with black stripes",
+   "antennae",
+   "thick arms"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Electabuzz_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Electabuzz"
+  ]
+ },
+ "MAGMAR": {
+  "dex": 126,
+  "shape": "biped",
+  "gait": "biped",
+  "attack": "punch",
+  "special": "roar",
+  "weight": "normal",
+  "surface": "skin",
+  "colors": {
+   "main": "#e85830",
+   "secondary": "#f8d030",
+   "accent": "#f8e090"
+  },
+  "features": [
+   "red flame body",
+   "yellow flame crest",
+   "duck-like bill"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Magmar_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Magmar"
+  ]
+ },
+ "PINSIR": {
+  "dex": 127,
+  "shape": "biped",
+  "gait": "stomp",
+  "attack": "slash",
+  "special": "roar",
+  "weight": "normal",
+  "surface": "scale",
+  "colors": {
+   "main": "#b09068",
+   "secondary": "#d8c098",
+   "accent": "#605040"
+  },
+  "features": [
+   "brown stag beetle",
+   "huge pincers",
+   "plated"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Pinsir_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Pinsir"
+  ]
+ },
+ "TAUROS": {
+  "dex": 128,
+  "shape": "quadruped",
+  "gait": "bound",
+  "attack": "charge",
+  "special": "roar",
+  "weight": "heavy",
+  "surface": "fur",
+  "colors": {
+   "main": "#a87840",
+   "secondary": "#d8b880",
+   "accent": "#302820"
+  },
+  "features": [
+   "brown bull",
+   "three tails",
+   "horns"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Tauros_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Tauros"
+  ]
+ },
+ "MAGIKARP": {
+  "dex": 129,
+  "shape": "fish",
+  "gait": "flop",
+  "attack": "tackle",
+  "special": "shake",
+  "weight": "normal",
+  "surface": "scale",
+  "colors": {
+   "main": "#e86830",
+   "secondary": "#f8e0a0",
+   "accent": "#f8f0d0"
+  },
+  "features": [
+   "red-orange carp",
+   "big scales",
+   "whiskers"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Magikarp_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Magikarp"
+  ],
+  "view": "side",
+  "face": "left"
+ },
+ "GYARADOS": {
+  "dex": 130,
+  "shape": "serpent",
+  "gait": "serpent",
+  "attack": "bite",
+  "special": "roar",
+  "weight": "heavy",
+  "surface": "scale",
+  "colors": {
+   "main": "#3878c0",
+   "secondary": "#f0e0a0",
+   "accent": "#f8f8f8"
+  },
+  "features": [
+   "blue sea serpent",
+   "cream belly",
+   "fins and whiskers",
+   "open fanged mouth"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Gyarados_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Gyarados"
+  ]
+ },
+ "LAPRAS": {
+  "dex": 131,
+  "shape": "quadruped",
+  "gait": "swim",
+  "attack": "headbutt",
+  "special": "dance",
+  "weight": "heavy",
+  "surface": "skin",
+  "colors": {
+   "main": "#4888c8",
+   "secondary": "#e8e0b8",
+   "accent": "#909098"
+  },
+  "features": [
+   "blue plesiosaur",
+   "grey shell with spikes",
+   "long neck"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Lapras_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Lapras"
+  ],
+  "view": "side",
+  "face": "left"
+ },
+ "DITTO": {
+  "dex": 132,
+  "shape": "blob",
+  "gait": "hop",
+  "attack": "tackle",
+  "special": "shake",
+  "weight": "light",
+  "surface": "smooth",
+  "colors": {
+   "main": "#c0a0e0",
+   "secondary": "#d8c0f0",
+   "accent": "#302820"
+  },
+  "features": [
+   "pink-lilac blob",
+   "simple face"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Ditto_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Ditto"
+  ]
+ },
+ "EEVEE": {
+  "dex": 133,
+  "shape": "quadruped",
+  "gait": "quad",
+  "attack": "bite",
+  "special": "dance",
+  "weight": "light",
+  "surface": "fur",
+  "colors": {
+   "main": "#c08850",
+   "secondary": "#f0dcb8",
+   "accent": "#7a4a28"
+  },
+  "features": [
+   "brown fox-cat",
+   "cream fluffy neck tuft",
+   "big ears",
+   "bushy tail with cream tip"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Eevee_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Eevee"
+  ]
+ },
+ "VAPOREON": {
+  "dex": 134,
+  "shape": "quadruped",
+  "gait": "quad",
+  "attack": "beam",
+  "special": "dance",
+  "weight": "normal",
+  "surface": "skin",
+  "colors": {
+   "main": "#4890d0",
+   "secondary": "#f0f0e0",
+   "accent": "#f0e0a0"
+  },
+  "features": [
+   "blue Eeveelution",
+   "fins on ears",
+   "fish tail"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Vaporeon_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Vaporeon"
+  ]
+ },
+ "JOLTEON": {
+  "dex": 135,
+  "shape": "quadruped",
+  "gait": "bound",
+  "attack": "charge",
+  "special": "shake",
+  "weight": "light",
+  "surface": "fur",
+  "colors": {
+   "main": "#f8d030",
+   "secondary": "#f8f8f0",
+   "accent": "#302820"
+  },
+  "features": [
+   "yellow spiky fur",
+   "white neck fur",
+   "pointy ears"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Jolteon_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Jolteon"
+  ]
+ },
+ "FLAREON": {
+  "dex": 136,
+  "shape": "quadruped",
+  "gait": "quad",
+  "attack": "bite",
+  "special": "dance",
+  "weight": "normal",
+  "surface": "fur",
+  "colors": {
+   "main": "#e87838",
+   "secondary": "#f8e070",
+   "accent": "#f8e070"
+  },
+  "features": [
+   "orange fur",
+   "cream neck fur",
+   "bushy tail"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Flareon_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Flareon"
+  ]
+ },
+ "PORYGON": {
+  "dex": 137,
+  "shape": "floater",
+  "gait": "float",
+  "attack": "charge",
+  "special": "shake",
+  "weight": "light",
+  "surface": "smooth",
+  "colors": {
+   "main": "#f088a0",
+   "secondary": "#4890d8",
+   "accent": "#302820"
+  },
+  "features": [
+   "pink and blue polygonal",
+   "duck bill",
+   "angular"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Porygon_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Porygon"
+  ]
+ },
+ "OMANYTE": {
+  "dex": 138,
+  "shape": "shell",
+  "gait": "crawl",
+  "attack": "tackle",
+  "special": "shake",
+  "weight": "light",
+  "surface": "smooth",
+  "colors": {
+   "main": "#78b8e0",
+   "secondary": "#f0e0b8",
+   "accent": "#e0c890"
+  },
+  "features": [
+   "blue nautilus",
+   "spiral shell",
+   "tentacles"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Omanyte_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Omanyte"
+  ],
+  "view": "side",
+  "face": "left"
+ },
+ "OMASTAR": {
+  "dex": 139,
+  "shape": "shell",
+  "gait": "crawl",
+  "attack": "bite",
+  "special": "roar",
+  "weight": "normal",
+  "surface": "smooth",
+  "colors": {
+   "main": "#5898d0",
+   "secondary": "#f0e0b8",
+   "accent": "#e0c890"
+  },
+  "features": [
+   "blue with big spiked shell",
+   "tentacles",
+   "beak"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Omastar_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Omastar"
+  ],
+  "view": "side",
+  "face": "left"
+ },
+ "KABUTO": {
+  "dex": 140,
+  "shape": "shell",
+  "gait": "crawl",
+  "attack": "slash",
+  "special": "shake",
+  "weight": "light",
+  "surface": "smooth",
+  "colors": {
+   "main": "#a87838",
+   "secondary": "#603820",
+   "accent": "#e04040"
+  },
+  "features": [
+   "brown horseshoe crab shell",
+   "red eyes"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Kabuto_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Kabuto"
+  ],
+  "view": "side",
+  "face": "left"
+ },
+ "KABUTOPS": {
+  "dex": 141,
+  "shape": "biped",
+  "gait": "biped",
+  "attack": "slash",
+  "special": "spin",
+  "weight": "normal",
+  "surface": "scale",
+  "colors": {
+   "main": "#a87838",
+   "secondary": "#603820",
+   "accent": "#d8d8e0"
+  },
+  "features": [
+   "brown bipedal",
+   "scythe arms",
+   "dome head"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Kabutops_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Kabutops"
+  ]
+ },
+ "AERODACTYL": {
+  "dex": 142,
+  "shape": "winged",
+  "gait": "flap",
+  "attack": "bite",
+  "special": "roar",
+  "weight": "normal",
+  "surface": "scale",
+  "colors": {
+   "main": "#a098b8",
+   "secondary": "#c8c0d8",
+   "accent": "#e8d8b0"
+  },
+  "features": [
+   "grey pterosaur",
+   "sharp teeth",
+   "wings"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Aerodactyl_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Aerodactyl"
+  ]
+ },
+ "SNORLAX": {
+  "dex": 143,
+  "shape": "biped",
+  "gait": "waddle",
+  "attack": "slam",
+  "special": "roar",
+  "weight": "heavy",
+  "surface": "fur",
+  "colors": {
+   "main": "#508088",
+   "secondary": "#f0e0c0",
+   "accent": "#f8f0d8"
+  },
+  "features": [
+   "huge teal-blue bear-like",
+   "cream face and belly",
+   "two small ears",
+   "sleepy"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Snorlax_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Snorlax"
+  ],
+  "view": "front"
+ },
+ "ARTICUNO": {
+  "dex": 144,
+  "shape": "bird",
+  "gait": "flap",
+  "attack": "beam",
+  "special": "pulse",
+  "weight": "normal",
+  "surface": "smooth",
+  "colors": {
+   "main": "#78b8f0",
+   "secondary": "#d8f0f8",
+   "accent": "#2858a8"
+  },
+  "features": [
+   "blue bird",
+   "long tail feathers",
+   "crest"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Articuno_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Articuno"
+  ]
+ },
+ "ZAPDOS": {
+  "dex": 145,
+  "shape": "bird",
+  "gait": "flap",
+  "attack": "beam",
+  "special": "shake",
+  "weight": "normal",
+  "surface": "fur",
+  "colors": {
+   "main": "#f8d838",
+   "secondary": "#f0a830",
+   "accent": "#302820"
+  },
+  "features": [
+   "yellow thunderbird",
+   "jagged feathers",
+   "orange beak"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Zapdos_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Zapdos"
+  ]
+ },
+ "MOLTRES": {
+  "dex": 146,
+  "shape": "bird",
+  "gait": "flap",
+  "attack": "beam",
+  "special": "roar",
+  "weight": "normal",
+  "surface": "fur",
+  "colors": {
+   "main": "#f8c830",
+   "secondary": "#f07820",
+   "accent": "#e03820"
+  },
+  "features": [
+   "fiery bird",
+   "flame crest and tail",
+   "yellow"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Moltres_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Moltres"
+  ]
+ },
+ "DRATINI": {
+  "dex": 147,
+  "shape": "serpent",
+  "gait": "serpent",
+  "attack": "coil",
+  "special": "pulse",
+  "weight": "light",
+  "surface": "scale",
+  "colors": {
+   "main": "#5898e0",
+   "secondary": "#f0f0f8",
+   "accent": "#a0c8f0"
+  },
+  "features": [
+   "blue serpent",
+   "white belly",
+   "small fin ears"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Dratini_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Dratini"
+  ]
+ },
+ "DRAGONAIR": {
+  "dex": 148,
+  "shape": "serpent",
+  "gait": "serpent",
+  "attack": "coil",
+  "special": "pulse",
+  "weight": "normal",
+  "surface": "scale",
+  "colors": {
+   "main": "#6090e0",
+   "secondary": "#f0f0f8",
+   "accent": "#a0c8f0"
+  },
+  "features": [
+   "long blue serpent",
+   "white orbs on tail and neck",
+   "horn and wings-fins"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Dragonair_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Dragonair"
+  ],
+  "view": "side",
+  "face": "left"
+ },
+ "DRAGONITE": {
+  "dex": 149,
+  "shape": "winged",
+  "gait": "waddle",
+  "attack": "slam",
+  "special": "roar",
+  "weight": "heavy",
+  "surface": "scale",
+  "colors": {
+   "main": "#f0b048",
+   "secondary": "#f8e0a0",
+   "accent": "#48b0a0"
+  },
+  "features": [
+   "orange dragon",
+   "small teal wings",
+   "cream belly",
+   "antennae"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Dragonite_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Dragonite"
+  ]
+ },
+ "MEWTWO": {
+  "dex": 150,
+  "shape": "biped",
+  "gait": "biped",
+  "attack": "psychic",
+  "special": "pulse",
+  "weight": "normal",
+  "surface": "skin",
+  "colors": {
+   "main": "#d8d0e0",
+   "secondary": "#a878c0",
+   "accent": "#a060c0"
+  },
+  "features": [
+   "pale grey feline humanoid",
+   "purple belly and tail",
+   "tube on neck"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Mewtwo_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Mewtwo"
+  ]
+ },
+ "MEW": {
+  "dex": 151,
+  "shape": "biped",
+  "gait": "float",
+  "attack": "psychic",
+  "special": "pulse",
+  "weight": "light",
+  "surface": "fur",
+  "colors": {
+   "main": "#f8b8d0",
+   "secondary": "#f8d8e8",
+   "accent": "#f070a0"
+  },
+  "features": [
+   "pink kitten-like",
+   "long tail",
+   "big blue eyes",
+   "floats"
+  ],
+  "sources": [
+   "https://bulbapedia.bulbagarden.net/wiki/Mew_%28Pok%C3%A9mon%29",
+   "https://pokemon.fandom.com/wiki/Mew"
+  ]
+ }
+}

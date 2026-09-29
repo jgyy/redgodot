@@ -38,8 +38,13 @@ func setup(sid: String) -> void:
 		model = _fallback_model(sid)
 	add_child(model)
 	Toon.apply(model)
+	Toon.set_param(model, "use_vertex_ao", 1.0)   # the glbs carry baked ambient occlusion in COLOR_0
 	_anim = _find_anim_player(model)
 	AnimUtil.fix_looping(_anim)
+	if _anim:
+		# cross-fade between clips (Idle <-> Walk <-> Attack ...): the baked clips start/end in different poses.
+		# (--noblend: contact-sheet tooling seeks paused poses, where a pending blend would hide the clip)
+		_anim.playback_default_blend_time = 0.0 if OS.get_cmdline_user_args().has("--noblend") else 0.12
 	play("Idle")
 
 ## Plays a baked clip: Idle / Walk (looping), Attack / Hurt / Faint / Special (one-shot).

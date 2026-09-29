@@ -22,6 +22,9 @@ uniform float fade = 0.0;             // 0..1 dissolve toward transparent-dark (
 uniform float rim = 0.12;             // subtle back-rim so silhouettes pop against dark backgrounds
 uniform float ramp_bias = 0.0;        // added to N.L (e.g. +0.2 keeps faces out of the shadow bands)
 uniform float ramp_strength = 1.0;    // scales the ramp's shade amounts (softer look for characters)
+// Baked ambient occlusion (COLOR.r of the vertex colour; the Pokemon glbs carry it -- PokemonActor turns it on).
+// 0 = off (default, so every other model is unchanged).  Occluded areas take the darkest ramp step (cool hue).
+uniform float use_vertex_ao : hint_range(0.0, 1.0) = 0.0;
 
 vec3 rgb2hsl(vec3 c) {
 	float mx = max(c.r, max(c.g, c.b));
@@ -107,6 +110,9 @@ void fragment() {
 	// soft rim on the silhouette facing away from the light (keeps dark sides readable)
 	float fres = pow(1.0 - clamp(n.z, 0.0, 1.0), 3.0);
 	col = mix(col, shade(c, 0.1), fres * rim * step(I, 0.32));
+	// baked AO: soft toward the darkest cel step so creases / armpits / under-chins read
+	float occ = (1.0 - clamp(COLOR.r, 0.0, 1.0)) * use_vertex_ao;
+	col = mix(col, shade(c, -0.36 * ramp_strength), clamp(occ * 0.85, 0.0, 0.85) * (0.5 + 0.5 * smoothstep(0.0, 0.35, occ)));
 	col = to_linear(col);
 	col *= tint.rgb;
 	col = mix(col, flash.rgb, flash.a);
