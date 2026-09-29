@@ -14,6 +14,17 @@ CLAW = '#f6f0dc'
 
 
 # ============================================================================ helpers
+def _tame(c, top=0xe8):
+    """Near-white palette colours blow out under the cel shader's brightest ramp step (and its top-light gradient):
+    keep the brightest channel <= `top` so creams and whites stay cream / white-ish instead of pure white."""
+    r, g, b = int(c[1:3], 16), int(c[3:5], 16), int(c[5:7], 16)
+    m = max(r, g, b)
+    if m > top:
+        k = top / float(m)
+        r, g, b = int(r * k), int(g * k), int(b * k)
+    return '#%02x%02x%02x' % (r, g, b)
+
+
 def keep_features(d):
     """The face features (eyes, mouths, shines) of the definition, for a rebuild."""
     return [p for p in d['parts'] if p['t'] in ('eye', 'mouth', 'shine')]
@@ -22,6 +33,10 @@ def keep_features(d):
 def rebuild(d, parts, pal=None, features=None):
     """Replace the whole part list (keeping, unless `features` is given, the sprite's eyes / mouths)."""
     feats = keep_features(d) if features is None else features
+    for p in list(parts) + list(feats):
+        c = p.get('c')
+        if isinstance(c, str) and len(c) == 7 and c[0] == '#':
+            p['c'] = _tame(c)
     for p in parts:               # ellipsoid groups hidden inside others would otherwise be flattened into decals
         if p['t'] == 'e' and not p.get('face') and not p.get('frontOnly'):
             p.setdefault('solid', True)
@@ -373,41 +388,6 @@ def sidefoot(d, g, dirx=-1, n=3, w=4.6, h=2.3, toe_r=1.25, c=None, gnd=60.0, cla
         add(d, E(g, tx, gnd - toe_r * 0.9, toe_r * 1.05, toe_r * 0.95, c, z=zz, rd=toe_r * 1.1, d=f * toe_r * 2.0))
         add(d, Cap(g, tx + dirx * 0.3, gnd - toe_r * 0.8, tx + dirx * 1.3, gnd - toe_r * 0.5, toe_r * 0.55, 0.2, claw,
                    z=zz + 0.02, d1=f * toe_r * 2.0, d2=f * toe_r * 2.3))
-
-
-@fix('BULBASAUR', 'IVYSAUR', 'VENUSAUR')
-def bulbasaur_line(d, look):
-    venu = look and look.get('dex') == 3
-    for g in ('legF', 'legF2', 'legB', 'legB2'):
-        if parts(d, g):
-            thick(d, g, 1.1)
-            sidefoot(d, g, -1, w=5.4 if venu else 4.8, h=2.7 if venu else 2.4, toe_r=1.85 if venu else 1.55)
-    spread = 7.5 if venu else 6.0
-    for p in parts(d, 'body'):
-        if p['t'] == 'e':
-            p['ry'] += 1.4
-            p['y'] += 1.2
-    for g in ('legF', 'legF2', 'legB', 'legB2'):
-        thick(d, g, 1.12)
-    for g, cdv in (('legF', -spread), ('legF2', spread), ('legB', -spread), ('legB2', spread)):
-        mod(d, g, cd=cdv)
-    for p in parts(d, 'head'):
-        if p['t'] == 'p':
-            p['T'] = 2.4
-    # a proper bulb with a pointed sprout tip
-    if look and look.get('dex') == 1:
-        add(d, Cap('bulb', 42, 19, 43, 12.5, 2.6, 0.5, 'bulbD', z=-0.5))
-        for p in parts(d, 'bulb'):
-            if p['t'] == 'e':
-                p['ry'] = 13.4
-                p['rd'] = 12.0
-
-
-@fix('BULBASAUR')
-def bulbasaur(d, look):
-    bulbasaur_line(d, look)
-    # a wider, flatter muzzle so the face reads as the toad-like Bulbasaur snout
-    add(d, E('head', 16.5, 39, 6.8, 5.2, 'skin', z=1, rd=6.0, d=-1.0))
 
 
 # ============================================================================ birds
@@ -1239,8 +1219,8 @@ def _fox_legs(body, paw, by, leg_r=2.7, front=4.5, back=8.5, gnd=58.6, top_f=Non
 def vulpix(d, look):
     body, tail, curl, paw, inner = '#cc5c34', '#e87838', '#f4a050', '#f0d4a4', '#6a3020'
     parts = []
-    parts += tail_fan(['t1', 't2', 't3', 't4', 't5', 't6'], (32, 48.0), [-98, -60, -22, 22, 60, 98], 18.0, 7.0, 3.2, tail,
-                      tipc=curl, curl=75, depth=(11.0, 13.0), tip_r=2.4)
+    parts += tail_fan(['t1', 't2', 't3', 't4', 't5', 't6'], (32, 47.0), [-104, -64, -24, 24, 64, 104], 23.0, 8.0, 3.4, tail,
+                      tipc=curl, curl=100, depth=(10.0, 13.0), tip_r=2.8)
     parts.append(E('body', 32, 49.0, 8.8, 7.4, body, z=0, rd=10.0, d=4.0, cd=0.0))
     parts.append(E('chest', 32, 47.5, 4.8, 4.6, paw, z=0.5, rd=5.0, d=-5.0, cd=0.0, frontOnly=True))
     parts += _fox_legs(body, paw, 49.0)
@@ -1739,3 +1719,100 @@ def beedrill(d, look):
                             d1=-2.0, d2=-1.0, cd=0.0))
     parts.append(Mouth(32.0, 25.4, 1.0, 'line'))
     rebuild(d, parts, features=[Mouth(32.0, 25.6, 1.2, 'line')])
+
+
+# ============================================================================ Bulbasaur line (front-facing quadrupeds)
+def _toad_legs(skin, by, spread_f=7.0, spread_b=8.0, leg_r=4.2, foot_w=4.4, foot_l=5.0, toe_r=1.4, df=-6.0, db=12.0,
+               claw=CLAW, top_f=None):
+    out = []
+    for side, g in ((-1, 'legFL'), (1, 'legFR')):
+        x = 32 + side * spread_f
+        out.append(Cap(g, x, top_f or by + 1.0, x + side * 0.4, 56.0, leg_r, leg_r * 0.92, skin, z=2, cd=df))
+        out += foot(g, x + side * 0.6, 60.0, skin, w=foot_w, ln=foot_l, n=3, dz=-1.0, toe_r=toe_r, z=2.2, claw=claw)
+    for side, g in ((-1, 'legBL'), (1, 'legBR')):
+        x = 32 + side * spread_b
+        out.append(Cap(g, x, by - 1.0, x + side * 0.4, 56.0, leg_r * 1.15, leg_r * 1.0, skin, z=2, cd=db))
+        out += foot(g, x + side * 0.6, 60.0, skin, w=foot_w * 1.05, ln=foot_l, n=3, dz=-1.0, toe_r=toe_r, z=2.2, claw=claw)
+    return out
+
+
+def _toad_head(skin, spot, hy, hrx, hry, eye_dx, eye_y, eye_s, cd=-10.0, ear_h=5.2, ear_dx=8.0):
+    parts = [E('head', 32, hy, hrx, hry, skin, z=4, rd=hry + 1.2, cd=cd)]
+    parts.append(E('head', 32, hy + hry * 0.42, hrx * 0.7, hry * 0.58, skin, z=4, rd=hry * 0.9, d=-4.4, cd=cd, frontOnly=True))
+    for side, g in ((-1, 'earL'), (1, 'earR')):
+        parts += cone(g, 32 + side * ear_dx, hy - hry * 0.55, 32 + side * (ear_dx + 2.2), hy - hry - ear_h, 4.8, 0.9, skin, z=1, cd=cd)
+    parts.append(Spot('head', 32 - hrx * 0.62, hy - hry * 0.78, 2.4, 1.6, spot))
+    parts.append(Spot('head', 32 + hrx * 0.55, hy - hry * 0.85, 1.9, 1.3, spot))
+    parts.append(Spot('head', 32 - 1.4, hy + hry * 0.35, 0.55, 0.45, '#2a4a40', face=True))
+    parts.append(Spot('head', 32 + 1.4, hy + hry * 0.35, 0.55, 0.45, '#2a4a40', face=True))
+    feats = [Eye(32 - eye_dx, eye_y, eye_s, '#d03040', look=(0, 0), style='angry', wide=1.05),
+             Eye(32 + eye_dx, eye_y, eye_s, '#d03040', look=(0, 0), style='angry', wide=1.05, flip=True)]
+    return parts, feats
+
+
+@fix('BULBASAUR')
+def bulbasaur(d, look):
+    skin, spot, bulb, bulbd = '#72c8a8', '#3f8f76', '#5aa848', '#3a7a38'
+    parts = []
+    parts.append(E('body', 32, 47.5, 11.4, 9.4, skin, z=0, rd=13.0, d=5.0, cd=0.0))
+    for x, y in ((25.5, 44.0), (38.5, 46.5), (33.0, 51.5), (29.0, 49.5)):
+        parts.append(Spot('body', x, y, 2.6, 2.0, spot))
+    parts += _toad_legs(skin, 47.5, spread_f=7.0, spread_b=8.4, leg_r=4.3)
+    # the bulb: a big green onion with a pointed sprout and ribs
+    parts.append(E('bulb', 32, 34.5, 12.4, 12.0, bulb, z=1, rd=12.4, d=7.5, cd=0.0, gloss=True, solid=True))
+    parts.append(Cap('bulb', 32, 25.0, 32, 18.5, 3.4, 0.5, bulbd, z=1.1, d1=7.5, d2=7.5, cd=0.0))
+    for x0, x1 in ((23.5, 26.0), (32, 32), (40.5, 38.0)):
+        parts.append(Stripe('bulb', [x0, 28.0, (x0 + x1) / 2 + (0 if x0 == 32 else 0.4 * (x1 - x0)), 36.0, x1, 45.5], 1.4, bulbd))
+    hp, feats = _toad_head(skin, spot, 42.5, 12.6, 8.8, 5.8, 41.2, 3.0)
+    parts += hp
+    feats.append(Mouth(32.0, 47.6, 3.6, 'open'))
+    rebuild(d, parts, features=feats)
+
+
+@fix('IVYSAUR')
+def ivysaur(d, look):
+    skin, spot, bulb, bulbd = '#68bcb0', '#3c8a80', '#4aac48', '#2e7c34'
+    bud, budd, trunk = '#f482a2', '#c44874', '#9a6a3c'
+    parts = []
+    parts.append(E('body', 32, 47.0, 12.2, 9.8, skin, z=0, rd=13.6, d=5.0, cd=0.0))
+    for x, y in ((24.5, 44.0), (39.5, 46.5), (33.0, 51.5), (28.0, 49.5)):
+        parts.append(Spot('body', x, y, 2.8, 2.1, spot))
+    parts += _toad_legs(skin, 47.0, spread_f=7.4, spread_b=8.8, leg_r=4.7, foot_w=4.8, foot_l=5.3, toe_r=1.5)
+    parts.append(E('bulb', 32, 37.0, 10.0, 8.0, bulb, z=1, rd=10.0, d=7.0, cd=0.0, solid=True))
+    parts.append(Cap('trunk', 32, 37.0, 32, 26.0, 3.6, 3.0, trunk, z=1.5, d1=7.0, d2=7.0, cd=0.0))
+    # the budding flower
+    parts.append(E('bud', 32, 21.0, 6.6, 9.0, bud, z=2, rd=6.6, d=7.0, cd=0.0, gloss=True, solid=True))
+    parts.append(Cap('bud', 32, 13.0, 32, 8.0, 3.2, 0.5, bud, z=2.1, d1=7.0, d2=7.0, cd=0.0))
+    for x0, x1 in ((26.5, 28.0), (32, 32), (37.5, 36.0)):
+        parts.append(Stripe('bud', [x0, 12.0, (x0 + x1) / 2, 20.0, x1, 29.0], 1.1, budd))
+    for side, g in ((-1, 'lfL'), (1, 'lfR')):
+        parts += leaf_plate(g, 32 + side * 3.0, 33.0, side * 66, 19.0, 9.0, '#4aac48', bulbd, z=0.5, T=1.5, cd=6.0)
+    hp, feats = _toad_head(skin, spot, 42.0, 13.0, 9.0, 6.0, 40.6, 3.0, ear_h=5.8)
+    parts += hp
+    feats.append(Mouth(32.0, 47.2, 3.4, 'open'))
+    rebuild(d, parts, features=feats)
+
+
+@fix('VENUSAUR')
+def venusaur(d, look):
+    skin, spot = '#5eb0a4', '#387c74'
+    petal, petald, center, leaf, leafd, trunk = '#f07888', '#d05068', '#f4d870', '#44a44c', '#2a6c34', '#8a5a30'
+    parts = []
+    parts.append(E('body', 32, 45.5, 15.8, 11.8, skin, z=0, rd=15.5, d=5.0, cd=0.0))
+    for x, y in ((21.0, 42.0), (43.0, 45.0), (33.0, 52.0), (26.0, 49.0), (39.0, 50.0)):
+        parts.append(Spot('body', x, y, 3.0, 2.3, spot))
+    parts += _toad_legs(skin, 45.5, spread_f=9.6, spread_b=10.8, leg_r=6.0, foot_w=5.8, foot_l=6.2, toe_r=1.8, df=-7.0, db=13.5)
+    # trunk + big flower
+    parts.append(Cap('trunk', 32, 36.0, 32, 24.0, 5.4, 4.6, trunk, z=1.5, d1=7.0, d2=7.0, cd=0.0))
+    parts += petals('flower', 32, 18.5, 7.0, 12.5, 5, 10.0, 4.4, 9.0, petal, tilt=0.5, z=2, a0=-90)
+    parts.append(E('flower', 32, 19.0, 9.0, 5.4, petald, z=2.1, rd=9.0, d=7.0, solid=True))
+    parts.append(E('ctr', 32, 17.0, 6.0, 4.0, center, z=3, rd=6.0, d=5.0, solid=True))
+    for x, y in ((18.0, 22.0), (46.0, 22.0), (24.0, 30.0), (40.0, 30.0), (32, 12.0)):
+        parts.append(Spot('flower', x, y, 2.0, 1.5, '#fae0e6'))
+    for side, g in ((-1, 'lfL'), (1, 'lfR')):
+        parts += leaf_plate(g, 32 + side * 6.0, 36.0, side * 74, 22.0, 10.0, leaf, leafd, z=0.5, T=1.6, cd=6.0)
+    hp, feats = _toad_head(skin, spot, 41.5, 14.4, 9.6, 6.6, 39.6, 3.0, cd=-11.0, ear_h=5.0, ear_dx=9.0)
+    parts += hp
+    feats.append(Mouth(32.0, 47.0, 3.8, 'fang'))
+    rebuild(d, parts, features=feats)
+    look['view'] = 'front'
