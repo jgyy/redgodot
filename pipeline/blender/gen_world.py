@@ -27,6 +27,8 @@ import bpy  # noqa: E402
 import bmesh  # noqa: E402
 from mathutils import Vector  # noqa: E402
 import common as C  # noqa: E402
+import env_kit as K  # noqa: E402
+import env_props as EP  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, '..', '..'))
@@ -93,21 +95,49 @@ def build_tree(key, d, pal):
     ob = new_mesh_obj(key)
     bm = bmesh.new()
     col = vcol_layer(bm)
-    # ---- trunk: a slightly tapered box, 4px wide, lit from the left like the sprite
+    # ---- trunk: octagonal tapered stem with a root flare, bark stripes and two root buttresses,
+    # lit from the left like the sprite (the sprite's trunk is 4 px wide)
     tx0, ty0, tx1, ty1 = d['trunk']
-    w = (tx1 - tx0) / 16.0
-    h = (26 - ty0) / 16.0 + 0.1
-    dep = 0.16
-    x0, x1 = (tx0 - 8) / 16.0, (tx1 - 8) / 16.0
-    verts = []
-    for (z, sc) in ((0.0, 1.15), (h, 0.85)):
-        cx = (x0 + x1) / 2
-        for (xx, yy) in ((x0, -dep / 2), (x1, -dep / 2), (x1, dep / 2), (x0, dep / 2)):
-            verts.append(bm.verts.new((cx + (xx - cx) * sc, yy * sc, z)))
-    faces = [((0, 1, 5, 4), trunk[2]), ((1, 2, 6, 5), trunk[1]), ((2, 3, 7, 6), trunk[1]), ((3, 0, 4, 7), trunk[3])]
-    for idx, c in faces:
-        f = bm.faces.new([verts[i] for i in idx])
-        set_face_color(bm, f, c, col)
+    h = (26 - ty0) / 16.0 + 0.12
+    cxt = ((tx0 + tx1) / 2.0 - 8) / 16.0
+    wr = (tx1 - tx0) / 16.0 * 0.5
+    rings = [(0.0, wr * 1.55), (0.07, wr * 1.18), (0.22, wr * 1.0), (h, wr * 0.82)]
+    nseg = 8
+    rvs = []
+    for (z, r) in rings:
+        rv = []
+        for k in range(nseg):
+            a_ = 2 * math.pi * k / nseg + math.pi / 8
+            rv.append(bm.verts.new((cxt + math.cos(a_) * r, math.sin(a_) * r * 0.8, z)))
+        rvs.append(rv)
+    for i in range(len(rvs) - 1):
+        for k in range(nseg):
+            k2 = (k + 1) % nseg
+            f = bm.faces.new((rvs[i][k], rvs[i][k2], rvs[i + 1][k2], rvs[i + 1][k]))
+            f.normal_update()
+            nrm = f.normal
+            lit = -nrm.x * 0.55 - nrm.y * 0.45 + nrm.z * 0.3
+            ti = 3 if lit > 0.55 else 2 if lit > 0.15 else 1 if lit > -0.35 else 0
+            if (k + i) % 3 == 0 and ti > 0:
+                ti -= 1                                  # dark bark furrow
+            if i == 0:
+                ti = max(0, ti - 1)                      # shadowed root flare
+            set_face_color(bm, f, trunk[ti], col)
+    for (ang, ln) in ((-0.6, 0.20), (0.75, 0.17)):        # root buttresses
+        bx, by = cxt + math.cos(ang) * wr * 1.3, math.sin(ang) * wr * 1.0 - 0.02
+        tip = bm.verts.new((bx + math.cos(ang) * ln, by + math.sin(ang) * ln * 0.6, 0.0))
+        v1 = bm.verts.new((bx - math.sin(ang) * wr * 0.5, by + math.cos(ang) * wr * 0.4, 0.0))
+        v2 = bm.verts.new((bx + math.sin(ang) * wr * 0.5, by - math.cos(ang) * wr * 0.4, 0.0))
+        top = bm.verts.new((bx, by, 0.11))
+        for tri, ti in (((v1, v2, top), 1), ((tip, v1, top), 2), ((v2, tip, top), 0)):
+            try:
+                f = bm.faces.new(tri)
+                f.normal_update()
+                if f.normal.z < -0.9:
+                    f.normal_flip()
+                set_face_color(bm, f, trunk[ti], col)
+            except ValueError:
+                pass
     # ---- canopy clumps (back to front, like the sprite)
     clumps = sorted(d['clumps'], key=lambda c: c['y'])
     for ci, c in enumerate(clumps):
@@ -136,6 +166,24 @@ def build_tree(key, d, pal):
             if idx == len(ramp) - 2 and rng.random() < 0.18:
                 idx = len(ramp) - 1
             set_face_color(bm, f, ramp[max(0, min(len(ramp) - 1, idx))], col)
+        if c['r'] >= 3.9:
+            # a sunlit leaf tuft on the upper-left shoulder of each large clump (breaks the round silhouette)
+            tr = r * 0.46
+            tcx, tcz = cx - r * 0.55, cz + r * 0.5 * 0.707
+            tcy = cy - r * 0.18
+            sph = bmesh.ops.create_icosphere(bm, subdivisions=1, radius=1.0)
+            for v in sph['verts']:
+                nn = v.co.normalized()
+                jag = 1.0 + (hash2(int(nn.x * 50 + 99), int(nn.z * 50 + 99), seed + ci + 40) - 0.5) * 0.3
+                v.co = Vector((tcx + nn.x * tr * jag, tcy + nn.y * tr * 0.707 * jag, tcz + nn.z * tr * 0.707 * jag))
+            for f in {f for v in sph['verts'] for f in v.link_faces}:
+                fc = f.calc_center_median()
+                nd = Vector(((fc.x - tcx) / tr, (fc.y - tcy) / (tr * 0.707), (fc.z - tcz) / (tr * 0.707)))
+                if nd.length > 0:
+                    nd.normalize()
+                ns = (nd.x, -nd.z, -nd.y)
+                idx = foliage_index(ns, 0.18, (rng.random() - 0.5) * 0.12, len(ramp), nd.z < -0.6)
+                set_face_color(bm, f, ramp[max(0, min(len(ramp) - 1, idx))], col)
     bm.to_mesh(ob.data)
     bm.free()
     me = ob.data
@@ -246,13 +294,15 @@ def main():
         export_static(path)
         manifest['tree_%s' % key] = {'tris': tris, 'kind': d['kind'], 'variant': d['v']}
         print('[gen_world] %s: %d tris' % (path, tris))
-    for name, fn in (('pokeball', build_pokeball), ('boulder', build_boulder)):
-        C.reset_scene()
-        ob = fn()
-        tris = sum(len(p.vertices) - 2 for p in ob.data.polygons)
+    for name in EP.GAME:
+        fn, note = EP.PROPS[name]
+        K.reset()
+        P = fn('vcol')
+        tris = P.tri_count()
+        P.to_object()
         path = os.path.join(OUT_DIR, '%s.glb' % name)
-        export_static(path)
-        manifest[name] = {'tris': tris}
+        size = K.export(path)
+        manifest[name] = {'tris': tris, 'bytes': size, 'notes': note}
         print('[gen_world] %s: %d tris' % (path, tris))
     json.dump(manifest, open(os.path.join(OUT_DIR, 'manifest.json'), 'w'), indent=1)
 
