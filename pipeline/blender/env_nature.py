@@ -126,7 +126,7 @@ def p_tree_palm(style):
             s0 = Vector((-d.y, d.x, 0)) * w0
             s1 = Vector((-d.y, d.x, 0)) * w1
             P.quad(a0 - s0, a0 + s0, a1 + s1 + Vector((0, 0, 0.0)), a1 - s1, 'palm', toward=(0, 0, 1), ao=False, bias=1 if i % 2 else 0)
-            P.quad(a0 - s0 + Vector((0, 0, -0.03)), a0 + s0 + Vector((0, 0, -0.03)), a1 + s1 + Vector((0, 0, -0.03)), a1 - s1 + Vector((0, 0, -0.03)), 'palm', toward=(0, 0, -1), ao=False, bias=-1 if False else 0)
+            P.quad(a0 - s0 + Vector((0, 0, -0.03)), a0 + s0 + Vector((0, 0, -0.03)), a1 + s1 + Vector((0, 0, -0.03)), a1 - s1 + Vector((0, 0, -0.03)), 'palm', toward=(0, 0, -1), ao=False, bias=0)
     for i in range(3):
         a = i * 2.1
         P.sphere((tip.x + math.cos(a) * 0.09, math.sin(a) * 0.09, 1.78), 0.075, 'brass' if i % 2 else 'wood_dark', subdiv=1, ao=False)

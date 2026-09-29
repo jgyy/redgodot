@@ -462,7 +462,7 @@ def p_container(style):
     P = Prop('container', style, seed=431)
     P.box((-0.94, -0.4, 0.06), (0.94, 0.4, 0.94), 'blue', bevel=0.02)
     for i in range(13):
-        P.box((-0.9 + i * 0.14, -0.415, 0.1), (-0.9 + i * 0.14 + 0.07, -0.4, 0.9), 'blue', ao=False, bias=-1 if False else 1)
+        P.box((-0.9 + i * 0.14, -0.415, 0.1), (-0.9 + i * 0.14 + 0.07, -0.4, 0.9), 'blue', ao=False, bias=1)
     for sx in (-1, 1):
         for sy in (-1, 1):
             for z in (0.0, 0.88):

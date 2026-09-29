@@ -270,3 +270,31 @@ sprite's glass pixels.
   slots are vertex alpha ids 11-15 (wall / roof / trim / door / shutter) on a grey ramp; `BuildingBuilder._part`
   recolours them per building and bakes the instance into the building's single mesh. Fixed-colour parts
   (glass, steel, lamp glow) use alpha 1.
+
+### Furniture, nature, town and building-module models (`env_furn.py`, `env_nature.py`, `env_town.py`, `env_mods.py`)
+
+153 more props built on the same `Prop` kit (bevelled boxes with 1-2 segment rounds, lathes, swept tubes, faceted
+blobs; ramp-lit vertex colours, baked ground AO). Self-lit ramps (screens, LEDs, lamp glass) use vertex alpha 15/16
+so `tree.gdshader` keeps them bright at night. `env_ext.py` registers the extra ramps (plastics, cloth, crystals,
+ice, lava ...); `env_registry.py` lists the four sets for `gen_world.py`, which writes
+`assets/models/world/<name>.glb` plus the manifest (`GEN_SET=furniture,nature,town,building` or
+`GEN_ONLY=pc,heal_machine` regenerate a subset; without them everything is rebuilt). `gen_tiles.py` also writes
+textured copies of the hero props into `assets/models/tiles/`.
+
+- `env_furn.py` - PC, laptop, CRT TVs, Poke Ball healing machine (2 x 2 cells), bookshelves, mart shelves, racks,
+  vending / slot machines, stove, sink, fridge, seating, lab machines, generator, table-top items ... and five
+  modular *sets* (`table_set`, `desk_set`, `counter_center_set`, `counter_mart_set`, `bench_set`): one glb holding a
+  mesh per neighbour mask (`m0..m15`), so a run of table cells gets end / middle / corner pieces.
+- `env_nature.py` - tree species (pine, slim pine, oak, birch, dead, cherry, palm, autumn, apple), bushes, ferns,
+  reeds, lily pads, flower patches, rocks, stalagmites, crystals, ice, lava rock, logs, stumps, driftwood ...
+- `env_town.py` - mailbox, lamp, benches, fountain, hydrant, market stall, flag, windmill, gates and arches, bridge /
+  dock parts, boats, lighthouse, pylon, water tower, truck, container, incense burner ...
+- `env_mods.py` - roof aerials / vanes / masts / hatches / tanks and one roof ornament per gym type.
+
+Godot side: `FurnitureKit.gd` (label cells -> furniture, neighbour-aware), `DressingKit.gd` (tree species, shores,
+meadows, caves, nooks, bridge rails, roofs, hand-placed landmarks), both drawing through `PropKit`'s chunked
+MultiMeshes; `EnvTests.gd` covers them (and builds the props of all 223 maps in the unit tests).
+`python3 pipeline/blender/verify_glb.py godot/assets/models/world --min-kb 1 --max-kb 300 --max-tris 4000 --meshes
+table_set=16,desk_set=16,counter_center_set=16,counter_mart_set=16,bench_set=4` checks the files;
+`--scene=model_sheet --kind=props|kit --dir=world|tiles --view=game|close` renders the contact sheets
+(`docs/gallery/props-sheet.png`).

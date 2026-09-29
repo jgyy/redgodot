@@ -236,6 +236,10 @@ static func _interior(map: String, lab: Dictionary, can_walk: Callable, busy: Di
 		theme = "school"
 	elif map.begins_with("PokemonTower"):
 		theme = "tower"
+	elif map.begins_with("SSAnne") and not map.contains("Kitchen"):
+		theme = "ship"
+	elif map.begins_with("SilphCo") or map.begins_with("GameCorner"):
+		theme = "lab"
 	elif map.contains("Lab") or map.contains("Museum"):
 		theme = "lab"
 	elif map.contains("House") or map.contains("Daycare") or map.contains("FanClub") or map.contains("Dojo"):
@@ -243,17 +247,22 @@ static func _interior(map: String, lab: Dictionary, can_walk: Callable, busy: Di
 	if theme == "":
 		return 0
 	var corner_props: Array = {"home": ["floor_lamp", "armchair", "wardrobe", "fridge", "stool", "globe"], "lab": ["microscope", "globe", "floor_lamp", "lab_machine"],
-		"school": ["school_desk", "stool", "globe"], "tower": ["candle_stand", "incense_burner"]}[theme]
+		"school": ["school_desk", "stool", "globe"], "tower": ["candle_stand", "incense_burner"], "ship": ["stool", "floor_lamp", "cargo_crates"]}[theme]
 	var n := 0
 	var board_done := false
+	var wall_label := "ship_wall" if theme == "ship" else "wall"
 	for y in range(h):
 		for x in range(w):
 			var c := Vector2i(x, y)
 			var l := String(lab.get(c, ""))
 			if busy.has(c) or not bool(can_walk.call(c)):
 				continue
+			if l == "ship_floor" or l == "deck":
+				l = "floor"       # the ship's decks count as room floor
 			var r := _h(x, y, 560)
 			var north := String(lab.get(c + Vector2i(0, -1), ""))
+			if north == wall_label:
+				north = "wall"
 			# ---- wall dressing on the back wall
 			if theme == "tower" and north == "wall" and l.begins_with("floor") and r < 0.07:
 				n += _one(add, "wall_lantern", Vector3(x + 0.5, 0.55 * WorldData.K, y - 0.02), 0.0, c, 1.0)
@@ -269,6 +278,8 @@ static func _interior(map: String, lab: Dictionary, can_walk: Callable, busy: Di
 						wall_props = ["wall_clock", "poster_view", "painting", "kitchen_rack", "poster_map"]
 					elif theme == "lab":
 						wall_props = ["wall_clock", "poster_map", "poster_ball", "poster_view"]
+					elif theme == "ship":
+						wall_props = ["life_ring", "wall_lantern", "painting", "wall_clock"]
 					n += _one(add, wall_props[int(_h(x, y, 561) * wall_props.size()) % wall_props.size()], Vector3(x + 0.5, 0.5 * WorldData.K, y - 0.02), 0.0, c, 1.0)
 					continue
 			# ---- corner furniture

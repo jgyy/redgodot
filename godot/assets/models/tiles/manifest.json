@@ -15,7 +15,7 @@
   "floor_pave": {
    "file": "floor_pave.glb",
    "tris": 242,
-   "bytes": 77376,
+   "bytes": 77336,
    "notes": "walkable ground (town): four bevelled slabs, grout, moss and a crack"
   },
   "tallgrass": {
@@ -83,7 +83,7 @@
   "lamp_post": {
    "file": "lamp_post.glb",
    "tris": 336,
-   "bytes": 36352,
+   "bytes": 35204,
    "notes": "iron street lamp"
   },
   "mailbox": {
