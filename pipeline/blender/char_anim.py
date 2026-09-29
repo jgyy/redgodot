@@ -314,7 +314,7 @@ def build_cheer(P, hair):
     # otherwise the feet sink into the floor at the bottom of each hop
     knee = np.degrees(np.arccos(np.clip(1.0 - drop / (P.hip - P.ankle), -1.0, 1.0)))
     for side, sg in (('L', 1), ('R', -1)):
-        c.r('upper_arm_' + side)[:, 1] = -sg * (150 + 8 * np.sin(w * 2))
+        c.r('upper_arm_' + side)[:, 1] = -sg * (130 + 8 * np.sin(w * 2))      # >= ~140 deg drives the hands into the (wider than the shoulders) head
         c.r('upper_arm_' + side)[:, 0] = -10
         c.r('forearm_' + side)[:, 0] = -10 - 12 * hop
         c.r('thigh_' + side)[:, 0] = -knee - 4 * hop
@@ -457,11 +457,14 @@ def build_sleep(P, hair):
     c.r('spine')[:, 0] += 7 + 1.5 * br
     c.r('chest')[:, 0] += 1.5 * br
     c.l('hips')[:, 2] += -0.2
+    # the 0.2 pelvis drop needs knee bend of acos(1 - 0.2 / leg) ~ 15 deg (isosceles leg: thigh -a, shin +2a, foot -a)
+    # -- the old -6/+8 left both feet ~0.4 rows below the floor
     for side, sg in (('L', 1), ('R', -1)):
         c.r('upper_arm_' + side)[:, 0] += 8
         c.r('upper_arm_' + side)[:, 1] += -sg * (-3 - 1.2 * br)
-        c.r('thigh_' + side)[:, 0] += -6
-        c.r('shin_' + side)[:, 0] += 8
+        c.r('thigh_' + side)[:, 0] += -15
+        c.r('shin_' + side)[:, 0] += 30
+        c.r('foot_' + side)[:, 0] += -15
     add_face(c, t, blinks=(), talk=1.0 + 0.5 * np.clip(np.sin(w) , 0, 1))
     for eye in ('eye_L', 'eye_R'):
         c.s(eye)[:, 2] = 0.1
@@ -506,7 +509,7 @@ def build_stretch(P, hair):
     a = _window(t, 0.05, 0.95, 0.25)
     tremble = np.sin(w * 8) * 0.6
     for side, sg in (('L', 1), ('R', -1)):
-        c.r('upper_arm_' + side)[:, 1] += -sg * 168 * a
+        c.r('upper_arm_' + side)[:, 1] += -sg * 136 * a                       # 168 deg = straight up, straight through the skull
         c.r('upper_arm_' + side)[:, 0] += -8 * a + tremble * a
         c.r('forearm_' + side)[:, 0] += -6 * a
         c.r('clavicle_' + side)[:, 1] += -sg * -8 * a
@@ -524,15 +527,17 @@ def build_dance(P, hair):
     c, t, w = _base(P, hair, 'Dance', 48)
     beat = np.sin(w * 2)
     c.l('hips')[:, 0] += 0.7 * np.sin(w)
-    c.l('hips')[:, 2] += -0.25 + 0.32 * np.abs(np.sin(w * 2))
+    c.l('hips')[:, 2] += 0.32 * np.abs(np.sin(w * 2))          # bounce up only: lowering the pelvis with straight legs sank the standing foot ~0.5 rows into the floor
     c.r('hips')[:, 1] += 9 * np.sin(w)
     c.r('spine')[:, 1] += -6 * np.sin(w)
     for side, sg, ph in (('L', 1, 0.0), ('R', -1, math.pi)):
         c.r('upper_arm_' + side)[:, 1] += -sg * (70 + 52 * np.sin(w * 2 + ph))
         c.r('upper_arm_' + side)[:, 0] += -12 * np.sin(w * 2 + ph)
         c.r('forearm_' + side)[:, 0] += -30 - 20 * np.sin(w * 2 + ph)
-        c.r('thigh_' + side)[:, 0] += -9 * np.clip(np.sin(w + ph), 0, 1)
-        c.r('shin_' + side)[:, 0] += 16 * np.clip(np.sin(w + ph), 0, 1)
+        lift = np.clip(np.sin(w + ph), 0, 1)
+        c.r('thigh_' + side)[:, 0] += -16 * lift
+        c.r('shin_' + side)[:, 0] += 32 * lift               # knee bend (thigh -a, shin +2a) that really lifts the foot ...
+        c.r('foot_' + side)[:, 0] += -16 * lift              # ... and a flat foot: the old -9/+16 pitched the toe ~0.4 rows into the floor
     c.r('head')[:, 1] += 8 * np.sin(w)
     c.r('head')[:, 0] += 3 * beat
     add_face(c, t, blinks=(0.4,), talk=1.4)
