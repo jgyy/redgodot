@@ -282,6 +282,9 @@ def parse_evos_moves(repo):
 
 
 # ---------------------------------------------------------------- objects
+ITEMS = None   # set of item ids (pokedata.json), so a species in an object's last field isn't taken for an item
+
+
 def parse_objects(repo, m):
     try:
         t = fetch(repo, f'data/maps/objects/{m}.asm')
@@ -298,8 +301,11 @@ def parse_objects(repo, m):
         o = {'x': int(a[0]), 'y': int(a[1]), 'sprite': a[2][7:].lower(), 'move': a[3], 'dir': a[4], 'text': a[5]}
         if len(a) >= 8 and a[6].startswith('OPP_'):
             o['trainer'] = {'cls': norm_class(a[6][4:]), 'n': int(a[7])}
-        elif len(a) >= 7 and not a[6].startswith('OPP_'):
-            o['item'] = a[6]
+        elif len(a) >= 7 and not a[6].startswith('OPP_') and not a[6].isdigit():
+            if ITEMS is None or a[6] in ITEMS:
+                o['item'] = a[6]
+            else:
+                o['mon'] = a[6]   # static encounters (ZAPDOS, VOLTORB ...) carry a species here
         objs.append(o)
     for i, o in enumerate(objs):
         o['id'] = ids[i] if i < len(ids) else ''
@@ -425,6 +431,8 @@ def main():
     CACHE = args.cache
     pd = json.load(open(os.path.join(ROOT, 'godot/data/pokedata.json')))
     md = json.load(open(os.path.join(ROOT, 'godot/data/mapdata.json')))
+    global ITEMS
+    ITEMS = set(pd['items'].keys())
     classes = list(pd['parties'].keys())
     res = {'versions': ['RED', 'BLUE', 'YELLOW'], 'source': 'pret/pokered + pret/pokeyellow (data/*.asm)'}
 

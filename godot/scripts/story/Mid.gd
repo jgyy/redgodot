@@ -749,14 +749,14 @@ static func prize_menu(which: int) -> void:
 	var items: Array = []
 	for e in list:
 		var nm := Story.item_name(e[0]) if is_tm else Story.species_name(e[0])
-		items.append(nm.rpad(10) + str(e[1]).lpad(5))
+		items.append(nm.rpad(10) + str(int(e[1])).lpad(5))
 	items.append("NO THANKS")
 	var r := await Story.menu_with_text("WhichPrizeText", items, {"x": 6, "y": 30, "w": 200})
 	if r < 0 or r == 3:
 		Story.close_box(box)
 		return
 	var id: String = list[r][0]
-	var cost: int = list[r][1]
+	var cost: int = int(list[r][1])
 	Story.setvar("wNameBuffer", Story.item_name(id) if is_tm else Story.species_name(id))
 	if not await Story.ask("SoYouWantPrizeText"):
 		await Story.say("OhFineThenText")

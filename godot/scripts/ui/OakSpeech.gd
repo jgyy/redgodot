@@ -62,7 +62,7 @@ func _ready() -> void:
 		if k == "mon":
 			var a := PokemonActor.new()
 			holder.add_child(a)
-			a.setup("NIDORINO")
+			a.setup(_intro_mon())
 		else:
 			holder.add_child(CharacterModel.build({"oak": "oak", "red": "red", "blue": "blue"}[k]))
 			Diorama.play_anim(holder, ["Idle"])
@@ -116,6 +116,10 @@ func _set_alpha(n: Node, a: float) -> void:
 	for c in n.get_children():
 		_set_alpha(c, a)
 
+## The POKeMON Prof. Oak introduces: NIDORINO in RED / BLUE, PIKACHU in YELLOW.
+func _intro_mon() -> String:
+	return "PIKACHU" if GameState.is_yellow() else "NIDORINO"
+
 func _frames(n: int) -> void:
 	for i in n:
 		await get_tree().process_frame
@@ -137,7 +141,7 @@ func _run() -> void:
 	await _fade_pic(false)
 	var au := UI.audio()
 	if au and au.has_method("cry"):
-		au.cry("NIDORINO")
+		au.cry(_intro_mon())
 	await _say("OakSpeechText2A")
 	await _say("OakSpeechText2B")
 	await _fade_pic(true)

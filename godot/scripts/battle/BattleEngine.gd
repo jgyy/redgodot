@@ -610,6 +610,9 @@ func execute_move(side: BattleSide, md: Dictionary) -> void:
 	if tm == 0.0 and eff != "SPECIAL_DAMAGE" and eff != "SUPER_FANG":
 		await ui.msg("It doesn't affect " + tname + "!")
 		v["thrash"] = {}
+		if eff == "JUMP_KICK":   # Gen 1: a JUMP KICK that can't connect (immune target) still costs the user 1 HP
+			await ui.msg(nm + " kept going and crashed!")
+			await apply_damage(side, 1)
 		if eff == "EXPLODE":
 			a.hp = 0
 			await ui.sync_hp(side)
