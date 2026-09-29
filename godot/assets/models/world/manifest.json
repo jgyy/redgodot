@@ -1,68 +1,172 @@
 {
  "tree_tree0": {
-  "tris": 648,
+  "tris": 774,
   "kind": "tree",
   "variant": 0
  },
  "tree_tree1": {
-  "tris": 648,
+  "tris": 774,
   "kind": "tree",
   "variant": 1
  },
  "tree_tree2": {
-  "tris": 648,
+  "tris": 774,
   "kind": "tree",
   "variant": 2
  },
  "tree_tree20": {
-  "tris": 488,
+  "tris": 614,
   "kind": "tree2",
   "variant": 0
  },
  "tree_tree21": {
-  "tris": 488,
+  "tris": 614,
   "kind": "tree2",
   "variant": 1
  },
  "tree_tree22": {
-  "tris": 488,
+  "tris": 614,
   "kind": "tree2",
   "variant": 2
  },
  "tree_tree23": {
-  "tris": 488,
+  "tris": 614,
   "kind": "tree2",
   "variant": 3
  },
  "tree_tree24": {
-  "tris": 488,
+  "tris": 614,
   "kind": "tree2",
   "variant": 4
  },
  "tree_tree25": {
-  "tris": 488,
+  "tris": 614,
   "kind": "tree2",
   "variant": 5
  },
  "tree_tree3": {
-  "tris": 648,
+  "tris": 774,
   "kind": "tree",
   "variant": 3
  },
  "tree_tree4": {
-  "tris": 648,
+  "tris": 774,
   "kind": "tree",
   "variant": 4
  },
  "tree_tree5": {
-  "tris": 648,
+  "tris": 774,
   "kind": "tree",
   "variant": 5
  },
- "pokeball": {
-  "tris": 320
+ "sign": {
+  "tris": 380,
+  "bytes": 30064,
+  "notes": "wooden sign on a post with nails and text lines"
+ },
+ "fence_x": {
+  "tris": 152,
+  "bytes": 12112,
+  "notes": "white picket fence cell running along X"
+ },
+ "fence_z": {
+  "tris": 152,
+  "bytes": 12112,
+  "notes": "white picket fence cell running along Z"
+ },
+ "fence_post": {
+  "tris": 98,
+  "bytes": 8604,
+  "notes": "fence post with cap and footing"
+ },
+ "plant": {
+  "tris": 300,
+  "bytes": 25044,
+  "notes": "potted plant"
+ },
+ "barrel": {
+  "tris": 276,
+  "bytes": 18532,
+  "notes": "banded wooden barrel"
+ },
+ "crate": {
+  "tris": 478,
+  "bytes": 37252,
+  "notes": "wooden crate"
  },
  "boulder": {
-  "tris": 80
+  "tris": 204,
+  "bytes": 21272,
+  "notes": "strength boulder"
+ },
+ "pokeball": {
+  "tris": 452,
+  "bytes": 29308,
+  "notes": "item ball"
+ },
+ "grave_a": {
+  "tris": 164,
+  "bytes": 13912,
+  "notes": "gravestone, rounded slab"
+ },
+ "grave_b": {
+  "tris": 240,
+  "bytes": 20336,
+  "notes": "gravestone, slab with a cross"
+ },
+ "brazier": {
+  "tris": 352,
+  "bytes": 27980,
+  "notes": "stone brazier (flame drawn by fx.gdshader)"
+ },
+ "bush": {
+  "tris": 172,
+  "bytes": 18384,
+  "notes": "small round tree (HM Cut target)"
+ },
+ "statue": {
+  "tris": 554,
+  "bytes": 55116,
+  "notes": "gym / mansion guardian statue"
+ },
+ "bed": {
+  "tris": 400,
+  "bytes": 31272,
+  "notes": "bed, head toward +Y (fitted to the 14 x 32 px sprite footprint by PropKit)"
+ },
+ "rockcell": {
+  "tris": 120,
+  "bytes": 13184,
+  "notes": "small rock filling a cell"
+ },
+ "tuft": {
+  "tris": 54,
+  "bytes": 5580,
+  "notes": "grass tuft (wind sway in game)"
+ },
+ "pebbles": {
+  "tris": 60,
+  "bytes": 7348,
+  "notes": "small stones"
+ },
+ "flower_red": {
+  "tris": 141,
+  "bytes": 11008,
+  "notes": "flower tuft (3 blooms)"
+ },
+ "flower_yellow": {
+  "tris": 141,
+  "bytes": 10952,
+  "notes": "flower tuft (3 blooms)"
+ },
+ "flower_white": {
+  "tris": 141,
+  "bytes": 10948,
+  "notes": "flower tuft (3 blooms)"
+ },
+ "flower_pink": {
+  "tris": 141,
+  "bytes": 10948,
+  "notes": "flower tuft (3 blooms)"
  }
 }

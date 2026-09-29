@@ -2,92 +2,269 @@
  "tiles": {
   "floor_grass": {
    "file": "floor_grass.glb",
-   "tris": 32,
-   "bytes": 3956,
-   "notes": "walkable ground"
+   "tris": 601,
+   "bytes": 98820,
+   "notes": "walkable ground: turf with blades, clover, flowers on an earth slab"
   },
   "floor_path": {
    "file": "floor_path.glb",
-   "tris": 32,
-   "bytes": 4052,
-   "notes": "walkable ground"
+   "tris": 412,
+   "bytes": 74480,
+   "notes": "walkable ground: packed dirt with ruts and pebbles"
   },
   "floor_pave": {
    "file": "floor_pave.glb",
-   "tris": 8,
-   "bytes": 2888,
-   "notes": "walkable ground (town)"
+   "tris": 242,
+   "bytes": 77296,
+   "notes": "walkable ground (town): four bevelled slabs, grout, moss and a crack"
   },
   "tallgrass": {
    "file": "tallgrass.glb",
-   "tris": 232,
-   "bytes": 18612,
-   "notes": "walkable, wild encounters"
+   "tris": 692,
+   "bytes": 109076,
+   "notes": "walkable, wild encounters: 70+ sway-ready blades"
   },
   "water": {
    "file": "water.glb",
-   "tris": 32,
-   "bytes": 4460,
-   "notes": "blocking unless surfing; top at -0.05 m"
+   "tris": 352,
+   "bytes": 88420,
+   "notes": "blocking unless surfing; surface at -0.05 m, foam edges, ripple rings, lily pads"
   },
   "tree": {
    "file": "tree.glb",
-   "tris": 504,
-   "bytes": 13060,
-   "notes": "blocking, ~2.5 m"
+   "tris": 691,
+   "bytes": 115732,
+   "notes": "blocking, ~2.3 m: root flare, layered faceted canopy"
   },
   "wall": {
    "file": "wall.glb",
-   "tris": 24,
-   "bytes": 3072,
-   "notes": "blocking 1 m cube"
+   "tris": 392,
+   "bytes": 71216,
+   "notes": "blocking 1 m: staggered ashlar courses, plinth, coping, moss"
   },
   "building_wall": {
    "file": "building_wall.glb",
-   "tris": 24,
-   "bytes": 3064,
-   "notes": "blocking 1.2 m"
+   "tris": 288,
+   "bytes": 72248,
+   "notes": "blocking 1.2 m: brick plinth, plaster, timber posts, window and eave trim"
   },
   "roof": {
    "file": "roof.glb",
-   "tris": 8,
-   "bytes": 1608,
-   "notes": "prism, ridge along X, 0.6 m tall; stack on building_wall"
+   "tris": 332,
+   "bytes": 59700,
+   "notes": "gable roof piece, ridge along X, 0.6 m: shingle rows, ridge cap, rake boards; stack on building_wall"
   },
   "door": {
    "file": "door.glb",
-   "tris": 104,
-   "bytes": 5428,
-   "notes": "warp tile, door panel on the -Y (Godot +Z) face"
+   "tris": 568,
+   "bytes": 128096,
+   "notes": "warp tile: framed plank door, hinges, handle, step, lintel and canopy on the -Y face"
   },
   "counter": {
    "file": "counter.glb",
-   "tris": 24,
-   "bytes": 3088,
-   "notes": "blocking, waist height, interact across"
-  },
-  "sign": {
-   "file": "sign.glb",
-   "tris": 84,
-   "bytes": 4072,
-   "notes": "blocking, interactable"
+   "tris": 440,
+   "bytes": 55876,
+   "notes": "blocking, waist height: panelled cabinet, overhanging top, gold trim"
   },
   "ledge": {
    "file": "ledge.glb",
-   "tris": 110,
-   "bytes": 5316,
-   "notes": "one-way jump-down; lip on the -Y (Godot +Z) edge"
+   "tris": 412,
+   "bytes": 101416,
+   "notes": "one-way jump-down: earth strata, grassy overhang, edge stones; lip on -Y"
   },
   "rock": {
    "file": "rock.glb",
-   "tris": 80,
-   "bytes": 7224,
-   "notes": "blocking boulder"
+   "tris": 204,
+   "bytes": 61548,
+   "notes": "blocking boulder: facets, chips, moss, crack"
+  }
+ },
+ "props": {
+  "lamp_post": {
+   "file": "lamp_post.glb",
+   "tris": 212,
+   "bytes": 40808,
+   "notes": "street lamp"
+  },
+  "mailbox": {
+   "file": "mailbox.glb",
+   "tris": 228,
+   "bytes": 34948,
+   "notes": "mailbox on a post"
+  },
+  "pc": {
+   "file": "pc.glb",
+   "tris": 276,
+   "bytes": 48492,
+   "notes": "PC terminal on a desk"
+  },
+  "shelf": {
+   "file": "shelf.glb",
+   "tris": 772,
+   "bytes": 107612,
+   "notes": "bookshelf with books"
+  },
+  "table": {
+   "file": "table.glb",
+   "tris": 264,
+   "bytes": 38296,
+   "notes": "wooden table"
+  },
+  "chair": {
+   "file": "chair.glb",
+   "tris": 180,
+   "bytes": 30160,
+   "notes": "wooden chair"
+  },
+  "bench": {
+   "file": "bench.glb",
+   "tris": 176,
+   "bytes": 46496,
+   "notes": "park bench"
+  },
+  "window": {
+   "file": "window.glb",
+   "tris": 368,
+   "bytes": 73180,
+   "notes": "wall segment with framed window, sill, flower box and shutters"
+  },
+  "pillar": {
+   "file": "pillar.glb",
+   "tris": 164,
+   "bytes": 27460,
+   "notes": "stone pillar with base and capital"
+  },
+  "podium": {
+   "file": "podium.glb",
+   "tris": 152,
+   "bytes": 25848,
+   "notes": "gym trainer podium"
+  },
+  "bed": {
+   "file": "bed.glb",
+   "tris": 400,
+   "bytes": 52984,
+   "notes": "bed, head toward +Y (fitted to the 14 x 32 px sprite footprint by PropKit)"
+  },
+  "sign": {
+   "file": "sign.glb",
+   "tris": 380,
+   "bytes": 81648,
+   "notes": "wooden sign on a post with nails and text lines"
+  },
+  "fence_x": {
+   "file": "fence_x.glb",
+   "tris": 152,
+   "bytes": 16428,
+   "notes": "white picket fence cell running along X"
+  },
+  "fence_post": {
+   "file": "fence_post.glb",
+   "tris": 98,
+   "bytes": 23416,
+   "notes": "fence post with cap and footing"
+  },
+  "plant": {
+   "file": "plant.glb",
+   "tris": 300,
+   "bytes": 67304,
+   "notes": "potted plant"
+  },
+  "barrel": {
+   "file": "barrel.glb",
+   "tris": 276,
+   "bytes": 49368,
+   "notes": "banded wooden barrel"
+  },
+  "crate": {
+   "file": "crate.glb",
+   "tris": 478,
+   "bytes": 58016,
+   "notes": "wooden crate"
+  },
+  "grave_a": {
+   "file": "grave_a.glb",
+   "tris": 164,
+   "bytes": 48968,
+   "notes": "gravestone, rounded slab"
+  },
+  "grave_b": {
+   "file": "grave_b.glb",
+   "tris": 240,
+   "bytes": 56884,
+   "notes": "gravestone, slab with a cross"
+  },
+  "brazier": {
+   "file": "brazier.glb",
+   "tris": 352,
+   "bytes": 65416,
+   "notes": "stone brazier (flame drawn by fx.gdshader)"
+  },
+  "bush": {
+   "file": "bush.glb",
+   "tris": 172,
+   "bytes": 53520,
+   "notes": "small round tree (HM Cut target)"
+  },
+  "statue": {
+   "file": "statue.glb",
+   "tris": 554,
+   "bytes": 99880,
+   "notes": "gym / mansion guardian statue"
+  },
+  "flower_red": {
+   "file": "flower_red.glb",
+   "tris": 141,
+   "bytes": 37512,
+   "notes": "flower tuft (3 blooms)"
+  },
+  "flower_yellow": {
+   "file": "flower_yellow.glb",
+   "tris": 141,
+   "bytes": 37436,
+   "notes": "flower tuft (3 blooms)"
+  },
+  "flower_white": {
+   "file": "flower_white.glb",
+   "tris": 141,
+   "bytes": 37516,
+   "notes": "flower tuft (3 blooms)"
+  },
+  "flower_pink": {
+   "file": "flower_pink.glb",
+   "tris": 141,
+   "bytes": 37432,
+   "notes": "flower tuft (3 blooms)"
+  },
+  "pokeball": {
+   "file": "pokeball.glb",
+   "tris": 452,
+   "bytes": 39788,
+   "notes": "item ball"
+  },
+  "rail_x": {
+   "file": "rail_x.glb",
+   "tris": 264,
+   "bytes": 38332,
+   "notes": "wooden ship railing along X"
+  },
+  "rail_z": {
+   "file": "rail_z.glb",
+   "tris": 264,
+   "bytes": 38332,
+   "notes": "wooden ship railing along Z"
+  },
+  "rail_post": {
+   "file": "rail_post.glb",
+   "tris": 88,
+   "bytes": 21932,
+   "notes": "railing post"
   }
  },
  "conventions": {
   "footprint": "1 x 1 m, pivot at bottom centre",
   "front": "Blender -Y == glTF/Godot +Z",
-  "palette": "colours from src/art/palette.js ramps"
+  "palette": "colours from src/art/palette.js ramps (env_textures.PAL)",
+  "textures": "pipeline/data/env_tex/*.png, embedded"
  }
 }

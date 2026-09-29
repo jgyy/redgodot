@@ -39,6 +39,7 @@ var actors: Array = []   # OwActor NPCs currently on this map
 var world_mat: ShaderMaterial
 var obj_mat: ShaderMaterial
 var grass_node: Node3D
+var _atlas_img: Image = null
 
 func load_map(name: String, with_bake: bool = true) -> bool:
 	WorldData.ensure()
@@ -276,11 +277,16 @@ func _rebuild_objects() -> void:
 	if old:
 		old.free()
 	var wb := WorldBuilder.new(bake)
+	wb.atlas_img = _atlas_img
 	var hide: Array = []
 	for c in label_override.keys():
 		hide.append(c)
 	var node := wb.build_objects(obj_mat, hide)
 	add_child(node)
+	var oldp := get_node_or_null("Props")
+	if oldp:
+		oldp.free()
+	add_child(PropKit.build(bake, label_override, TileKit.prop_material()))
 
 func spawn_actor(o: Dictionary) -> OwActor:
 	var a := OwActor.new()
@@ -333,15 +339,39 @@ func _build_visuals() -> void:
 		world_mat.set_shader_parameter("noise_tex", load("res://assets/maps/noise_water.png"))
 		world_mat.set_shader_parameter("world_px0", Vector2(float(bake.get("wx0", 0)), float(bake.get("wy0", 0))))
 		world_mat.set_shader_parameter("water_pal", TileKit.palette_colors("water"))
+	var dtex: Texture2D = load("res://assets/models/tiles/env_detail.png")
+	if dtex:
+		world_mat.set_shader_parameter("detail_tex", dtex)
+		world_mat.set_shader_parameter("class_tex", GroundDetail.class_texture(bake))
+		world_mat.set_shader_parameter("ao_tex", GroundDetail.ao_texture(bake))
+		world_mat.set_shader_parameter("detail_on", true)
 	obj_mat = wb.make_material(atlas_tex, false)
+	if dtex:
+		obj_mat.set_shader_parameter("detail_tex", dtex)
+		obj_mat.set_shader_parameter("obj_grain", 0.22)
+		obj_mat.set_shader_parameter("detail_on", true)
+	_atlas_img = _readable(atlas_tex)
+	wb.atlas_img = _atlas_img
 	add_child(wb.build_ground(world_mat))
 	add_child(wb.build_objects(obj_mat))
 	var mx := int(bake.get("mx", 0))
 	var my := int(bake.get("my", 0))
 	var deco := TileKit.build_decor(bake, mx, my)
 	add_child(deco)
+	var smoke := TileKit.build_smoke(bake, wb.smoke_points)
+	if smoke:
+		add_child(smoke)
 	grass_node = deco.get_node_or_null("TallGrass")
+	add_child(PropKit.build(bake, label_override, TileKit.prop_material()))
 	_spawn_npcs()
+
+static func _readable(tex: Texture2D) -> Image:
+	if tex == null:
+		return null
+	var img := tex.get_image()
+	if img and img.is_compressed():
+		img.decompress()
+	return img
 
 ## ambient.js cloud shadows on/off for every world material of this map.
 func set_clouds(on: bool) -> void:
