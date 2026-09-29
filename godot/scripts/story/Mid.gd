@@ -743,7 +743,7 @@ static func prize_menu(which: int) -> void:
 		await Story.say("RequireCoinCaseText")
 		return
 	await Story.say("ExchangeCoinsForPrizesText")
-	var list: Array = PRIZES[which]
+	var list: Array = (Story.pokedata.get("prizes", PRIZES) as Array)[which]   # the active version's window (RED / BLUE / YELLOW)
 	var is_tm := which == 2
 	var box := Story.info_box(func() -> Array: return [Story.coin_str()])
 	var items: Array = []

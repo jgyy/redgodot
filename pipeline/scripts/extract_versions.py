@@ -176,10 +176,11 @@ def parse_prizes(repo, flag):
 
 
 def parse_marts(repo):
+    """{ClerkText label: [items]} from data/items/marts.asm"""
     t = fetch(repo, 'data/items/marts.asm')
-    res = []
-    for m in re.finditer(r'script_mart\s+([A-Z_0-9, ]+)', t):
-        res.append([x.strip() for x in m.group(1).split(',')])
+    res = {}
+    for m in re.finditer(r'^(\w+)::[^\n]*\n\s*script_mart\s+([A-Z_0-9, ]+)', t, re.M):
+        res[m.group(1)] = [x.strip() for x in m.group(2).split(',')]
     return res
 
 
@@ -437,14 +438,14 @@ def main():
     res.update({'wild': wild, 'goodRod': rods, 'superRod': srods, 'trades': trades, 'prizes': prizes})
 
     # marts: pokered's list order is the ClerkText order of pokedata.json["marts"]
-    labels = list(pd['marts'].keys())
     mr = parse_marts('pokered')
     my = parse_marts('pokeyellow')
     marts = {}
-    for i, lab in enumerate(labels[:len(my)]):
-        base = pd['marts'][lab]
-        if i < len(my) and my[i] != mr[i] and my[i]:
-            marts[lab] = my[i]
+    for lab in pd['marts'].keys():
+        if mr.get(lab) is not None and mr[lab] != pd['marts'][lab]:
+            print('  note: pokered mart', lab, 'differs from the base data', file=sys.stderr)
+        if my.get(lab) and my[lab] != mr.get(lab):
+            marts[lab] = my[lab]
     res['marts'] = {'YELLOW': marts}
 
     # trainer parties
