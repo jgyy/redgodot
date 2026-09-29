@@ -52,6 +52,7 @@ def _r5(name):
 
 # name -> (ramp, texture, detail tile id). detail ids follow env_textures.DETAIL_TILES
 MATS = {
+    '_dummy': ([hx('#ffffff')] * 5, None, 255),
     'wood': (_r5('wood'), 'wood', 7),
     'wood_dark': ([hx(c) for c in ('#2a1810', '#3e2418', '#54331f', '#6e4228', '#8e5a3a')], 'wood', 7),
     'paint': ([hx(c) for c in ('#7c7f98', '#a4a7be', '#cfd1de', '#eceaf2', '#ffffff')], None, 255),
@@ -60,7 +61,8 @@ MATS = {
     'leaf_light': ([hx(c) for c in ('#1d5433', '#2a723a', '#3c9142', '#5bb04d', '#8bcf5f')], 'turf', 0),
     'moss': ([hx(c) for c in ('#173d2f', '#1f5634', '#2f7a3a', '#48a043', '#6cbf4c')], 'turf', 0),
     'grass': (_r5('grass'), 'turf', 0),
-    'tallgrass': ([hx(c) for c in ('#1a4f33', '#26703a', '#389040', '#58b04a', '#86cf58')], 'turf', 255),
+    'tallgrass': ([hx(c) for c in ('#1a4f33', '#26703a', '#389040', '#58b04a', '#86cf58')], None, 255),
+    'blade': ([hx(c) for c in ('#2f7a3a', '#48a043', '#6cbf4c', '#9dd95f', '#cdef82')], None, 0),
     'terracotta': ([hx(c) for c in ('#5e2c28', '#7c3a30', '#a24a36', '#c2643f', '#d98458')], None, 255),
     'stone': (_r5('stone'), 'stone', 3),
     'pave': (_r5('pave'), 'cobble', 3),
@@ -338,6 +340,20 @@ class Prop:
         self.paint(fs, mat, **kw)
         return fs
 
+    def poly_prism_x(self, pts_yz, x0, x1, mat, **kw):
+        """Polygon in the YZ plane extruded along X from x0 to x1 (roof slopes, trims running along X)."""
+        b = self.bm
+        f0 = [b.verts.new((x0, y, z)) for y, z in pts_yz]
+        f1 = [b.verts.new((x1, y, z)) for y, z in pts_yz]
+        n = len(pts_yz)
+        fs = [b.faces.new(list(reversed(f0))), b.faces.new(f1)]
+        for k in range(n):
+            j = (k + 1) % n
+            fs.append(b.faces.new((f0[k], f1[k], f1[j], f0[j])))
+        bmesh.ops.recalc_face_normals(b, faces=fs)
+        self.paint(fs, mat, **kw)
+        return fs
+
     # ---------------------------------------------------------------- transforms
     def transform_all(self, M):
         bmesh.ops.transform(self.bm, matrix=M, verts=list(self.bm.verts))
@@ -372,6 +388,20 @@ class Prop:
     # ---------------------------------------------------------------- output
     def to_object(self):
         me = bpy.data.meshes.new(self.name)
+        if self.style == 'tex' and self.mat_names:
+            # Godot's glTF importer forgets to enable vertex colours on the FIRST primitive of a mesh: make that a
+            # sub-millimetre dummy triangle so every real material keeps its baked lighting / AO
+            self.mi('_dummy')
+            self.mat_names.remove('_dummy')
+            self.mat_names.insert(0, '_dummy')
+            for f in self.bm.faces:
+                f.material_index += 1
+            v = [self.bm.verts.new(p) for p in ((0, 0, -0.002), (0.0002, 0, -0.002), (0, 0, -0.0018))]
+            tri = self.bm.faces.new(v)
+            tri.material_index = 0
+            for lp in tri.loops:
+                lp[self.col] = (1, 1, 1, 1)
+                lp[self.uv].uv = (0, 0)
         self.bm.normal_update()
         self.bm.to_mesh(me)
         self.bm.free()
@@ -418,8 +448,16 @@ def _material(name, style, vname='prop'):
         tn.extension = 'REPEAT'
         nt.links.new(tn.outputs['Color'], bsdf.inputs['Base Color'])
     else:
-        c = ramp[2]
-        bsdf.inputs['Base Color'].default_value = (c[0] ** 2.2, c[1] ** 2.2, c[2] ** 2.2, 1.0)
+        bsdf.inputs['Base Color'].default_value = (1.0, 1.0, 1.0, 1.0)     # the colour lives in the vertices
+        if style == 'tex':
+            # Godot's importer only honours COLOR_0 on textured materials: give plain ones a 4x4 white texture
+            img = bpy.data.images.get('white4') or bpy.data.images.new('white4', 4, 4)
+            img.pixels = [1.0] * (4 * 4 * 4)
+            img.pack()
+            tn = nt.nodes.new('ShaderNodeTexImage')
+            tn.image = img
+            tn.interpolation = 'Closest'
+            nt.links.new(tn.outputs['Color'], bsdf.inputs['Base Color'])
     if name in ('glass', 'water', 'screen'):
         bsdf.inputs['Roughness'].default_value = 0.15
     if name in ('gold', 'metal'):
