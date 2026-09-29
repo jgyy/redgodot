@@ -324,12 +324,17 @@ SPRITE_ALIAS = {  # sprites Yellow adds that have no model of their own here -> 
 
 # Yellow renamed / replaced a few maps: the RED map -> the YELLOW map whose objects and text replace it
 MAP_ALIAS = {'CeruleanTradeHouse': 'CeruleanMelaniesHouse'}
+# YELLOW redrew Cerulean Cave (125 / 106 / 114 of each floor's 135 blocks differ); its item and warp coordinates would
+# land inside walls of the RED layout this port has, so those three floors keep RED's objects
+KEEP_RED_OBJECTS = {'CeruleanCave1F', 'CeruleanCave2F', 'CeruleanCaveB1F'}
 
 
 def object_overlay(map_names, species):
     out = {}
     prefetch([(r, f'data/maps/objects/{MAP_ALIAS.get(m, m)}.asm') for m in map_names for r in ('pokered', 'pokeyellow')])
     for m in map_names:
+        if m in KEEP_RED_OBJECTS:
+            continue
         r = parse_objects('pokered', m)
         y = parse_objects('pokeyellow', MAP_ALIAS.get(m, m))
         if r is None or y is None:
