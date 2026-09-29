@@ -276,6 +276,10 @@ func _cell_fx(cell: Vector2i, label: String) -> void:
 		fx.name = n
 		add_child(fx)
 
+## What PropKit / FurnitureKit need to know about this map beyond the bake (clerks for the till, passability for dressing).
+func _prop_ctx() -> Dictionary:
+	return {"map": map_name, "objs": map_data.get("objs", []), "passable": Callable(self, "passable")}
+
 func _rebuild_objects() -> void:
 	if bake.is_empty() or obj_mat == null or not is_inside_tree():
 		return
@@ -292,7 +296,7 @@ func _rebuild_objects() -> void:
 	var oldp := get_node_or_null("Props")
 	if oldp:
 		oldp.free()
-	add_child(PropKit.build(bake, label_override, TileKit.prop_material()))
+	add_child(PropKit.build(bake, label_override, TileKit.prop_material(), _prop_ctx()))
 
 func spawn_actor(o: Dictionary) -> OwActor:
 	var a := OwActor.new()
@@ -368,7 +372,7 @@ func _build_visuals() -> void:
 	if smoke:
 		add_child(smoke)
 	grass_node = deco.get_node_or_null("TallGrass")
-	add_child(PropKit.build(bake, label_override, TileKit.prop_material()))
+	add_child(PropKit.build(bake, label_override, TileKit.prop_material(), _prop_ctx()))
 	_spawn_npcs()
 
 static func _readable(tex: Texture2D) -> Image:

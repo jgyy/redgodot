@@ -181,7 +181,7 @@ class Prop:
         return [f for f in self.bm.faces if f not in before]
 
     # ---------------------------------------------------------------- primitives
-    def box(self, lo, hi, mat, bevel=0.0, **kw):
+    def box(self, lo, hi, mat, bevel=0.0, seg=1, **kw):
         before = set(self.bm.faces)
         res = bmesh.ops.create_cube(self.bm, size=1.0)
         lo, hi = Vector(lo), Vector(hi)
@@ -191,7 +191,7 @@ class Prop:
             v.co = Vector((c.x + v.co.x * s.x, c.y + v.co.y * s.y, c.z + v.co.z * s.z))
         if bevel > 0:
             edges = list({e for v in res['verts'] for e in v.link_edges})
-            bmesh.ops.bevel(self.bm, geom=edges, offset=min(bevel, min(s) * 0.45), segments=1, affect='EDGES')
+            bmesh.ops.bevel(self.bm, geom=edges, offset=min(bevel, min(s) * 0.45), segments=seg, affect='EDGES')
         faces = self._new_faces(before)
         for f in faces:
             f.normal_update()
@@ -361,6 +361,107 @@ class Prop:
         bmesh.ops.recalc_face_normals(b, faces=fs)
         self.paint(fs, mat, **kw)
         return fs
+
+    # ---------------------------------------------------------------- extended primitives (env_furn / env_nature / env_town)
+    def sphere(self, center, r, mat, subdiv=1, **kw):
+        return self.blob(center, (r, r, r), mat, subdiv=subdiv, **kw)
+
+    def between(self, p0, p1, r0, r1, mat, seg=6, cap0=True, cap1=True, sq=1.0, **kw):
+        """Cylinder / cone frustum from p0 to p1 (any direction). sq squashes the section along the second axis."""
+        b = self.bm
+        p0, p1 = Vector(p0), Vector(p1)
+        a = p1 - p0
+        if a.length < 1e-6:
+            return []
+        a.normalize()
+        ref = Vector((0, 0, 1)) if abs(a.z) < 0.9 else Vector((1, 0, 0))
+        u = a.cross(ref).normalized()
+        v = a.cross(u).normalized()
+        rings = []
+        for p, r in ((p0, r0), (p1, r1)):
+            ring = []
+            for i in range(seg):
+                t = 2 * math.pi * i / seg
+                ring.append(b.verts.new(p + u * (math.cos(t) * r) + v * (math.sin(t) * r * sq)))
+            rings.append(ring)
+        fs = []
+        for i in range(seg):
+            j = (i + 1) % seg
+            fs.append(b.faces.new((rings[0][i], rings[0][j], rings[1][j], rings[1][i])))
+        if cap1 and r1 > 1e-5:
+            fs.append(b.faces.new(list(reversed(rings[1]))))
+        if cap0 and r0 > 1e-5:
+            fs.append(b.faces.new(rings[0]))
+        bmesh.ops.recalc_face_normals(b, faces=fs)
+        self.paint(fs, mat, **kw)
+        return fs
+
+    def tube(self, pts, r, mat, seg=5, r_end=None, **kw):
+        """A cable / pipe swept along a polyline (each joint is a shared ring so the bends stay closed)."""
+        b = self.bm
+        pts = [Vector(p) for p in pts]
+        n = len(pts)
+        rings = []
+        for k, p in enumerate(pts):
+            if k == 0:
+                a = pts[1] - pts[0]
+            elif k == n - 1:
+                a = pts[-1] - pts[-2]
+            else:
+                a = (pts[k + 1] - pts[k]).normalized() + (pts[k] - pts[k - 1]).normalized()
+            if a.length < 1e-6:
+                a = Vector((0, 0, 1))
+            a.normalize()
+            ref = Vector((0, 0, 1)) if abs(a.z) < 0.9 else Vector((1, 0, 0))
+            u = a.cross(ref).normalized()
+            v = a.cross(u).normalized()
+            rr = r if (r_end is None or n < 2) else r + (r_end - r) * k / (n - 1)
+            rings.append([b.verts.new(p + u * (math.cos(2 * math.pi * i / seg) * rr) + v * (math.sin(2 * math.pi * i / seg) * rr)) for i in range(seg)])
+        fs = []
+        for k in range(n - 1):
+            for i in range(seg):
+                j = (i + 1) % seg
+                fs.append(b.faces.new((rings[k][i], rings[k][j], rings[k + 1][j], rings[k + 1][i])))
+        fs.append(b.faces.new(list(reversed(rings[-1]))))
+        fs.append(b.faces.new(rings[0]))
+        bmesh.ops.recalc_face_normals(b, faces=fs)
+        self.paint(fs, mat, **kw)
+        return fs
+
+    def attach(self, other, M=None):
+        """Merge another Prop of the same style (materials and UVs kept), optionally transformed by matrix M, then free it."""
+        bm = self.bm
+        if M is not None:
+            bmesh.ops.transform(other.bm, matrix=M, verts=list(other.bm.verts))
+        remap = {}
+        for i, nm in enumerate(other.mat_names):
+            remap[i] = self.mi(nm) if self.style == 'tex' else self.mi('vcol')
+        vmap = {}
+        other.bm.verts.index_update()
+        for f in other.bm.faces:
+            vs = []
+            for v in f.verts:
+                if v.index not in vmap:
+                    vmap[v.index] = bm.verts.new(v.co)
+                vs.append(vmap[v.index])
+            try:
+                nf = bm.faces.new(vs)
+            except ValueError:
+                continue
+            nf.material_index = remap.get(f.material_index, 0)
+            nf.smooth = False
+            for la, lb in zip(f.loops, nf.loops):
+                lb[self.col] = la[other.col]
+                if self.uv is not None and other.uv is not None:
+                    lb[self.uv].uv = la[other.uv].uv
+        other.bm.free()
+
+    def sub(self):
+        """An empty Prop of the same style (build a part in its own frame, rotate it, attach() it)."""
+        return Prop(self.name + '_sub', self.style, seed=self.rnd.randint(1, 10 ** 6))
+
+    def gable_x(self, x0, x1, y0, y1, z0, zr, mat, **kw):
+        return self.prism(x0, x1, y0, y1, z0, zr, mat, **kw)
 
     # ---------------------------------------------------------------- transforms
     def transform_all(self, M):
