@@ -16,19 +16,12 @@ func _gentleman(_o: Dictionary) -> void:
 		m.xp += int(dc.get("steps", 0))
 		while m.level < 100 and m.xp >= GameState.exp_for_level(_growth(m.species_id), m.level + 1):
 			m.level += 1
-		var old_moves: Array = m.moves.duplicate()
-		var nick := m.nickname
-		var xp := m.xp
-		var status := m.status
-		m = GameState.PartyMon.new(m.species_id, m.level)  # recalc stats at the new level, full HP
-		m.nickname = nick
-		m.xp = xp
-		m.status = status
-		m.moves = old_moves
-		for mv in m.moves:
-			m.pp[mv] = int(GameData.get_move(mv).get("pp", 0))
-		Story.setvar("wNameBuffer", m.nickname)
-		Story.setvar("wDayCareMonName", m.nickname)
+		# recalc stats at the new level with full HP (upstream m.recalc(true); m.hp = m.maxhp): in place, so the DVs,
+		# stat EXP, OT and PP UPs survive (a fresh PartyMon would re-roll them to zero)
+		m.recalc_keep_hp()
+		m.hp = m.max_hp
+		Story.setvar("wNameBuffer", m.display_name())
+		Story.setvar("wDayCareMonName", m.display_name())
 		var grown := m.level - start_lv
 		if int(dc.get("steps", 0)) == 0:
 			await Story.say("DaycareGentlemanMonNeedsMoreTimeText")
@@ -86,6 +79,6 @@ func _gentleman(_o: Dictionary) -> void:
 	GameState.party.remove_at(i)
 	GameState.party_changed.emit()
 	GameState.daycare = {"mon": pm.to_dict(), "steps": 0}
-	Story.setvar("wNameBuffer", pm.nickname)
+	Story.setvar("wNameBuffer", pm.display_name())
 	await Story.say("DaycareGentlemanWillLookAfterMonText")
 	await Story.say("DaycareGentlemanComeSeeMeInAWhileText")

@@ -85,6 +85,20 @@ gracefully falls back to a simple colored primitive for anything the pipeline
 hasn't generated yet, so the game is always playable even for parts of the
 pipeline still in progress.
 
+
+### Character creator parts and NPC gestures
+
+```sh
+python3 pipeline/blender/gen_characters.py            # 60 NPCs, 19 clips each (~3 min)
+python3 pipeline/blender/gen_player_parts.py --jobs 4 # 36 head + 7 body parts for the creator (~30 s)
+```
+
+`char_anim.py` bakes 13 gesture clips (`Nod Shake Think Laugh Bow Point Sleep Surprised Salute Stretch Dance Sad Shiver`) on
+top of `Idle Walk Run Talk Wave Cheer`. `gen_player_parts.py` splits the character build into a head part (head, face,
+hair, hat + skeleton + clips) and a body part (outfit, shoes, bag), and ships each part's atlas as RGBA where alpha encodes
+the colour role (found by rebuilding once per role with that role recoloured and diffing the painted atlases), so
+`godot/scripts/util/PlayerModel.gd` can recolour skin, hair, hat, clothes, shoes, bag and eyes at runtime.
+
 ### Pokemon models (public GLBs, rigged + animated here)
 
 The Pokémon meshes and textures are the openly published

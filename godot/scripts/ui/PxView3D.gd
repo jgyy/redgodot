@@ -98,6 +98,23 @@ func show_character(cast_key: String) -> void:
 			_anim.play("Idle")
 	_frame()
 
+## Shows the player's customised model (character creator, trainer card).
+func show_look(look: PlayerLook) -> void:
+	_key = "look:" + JSON.stringify(look.to_dict())
+	var m := PlayerModel.build(look)
+	if m == null:
+		show_character("red")
+		return
+	_set_model(m)
+	_anim = CharacterModel.find_anim(model)
+	if _anim and _anim.has_animation("Idle"):
+		_anim.play("Idle")
+	_frame()
+
+func play_clip(clip: String) -> void:
+	if _anim and _anim.has_animation(clip):
+		_anim.play(clip)
+
 func clear() -> void:
 	_key = ""
 	if model:

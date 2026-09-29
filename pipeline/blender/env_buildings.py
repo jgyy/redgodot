@@ -171,7 +171,7 @@ def porch():
     ov = 1.2 * U
     for sx in (-1, 1):
         P.quad((sx * (w / 2 + ov), 0, hp + 0.8 * U), (sx * (w / 2 + ov), -d - ov, hp + 0.8 * U), (0, -d - ov, rz), (0, 0, rz), 'bld_roof', toward=(sx * 0.7, -0.2, 1), ao=False, bias=0 if sx < 0 else -1)
-    P.tri((-w / 2 - ov * 0, -d - ov, hp + 0.8 * U), (w / 2, -d - ov, hp + 0.8 * U), (0, -d - ov, rz), 'bld_wall', toward=(0, -1, 0), ao=False, bias=0)
+    P.tri((-(w / 2 + ov), -d - ov, hp + 0.8 * U), (w / 2 + ov, -d - ov, hp + 0.8 * U), (0, -d - ov, rz), 'bld_wall', toward=(0, -1, 0), ao=False, bias=0)
     P.box((-0.4 * U, -d - ov - 0.3 * U, rz - 0.3 * U), (0.4 * U, 0, rz + 0.5 * U), 'bld_roof', ao=False, bias=2)
     return P
 

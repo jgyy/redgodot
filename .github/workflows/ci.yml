@@ -46,6 +46,13 @@ jobs:
           python3 pipeline/blender/verify_glb.py godot/assets/models/pokemon --require-skin --min-kb 20 \
             --anims Idle,Walk,Run,Attack,Special,Hurt,Faint,Victory,Sleep,Roar,Dodge,Spin,Hop,Charge,Taunt,Spawn,Hover,Talk
 
+      - name: Verify NPC glbs (rigged, 19 clips each)
+        run: |
+          python3 pipeline/blender/verify_glb.py godot/assets/models/characters --require-skin --min-kb 20 --skip humanoid.glb \
+            --anims Idle,Walk,Run,Talk,Wave,Cheer,Nod,Shake,Think,Laugh,Bow,Point,Sleep,Surprised,Salute,Stretch,Dance,Sad,Shiver
+          python3 pipeline/blender/verify_glb.py godot/assets/models/player --prefix head_ --require-skin --min-kb 20 \
+            --anims Idle,Walk,Run,Talk,Wave,Cheer,Nod,Shake,Think,Laugh,Bow,Point,Sleep,Surprised,Salute,Stretch,Dance,Sad,Shiver
+
       - name: Import project
         run: timeout 20m /opt/godot/godot4 --headless --path godot --import
 

@@ -4,7 +4,7 @@ extends CanvasLayer
 ## before the battle scene opened (upstream battleflow.js transition()).  Not used without a snapshot (headless, tests).
 
 const SHADER := preload("res://assets/shaders/battle_transition.gdshader")
-const FRAMES := {"wild": 62, "trainer": 52, "boss": 48}
+const FRAMES := {"wild": 62, "trainer": 52, "boss": 52}   # upstream: 62 for wild, 52 for everything else
 const KINDS := {"wild": 0, "trainer": 1, "boss": 2}
 
 var _rect: ColorRect

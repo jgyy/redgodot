@@ -34,6 +34,7 @@ import common as C  # noqa: E402
 import env_kit as K  # noqa: E402
 import env_props as EP  # noqa: E402
 import env_buildings as EBL  # noqa: E402
+from upstream_px import hash2 as _hash2  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, '..', '..'))
@@ -46,16 +47,8 @@ def hex_rgb(h):
 
 
 def hash2(x, y, s):
-    """upstream gfx.hash2 (32-bit integer hash)"""
-    def i32(v):
-        v &= 0xffffffff
-        return v - (1 << 32) if v & 0x80000000 else v
-    def imul(a, b):
-        return i32((a & 0xffffffff) * (b & 0xffffffff))
-    h = i32(imul(int(x), 374761393) + imul(int(y), 668265263) + i32(imul(int(s), 2147483647)))
-    h = imul(h ^ ((h & 0xffffffff) >> 13), 1274126177)
-    h = h ^ ((h & 0xffffffff) >> 16)
-    return (h & 0xffffffff) / 4294967296.0
+    """upstream gfx.hash2 with JS double/int32 semantics (upstream_px.hash2; exact integer multiplies differ from JS's rounded doubles)"""
+    return _hash2(x, y, s)
 
 
 def new_mesh_obj(name):

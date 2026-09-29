@@ -1,0 +1,101 @@
+{
+ "roles": [
+  "skin",
+  "hair",
+  "hat",
+  "hatk",
+  "shirt",
+  "pants",
+  "shoes",
+  "bag",
+  "coat",
+  "iris"
+ ],
+ "reference": {
+  "skin": "#f4cca4",
+  "hair": "#d0d0d0",
+  "hat": "#d0d0d0",
+  "hatk": "#d0d0d0",
+  "shirt": "#d0d0d0",
+  "pants": "#d0d0d0",
+  "shoes": "#d0d0d0",
+  "bag": "#d0d0d0",
+  "coat": "#d0d0d0",
+  "iris": "#d0d0d0"
+ },
+ "alpha": "a = 255 - 20 * role (0 = fixed)",
+ "hairs": [
+  "short",
+  "spiky",
+  "long",
+  "pony",
+  "bun",
+  "bald"
+ ],
+ "hats": [
+  "none",
+  "cap",
+  "beanie"
+ ],
+ "eyes": [
+  "round",
+  "lash"
+ ],
+ "outfits": [
+  "tee_jeans",
+  "jacket_jeans",
+  "tee_shorts",
+  "dress",
+  "tee_skirt",
+  "coat_pants",
+  "long_pants"
+ ],
+ "heads": [
+  "head_short_none_round",
+  "head_short_none_lash",
+  "head_short_cap_round",
+  "head_short_cap_lash",
+  "head_short_beanie_round",
+  "head_short_beanie_lash",
+  "head_spiky_none_round",
+  "head_spiky_none_lash",
+  "head_spiky_cap_round",
+  "head_spiky_cap_lash",
+  "head_spiky_beanie_round",
+  "head_spiky_beanie_lash",
+  "head_long_none_round",
+  "head_long_none_lash",
+  "head_long_cap_round",
+  "head_long_cap_lash",
+  "head_long_beanie_round",
+  "head_long_beanie_lash",
+  "head_pony_none_round",
+  "head_pony_none_lash",
+  "head_pony_cap_round",
+  "head_pony_cap_lash",
+  "head_pony_beanie_round",
+  "head_pony_beanie_lash",
+  "head_bun_none_round",
+  "head_bun_none_lash",
+  "head_bun_cap_round",
+  "head_bun_cap_lash",
+  "head_bun_beanie_round",
+  "head_bun_beanie_lash",
+  "head_bald_none_round",
+  "head_bald_none_lash",
+  "head_bald_cap_round",
+  "head_bald_cap_lash",
+  "head_bald_beanie_round",
+  "head_bald_beanie_lash"
+ ],
+ "bodies": [
+  "body_tee_jeans",
+  "body_jacket_jeans",
+  "body_tee_shorts",
+  "body_dress",
+  "body_tee_skirt",
+  "body_coat_pants",
+  "body_long_pants"
+ ],
+ "animations": "see gen_characters.py / char_anim.py"
+}

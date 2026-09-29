@@ -21,7 +21,10 @@ const DEFAULTS := {
 
 ## Clips baked by pipeline/blender/char_anim.py: Idle, Walk (one full 2-step gait per 16-frame cell, so it stays
 ## seamless when restarted every step), Run, Talk, Wave, Cheer -- all loop.
-const LOOPING_EXTRA := ["Talk", "Wave", "Cheer", "Surf"]
+const LOOPING_EXTRA := ["Talk", "Wave", "Cheer", "Surf", "Nod", "Shake", "Think", "Laugh", "Point", "Sleep", "Salute",
+		"Stretch", "Dance", "Sad", "Shiver"]
+## The 13 gesture clips every character has on top of Idle/Walk/Run/Talk/Wave/Cheer (Bow and Surprised play once).
+const GESTURES := ["Nod", "Shake", "Think", "Laugh", "Bow", "Point", "Sleep", "Surprised", "Salute", "Stretch", "Dance", "Sad", "Shiver"]
 
 const SLOT_FIELD := {
 	"mat_skin": "skin", "mat_hair": "hair", "mat_top": "shirt",
@@ -33,6 +36,10 @@ static var _aliases_loaded := false
 
 ## Best available model for `sprite_key` (never null).
 static func instantiate(sprite_key: String, toon: bool = true) -> Node3D:
+	if sprite_key == "red" and GameState.look_enabled():
+		var pm := PlayerModel.build(GameState.player_look(), toon)
+		if pm:
+			return pm
 	var key := resolve_key(sprite_key)
 	var model: Node3D = null
 	var tinted := false
@@ -57,6 +64,11 @@ static func instantiate(sprite_key: String, toon: bool = true) -> Node3D:
 		# character sprites are mostly flat skin with a darker lower edge)
 		Toon.set_param(model, "ramp_bias", 0.28)
 		Toon.set_param(model, "ramp_strength", 0.6)
+	finish_model(model)
+	return model
+
+## Shared tail of instantiate(): looping clips and short cross-fades.
+static func finish_model(model: Node3D) -> void:
 	var ap := AnimUtil.find_player(model)
 	AnimUtil.fix_looping(ap)
 	if ap:
@@ -66,7 +78,6 @@ static func instantiate(sprite_key: String, toon: bool = true) -> Node3D:
 		for clip in LOOPING_EXTRA:
 			if ap.has_animation(clip):
 				ap.get_animation(clip).loop_mode = Animation.LOOP_LINEAR
-	return model
 
 ## Callers that size a model by its bounding box (OwActor._fit_height) would shrink every character with
 ## tall spiky hair, a chef's toque or a mohawk and enlarge children to adult height.  The generated meshes

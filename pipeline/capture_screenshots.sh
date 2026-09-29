@@ -174,6 +174,22 @@ done
 python3 "$ROOT_DIR/pipeline/scripts/stitch_rows.py" "$OUT_DIR/pokemon-animations.png" "$OUT_DIR"/anim-row-*.png
 rm -f "$OUT_DIR"/anim-row-*.png
 
+# --- Character creator, custom player looks, NPC gestures ---------------------------------
+shot "120-creator-boy"    --scene=creator --gender=boy  --row=0 --wait=2
+shot "121-creator-girl"   --scene=creator --gender=girl --row=3 --wait=2
+shot "122-creator-random" --scene=creator --random=1 --seed=3 --row=8 --wait=2
+shot "123-overworld-custom-look" --scene=overworld --map=PalletTown --pc=10,9 --look=random --seed=21 --follower=none --wait=2
+shot "124-battle-custom-look" --scene=battle --look=girl --wait=1.5
+NPC_CAST="oak,misty,brock,nurse,youngster,rocket,sailor,lass"
+i=0
+for clip in "Nod 0.1" "Think 0.5" "Laugh 0.1" "Bow 0.5" "Point 0.5" "Surprised 0.15" "Salute 0.5" "Stretch 0.5" "Dance 0.15" "Sad 0.5" "Shiver 0.1" "Sleep 0.5"; do
+  set -- $clip
+  shot "gesture-row-$(printf %02d $i)" --scene=model_sheet --kind=characters --species="$NPC_CAST" --cols=8 --cell=150 --anim="$1" --anim_t="$2" --yaw=-20 --wait=1
+  i=$((i + 1))
+done
+python3 "$ROOT_DIR/pipeline/scripts/stitch_rows.py" "$OUT_DIR/npc-gestures.png" "$OUT_DIR"/gesture-row-*.png
+rm -f "$OUT_DIR"/gesture-row-*.png
+
 # --- 3D model contact sheets (every Pokemon / character next to upstream's sprite) ----
 # docs/gallery/pokemon-151-3d.png, pokemon-151-3d-back.png, characters-3d.png, characters-3d-back.png
 # (needs node + UPSTREAM=/path/to/pokemon-claude-red for the reference sprites)

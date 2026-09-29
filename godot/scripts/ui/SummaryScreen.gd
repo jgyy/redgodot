@@ -52,11 +52,13 @@ func _input_event(e: InputEvent) -> bool:
 			msel = maxi(0, msel - 1)
 		else:
 			idx = (idx + n - 1) % n
+			msel = 0
 	elif pressed(e, "move_down", true):
 		if page == 2:
-			msel = mini(m.moves.size() - 1, msel + 1)
+			msel = clampi(msel + 1, 0, maxi(0, m.moves.size() - 1))
 		else:
 			idx = (idx + 1) % n
+			msel = 0
 	elif pressed(e, "cancel") or (pressed(e, "confirm") and page != 2):
 		exit()
 	else:
@@ -91,7 +93,7 @@ func _draw() -> void:
 	Px.frame(self, x, y, 146, 96)
 	if page == 0:
 		var growth: String = sp.get("growth", "MEDIUM_FAST")
-		var to_next := maxi(0, GameState.exp_for_level(growth, m.level + 1) - m.xp)
+		var to_next := maxi(0, m.exp_to_next() - m.xp)
 		var rows := [["OT", GameState.player_name], ["ID No.", "%05d" % GameState.trainer_id],
 			["SPECIES", sp.get("name", m.species_id)],
 			["STATUS", m.status if m.status != "" else ("OK" if m.hp > 0 else "FAINTED")],

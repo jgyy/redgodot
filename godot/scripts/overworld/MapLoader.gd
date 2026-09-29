@@ -93,6 +93,7 @@ func load_map(name: String, with_bake: bool = true) -> bool:
 	for s in map_data.get("signs", []):
 		_sign_at[Vector2i(int(s.get("x", 0)), int(s.get("y", 0)))] = s
 	pass_override.clear()
+	label_override.clear()
 
 	bake = WorldBuilder.load_bake(name) if with_bake else {}
 	if is_inside_tree() and with_bake:
@@ -115,6 +116,10 @@ func passable(cell: Vector2i) -> bool:
 
 func is_tall_grass(cell: Vector2i) -> bool:
 	return in_bounds(cell) and _grass_tile >= 0 and tile(cell) == _grass_tile and not pass_override.has(cell)
+
+## Tilesets without a tall-grass tile (caves, buildings): wild encounters happen on any dry cell (upstream noGrassTile).
+func has_no_grass_tile() -> bool:
+	return _grass_tile < 0
 
 func is_water(cell: Vector2i) -> bool:
 	if not in_bounds(cell) or not _has_water:
@@ -263,6 +268,7 @@ func _cell_fx(cell: Vector2i, label: String) -> void:
 	var n := "CellFx_%d_%d" % [cell.x, cell.y]
 	var old := get_node_or_null(n)
 	if old:
+		remove_child(old)
 		old.queue_free()
 	if label == "barrier" or label == "teleport":
 		var fx := TileKit._fx_multimesh(n, TileKit._flower_mesh(), 1 if label == "barrier" else 2,

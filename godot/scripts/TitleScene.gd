@@ -224,10 +224,12 @@ func _open_menu() -> void:
 			await wp.closed
 			wp.queue_free()
 			continue
+		if opts[r] == "CONTINUE" and not GameState.load_save():
+			await UI.say("The save file could not be loaded.")   # stay on the title instead of starting with empty state
+			continue
 		done = true
 		await _overlay.fade(20, Color.BLACK, true)
 		if opts[r] == "CONTINUE":
-			GameState.load_save()
 			SceneRouter.goto_overworld()
 		else:
 			SceneRouter.goto_oak_speech()

@@ -77,6 +77,9 @@ var _amp := 0.0                   # 0..1 how strongly the walk is playing (fades
 var _breath := 0.0
 var _foot := 0
 var _ripple_t := 0.0
+var _gesture := ""                # a gesture clip (Nod, Think, Laugh ...) currently playing
+var _gesture_left := 0.0
+var gesture_wait := -1.0          # s until this idle NPC picks its next gesture (set by the overworld)
 var _proc_bob := false            # no Walk clip: bob and sway procedurally instead
 
 func _init() -> void:
@@ -283,6 +286,51 @@ static func _find_anim(node: Node) -> AnimationPlayer:
 			return f
 	return null
 
+
+## Plays one of a character's gesture clips (CharacterSkin.GESTURES, plus Talk / Wave / Cheer) for `secs` seconds
+## (0 = once through), then returns to Idle.  Walking cancels it.  False if this actor has no such clip.
+func gesture(clip: String, secs: float = 0.0) -> bool:
+	if _anim == null or is_mon or is_object or moving or not _anim.has_animation(clip):
+		return false
+	_gesture = clip
+	_gesture_left = secs if secs > 0.0 else _anim.get_animation(clip).length
+	_anim.speed_scale = 1.0
+	_anim.play(clip, 0.18)
+	return true
+
+func stop_gesture() -> void:
+	if _gesture != "":
+		_gesture = ""
+		if _anim and _anim.has_animation("Idle"):
+			_anim.play("Idle", BLEND_IDLE)
+
+func is_gesturing() -> bool:
+	return _gesture != ""
+
+## The gestures an idle NPC of this look picks from (upstream has none of this: static sprites).
+static func gesture_pool(sprite_key: String, o: Dictionary) -> Array:
+	var k := sprite_key.to_lower()
+	if k.contains("asleep"):
+		return ["Sleep"]
+	if k == "nurse":
+		return ["Bow", "Nod", "Stretch"]
+	for kid in ["youngster", "lass", "little", "boy", "girl", "kid"]:
+		if k.contains(kid):
+			return ["Dance", "Stretch", "Nod", "Laugh", "Point"]
+	for old in ["old", "gramps", "granny", "fuji", "oak", "guru", "man_"]:
+		if k.contains(old):
+			return ["Stretch", "Think", "Nod", "Shake"]
+	for sci in ["scientist", "gentleman", "nerd", "professor", "bill", "erika", "sabrina", "agatha"]:
+		if k.contains(sci):
+			return ["Think", "Nod", "Point", "Shake"]
+	for cop in ["guard", "police", "officer", "sailor", "biker", "cool", "black", "lance", "koga", "bruno"]:
+		if k.contains(cop):
+			return ["Salute", "Stretch", "Nod", "Point"]
+	if k.contains("rocket") or k.contains("giovanni"):
+		return ["Laugh", "Point", "Shake", "Stretch"]
+	if o.has("trainer"):
+		return ["Stretch", "Point", "Shake", "Nod"]
+	return ["Stretch", "Think", "Nod", "Shake"]
 
 func _play(n: String) -> void:
 	if _anim and _anim.has_animation(n) and _anim.current_animation != n:
@@ -499,6 +547,13 @@ func _update_facing(dt: float) -> void:
 	_apply_yaw()
 
 func _update_gait(dt: float) -> void:
+	if _gesture != "":
+		if moving:
+			_gesture = ""
+		else:
+			_gesture_left -= dt
+			if _gesture_left <= 0.0:
+				stop_gesture()
 	var v := speed_cells if moving else 0.0
 	if moving and _clip != "":
 		gait += v * dt / _gait_cells
@@ -512,7 +567,7 @@ func _update_gait(dt: float) -> void:
 				_anim.play(_clip, BLEND_WALK)
 			# the clip runs as fast as the feet travel: one cycle per _gait_cells of ground, whatever its length
 			_anim.speed_scale = maxf(0.0, _clip_len * v / _gait_cells)
-		else:
+		elif _gesture == "":
 			if _anim.has_animation("Idle") and _anim.current_animation != "Idle":
 				_anim.play("Idle", BLEND_IDLE)
 			_anim.speed_scale = 1.0

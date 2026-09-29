@@ -226,7 +226,7 @@ func _capture_interp() -> void:
 		it.capture(n)
 	for k in _holders:
 		it.capture(_holders[k])
-	for n in [_trainer_node, _player_trainer, _ball]:
+	for n in [_trainer_node, _player_trainer]:
 		if n != null and is_instance_valid(n):
 			it.capture(n, true)
 
@@ -259,20 +259,22 @@ func _apply_visuals() -> void:
 	if _trainer_node:
 		_trainer_node.visible = trainer_x >= 0.0
 		if trainer_x >= 0.0:
-			_place_on_px(_trainer_node, stage.enemy_anchor, trainer_x - 236.0)
+			_place_on_px(_trainer_node, stage.to_global(BattleStage.ENEMY_POS), trainer_x - 236.0)
 	if _player_trainer:
 		_player_trainer.visible = player_pic_x >= -200.0 and player_pic_x > -999.0 and _player_trainer.get_meta("on", false)
 		if _player_trainer.visible:
-			_place_on_px(_player_trainer, stage.player_anchor, player_pic_x - 84.0)
+			_place_on_px(_player_trainer, stage.to_global(BattleStage.PLAYER_POS), player_pic_x - 84.0)
 	if _wave_frames > 0:
 		_wave_t += 1
 		var k2 := sin(minf(1.0, float(_wave_t) / _wave_frames) * PI)
 		(wave_rect.material as ShaderMaterial).set_shader_parameter("amp", _wave_amp * k2 / 320.0)
 		(wave_rect.material as ShaderMaterial).set_shader_parameter("phase", _wave_t * 0.35)
 
-func _place_on_px(n: Node3D, anchor: Node3D, dx_px: float) -> void:
-	var w := vfx.px_world(anchor.global_position)
-	n.global_position = anchor.global_position + stage.camera.global_transform.basis.x * dx_px * w
+## `base`: the battler's resting spot. The trainer pics slide on their own (trainer_x / player_pic_x are absolute screen px
+## like upstream), so they must not also inherit the platform slide that moves the anchors.
+func _place_on_px(n: Node3D, base: Vector3, dx_px: float) -> void:
+	var w := vfx.px_world(base)
+	n.global_position = base + stage.camera.global_transform.basis.x * dx_px * w
 
 func _apply_actor(k: String) -> void:
 	if not _holders.has(k):
@@ -288,7 +290,7 @@ func _apply_actor(k: String) -> void:
 	if show[k] and _actors.has(k) and not _mon(k).is_fainted() and _mon(k).status != "SLP":
 		idle = sin(_t / (22.0 if k == "e" else 26.0) + (0.0 if k == "e" else 2.0)) * 1.1
 	var sink: float = (1.0 - float(clip[k])) * float(_model_h[k])
-	h.position = (cb.x * o.x * w + cb.y * (-(o.y + idle)) * w) * anchor.global_transform.basis.inverse() - Vector3(0, sink, 0)
+	h.position = anchor.global_transform.basis.inverse() * (cb.x * o.x * w + cb.y * (-(o.y + idle)) * w) - Vector3(0, sink, 0)
 	h.scale = Vector3.ONE * maxf(0.001, float(scale_k[k]))
 	h.visible = show[k] and not hidden[k] and float(vis[k]) > 0.0
 
@@ -533,7 +535,9 @@ func _ball_at(item: String, px: Vector2, spin: float, tilt: float = 0.0) -> void
 	_ball.visible = true
 	var pos := vfx.to3d(px, 0.3)
 	var w := vfx.px_world(pos) * 11.0
-	_ball.global_transform = Transform3D(Basis(Vector3(1, 0, 0), spin) * Basis(Vector3(0, 0, 1), tilt).scaled(Vector3(w, w, w)), pos)
+	# put(), not a bare global_transform write: this runs after _capture_interp() in the tick, so the interpolation
+	# record must be made here (capturing it next tick would feed the blended pose back in and make the ball lag)
+	vfx.interp.put(_ball, Transform3D(Basis(Vector3(1, 0, 0), spin) * Basis(Vector3(0, 0, 1), tilt).scaled(Vector3(w, w, w)), pos))
 
 func _ball_hide() -> void:
 	if _ball:
@@ -828,8 +832,11 @@ func _list_menu(items: Array, x: int, y: int, w: int) -> int:
 			return -1 if w < 0 else 1
 	return -1
 
-func party_menu(forced: bool) -> int:
-	hud.screen = {"kind": "party", "sel": engine.p.idx, "msg": "Bring out which POKéMON?" if forced else "Choose a POKéMON."}
+## item_target: picking the target of a bag item (upstream partyScreen `pick`): any mon may be chosen, including the one
+## that is out and fainted ones (REVIVE); the item itself rejects invalid targets.
+func party_menu(forced: bool, item_target: bool = false) -> int:
+	var base_msg := "Use on which POKéMON?" if item_target else ("Bring out which POKéMON?" if forced else "Choose a POKéMON.")
+	hud.screen = {"kind": "party", "sel": engine.p.idx, "msg": base_msg}
 	var n := GameState.party.size()
 	var wait_t := 0
 	while true:
@@ -862,22 +869,22 @@ func party_menu(forced: bool) -> int:
 					return -1
 				continue
 			var m: GameState.PartyMon = GameState.party[s]
-			if m.is_fainted():
-				await _screen_say(m.display_name() + " has no energy left to battle!")
+			if m.is_fainted() and not item_target:
+				await _screen_say(m.display_name() + " has no energy left to battle!", base_msg)
 				continue
-			if s == engine.p.idx and not forced:
-				await _screen_say(m.display_name() + " is already out!")
+			if s == engine.p.idx and not forced and not item_target:
+				await _screen_say(m.display_name() + " is already out!", base_msg)
 				continue
 			hud.screen = {}
 			return s
 	return -1
 
-func _screen_say(t: String) -> void:
+func _screen_say(t: String, restore: String = "Choose a POKéMON.") -> void:
 	hud.screen["msg"] = t
 	await wait(2)
 	while not (pressed("confirm") or pressed("cancel")):
 		await tick
-	hud.screen["msg"] = "Choose a POKéMON."
+	hud.screen["msg"] = restore
 
 func bag_menu() -> Dictionary:
 	var items: Array = []
@@ -917,7 +924,7 @@ func bag_menu() -> Dictionary:
 				continue
 			if BattleEngine.needs_target(id):
 				hud.screen = {}
-				var tgt: int = await party_menu(false)
+				var tgt: int = await party_menu(false, true)
 				if tgt < 0:
 					hud.screen = {"kind": "bag", "items": items, "sel": s, "scroll": sc}
 					continue
@@ -1055,7 +1062,7 @@ func anim(move_id: String, side: Variant, hit: int) -> void:
 		# with a crossfade by themselves (PokemonActor.play_once queues it)
 		pa.play_once("Special" if BattleVfx.is_status_move(move_id) and pa.has_anim("Special") else "Attack")
 	await vfx.move(move_id, k, hit)
-	if pa and is_instance_valid(pa) and pa.current_clip() not in ["Idle", "Attack", "Special", "Hurt"]:
+	if pa and is_instance_valid(pa) and pa.current_clip() not in [pa.idle_clip(), "Idle", "Attack", "Special", "Hurt"]:
 		pa.play("Idle")
 
 ## The target of a missed move sidesteps it (Dodge clip + a slide on the stage).
@@ -1139,7 +1146,7 @@ func dex_entry(_sp: String) -> void:
 	await tick
 
 func trainer_defeated(b: BattleEngine) -> void:
-	_music("victory_leader" if b.trainer.get("boss", false) else "victory")
+	_music("victory_leader" if b.o.get("boss", false) else "victory")
 	trainer_x = 236.0 + 120.0
 	for i in 24:
 		trainer_x -= 5.0
@@ -1286,8 +1293,8 @@ func evolve(m: GameState.PartyMon, to: String) -> void:
 	evo.show_form(true, false)
 	evo.burst()
 	for i in 30:
-		hud.flash_amt = 1.0 - i / 30.0
-		hud.flash_color = Color.WHITE
+		flash = 1.0 - i / 30.0    # _apply_visuals owns hud.flash_amt (it would overwrite a direct write every tick)
+		flash_color = Color.WHITE
 		await tick
 	_cry(to)
 	var old_name := m.display_name()

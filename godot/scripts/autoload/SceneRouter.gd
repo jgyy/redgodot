@@ -36,10 +36,12 @@ func register_root(root: Node) -> void:
 
 func _swap(scene: PackedScene) -> Node:
 	if _battle:
+		_battle.name = &"_freed_battle"   # free the node name so the new scene keeps its own (Audio follows by name)
 		_battle.queue_free()
 		_battle = null
 		_suspended = {}
 	if _active:
+		_active.name = &"_freed_scene"
 		_active.queue_free()
 		_active = null
 	_active = scene.instantiate()
@@ -75,7 +77,12 @@ func goto_oak_speech() -> void:
 	_swap_node(OakSpeech.new())
 
 func _swap_node(node: Node) -> Node:
+	if _battle:
+		_battle.queue_free()
+		_battle = null
+		_suspended = {}
 	if _active:
+		_active.name = &"_freed_scene"
 		_active.queue_free()
 		_active = null
 	_active = node
@@ -114,8 +121,11 @@ func _open_battle(enc: Dictionary) -> void:
 			enc["_snapshot"] = snap
 	_return_state = {"map": GameState.current_map, "cell": GameState.player_cell, "facing": GameState.player_facing}
 	if in_battle():
+		_battle.name = &"_freed_battle"
 		_battle.queue_free()
-	_suspend_active()
+		_battle = null
+	else:
+		_suspend_active()
 	_battle = load(BATTLE).instantiate()
 	_root.add_child(_battle)
 	battle_started.emit(enc)
@@ -133,6 +143,7 @@ func end_battle(result: Variant) -> void:
 	last_result = r
 	last_outcome = outcome
 	if _battle and is_instance_valid(_battle):
+		_battle.name = &"_freed_battle"
 		_battle.queue_free()
 	_battle = null
 	var had_scene := _resume_active()

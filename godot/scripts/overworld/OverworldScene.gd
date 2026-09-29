@@ -56,6 +56,7 @@ var _arrived_dir := ""       # the way we came through a door, until the first s
 var _pending_conn: Dictionary = {}
 var _rng := RandomNumberGenerator.new()
 var _light_key := ""
+var _light_maps_for := ""   # map whose light/glow textures are on the world materials
 var _follower_species := ""
 var _hidden_ids := {}        # object ids hidden by scripts on this map
 var _shown_ids := {}         # object ids shown by scripts (objs[].shown == false)
@@ -236,6 +237,10 @@ func _load_map(map_name: String, cell: Vector2i, facing: String) -> void:
 	_hidden_ids.clear()
 	_shown_ids.clear()
 	_exit_redirect = []
+	_spinning = false
+	_light_maps_for = ""
+	_pending_conn = {}
+	_pending_land = false
 	if _map_loader.outdoor:
 		flashed = false   # FLASH lasts until you're back outside (upstream)
 	player.place(cell, facing if facing != "" else player.facing)
@@ -264,13 +269,15 @@ func _update_lighting() -> void:
 		return
 	var h := fmod(GameState.clock_minutes / 60.0, 24.0)
 	var td := LightingRig.time_of_day(h)
+	if not bool(GameState.options.get("day_night", true)):
+		td = {"night": 0.0, "dusk": 0.0}   # upstream timeOfDay(): OPTION day/night off = always daytime
 	var graded := _map_loader.outdoor or _map_loader.ts_file == "forest"
 	var g := LightingRig.grade(td) if graded else Color(1, 1, 1)
 	var la := LightingRig.light_amount(td) if graded else 0.0
 	var key := "%s|%.3f|%.3f|%.3f|%.2f" % [_map_loader.map_name, g.r, g.g, g.b, la]
 	if key == _light_key:
 		return
-	var rebuild := not _light_key.begins_with(_map_loader.map_name + "|")
+	var rebuild := not _light_key.begins_with(_map_loader.map_name + "|") or (la > 0.0 and _light_maps_for != _map_loader.map_name)
 	_light_key = key
 	var lt: Texture2D = null
 	var gt: Texture2D = null
@@ -278,6 +285,7 @@ func _update_lighting() -> void:
 		var maps := LightingRig.build_light_maps(_map_loader.bake)
 		lt = maps[0]
 		gt = maps[1]
+		_light_maps_for = _map_loader.map_name
 	_map_loader.apply_grade(g, la, lt, gt)
 	var mn := _map_loader.map_name
 	var cloudy_env := (_map_loader.outdoor and not mn.begins_with("PokemonTower")) or mn.begins_with("SafariZone")
@@ -296,11 +304,13 @@ func _process(dt: float) -> void:
 	if not held:
 		var st := _story()
 		held = st != null and st.has_method("forced_direction") and String(st.forced_direction()) != ""
-	player.stop_hint = not held
-	follower.stop_hint = not held
+	if not player.scripted:   # a scripted path (move_actor) chains its own steps with start_move(..., more)
+		player.stop_hint = not held
+		follower.stop_hint = not held
 	if not ui_open and _locks == 0 and not _busy:
 		_player_control(dt)
 		_npcs_idle(dt)
+		_player_gestures(dt, false)
 	elif not player.moving:
 		_was_moving = false
 	_update_camera(dt)
@@ -312,8 +322,9 @@ func _update_fireflies() -> void:
 	fireflies.center = player.global_position
 	var m := _map_loader
 	# night, outdoors, away from towns' streets (grass routes, forests, the safari zone)
-	var wild: bool = m.outdoor and (m.map_name.begins_with("Route") or "Forest" in m.map_name or "Safari" in m.map_name or "Town" in m.map_name)
-	fireflies.set_active(wild and GameState.time_period() == "night" and GameState.options.get("day_night", true))
+	var env := ambient_env(m.map_name, m.outdoor)
+	var wild: bool = env == "outdoor" or env == "safari" or env == "forest"
+	fireflies.set_active(wild and float(LightingRig.time_of_day(fmod(GameState.clock_minutes / 60.0, 24.0)).night) > 0.5 and bool(GameState.options.get("day_night", true)))
 
 func _update_camera(dt: float) -> void:
 	_update_fireflies()
@@ -482,6 +493,7 @@ func _push_warp(cell: Vector2i, d: String) -> bool:
 func _on_player_step(_a: OwActor) -> void:
 	GameState.player_cell = player.cell
 	GameState.player_facing = player.facing
+	_arrived_dir = ""   # upstream onPlayerStep: `arrived` only lasts until the first step is done
 	if not _pending_conn.is_empty():
 		var c := _pending_conn
 		_pending_conn = {}
@@ -512,8 +524,21 @@ func _on_player_step(_a: OwActor) -> void:
 	if no_encounters or (story and story.has_method("encounters_blocked") and bool(story.encounters_blocked(player.cell))):
 		return
 	var on_water := ride == "surf" and m.is_water(player.cell)
-	if m.is_tall_grass(player.cell) or on_water:
+	# upstream encounters.check: repel ticks down every step, and the message ends the step
+	if GameState.repel > 0:
+		GameState.repel -= 1
+		if GameState.repel == 0:
+			_dialogue.show_lines(["REPEL's effect wore off."])
+			return
+	# tilesets without a tall-grass tile (caves, buildings) roll on every dry cell
+	if m.is_tall_grass(player.cell) or on_water or (m.has_no_grass_tile() and not m.is_water(player.cell)):
 		var res := EncounterSystem.roll(m.map_name, on_water, _rng)
+		if not res.is_empty() and GameState.repel > 0 and not GameState.party.is_empty():
+			for pm in GameState.party:
+				if pm.hp > 0:
+					if int(res["level"]) < pm.level:
+						res = {}
+					break
 		if not res.is_empty():
 			SceneRouter.start_battle({"kind": "wild", "species": res["species"], "level": res["level"]})
 
@@ -618,9 +643,12 @@ func _try_interact() -> void:
 		return
 	var story := get_node_or_null("/root/Story")
 	if a:
-		if not ["UP", "DOWN", "LEFT", "RIGHT"].has(String(a.obj.get("dir", ""))) or a.obj.get("move", "") == "WALK":
+		if not a.is_object:   # upstream talkTo: every non-object actor turns to face you, fixed-facing ones too
 			a.face(OPP[player.facing])
 		interacted.emit("npc", a.obj)
+		if OwActor.gesture_pool(a.sprite, a.obj) != ["Sleep"]:
+			a.stop_gesture()
+			a.gesture("Talk", 2.6)
 		if story and story.has_method("on_talk") and story.on_talk(a.obj):
 			return
 		_dialogue.show_lines(DialogueText.for_obj(a.obj))
@@ -636,12 +664,47 @@ func _try_interact() -> void:
 	if story and story.has_method("on_interact_cell"):
 		story.on_interact_cell(t, player.facing)
 
+# ---------------------------------------------------------------- NPC gestures
+## Idle NPCs occasionally play a gesture from their pool (stretch, think, nod, salute, dance ...); sleepers keep snoring.
+func _npc_gestures(act: OwActor, dt: float) -> void:
+	if act.is_gesturing():
+		return
+	var pool: Array = OwActor.gesture_pool(act.sprite, act.obj)
+	if pool == ["Sleep"]:
+		act.gesture("Sleep", 1e6)
+		return
+	if act.gesture_wait < 0.0:
+		act.gesture_wait = 2.0 + _rng.randf() * 12.0
+	act.gesture_wait -= dt
+	if act.gesture_wait <= 0.0:
+		act.gesture_wait = 7.0 + _rng.randf() * 14.0
+		act.gesture(pool[_rng.randi() % pool.size()])
+
+var _player_idle := 0.0
+
+## The player also fidgets after standing still for a while (stretches, thinks, dances a little).
+func _player_gestures(dt: float, ui_open: bool) -> void:
+	if player.moving or ui_open or player.scripted or _input_dir() != "":
+		_player_idle = 0.0
+		player.stop_gesture()
+		return
+	_player_idle += dt
+	if _player_idle > 14.0 and not player.is_gesturing():
+		_player_idle = 8.0 + _rng.randf() * 4.0
+		var pool := ["Stretch", "Think", "Nod", "Dance", "Wave"]
+		player.gesture(pool[_rng.randi() % pool.size()])
+
+## Emote bubbles come with a matching body reaction.
+const EMOTE_GESTURE := {"!": "Surprised", "?": "Think", "heart": "Dance", "...": "Sad"}
+
 # ---------------------------------------------------------------- NPC idle (upstream npcIdle)
 func _npcs_idle(dt: float) -> void:
 	for a in _map_loader.actors:
 		var act: OwActor = a
 		if act.moving or act.scripted or not act.visible:
 			continue
+		if not act.is_mon and not act.is_object:
+			_npc_gestures(act, dt)
 		act.idle_t -= dt
 		if act.idle_t > 0.0:
 			continue
@@ -657,7 +720,7 @@ func _npcs_idle(dt: float) -> void:
 			act.face(d)
 			if can_move(act, d).get("ok", false) and _rng.randf() < 0.7:
 				act.start_move(d, 1.0)
-		elif String(o.get("dir", "")) == "NONE" and not o.has("trainer") and not o.has("item"):
+		elif String(o.get("dir", "")) == "NONE" and not o.has("trainer") and not o.has("item") and not act.is_object:
 			act.face(["up", "down", "left", "right"][_rng.randi() % 4])
 
 # ---------------------------------------------------------------- walking partner (upstream follower.js)
@@ -715,7 +778,7 @@ static func follower_mood(m: GameState.PartyMon, map_name: String, in_grass: boo
 
 ## upstream follower.js lead(): the first party Pokémon, while it hasn't fainted (OPTION > FOLLOWER off hides it)
 func _lead_species() -> String:
-	if bool(GameState.get_meta("no_follower", false)) or GameState.party.is_empty():
+	if bool(GameState.get_meta("no_follower", false)) or not bool(GameState.options.get("follower", true)) or GameState.party.is_empty():
 		return ""
 	var pm: GameState.PartyMon = GameState.party[0]
 	return pm.species_id if pm.hp > 0 else ""
@@ -774,10 +837,13 @@ func _follower_follow(from: Vector2i, speed: float, jump: bool, more: bool = fal
 		pass
 
 func _update_follower_visibility() -> void:
-	if _follower_species == "" or _lead_species() == "":
+	var lead := _lead_species()
+	if lead != "" and lead != _follower_species and _map_loader != null:
+		_place_follower()   # first Pokémon received / a new lead / the option switched back on (upstream tick())
+	if _follower_species == "" or lead == "":
 		follower.visible = false
 		return
-	if not player.visible:
+	if not player.visible or ride != "walk":   # it goes back in its ball while surfing or cycling
 		follower.visible = false
 		return
 	var tucked := not follower.moving and follower.cell == player.cell
@@ -954,18 +1020,23 @@ func emote(id: String, kind: String = "!") -> void:
 func emote_on(a: OwActor, kind: String) -> void:
 	if a == null:
 		return
+	if EMOTE_GESTURE.has(kind):
+		a.gesture(EMOTE_GESTURE[kind])
 	var l := _emote_node(kind)
 	a.add_child(l)
 	# pops up with an overshoot, bobs while it hangs there, then shrinks away
 	l.scale = Vector3.ONE * 0.01
-	var tw := create_tween()
+	var tw := l.create_tween()
 	tw.tween_property(l, "scale", Vector3.ONE * 1.15, 10.0 * FRAME).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tw.tween_property(l, "scale", Vector3.ONE, 5.0 * FRAME)
 	await get_tree().create_timer(50.0 * FRAME).timeout
-	var tw2 := create_tween()
+	if not is_instance_valid(l):   # the actor's map was unloaded while the bubble hung there
+		return
+	var tw2 := l.create_tween()
 	tw2.tween_property(l, "scale", Vector3.ONE * 0.01, 8.0 * FRAME)
-	await tw2.finished
-	l.queue_free()
+	await get_tree().create_timer(8.0 * FRAME).timeout   # (a tween on a freed bubble never emits `finished`)
+	if is_instance_valid(l):
+		l.queue_free()
 
 const EMOTE_MESHES := {"!": "emote_exclaim", "?": "emote_question", "heart": "emote_heart", "...": "emote_dots"}
 
@@ -1102,25 +1173,33 @@ func set_flash(on: bool) -> void:
 	flashed = on
 	_apply_ambient_env()
 
+var _flash_tw: Tween = null   # the running flash fade (a new flash replaces it instead of fighting it)
+
+func _flash_fade(start: Color, secs: float, trans: Tween.TransitionType = Tween.TRANS_LINEAR) -> Tween:
+	if _flash_tw and _flash_tw.is_valid():
+		_flash_tw.kill()
+	_flash_rect.color = start
+	_flash_tw = create_tween()
+	_flash_tw.set_trans(trans).set_ease(Tween.EASE_OUT)
+	_flash_tw.tween_property(_flash_rect, "color:a", 0.0, secs)
+	return _flash_tw
+
 func flash_white(frames: int = 8) -> void:
-	_flash_rect.color = Color(1, 1, 1, 1)
-	var tw := create_tween()
-	tw.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tw.tween_property(_flash_rect, "color:a", 0.0, frames * FRAME)
-	await tw.finished
+	_flash_fade(Color(1, 1, 1, 1), frames * FRAME, Tween.TRANS_QUAD)
+	await get_tree().create_timer(frames * FRAME).timeout   # (a killed tween never emits `finished`)
 
 func poison_flash() -> void:
-	_flash_rect.color = Color(0.69, 0.28, 0.63, 0.35)
-	var tw := create_tween()
-	tw.tween_property(_flash_rect, "color:a", 0.0, 6.0 * FRAME)
+	_flash_fade(Color(0.69, 0.28, 0.63, 0.35), 6.0 * FRAME)
 
 ## Pokémon Center healing machine: `count` balls placed, `glow` while it runs.
 func heal_machine(count: int, glow: bool) -> void:
+	if _map_loader:
+		for na in _map_loader.actors:
+			if (na as OwActor).sprite == "nurse":
+				(na as OwActor).gesture("Bow")
 	_heal_count = count
 	if glow:
-		_flash_rect.color = Color(1.0, 0.95, 0.8, 0.25)
-		var tw := create_tween()
-		tw.tween_property(_flash_rect, "color:a", 0.0, 20.0 * FRAME)
+		_flash_fade(Color(1.0, 0.95, 0.8, 0.25), 20.0 * FRAME)
 
 ## S.S. Anne leaves Vermilion's dock (Early.gd): the ship sails off into a fade.
 func ship_departs() -> void:

@@ -15,7 +15,7 @@ static func roll(map_key: String, in_water: bool = false, rng: RandomNumberGener
 	var rate: int = table.get("rate", 0)
 	if rate <= 0:
 		return {}
-	var roll255: int = (rng.randi_range(0, 254) if rng else randi() % 255)
+	var roll255: int = (rng.randi_range(0, 255) if rng else randi() % 256)
 	if roll255 >= rate:
 		return {}
 	var mons: Array = table.get("mons", [])

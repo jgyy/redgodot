@@ -53,7 +53,7 @@ void fragment() {
 		if (p >= 0.999) { col = cover; a = 1.0; }
 	} else {
 		vec2 d = uv - center;
-		float ang = atan(d.x, -d.y) / 6.2831853 + 0.5;
+		float ang = fract(atan(d.x, -d.y) / 6.2831853);   // 0 at 12 o'clock, growing clockwise
 		a = ang < p ? 1.0 : 0.0;
 		a = p >= 0.999 ? 1.0 : a;
 	}

@@ -167,16 +167,16 @@ class PartyMon:
 		m._recalc_stats()
 		m.nickname = d.get("nickname", m.species_id)
 		m.xp = int(d.get("xp", m.xp))
-		m.hp = int(d.get("hp", m.max_hp))
-		m.moves = d.get("moves", m.moves)
+		m.hp = clampi(int(d.get("hp", m.max_hp)), 0, m.max_hp)   # upstream Mon.from: hp = min(o.hp, maxhp)
+		m.moves = d.get("moves", m.moves).duplicate()
 		var ppd: Dictionary = d.get("pp", m.pp)
 		m.pp = {}
-		for k in ppd.keys():
-			m.pp[k] = int(ppd[k])
 		var pmx: Dictionary = d.get("pp_max", {})
 		m.pp_max = {}
 		for mv in m.moves:
 			m.pp_max[mv] = int(pmx.get(mv, GameData.get_move(mv).get("pp", 0)))
+			# a move missing from the saved pp dict starts full; a saved value can't exceed the move's max
+			m.pp[mv] = clampi(int(ppd.get(mv, m.pp_max[mv])), 0, m.pp_max[mv])
 		m.status = d.get("status", "")
 		m.sleep = int(d.get("sleep", 0))
 		m.ot = d.get("ot", "")
@@ -195,6 +195,9 @@ var current_map: String = "PalletTown"
 var player_cell: Vector2i = Vector2i(5, 8)
 var player_facing: String = "down"
 var player_name: String = "RED"
+## The player's chosen appearance (PlayerLook.to_dict(); empty = the default boy). Set by the new-game character creator.
+var look: Dictionary = {}
+var _look_obj: PlayerLook = null
 var rival_name: String = "BLUE"
 var seen_species: Dictionary = {}
 var caught_species: Dictionary = {}
@@ -280,6 +283,16 @@ func reset_story_state() -> void:
 	repel = 0
 	always_on_bike = false
 	hall_of_fame = []
+	lucky_slot = 0
+	vermilion_trash = {}
+
+## Mirrors options -> the legacy text_speed / sound_on fields and the audio mute (upstream reads options directly).
+func apply_options() -> void:
+	sound_on = bool(options.get("sound", true))
+	text_speed = ["SLOW", "NORMAL", "FAST"][clampi(int(options.get("text_speed", 2)), 1, 3) - 1]
+	var au := get_node_or_null("/root/Audio")
+	if au and au.has_method("set_muted"):
+		au.set_muted(not sound_on)
 
 func text_speed_chars() -> int:
 	return clampi(int(options.get("text_speed", 2)), 1, 3)
@@ -290,27 +303,32 @@ func play_time_text() -> String:
 	return "%d:%02d" % [mins / 60, mins % 60]
 
 func box(i: int = -1) -> Array:
-	var idx := current_box if i < 0 else i
+	var idx := clampi(current_box if i < 0 else i, 0, 11)   # Bill's PC has 12 boxes (upstream S.boxes)
 	while pc_boxes.size() <= idx:
 		pc_boxes.append([])
 	return pc_boxes[idx]
 
 ## Gen-1 experience needed to reach level n for a growth rate (pokemon.js).
 static func exp_for_level(growth: String, n: int) -> int:
-	var n3 := float(n * n * n)
+	if n <= 1:
+		return 0   # upstream: level 1 (and below) needs no experience
+	var n3: int = n * n * n
 	match growth:
 		"FAST":
-			return int(floor(4.0 * n3 / 5.0))
+			return 4 * n3 / 5
 		"SLOW":
-			return int(floor(5.0 * n3 / 4.0))
+			return 5 * n3 / 4
 		"MEDIUM_SLOW":
-			return maxi(0, int(floor(1.2 * n3 - 15.0 * n * n + 100.0 * n - 140.0)))
+			# integer math like upstream's Math.floor(6*n^3/5): 1.2 * n^3 in floats can land just under an integer
+			return maxi(0, 6 * n3 / 5 - 15 * n * n + 100 * n - 140)
 		_:
-			return int(n3)
+			return n3
 
 ## Upstream G.newState() for NEW GAME (title.js newGameIntro): no POKéMON yet,
 ## an empty bag, a POTION in the PC, ₽3000, standing in RED's room facing up.
 func start_new_adventure() -> void:
+	look = {}
+	_look_obj = null
 	party.clear()
 	bag = {}
 	pc_items = {"POTION": 1}
@@ -321,8 +339,14 @@ func start_new_adventure() -> void:
 	seen_species = {}
 	caught_species = {}
 	options = DEFAULT_OPTIONS.duplicate()
+	apply_options()
 	trainer_id = randi() % 65536
 	play_seconds = 0.0
+	player_name = "RED"
+	rival_name = "BLUE"
+	last_heal_map = "PalletTown"
+	last_heal_cell = Vector2i(5, 6)
+	clock_minutes = 9.0 * 60.0
 	visited = {"PalletTown": true}
 	last_outdoor = "PalletTown"
 	current_map = "RedsHouse2F"
@@ -354,6 +378,7 @@ func build_showcase() -> void:
 	bag = {"POTION": 3, "SUPER_POTION": 3, "POKE_BALL": 3, "GREAT_BALL": 3,
 		"ULTRA_BALL": 3, "REVIVE": 3, "ESCAPE_ROPE": 3}
 	options = DEFAULT_OPTIONS.duplicate()
+	flags["EVENT_GOT_POKEDEX"] = true   # the showcase save owns a POKéDEX (START menu lists it)
 	# 75 owned: the even dex numbers, trading 10-18 for the party's odd ones.
 	var own := {}
 	for n in range(2, 152, 2):
@@ -404,6 +429,19 @@ func time_period(minutes: float = -1.0) -> String:
 		return "dusk"
 	return "night"
 
+func look_enabled() -> bool:
+	return PlayerModel.available()
+
+## The player's PlayerLook (cached; rebuilt whenever `look` is reassigned through set_look()).
+func player_look() -> PlayerLook:
+	if _look_obj == null:
+		_look_obj = PlayerLook.from_dict(look)
+	return _look_obj
+
+func set_look(l: PlayerLook) -> void:
+	_look_obj = l.duplicate_look()
+	look = _look_obj.to_dict()
+
 func new_game(starter_id: String) -> void:
 	party.clear()
 	add_to_party(starter_id, 5)
@@ -417,6 +455,8 @@ func add_to_party(species_id: String, level: int) -> PartyMon:
 	var mon := PartyMon.new(species_id, level)
 	if party.size() < 6:
 		party.append(mon)
+	elif box().size() < 20:
+		box().append(mon)   # upstream receiveMon: a full party sends the mon to the current PC box
 	caught_species[species_id] = true
 	mark_seen(species_id)
 	party_changed.emit()
@@ -446,7 +486,7 @@ func save() -> bool:
 		"party": party.map(func(m): return m.to_dict()),
 		"bag": bag, "badges": badges, "current_map": current_map,
 		"player_cell": [player_cell.x, player_cell.y], "player_facing": player_facing,
-		"player_name": player_name, "rival_name": rival_name,
+		"player_name": player_name, "rival_name": rival_name, "look": look,
 		"seen_species": seen_species, "caught_species": caught_species,
 		"clock_minutes": clock_minutes,
 		"last_heal_map": last_heal_map, "last_heal_cell": [last_heal_cell.x, last_heal_cell.y],
@@ -470,31 +510,45 @@ func load_save() -> bool:
 	if not has_save():
 		return false
 	var f := FileAccess.open(SAVE_PATH, FileAccess.READ)
+	if f == null:
+		return false
 	var parsed = JSON.parse_string(f.get_as_text())
 	f.close()
-	if parsed == null:
+	if not (parsed is Dictionary):
 		return false
 	var d: Dictionary = parsed
 	party = []
 	for pm in d.get("party", []):
 		party.append(PartyMon.from_dict(pm))
 	bag = d.get("bag", {})
+	for k in bag.keys():
+		bag[k] = int(bag[k])   # JSON numbers load as floats
 	badges = d.get("badges", [])
 	current_map = d.get("current_map", "PalletTown")
 	var pc: Array = d.get("player_cell", [5, 8])
+	if pc.size() < 2:
+		pc = [5, 8]
 	player_cell = Vector2i(int(pc[0]), int(pc[1]))
 	player_facing = d.get("player_facing", "down")
 	player_name = d.get("player_name", "RED")
+	look = d.get("look", {}) if d.get("look", {}) is Dictionary else {}
+	_look_obj = null
 	rival_name = d.get("rival_name", "BLUE")
 	seen_species = d.get("seen_species", {})
 	caught_species = d.get("caught_species", {})
-	clock_minutes = d.get("clock_minutes", clock_minutes)
+	clock_minutes = fposmod(float(d.get("clock_minutes", clock_minutes)), 1440.0)
 	last_heal_map = d.get("last_heal_map", last_heal_map)
 	var lh: Array = d.get("last_heal_cell", [last_heal_cell.x, last_heal_cell.y])
+	if lh.size() < 2:
+		lh = [5, 6]
 	last_heal_cell = Vector2i(int(lh[0]), int(lh[1]))
 	options = DEFAULT_OPTIONS.duplicate()
 	options.merge(d.get("options", {}), true)
-	options["text_speed"] = int(options["text_speed"])
+	var ts = options["text_speed"]
+	if ts is String:   # legacy saves stored "SLOW" | "NORMAL" | "FAST"
+		ts = {"SLOW": 1, "NORMAL": 2, "FAST": 3}.get(ts, 2)
+	options["text_speed"] = clampi(int(ts), 1, 3)
+	apply_options()
 	trainer_id = int(d.get("trainer_id", 0))
 	money = int(d.get("money", money))
 	play_seconds = float(d.get("play_seconds", 0.0))
@@ -510,6 +564,7 @@ func load_save() -> bool:
 		pc_items[k] = int(pc_items[k])
 	visited = d.get("visited", {"PalletTown": true})
 	last_outdoor = d.get("last_outdoor", "PalletTown")
+	reset_story_state()   # a save that lacks a story key must not inherit the previous run's value
 	story_from_dict(d.get("story", {}))
 	party_changed.emit()
 	return true

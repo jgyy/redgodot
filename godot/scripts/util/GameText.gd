@@ -40,7 +40,8 @@ static func get_text(label: String, fallback: String = "") -> String:
 static func text_for(label: String) -> String:
 	if label == "":
 		return "..."
-	return get_text(label, "...")
+	var t := get_text(label, "...")
+	return t if t != "" else "..."   # upstream `G.TEXT[label] || ... || '...'`: an empty entry is falsy too
 
 ## Extra {NAME} placeholders (upstream G.textVars), e.g. vars["wStringBuffer"].
 static var vars: Dictionary = {}

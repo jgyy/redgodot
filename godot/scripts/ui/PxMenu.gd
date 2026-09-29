@@ -59,6 +59,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	var n := items.size()
 	var handled := true
+	if n == 0:
+		if event.is_action_pressed("cancel") or event.is_action_pressed("confirm"):
+			_finish(-1)
+			_accept_input()
+		return
 	if event.is_action_pressed("move_up", true):
 		sel = (sel + n - 1) % n
 		UI.sfx("cursor")

@@ -37,6 +37,7 @@ func run_all(tree: SceneTree) -> void:
 	AudioTests.run(self)
 	_test_models_3d(tree)
 	_test_new_features()
+	_test_character_creator()
 	StoryTests.run(self)
 	MotionTests.run(self, tree.current_scene if tree.current_scene else tree.root)  # overworld motion continuity
 	BattleTests.run(self)  # battle engine / stage / UI (scripts/battle/BattleTests.gd)
@@ -355,6 +356,55 @@ func _test_new_features() -> void:
 		uniq[c2] = true
 	check(uniq.size() == 4, "quiz choices are distinct")
 	w.free()
+
+## Character creator: every look combination has its model parts, recolouring works, gestures are baked.
+func _test_character_creator() -> void:
+	var missing: Array = []
+	for h in PlayerLook.HAIRS:
+		for hat in PlayerLook.HATS:
+			for e in PlayerLook.EYES:
+				var k := "head_%s_%s_%s" % [h, hat, e]
+				if not ResourceLoader.exists("res://assets/models/player/%s.glb" % k) or not ResourceLoader.exists("res://assets/models/player/%s.png" % k):
+					missing.append(k)
+	for o in PlayerLook.OUTFITS:
+		if not ResourceLoader.exists("res://assets/models/player/body_%s.glb" % o):
+			missing.append(o)
+	check(missing.is_empty(), "every creator head/body part exists (missing %s)" % [missing])
+	var look := PlayerLook.default_girl()
+	var m: Node3D = PlayerModel.build(look)
+	check(m != null and m.find_child("Skeleton3D", true, false) != null, "creator model is rigged")
+	var ap := AnimUtil.find_player(m)
+	for clip in CharacterSkin.GESTURES + ["Idle", "Walk", "Run", "Talk", "Wave", "Cheer"]:
+		check(ap != null and ap.has_animation(clip), "player has clip %s" % clip)
+	var skel: Skeleton3D = m.find_child("Skeleton3D", true, false)
+	var meshes := 0
+	for c in skel.get_children():
+		if c is MeshInstance3D:
+			meshes += 1
+	check(meshes == 2, "head and body parts share one skeleton (%d meshes)" % meshes)
+	m.free()
+	var cols := {}
+	for r in PlayerModel.ROLES:
+		cols[r] = Color(look.colors.get(r, "#808080"))
+	var a := PlayerModel.recolored_texture("res://assets/models/player/body_dress.png", cols)
+	cols["shirt"] = Color("#00ff00")
+	var b := PlayerModel.recolored_texture("res://assets/models/player/body_dress.png", cols)
+	check(a != null and b != null and a.get_image().get_data() != b.get_image().get_data(), "recolouring the dress changes the atlas")
+	var l2 := PlayerLook.from_dict(look.to_dict())
+	check(l2.head_key() == look.head_key() and l2.colors == look.colors, "PlayerLook round-trips through a dict (save file)")
+	l2.set_gender("boy")
+	check(l2.hair == "short" and l2.outfit == "jacket_jeans", "switching to BOY swaps the girl defaults")
+	var cc := CharacterCreator.new()
+	cc.look = PlayerLook.default_boy()
+	var n_rows: int = cc.rows().size()
+	cc.row = 1
+	cc.step_value(1)
+	check(n_rows == 15 and cc.look.hair == "spiky", "creator steps the hair style")
+	cc.row = 3
+	var before: String = cc.look.colors["skin"]
+	cc.step_value(1)
+	check(cc.look.colors["skin"] != before, "creator steps the skin tone")
+	cc.free()
 
 func _test_models_3d(_tree: SceneTree) -> void:
 	var missing: Array = []

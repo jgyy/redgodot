@@ -80,7 +80,7 @@ func _actor(sp: String) -> PokemonActor:
 	a.setup(sp)
 	var cam := stage.camera
 	var d := 9.0
-	var dir := cam.project_ray_normal(Vector2(160, 70) * 3.0)
+	var dir := cam.project_ray_normal(Vector2(160, 62) * 3.0)   # sprite centre: blit at (128,30), 64 px
 	var pos := cam.global_position + dir * (d / dir.dot(-cam.global_transform.basis.z))
 	var w := d * 2.0 * tan(deg_to_rad(cam.fov) / 2.0) / 180.0
 	_px_w = w
@@ -88,7 +88,7 @@ func _actor(sp: String) -> PokemonActor:
 	var ab: AABB = scene._aabb_of(a)
 	var sc := 58.0 * w / maxf(0.05, maxf(ab.size.y, maxf(ab.size.x, ab.size.z) * 0.9))
 	a.scale = Vector3.ONE * sc
-	_base_scale = sc
+	a.set_meta("base_scale", sc)   # per actor: the two forms have different sizes
 	a.global_position = pos - Vector3(0, (ab.position.y + ab.size.y / 2.0) * sc, 0)
 	a.rotation_degrees.y = -15.0
 	for mi in scene._mesh_instances(a):
@@ -126,7 +126,7 @@ func _process(dt: float) -> void:
 	_pop = maxf(0.0, _pop - dt * 5.0)
 	var k := 1.0 + 0.07 * Smooth.ease_out(_pop, 2.0)
 	for a in [_from, _to]:
-		(a as Node3D).scale = Vector3.ONE * _base_scale * k
+		(a as Node3D).scale = Vector3.ONE * float(a.get_meta("base_scale", _base_scale)) * k
 	_update_aura()
 
 func _update_aura() -> void:

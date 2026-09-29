@@ -268,6 +268,44 @@ and the overworld emote bubbles (`!`, `?`, ♥, `…`) are extruded meshes that 
 |---|---|---|
 | ![](docs/gallery/113-oaks-lab-pokedex.png) | ![](docs/gallery/114-museum-old-amber.png) | ![](docs/gallery/115-mtmoon-fossils.png) |
 
+### Character creator (new game)
+
+Between naming the rival and the end of Oak's speech, the player now builds their own trainer (upstream's
+`customizer.js`, in 3D): **boy / girl**, **hair** (short, spiky, long, ponytail, bun, bald) + colour, **skin tone**, **eyes**
+(round / lashes) + colour, **hat** (none, cap, beanie) + colour, **outfit** (tee + jeans, jacket, tee + shorts, dress, tee +
+skirt, coat, long sleeve) with **shirt / pants / shoes / bag** colours, and **RANDOM**. The preview is the real model,
+turning and cycling through its gesture clips. The choice is saved with the game and used everywhere the player appears
+(overworld, battle back view, trainer card, Oak's stage).
+
+```mermaid
+flowchart LR
+    B["gen_player_parts.py (headless Blender)"] --> H["36 head parts\nhair × hat × eyes\nskeleton + 19 clips"]
+    B --> O["7 body parts\noutfits, skinned to the same bones"]
+    B --> A["RGBA atlases\nRGB = neutral reference paint\nalpha = colour-role map\n(found by rebuilding once per role and diffing)"]
+    C["CharacterCreator\nPlayerLook"] --> M["PlayerModel\nload head + body, re-parent the body mesh\nonto the head's skeleton,\nmultiply each role's pixels by target / reference"]
+    H & O & A --> M
+    M --> T["Toon shader\n→ overworld, battle, card, stage"]
+```
+
+| Boy | Girl | Random |
+|---|---|---|
+| ![](docs/gallery/120-creator-boy.png) | ![](docs/gallery/121-creator-girl.png) | ![](docs/gallery/122-creator-random.png) |
+
+### NPC gestures (19 clips per character)
+
+Every trainer / NPC model now has 19 clips: the original `Idle Walk Run Talk Wave Cheer` plus 13 gestures baked by
+`char_anim.py`: `Nod Shake Think Laugh Bow Point Sleep Surprised Salute Stretch Dance Sad Shiver`. The overworld uses them:
+idle NPCs fidget from a pool that suits them (kids dance and stretch, professors think and point, guards salute, the nurse
+bows, Rocket grunts laugh, sleepers keep sleeping), talking to an NPC plays `Talk`, emote bubbles come with a reaction
+(`!` → Surprised, `?` → Think, ♥ → Dance, `…` → Sad), and the player fidgets after standing still.
+
+![13 gestures on 8 NPCs](docs/gallery/npc-gestures.png)
+
+### Bug-fix pass
+
+A review of every subsystem (battle engine, battle presentation, overworld, story scripts, UI/audio, state/data/pipeline)
+found and fixed the bugs logged, with file, symptom and fix, in [`docs/BUGFIXES.md`](docs/BUGFIXES.md).
+
 ### Who's That Pokémon?
 
 ![Who's that Pokémon quiz](docs/gallery/110-wtp-quiz.png)
@@ -419,7 +457,8 @@ Inspect any of it with `--scene=vfx_sheet`.
 | **Physics & ambience** | Rigid debris (leaves, rock chips, sparks) with gravity, bounce and friction; Poké Ball drop-and-bounce on catches; sliding spinner tiles; night fireflies; 3D emote bubbles, fossils, Old Amber, Pokédex, clipboards and papers. |
 | **Who's That Pokémon?** | Silhouette quiz from the title menu, played with the rigged models. |
 | **Text** | All ~2,500 upstream dialogue lines extracted to `godot/data/text.json`. |
-| **Not ported** | Upstream's online features (Social Zone lounge, link battles/trades, cloud save, share cards), the character customiser, phone touch controls, slot-reel graphics (slots resolve as text), Hall of Fame / credits sequences (text only). |
+| **Character creator** | Boy/girl, hair, face, hat, outfit and colours for the player, previewed live in 3D, saved with the game. |
+| **Not ported** | Upstream's online features (Social Zone lounge, link battles/trades, cloud save, share cards), phone touch controls, slot-reel graphics (slots resolve as text), Hall of Fame / credits sequences (text only). |
 
 ## Architecture
 

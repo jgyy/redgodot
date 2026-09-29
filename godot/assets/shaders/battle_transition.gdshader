@@ -45,6 +45,7 @@ void fragment() {
 		float k = clamp(t / 44.0, 0.0, 1.0);
 		float dark = smoothstep(0.0, 1.0, k);
 		c *= 1.0 - dark * 0.85;
+		if (t < 10.0 && mod(t, 4.0) < 2.0) c = mix(c, vec3(1.0), 0.6);   // upstream's opening white flicker
 		float R = 0.04 + k * k * 1.35;                 // in screen-height units
 		vec2 d = (UV - vec2(0.5)) * vec2(320.0 / 180.0, 1.0);
 		float ang = t * 0.18;

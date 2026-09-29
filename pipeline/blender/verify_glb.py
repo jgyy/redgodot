@@ -28,7 +28,9 @@ def main():
     anims = args[args.index('--anims') + 1].split(',') if '--anims' in args else []
     need_skin = '--require-skin' in args
     min_kb = float(args[args.index('--min-kb') + 1]) if '--min-kb' in args else 2.0
-    files = sorted(f for f in os.listdir(folder) if f.endswith('.glb'))
+    prefix = args[args.index('--prefix') + 1] if '--prefix' in args else ''
+    skip = args[args.index('--skip') + 1].split(',') if '--skip' in args else []
+    files = sorted(f for f in os.listdir(folder) if f.endswith('.glb') and f.startswith(prefix) and f not in skip)
     bad, total = [], 0
     for f in files:
         p = os.path.join(folder, f)

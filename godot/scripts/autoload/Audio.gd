@@ -207,7 +207,8 @@ func _process(dt: float) -> void:
 	_buf.fill(Vector2.ZERO)
 	# ~50 ms duck/unduck ramps (audio.js duck())
 	_music_gain = move_toward(_music_gain, _music_target, dt / 0.05)
-	if _seq and not muted and _music_gain > 0.001:
+	# the ducked song keeps running underneath a jingle (audio.js duck()), it is only silent
+	if _seq and not muted:
 		if not _seq.render(_buf, 0, n, 0.56 * _music_gain):
 			_seq = null
 	if _jseq and not muted:
@@ -222,8 +223,11 @@ func _process(dt: float) -> void:
 ## Follows the active scene like upstream's G.music() call sites: title theme,
 ## the map's song in the overworld, wild/trainer battle themes.
 func _follow_scene() -> void:
-	var active: Node = SceneRouter.get("_active")
-	if active == null:
+	# battles are overlays: SceneRouter._active stays the (hidden) overworld underneath
+	var active: Node = SceneRouter.get("_battle")
+	if active == null or not is_instance_valid(active):
+		active = SceneRouter.get("_active")
+	if active == null or not is_instance_valid(active):
 		return
 	var key := String(active.name)
 	var song := ""
@@ -231,10 +235,15 @@ func _follow_scene() -> void:
 		"Title":
 			song = "title"
 		"Intro":
-			song = "oak_intro"
+			song = ""   # intro.js: silent until IntroScene starts IntroBattle itself
 		"Overworld":
-			key += ":" + GameState.current_map
-			song = map_song(GameState.current_map)
+			# audio.js mapMusic(): surfing / cycling override the map's song
+			var st := get_node_or_null("/root/Story")
+			var ride := ""
+			if st:
+				ride = "Surfing" if st.get("surfing") else ("BikeRiding" if st.get("biking") else "")
+			key += ":" + GameState.current_map + ":" + ride
+			song = ride if ride != "" else map_song(GameState.current_map)
 		"Battle":
 			var enc: Dictionary = active.get("encounter") if active.get("encounter") is Dictionary else {}
 			var trainer_cls := str(enc.get("trainer_class", enc.get("trainer_key", "")))

@@ -22,6 +22,7 @@ static func calc_damage(level: int, power: int, atk: int, def: int, move_type: S
 		attacker_types: Array, defender_types: Array, is_crit: bool, rng: RandomNumberGenerator = null) -> int:
 	if power <= 0:
 		return 0
+	def = maxi(1, def)
 	var l: int = level * 2 if is_crit else level
 	var stage1: int = int(floor(2.0 * l / 5.0 + 2.0))
 	var dmg: int = int(floor(floor(float(stage1) * power * atk / def) / 50.0))

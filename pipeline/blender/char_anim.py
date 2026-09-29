@@ -18,6 +18,7 @@ Clips (60 fps, all loop; first frame == last frame):
   Wave         60 f  right arm raised and waving
   Cheer        40 f  two hops with both arms up
   Surf         90 f  seated, gentle sway
+  Nod Shake Think Laugh Point Sleep Salute Stretch Dance Sad Shiver (loops), Bow Surprised (one-shots): NPC gestures
 """
 import math
 
@@ -343,9 +344,249 @@ def build_surf(P, hair):
     return c
 
 
+# ----------------------------------------------------------------------------- NPC gestures (12 extra clips)
+def _base(P, hair, name, n):
+    """A resampled Idle (breathing, weight shift, hair follow-through) that a gesture is layered on."""
+    c = resample_clip(build_idle(P, hair), name, n)
+    return c, fs(n), TAU * fs(n)
+
+
+def _window(t, a, b, fade=0.15):
+    """0 -> 1 -> 0 envelope: rises over `fade` from a, falls over `fade` before b."""
+    return ease((t - a) / fade) * (1 - ease((t - (b - fade)) / fade))
+
+
+def build_nod(P, hair):
+    c, t, w = _base(P, hair, 'Nod', 60)
+    nod = np.sin(w * 3)
+    c.r('head')[:, 0] += 5 + 11 * nod
+    c.r('neck')[:, 0] += 2 + 4 * np.sin(w * 3 - 0.35)
+    c.r('spine')[:, 0] += 1.2 * nod
+    add_face(c, t, blinks=(0.55,))
+    return c
+
+
+def build_shake(P, hair):
+    c, t, w = _base(P, hair, 'Shake', 60)
+    s = np.sin(w * 3)
+    c.r('head')[:, 2] += 24 * s
+    c.r('neck')[:, 2] += 8 * np.sin(w * 3 - 0.35)
+    c.r('chest')[:, 2] += 2.5 * s
+    c.r('head')[:, 0] += 3
+    for side, sg in (('L', 1), ('R', -1)):
+        c.r('upper_arm_' + side)[:, 1] += -sg * 10
+    add_face(c, t, blinks=(0.25, 0.75))
+    return c
+
+
+def build_think(P, hair):
+    c, t, w = _base(P, hair, 'Think', 96)
+    a = _window(t, 0.0, 1.0, 0.16)
+    c.r('upper_arm_R')[:, 0] += -68 * a
+    c.r('upper_arm_R')[:, 1] += -18 * a
+    c.r('forearm_R')[:, 0] += -112 * a
+    c.r('hand_R')[:, 0] += -10 * a
+    c.r('upper_arm_L')[:, 0] += -30 * a
+    c.r('forearm_L')[:, 0] += -70 * a
+    c.r('upper_arm_L')[:, 1] += 24 * a
+    c.r('head')[:, 1] += 7 * a
+    c.r('head')[:, 2] += 10 * a * np.sin(w)
+    c.r('head')[:, 0] += -3 * a
+    c.r('thigh_R')[:, 0] += -4 * a * np.clip(np.sin(w * 3), 0, 1)
+    add_face(c, t, blinks=(0.4, 0.85))
+    return c
+
+
+def build_laugh(P, hair):
+    c, t, w = _base(P, hair, 'Laugh', 60)
+    shake = np.sin(w * 6)
+    bounce = np.abs(np.sin(w * 3))
+    c.l('hips')[:, 2] += 0.16 * bounce
+    c.r('head')[:, 0] += -9 - 4 * shake
+    c.r('neck')[:, 0] += -4
+    c.r('chest')[:, 0] += -3 + 2.2 * shake
+    c.r('spine')[:, 0] += -2
+    for side, sg in (('L', 1), ('R', -1)):
+        c.r('upper_arm_' + side)[:, 0] += -22
+        c.r('upper_arm_' + side)[:, 1] += sg * 14
+        c.r('forearm_' + side)[:, 0] += -55 - 6 * shake
+    mouth = 1.0 + 1.6 * (0.5 + 0.5 * np.sin(w * 6 + 0.5))
+    add_face(c, t, blinks=(), talk=mouth)
+    for eye in ('eye_L', 'eye_R'):
+        c.s(eye)[:, 2] = 0.35
+    return c
+
+
+def build_bow(P, hair):
+    c, t, w = _base(P, hair, 'Bow', 72)
+    b = ease(t / 0.35) * (1 - ease((t - 0.65) / 0.35))
+    c.r('spine')[:, 0] += 30 * b
+    c.r('chest')[:, 0] += 14 * b
+    c.r('neck')[:, 0] += 8 * b
+    c.r('head')[:, 0] += 8 * b
+    c.l('hips')[:, 0] += -0.25 * b
+    for side, sg in (('L', 1), ('R', -1)):
+        c.r('upper_arm_' + side)[:, 0] += 10 * b
+        c.r('thigh_' + side)[:, 0] += -6 * b
+    add_face(c, t, blinks=(0.5,))
+    return c
+
+
+def build_point(P, hair):
+    c, t, w = _base(P, hair, 'Point', 60)
+    p = _window(t, 0.0, 1.0, 0.18)
+    c.r('upper_arm_R')[:, 0] += -86 * p
+    c.r('upper_arm_R')[:, 1] += 6 * p
+    c.r('forearm_R')[:, 0] += -6 * p
+    c.r('hand_R')[:, 0] += 2 * p
+    c.r('spine')[:, 0] += 3 * p
+    c.r('head')[:, 2] += 5 * p
+    c.r('head')[:, 0] += -2 * p + 1.5 * np.sin(w * 2) * p
+    c.r('upper_arm_R')[:, 0] += 3 * np.sin(w * 2) * p
+    return c
+
+
+def build_sleep(P, hair):
+    c, t, w = _base(P, hair, 'Sleep', 120)
+    br = np.sin(w)
+    c.r('head')[:, 0] += 26 + 3 * br
+    c.r('neck')[:, 0] += 12
+    c.r('spine')[:, 0] += 7 + 1.5 * br
+    c.r('chest')[:, 0] += 1.5 * br
+    c.l('hips')[:, 2] += -0.2
+    for side, sg in (('L', 1), ('R', -1)):
+        c.r('upper_arm_' + side)[:, 0] += 8
+        c.r('upper_arm_' + side)[:, 1] += -sg * (-3 - 1.2 * br)
+        c.r('thigh_' + side)[:, 0] += -6
+        c.r('shin_' + side)[:, 0] += 8
+    add_face(c, t, blinks=(), talk=1.0 + 0.5 * np.clip(np.sin(w) , 0, 1))
+    for eye in ('eye_L', 'eye_R'):
+        c.s(eye)[:, 2] = 0.1
+    return c
+
+
+def build_surprised(P, hair):
+    c, t, w = _base(P, hair, 'Surprised', 36)
+    s = ease(t / 0.12) * (1 - ease((t - 0.55) / 0.45))
+    jump = np.sin(math.pi * np.clip(t / 0.4, 0, 1)) ** 1.2
+    c.l('hips')[:, 2] += 1.1 * jump
+    c.r('spine')[:, 0] += -9 * s
+    c.r('head')[:, 0] += -7 * s
+    for side, sg in (('L', 1), ('R', -1)):
+        c.r('upper_arm_' + side)[:, 1] += -sg * 62 * s
+        c.r('upper_arm_' + side)[:, 0] += -18 * s
+        c.r('forearm_' + side)[:, 0] += -30 * s
+        c.r('thigh_' + side)[:, 0] += -10 * jump
+        c.r('shin_' + side)[:, 0] += 16 * jump
+    add_face(c, t, blinks=(), talk=1.0 + 1.4 * s)
+    for eye in ('eye_L', 'eye_R'):
+        c.s(eye)[:, 2] = 1.0 + 0.3 * s
+    return c
+
+
+def build_salute(P, hair):
+    c, t, w = _base(P, hair, 'Salute', 60)
+    a = _window(t, 0.0, 1.0, 0.2)
+    c.r('upper_arm_R')[:, 0] += -34 * a
+    c.r('upper_arm_R')[:, 1] += 78 * a
+    c.r('forearm_R')[:, 0] += -128 * a
+    c.r('forearm_R')[:, 1] += -14 * a
+    c.r('hand_R')[:, 1] += -10 * a
+    c.r('head')[:, 0] += -4 * a
+    c.r('spine')[:, 0] += -2 * a
+    add_face(c, t, blinks=())
+    return c
+
+
+def build_stretch(P, hair):
+    c, t, w = _base(P, hair, 'Stretch', 120)
+    a = _window(t, 0.05, 0.95, 0.25)
+    tremble = np.sin(w * 8) * 0.6
+    for side, sg in (('L', 1), ('R', -1)):
+        c.r('upper_arm_' + side)[:, 1] += -sg * 168 * a
+        c.r('upper_arm_' + side)[:, 0] += -8 * a + tremble * a
+        c.r('forearm_' + side)[:, 0] += -6 * a
+        c.r('clavicle_' + side)[:, 1] += -sg * -8 * a
+    c.r('spine')[:, 0] += -12 * a
+    c.r('chest')[:, 0] += -8 * a
+    c.r('head')[:, 0] += -12 * a
+    c.l('hips')[:, 2] += 0.1 * a
+    add_face(c, t, blinks=(), talk=1.0 + 1.7 * a * np.clip(np.sin(math.pi * np.clip((t - 0.3) / 0.4, 0, 1)), 0, 1))
+    for eye in ('eye_L', 'eye_R'):
+        c.s(eye)[:, 2] = 1.0 - 0.8 * a
+    return c
+
+
+def build_dance(P, hair):
+    c, t, w = _base(P, hair, 'Dance', 48)
+    beat = np.sin(w * 2)
+    c.l('hips')[:, 0] += 0.7 * np.sin(w)
+    c.l('hips')[:, 2] += -0.25 + 0.32 * np.abs(np.sin(w * 2))
+    c.r('hips')[:, 1] += 9 * np.sin(w)
+    c.r('spine')[:, 1] += -6 * np.sin(w)
+    for side, sg, ph in (('L', 1, 0.0), ('R', -1, math.pi)):
+        c.r('upper_arm_' + side)[:, 1] += -sg * (70 + 52 * np.sin(w * 2 + ph))
+        c.r('upper_arm_' + side)[:, 0] += -12 * np.sin(w * 2 + ph)
+        c.r('forearm_' + side)[:, 0] += -30 - 20 * np.sin(w * 2 + ph)
+        c.r('thigh_' + side)[:, 0] += -9 * np.clip(np.sin(w + ph), 0, 1)
+        c.r('shin_' + side)[:, 0] += 16 * np.clip(np.sin(w + ph), 0, 1)
+    c.r('head')[:, 1] += 8 * np.sin(w)
+    c.r('head')[:, 0] += 3 * beat
+    add_face(c, t, blinks=(0.4,), talk=1.4)
+    return c
+
+
+def build_sad(P, hair):
+    c, t, w = _base(P, hair, 'Sad', 90)
+    a = _window(t, 0.0, 1.0, 0.2)
+    sob = np.sin(w * 4) * a
+    c.r('head')[:, 0] += 18 * a + 1.2 * sob
+    c.r('neck')[:, 0] += 8 * a
+    c.r('spine')[:, 0] += 9 * a
+    c.r('chest')[:, 0] += 4 * a
+    c.l('hips')[:, 2] += -0.08 * a
+    for side, sg in (('L', 1), ('R', -1)):
+        c.r('clavicle_' + side)[:, 1] += -sg * 7 * a
+        c.r('upper_arm_' + side)[:, 0] += 10 * a
+        c.r('upper_arm_' + side)[:, 1] += sg * 3 * a
+        c.r('forearm_' + side)[:, 0] += -4 * a
+    add_face(c, t, blinks=(0.3, 0.7), talk=1.0 - 0.35 * a)
+    for eye in ('eye_L', 'eye_R'):
+        c.s(eye)[:, 2] = 1.0 - 0.45 * a
+    return c
+
+
+def build_shiver(P, hair):
+    c, t, w = _base(P, hair, 'Shiver', 30)
+    tr = np.sin(w * 8)
+    tr2 = np.sin(w * 9 + 1.0)
+    for side, sg in (('L', 1), ('R', -1)):
+        c.r('upper_arm_' + side)[:, 0] += -34
+        c.r('upper_arm_' + side)[:, 1] += sg * 24
+        c.r('forearm_' + side)[:, 0] += -112
+        c.r('forearm_' + side)[:, 1] += sg * 20
+        c.r('clavicle_' + side)[:, 1] += -sg * 6
+        c.r('thigh_' + side)[:, 1] += sg * 3
+    c.r('spine')[:, 0] += 5 + 1.2 * tr
+    c.r('spine')[:, 2] += 1.4 * tr2
+    c.r('head')[:, 0] += 5 + 1.6 * tr2
+    c.r('head')[:, 2] += 2 * tr
+    c.l('hips')[:, 0] += 0.08 * tr
+    add_face(c, t, blinks=(), talk=1.0 + 0.5 * np.abs(tr))
+    return c
+
+
+GESTURES = ['Nod', 'Shake', 'Think', 'Laugh', 'Bow', 'Point', 'Sleep', 'Surprised', 'Salute', 'Stretch', 'Dance', 'Sad', 'Shiver']
+ONE_SHOT = ['Bow', 'Surprised']
+
+
 def build_all(P, hair):
-    return [build_idle(P, hair), build_walk(P, hair), build_run(P, hair), build_talk(P, hair), build_wave(P, hair),
+    base = [build_idle(P, hair), build_walk(P, hair), build_run(P, hair), build_talk(P, hair), build_wave(P, hair),
             build_cheer(P, hair)]
+    extra = [build_nod(P, hair), build_shake(P, hair), build_think(P, hair), build_laugh(P, hair), build_bow(P, hair),
+             build_point(P, hair), build_sleep(P, hair), build_surprised(P, hair), build_salute(P, hair),
+             build_stretch(P, hair), build_dance(P, hair), build_sad(P, hair), build_shiver(P, hair)]
+    return base + extra
 
 
 # ----------------------------------------------------------------------------- writing
