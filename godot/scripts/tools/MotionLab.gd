@@ -38,9 +38,17 @@ func run(args: Dictionary, out_png: String) -> void:
 	var t0 := Time.get_ticks_usec()
 	var guard := 0
 	var moved := false
+	var last_cell := start_cell
+	var last_change := Time.get_ticks_msec()
 	while guard < 4000:
 		guard += 1
 		var cur: Vector2i = _ow.actor_cell("PLAYER")
+		if cur != last_cell:
+			last_cell = cur
+			last_change = Time.get_ticks_msec()
+		elif Time.get_ticks_msec() - last_change > 6000:
+			print("[motion_lab] stalled at %s (blocked route?)" % str(cur))
+			break
 		while idx < cells.size() - 1 and cur == cells[idx + 1]:
 			idx += 1
 		var want := ""

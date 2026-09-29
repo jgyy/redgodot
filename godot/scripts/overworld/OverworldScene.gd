@@ -785,11 +785,13 @@ func warp_to(map_name: String, cell: Vector2i, facing: String = "") -> void:
 
 func fade_out(frames: int = 10) -> void:
 	var tw := create_tween()
+	tw.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	tw.tween_property(_fade_rect, "color:a", 1.0, frames * FRAME)
 	await tw.finished
 
 func fade_in(frames: int = 10) -> void:
 	var tw := create_tween()
+	tw.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	tw.tween_property(_fade_rect, "color:a", 0.0, frames * FRAME)
 	await tw.finished
 
@@ -913,6 +915,7 @@ func set_flash(on: bool) -> void:
 func flash_white(frames: int = 8) -> void:
 	_flash_rect.color = Color(1, 1, 1, 1)
 	var tw := create_tween()
+	tw.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tw.tween_property(_flash_rect, "color:a", 0.0, frames * FRAME)
 	await tw.finished
 

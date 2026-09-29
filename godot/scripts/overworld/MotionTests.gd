@@ -13,6 +13,8 @@ static func run(t: TestSuite, root: Node) -> void:
 	_test_hop(t, root)
 	_test_fallback(t, root)
 	_test_frame_rate(t, root)
+	_test_tick_interp(t, root)
+	_test_fx(t, root)
 
 static func _actor(root: Node, sprite: String) -> OwActor:
 	var a := OwActor.new()
@@ -265,3 +267,40 @@ static func _test_frame_rate(t: TestSuite, root: Node) -> void:
 		a.queue_free()
 	t.check(absf(float(times[0]) - float(times[2])) < 0.09 and absf(float(times[1]) - float(times[2])) < 0.05,
 		"walk time is frame-rate independent (%.3f / %.3f / %.3f s)" % [times[0], times[1], times[2]])
+
+static func _test_tick_interp(t: TestSuite, root: Node) -> void:
+	# fixed-tick simulation shown at render rate: halfway between ticks is halfway between poses
+	var n := Node3D.new()
+	root.add_child(n)
+	var it := TickInterp.new()
+	it.begin_tick()
+	it.put(n, Transform3D(Basis.IDENTITY, Vector3(0, 0, 0)))
+	it.begin_tick()
+	it.put(n, Transform3D(Basis.IDENTITY, Vector3(10, 0, 0)))
+	it.apply(0.5)
+	t.check(absf(n.global_position.x - 5.0) < 1e-4, "TickInterp shows the pose halfway between ticks (%.3f)" % n.global_position.x)
+	it.apply(1.0)
+	t.check(absf(n.global_position.x - 10.0) < 1e-4, "TickInterp settles on the latest tick")
+	# a node that stops being updated stays at its last pose (no drifting back and forth)
+	it.begin_tick()
+	it.apply(0.3)
+	t.check(absf(n.global_position.x - 10.0) < 1e-4, "an idle node stays on its last pose")
+	n.queue_free()
+	var vfx := BattleVfx.new()
+	t.check(BattleVfx.is_status_move("SWORDS_DANCE") and not BattleVfx.is_status_move("TACKLE"), "status moves are told apart from attacks")
+	vfx.free()
+
+static func _test_fx(t: TestSuite, root: Node) -> void:
+	var fx := OwFx.new()
+	root.add_child(fx)
+	fx.dust(Vector3(1, 0, 1), 3)
+	fx.land(Vector3(2, 0, 2))
+	fx.ripple(Vector3(3, 0, 3))
+	fx.grass(Vector3(4, 0, 4), 4)
+	fx.sparkle(Vector3(5, 0, 5), 2)
+	t.check(fx.active_count() > 10, "overworld effects spawn (%d live)" % fx.active_count())
+	# all of them are gone after a couple of seconds of frames at any frame rate
+	for i in 130:
+		fx._process(1.0 / 60.0)
+	t.check(fx.active_count() == 0, "and expire on their own (%d left)" % fx.active_count())
+	fx.queue_free()
