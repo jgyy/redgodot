@@ -43,6 +43,10 @@ def shell(ctx, name, bot, top=None, az_range=(-180, 180), nu=32, nv=10, thick=0.
         body = np.minimum(body, lip + (thick - lip) * G.smoothstep(0.0, 0.28, v))
     crown = volume * np.exp(-((TH / 38.0) ** 2))
     th = (body + crown) * rid
+    if not wrap:
+        uu = np.linspace(0, 1, nu)
+        env = 0.3 + 0.7 * G.smoothstep(0.0, 0.22, uu) * G.smoothstep(1.0, 0.78, uu)
+        th = th * env[:, None]
     g = np.tile(v[None, :], (nu, 1)).reshape(-1)
     p = G.solid_surface(P, 0.0, cell=cell, name=name, wrap_u=wrap, g=g, thick_fn=lambda _P: th, offset=offset,
                         outward_from=H.c, inner='rim')
@@ -128,7 +132,7 @@ def build_hair(ctx, hair):
     fn(ctx, hair)
 
 
-def _bangs_(ctx, n=4, az_span=30, el0=44, el1=17, sweep=10, wid=1.55, off=(0.85, 0.62, 0.42), asym=0.0, thick=0.5, seed=2, lens=None, side=1):
+def _bangs_(ctx, n=5, az_span=32, el0=44, el1=17, sweep=10, wid=1.15, off=(0.8, 0.58, 0.40), asym=0.0, thick=0.38, seed=2, lens=None, side=1):
     """Swept fringe: a few broad overlapping locks that start in the crown and fall across the forehead."""
     rng = np.random.default_rng(seed)
     lens = lens or (1.0, 0.72, 0.92, 0.6, 0.85)
@@ -140,7 +144,7 @@ def _bangs_(ctx, n=4, az_span=30, el0=44, el1=17, sweep=10, wid=1.55, off=(0.85,
         sw = sweep * side * (0.6 + 0.6 * (f if side > 0 else 1 - f)) * (0.85 + 0.3 * rng.random())
         w = wid * (0.9 + 0.2 * rng.random())
         p = lock(ctx, [(az, el0 + 8, off[0]), (az + sw * 0.35, (el0 + e1) / 2 + 3, off[1]), (az + sw, e1, off[2])],
-                 [w, w * 1.05, w * 0.45], [thick, thick, thick * 0.6], 0, name='bang', seg=8, taper_tip=0.8)
+                 [w, w * 1.05, w * 0.3], [thick, thick, thick * 0.5], 0, name='bang', seg=8, taper_tip=0.9)
         ctx.add(p, 'head')
 
 
@@ -171,7 +175,7 @@ def style_short(ctx, h):
     p = shell(ctx, 'hair', bot, top=h.get('top'), thick=h.get('thick', 0.62), volume=h.get('volume', 0.3), ridges=h.get('ridges', 12))
     ctx.add(p, 'head')
     if h.get('bangs', True):
-        _bangs(ctx, n=h.get('bang_n', 4), az_span=h.get('bang_span', 30), el1=h.get('bang_el', 17), sweep=h.get('sweep', 10),
+        _bangs(ctx, n=h.get('bang_n', 5), az_span=h.get('bang_span', 32), el1=h.get('bang_el', 17), sweep=h.get('sweep', 10),
                asym=h.get('part', 0.0), seed=h.get('seed', 2), side=(1 if h.get('part', 0.5) >= 0 else -1))
     if h.get('tuft'):
         ctx.add(spike(ctx, 0, 62, 2.0, 1.2, tilt=(0, -0.5, 0.6), bend=(0, -0.3, 0.3)), 'head')

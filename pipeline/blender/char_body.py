@@ -55,14 +55,15 @@ class Ctx:
         self.atlas.detail(name, painter, w, h)
         return name
 
-    def add(self, part, bone=None, cell=None, ao=1.0):
+    def add(self, part, bone=None, cell=None, ao=None):
         if part is None:
             return None
         if bone is not None:
             part.set_bone(bone)
         if cell is not None:
             part.cell = cell
-        part.ao_gain = ao
+        if ao is not None:
+            part.ao_gain = ao
         self.parts.append(part)
         return part
 
@@ -395,7 +396,7 @@ def build_leg(ctx, side, cell, dr=0.0, z_top=None, z_bot=None, name='leg', flare
     path = path[sel]
     zs = path[:, 2]
     b = P.bulk
-    tab = table or [(P.hip + 1.0, 1.72), (P.hip - 0.5, 1.7), (P.knee + 0.4, 1.5), (P.knee - 0.2, 1.36), (P.ankle + 0.6, 1.22), (P.ankle, 1.2)]
+    tab = table or [(P.hip + 1.0, 1.58), (P.hip - 0.5, 1.58), (P.knee + 0.4, 1.44), (P.knee - 0.2, 1.33), (P.ankle + 0.6, 1.22), (P.ankle, 1.2)]
     xs = [t[0] for t in tab][::-1]
     ys = [t[1] for t in tab][::-1]
     r = np.interp(zs, xs, ys) * b + dr

@@ -55,11 +55,13 @@ static func instantiate(sprite_key: String, toon: bool = true) -> Node3D:
 		Toon.apply(model, 1.3, 0.02)
 		# chibi faces are big spheres: keep them out of the darkest bands (upstream's
 		# character sprites are mostly flat skin with a darker lower edge)
-		Toon.set_param(model, "ramp_bias", 0.22)
-		Toon.set_param(model, "ramp_strength", 0.7)
+		Toon.set_param(model, "ramp_bias", 0.28)
+		Toon.set_param(model, "ramp_strength", 0.6)
 	var ap := AnimUtil.find_player(model)
 	AnimUtil.fix_looping(ap)
 	if ap:
+		# short cross-fades so Idle <-> Walk <-> Run never pop (Walk restarts seamlessly: one cycle == one cell)
+		ap.playback_default_blend_time = 0.07
 		# the character pipeline's extra looping clips (AnimUtil only knows Idle/Walk/Run)
 		for clip in LOOPING_EXTRA:
 			if ap.has_animation(clip):

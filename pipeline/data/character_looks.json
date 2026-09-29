@@ -356,7 +356,7 @@
     "color": "hat",
     "band": "#5a3a22",
     "z": 1.5,
-    "crown": 4.6,
+    "crown": 5.4,
     "brim_r": 9.2,
     "droop": 0.5
    },
@@ -560,14 +560,14 @@
     "color": "#f4ecd8",
     "band": "accent",
     "brim_r": 9.6,
-    "crown": 4.0,
+    "crown": 4.8,
     "z": 1.5,
     "droop": 0.8
    },
    "top": {
     "type": "dress",
     "sleeves": "short",
-    "collar": "v",
+    "collar": "crew",
     "collar_color": "accent"
    },
    "shoes": {
@@ -683,6 +683,9 @@
     "type": "sneaker",
     "color": "shoes",
     "sole": "#f4f4f8"
+   },
+   "colors": {
+    "pants": "#c8a860"
    }
   },
   "little_boy": {
@@ -1056,7 +1059,7 @@
     "band": "#f4f4f8",
     "brim_r": 8.4,
     "droop": 1.0,
-    "crown": 4.6,
+    "crown": 5.4,
     "z": 1.4,
     "crown_r": 6.9
    },
@@ -1106,7 +1109,7 @@
     "band": "#f4f4f8",
     "brim_r": 8.6,
     "droop": 1.2,
-    "crown": 4.6,
+    "crown": 5.4,
     "z": 1.4,
     "crown_r": 6.9
    },
@@ -1989,7 +1992,7 @@
    "top": {
     "type": "dress",
     "sleeves": "long",
-    "collar": "v",
+    "collar": "crew",
     "collar_color": "accent",
     "hem": "accent"
    },

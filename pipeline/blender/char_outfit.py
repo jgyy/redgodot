@@ -110,6 +110,15 @@ def cloth_cell(ctx, name, spec, default='shirt', **kw):
     return ctx.ramp(name, 'cloth', ctx.col(spec, default), stripes=stripes, hem=ctx.col(hem) if hem else None, **kw)
 
 
+def sleeve_cell(ctx, t, cell, default='shirt'):
+    """Sleeves get their own plain cell when the body cell carries a hem trim / stripes (arm g runs shoulder->wrist)."""
+    if t.get('sleeve_color') or t.get('sleeve_stripes'):
+        return cloth_cell(ctx, 'sleeve', t.get('sleeve_color') or t.get('color'), default, stripes=t.get('sleeve_stripes'))
+    if t.get('hem') or t.get('stripes'):
+        return cloth_cell(ctx, 'sleeve', t.get('color'), default)
+    return cell
+
+
 def sleeves(ctx, cell, upto, dr=0.14, cuff=None, name='sleeve', taper=None, cuff_h=0.5):
     for s in (1, -1):
         sl = B.build_arm(ctx, s, cell, dr=dr, upto=upto, name=name, cap_end=0.0, taper=taper)
@@ -148,7 +157,7 @@ def top_shirt(ctx, t):
         ctx.add(B.build_torso_shell(ctx, 'skin', dr=-0.05))        # midriff
     ctx.add(B.build_torso_shell(ctx, cell, dr=t.get('dr', 0.0), hem_flare=t.get('flare', 0.12), z_bot=t.get('hem_z')))
     sl = t.get('sleeves', 'short')
-    scell = cloth_cell(ctx, 'sleeve', t.get('sleeve_color') or t.get('color'), stripes=t.get('sleeve_stripes')) if t.get('sleeve_color') or t.get('sleeve_stripes') else cell
+    scell = sleeve_cell(ctx, t, cell)
     if sl == 'short':
         sleeves(ctx, scell, 0.36, cuff=ctx.ramp('cuff', 'cloth', ctx.col(t.get('cuff', t.get('sleeve_color') or t.get('color')))) if t.get('cuff') else None)
     elif sl == 'long':
@@ -207,8 +216,7 @@ def top_jacket(ctx, t):
     if t.get('zip', True):
         zc = ctx.ramp('zip', 'metal', '#c0c4cc')
         ctx.add(plate_on_torso(ctx, P.hip - 0.3, P.neck_base, -0.03, 0.03, dr=0.32, thick=0.16, cell=zc, name='zip', n_z=8, n_a=2))
-    scol = t.get('sleeve_color')
-    scell = cloth_cell(ctx, 'sleeve', scol) if scol else cell
+    scell = sleeve_cell(ctx, t, cell)
     sl = t.get('sleeves', 'long')
     up = {'short': 0.36, 'long': 0.97, 'three': 0.62}.get(sl, 0.97)
     sleeves(ctx, scell, up, dr=0.2, cuff=trim if t.get('cuff', True) else None)
@@ -286,15 +294,15 @@ def top_dress(ctx, t):
     ctx.add(B.build_torso_shell(ctx, cell, dr=0.0, z_bot=P.hip + 0.2, hem_flare=0.0))
     z_top = P.hip + 1.4
     hem = t.get('length', P.knee - 0.4)
-    prof = [(2.4, z_top), (2.9, z_top - 0.6), (3.5, (z_top + hem) / 2 + 0.7), (4.1, hem + 0.5), (4.4, hem)]
-    sk = G.lathe(prof, seg=26, center=(0, 0.1, 0), scale=(P.sw * t.get('flare', 1.0), 0.86), cell=cell, name='skirt',
+    prof = [(2.85, z_top), (3.15, z_top - 0.6), (3.6, (z_top + hem) / 2 + 0.7), (4.1, hem + 0.5), (4.4, hem)]
+    sk = G.lathe(prof, seg=26, center=(0, 0.1, 0), scale=(P.sw * t.get('flare', 1.0), 0.84), cell=cell, name='skirt',
                  wobble=lambda a, z: 1 + 0.04 * np.sin(a * 9) * G.smoothstep(z_top, hem, z))
     sk.g = np.clip((sk.V[:, 2] - hem) / (z_top - hem), 0, 1)
     skirt_weights(ctx, sk, z_top - 0.5, hem, 0.45)
     ctx.add(sk)
     sl = t.get('sleeves', 'short')
     if sl != 'none':
-        sleeves(ctx, cloth_cell(ctx, 'sleeve', t.get('sleeve_color') or t.get('color')) if t.get('sleeve_color') else cell,
+        sleeves(ctx, sleeve_cell(ctx, t, cell),
                 {'short': 0.34, 'long': 0.97, 'three': 0.62, 'puff': 0.30}[sl], dr=0.15 if sl != 'puff' else 0.35)
     collar(ctx, t)
     if t.get('sash'):
@@ -434,7 +442,7 @@ def build_legs(ctx, l):
         pelvis(ctx, cell, dr=l.get('dr', 0.0) + (0.12 if typ != 'pants' else 0.0))
     elif typ in ('shorts', 'trunks'):
         skin = 'skin'
-        z_bot = P.knee + 1.3 if typ == 'shorts' else P.hip - 2.5
+        z_bot = P.knee + 2.0 if typ == 'shorts' else P.hip - 2.5
         for s in (1, -1):
             ctx.add(B.build_leg(ctx, s, skin, name='leg'))
             sh = B.build_leg(ctx, s, cell, dr=0.1, z_bot=z_bot, name='shorts')
@@ -448,18 +456,18 @@ def build_legs(ctx, l):
         for s in (1, -1):
             ctx.add(B.build_leg(ctx, s, skin if typ != 'robe' else cell))
         if typ != 'none':
-            pelvis(ctx, cell, dr=0.05)
+            pelvis(ctx, 'top' if 'top' in ctx.atlas.cells else cell, dr=0.05)
         else:
             pelvis(ctx, 'skin', dr=0.0)
 
 
 def pelvis(ctx, cell, dr=0.0):
     P = ctx.P
-    zs = np.linspace(P.hip - 1.5, P.hip + 1.5, 6)
+    zs = np.linspace(P.hip - 1.5, P.hip + 1.0, 6)
     path = np.array([[0, 0.12, z] for z in zs])
-    rad = np.array([[P.sw * (2.95 - 0.25 * ((z - P.hip) / 1.5) ** 2) + dr, 2.35 + dr] for z in zs])
+    rad = np.array([[P.sw * (2.95 - 0.35 * max(0.0, (z - P.hip) / 1.0) ** 2) + dr, 2.35 - 0.16 * max(0.0, (z - P.hip) / 1.0) ** 2 + dr] for z in zs])
     p = G.loft(path, rad, seg=18, cell=cell, name='pelvis', caps=(0.6, 0.2), e=2.4)
-    p.g = np.clip((p.V[:, 2] - (P.hip - 1.5)) / 3.0, 0, 1)
+    p.g = np.clip((p.V[:, 2] - (P.hip - 1.5)) / 2.5, 0, 1)
     p.w = {'hips': np.ones(len(p.V))}
     ctx.add(p)
 

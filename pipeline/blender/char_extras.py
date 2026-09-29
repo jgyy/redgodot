@@ -257,6 +257,7 @@ def moustache(ctx, m):
         pts = [(s * 0.5, -25.0), (s * ln * 0.45, -26.0), (s * ln * 0.85, -30.0 - (2 if kind == 'handle' else 0)), (s * ln, -33.0 + (5 if kind == 'handle' else 0))]
         p = B.face_tube(ctx, pts, th, col, 'stache', off=th * 0.45, seg=8, taper=[1.0, 1.0, 0.8, 0.3])
         p.g[:] = 0.5
+        p.ao_gain = 0.4
 
 
 def beard(ctx, b):
@@ -289,10 +290,11 @@ def beard(ctx, b):
     # thin at the sideburn / upper edge, fat under the chin, rolled edge at the bottom
     prof = 0.28 + (th * 1.5 * full - 0.28) * G.smoothstep(0.0, 0.55, v)
     prof = prof * (0.45 + 0.55 * G.smoothstep(1.0, 0.82, v))
-    edge_fade = 0.55 + 0.45 * np.cos(np.radians(AZ) * 90.0 / max(np.abs(az).max(), 1.0)) ** 0.5
+    edge_fade = 0.55 + 0.45 * np.clip(np.cos(np.radians(AZ) * 90.0 / max(np.abs(az).max(), 1.0)), 0.0, 1.0) ** 0.5
     body = prof[None, :] * edge_fade * (1 + 0.10 * np.sin(AZ * 0.5))
     p = G.solid_surface(pts, 0.0, cell=col, name='beard', g=(1 - v)[None, :].repeat(nu, 0).reshape(-1) * 0.8 + 0.1, thick_fn=lambda _P: body,
                         offset=0.4, outward_from=H_.c, inner='rim')
+    p.ao_gain = 0.4
     ctx.add(p, 'head')
     if kind == 'chin' or b.get('tuft'):
         c0 = H_.surf(0, -82, 0.4)

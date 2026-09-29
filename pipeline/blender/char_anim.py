@@ -97,11 +97,11 @@ def gait(P, n, *, S, ds, lift, sway=0.3, lean=3.0, arm_amp=30.0, elbow=14.0, yaw
         x_st = S - 2 * S * u
         x_sw = -S + 2 * S * ease(v)
         rest = P.ankle
-        z_st = rest + toe * (0.55 * (1 - ease(u / 0.18)) + 1.15 * ease((u - 0.72) / 0.28))
-        z_start, z_end = rest + toe * 1.15, rest + toe * 0.55
+        z_st = rest + toe * (0.55 * (1 - ease(u / 0.18)) + 1.3 * ease((u - 0.72) / 0.28))
+        z_start, z_end = rest + toe * 1.3, rest + toe * 0.55
         z_sw = z_start + (z_end - z_start) * ease(v) + lift * np.sin(math.pi * v) ** 0.85
-        pitch_st = 14 * (1 - ease(u / 0.22)) - 34 * ease((u - 0.7) / 0.3)
-        pitch_sw = -34 + 48 * ease(v * 1.5) - 8 * np.sin(math.pi * v)
+        pitch_st = 14 * (1 - ease(u / 0.22)) - 28 * ease((u - 0.7) / 0.3)
+        pitch_sw = -28 + 42 * ease(v * 1.5) - 8 * np.sin(math.pi * v)
         legs[side] = dict(x=np.where(stance, x_st, x_sw), z=np.where(stance, z_st, z_sw),
                           pitch=np.where(stance, pitch_st, pitch_sw))
     if run:
@@ -203,7 +203,7 @@ def build_idle(P, hair, name='Idle', n=96):
     t = fs(n)
     w = TAU * t
     breath = np.sin(w)
-    shift = np.sin(w * 0.5 + 0.4)
+    shift = np.sin(w + 0.4)
     c.l('hips')[:, 2] = -0.1 - 0.06 * (0.5 - 0.5 * np.cos(w))
     c.l('hips')[:, 0] = 0.25 * shift
     c.r('hips')[:, 1] = 1.0 * shift
@@ -246,7 +246,7 @@ def resample_clip(base, name, n):
 
 def build_walk(P, hair, name='Walk', n=16, mult=1):
     stride = 1.0 if mult == 1 and n == 16 else 1.12
-    c = gait(P, n, S=2.75 * stride, ds=0.62, lift=1.45, sway=0.32, lean=3.0, arm_amp=32, elbow=16, yaw=6.0, name=name, mult=mult)
+    c = gait(P, n, S=3.1 * stride, ds=0.58, lift=1.6, sway=0.34, lean=3.0, arm_amp=32, elbow=16, yaw=6.0, name=name, mult=mult)
     t = fs(n)
     add_face(c, t, blinks=())
     hair_motion(c, t, hair, 'walk')
@@ -338,7 +338,7 @@ def build_surf(P, hair):
     c.l('hips')[:, 2] = -(P.hip - P.ankle) * 0.62 + 0.15 * np.sin(w)
     c.l('hips')[:, 1] = -1.0
     c.r('spine')[:, 0] += 3 + 1.5 * np.sin(w - 0.4)
-    c.r('hips')[:, 1] = 2.5 * np.sin(w * 0.5)
+    c.r('hips')[:, 1] = 2.5 * np.sin(w)
     hair_motion(c, t, hair, 'talk')
     return c
 

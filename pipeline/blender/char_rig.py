@@ -32,7 +32,7 @@ class Prop:
         self.chin = self.neck_top - 0.7
         self.head_c = np.array([0.0, 0.0, self.chin + self.head_rz * 0.97])
         self.head_top = self.head_c[2] + self.head_rz
-        self.leg_x = 1.95 * sw
+        self.leg_x = 1.85 * sw
         self.shoulder_x = 3.75 * sw
         self.elbow_z = self.shoulder - 2.65 * sh
         self.wrist_z = self.shoulder - 5.05 * sh
