@@ -420,6 +420,23 @@ func _test_models_3d(_tree: SceneTree) -> void:
 	for clip in PokemonActor.CLIPS:
 		check(actor.has_anim(clip), "PIKACHU has clip %s" % clip)
 	check(actor.model.find_child("Skeleton3D", true, false) != null, "PIKACHU is rigged (Skeleton3D)")
+	for v in PokemonActor.IDLE_VARIANTS:
+		check(actor.has_anim(v), "PIKACHU has idle variant %s" % v)
+	var sigs: Array = actor.signature_clips()
+	check(sigs.size() >= 6, "PIKACHU has >= 6 signature clips (%d)" % sigs.size())
+	var all_ok := true
+	for sc in sigs:
+		all_ok = all_ok and actor.has_anim(sc)
+	check(all_ok, "every manifest signature clip exists in the glb")
+	check(actor._anim.get_animation_list().size() >= 24, "PIKACHU has >= 24 clips (%d)" % actor._anim.get_animation_list().size())
+	check(PokemonActor.move_clip_name("SWORDS_DANCE") == "SwordsDance" and PokemonActor.move_clip_name("FLY") == "FlyUp" \
+			and PokemonActor.move_clip_name("PSYCHIC_M") == "Psychic", "move id -> clip name")
+	check(actor.signature_clip("NO_SUCH_MOVE") == "", "unknown move has no signature clip")
+	check(actor.play_move("NO_SUCH_MOVE", false) == "Attack" and actor.play_move("NO_SUCH_MOVE", true) == "Special",
+			"moves without a signature clip fall back to Attack / Special")
+	check(actor.is_signature_clip(sigs[0]) and not actor.is_signature_clip("Idle") and not actor.is_signature_clip("IdleLook"), "signature clip classification")
+	var sig_anim: Animation = actor._anim.get_animation(sigs[0])
+	check(sig_anim.loop_mode == Animation.LOOP_NONE, "signature clips are one-shots")
 	actor.sleeping = true
 	check(actor.idle_clip() == "Sleep", "sleeping mons rest in the Sleep clip")
 	actor.sleeping = false
