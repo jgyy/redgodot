@@ -20,6 +20,9 @@ import env_props as EP  # noqa: E402
 import env_textures as ET  # noqa: E402
 import env_tiles as TL  # noqa: E402
 import env_buildings as EBL  # noqa: E402
+import env_furn as EF  # noqa: E402
+import env_town as ETW  # noqa: E402
+import env_nature as ENA  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, '..', '..'))
@@ -42,6 +45,20 @@ def main():
     jobs += [(n, fn, note, 'props') for n, fn, note in TL.PROPS_EXTRA]
     jobs += [(n, EP.PROPS[n][0], EP.PROPS[n][1], 'props') for n in KIT_PROPS]
     jobs += [(n, (lambda style, f=f: f()), 'building part (neutral grey in the kit; tinted per building in game)', 'props') for n, f in EBL.PARTS.items()]
+    # the kit's older hand-made pc / shelf / table ... are superseded by the detailed in-game models (env_furn / env_town)
+    better = {'pc': (EF.p_pc, 'PC terminal: desk cabinet, tilted LCD, keyboard, mouse, mini-tower, cables'),
+              'shelf': (EF.p_bookshelf, 'bookcase with five shelves of books'),
+              'table': (lambda style: EF.make_table(style, 0), 'wooden table (single-cell piece of table_set)'),
+              'chair': (EF.p_chair, 'wooden dining chair'), 'bench': (ETW.p_park_bench, 'park bench'),
+              'mailbox': (ETW.p_mailbox, 'mailbox with flag'), 'lamp_post': (ETW.p_lamp_post, 'iron street lamp')}
+    jobs = [(n, better[n][0], better[n][1], g) if n in better else (n, fn, note, g) for n, fn, note, g in jobs]
+    # textured (albedo from the procedural env_tex maps, AO in the vertices) copies of the hero props
+    extra = {}
+    for src in (EF.FURN, ENA.NATURE, ETW.TOWN):
+        extra.update(src)
+    for n in ('heal_machine', 'tv_crt', 'vending_machine', 'fridge', 'stove', 'sink', 'cabinet_wood', 'cash_register', 'tree_oak', 'tree_pine', 'tree_birch',
+              'rock_mossy', 'boulder_large', 'fountain', 'market_stall', 'lighthouse', 'rowboat', 'well', 'sofa', 'armchair', 'wardrobe', 'display_case'):
+        jobs.append((n, extra[n][0], extra[n][1], 'props'))
     for name, fn, note, group in jobs:
         K.reset()
         P = fn('tex')

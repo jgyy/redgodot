@@ -4,7 +4,15 @@
    -90,
    0,
    0
-  ]
+  ],
+  "head_z": 0.69,
+  "retint": {
+   "BodyA": "#f8d030",
+   "BodyB": "#f8d030",
+   "face": "#f8d030",
+   "Mouth": "#f8d030",
+   "material": "#f8d030"
+  }
  },
  "RAPIDASH": {
   "material_colors": {
@@ -73,5 +81,246 @@
  },
  "KANGASKHAN": {
   "droop": 58
+ },
+ "FLAREON": {
+  "face_deg": 100,
+  "head_z": 0.5,
+  "eyes_kind": "baked"
+ },
+ "ALAKAZAM": {
+  "strays": {
+   "far": 2.4
+  }
+ },
+ "ABRA": {
+  "head_z": 0.8,
+  "eyes_kind": "baked"
+ },
+ "BEEDRILL": {
+  "head_z": 0.72,
+  "eyes_kind": "baked"
+ },
+ "BUTTERFREE": {
+  "head_z": 0.5,
+  "eyes_kind": "baked"
+ },
+ "CHARIZARD": {
+  "head_z": 0.8,
+  "eyes_kind": "baked"
+ },
+ "DITTO": {
+  "head_z": 0.6,
+  "eyes_kind": "baked",
+  "head_r": 0.3
+ },
+ "EEVEE": {
+  "head_z": 0.5,
+  "eyes_kind": "baked"
+ },
+ "EXEGGUTOR": {
+  "head_z": 0.75,
+  "eyes_kind": "baked"
+ },
+ "GASTLY": {
+  "drop_materials": [
+   "PaletteMaterial001",
+   "PaletteMaterial003",
+   "PaletteMaterial004",
+   "PaletteMaterial005",
+   "PaletteMaterial006"
+  ],
+  "head_z": 0.5,
+  "eye_patches": [
+   {
+    "x": 0.16,
+    "z": 0.56,
+    "w": 0.2,
+    "h": 0.15,
+    "rot": 12,
+    "color": [
+     0.96,
+     0.96,
+     1.0
+    ],
+    "layer": 1,
+    "mirror": true
+   },
+   {
+    "x": 0.15,
+    "z": 0.55,
+    "w": 0.075,
+    "h": 0.09,
+    "rot": 0,
+    "color": [
+     0.05,
+     0.02,
+     0.08
+    ],
+    "layer": 2,
+    "mirror": true
+   },
+   {
+    "x": 0.0,
+    "z": 0.33,
+    "w": 0.36,
+    "h": 0.17,
+    "rot": 0,
+    "color": [
+     0.96,
+     0.96,
+     1.0
+    ],
+    "layer": 1
+   },
+   {
+    "x": 0.0,
+    "z": 0.32,
+    "w": 0.32,
+    "h": 0.12,
+    "rot": 0,
+    "color": [
+     0.1,
+     0.02,
+     0.16
+    ],
+    "layer": 2
+   }
+  ],
+  "head_r": 0.4
+ },
+ "GENGAR": {
+  "head_z": 0.68,
+  "eyes_kind": "baked"
+ },
+ "JOLTEON": {
+  "head_z": 0.52,
+  "eyes_kind": "baked"
+ },
+ "KABUTO": {
+  "head_z": 0.66,
+  "eyes_kind": "baked",
+  "head_r": 0.35
+ },
+ "KOFFING": {
+  "head_z": 0.5,
+  "eyes_kind": "baked"
+ },
+ "LAPRAS": {
+  "head_z": 0.75,
+  "eyes_kind": "baked"
+ },
+ "MAGNEMITE": {
+  "head_z": 0.5,
+  "eyes_kind": "baked"
+ },
+ "MAGNETON": {
+  "head_z": 0.55,
+  "eyes_kind": "baked"
+ },
+ "ONIX": {
+  "head_z": 0.8,
+  "face_deg": 90,
+  "eyes_kind": "baked",
+  "head_r": 0.2
+ },
+ "PARAS": {
+  "head_z": 0.5,
+  "eyes_kind": "baked"
+ },
+ "PARASECT": {
+  "head_z": 0.53,
+  "eyes_kind": "baked"
+ },
+ "PONYTA": {
+  "head_z": 0.8,
+  "eyes_kind": "baked"
+ },
+ "SNORLAX": {
+  "head_z": 0.72,
+  "eye_decals": [
+   {
+    "tex": "pm0143_00_Face.png",
+    "key": "dark",
+    "uv": [
+     0.03,
+     0.336,
+     0.22,
+     0.434
+    ],
+    "x": 0.073,
+    "z": 0.861,
+    "w": 0.075,
+    "h": 0.03,
+    "mirror": true
+   }
+  ],
+  "head_r": 0.2
+ },
+ "STARMIE": {
+  "head_z": 0.5,
+  "eyes_kind": "none"
+ },
+ "STARYU": {
+  "head_z": 0.5,
+  "eyes_kind": "none"
+ },
+ "VAPOREON": {
+  "head_z": 0.75,
+  "eyes_kind": "baked"
+ },
+ "VENOMOTH": {
+  "head_z": 0.62,
+  "eyes_kind": "baked"
+ },
+ "VENONAT": {
+  "head_z": 0.6,
+  "eyes_kind": "baked"
+ },
+ "VOLTORB": {
+  "head_z": 0.55,
+  "eyes_kind": "baked"
+ },
+ "WEEZING": {
+  "head_z": 0.5,
+  "eyes_kind": "baked"
+ },
+ "WIGGLYTUFF": {
+  "head_z": 0.63,
+  "eyes_kind": "baked"
+ },
+ "ZUBAT": {
+  "head_z": 0.6,
+  "eyes_kind": "none"
+ },
+ "FARFETCHD": {
+  "alpha_fill": {
+   "Body": [
+    0.06,
+    0.04,
+    0.04
+   ],
+   "material": [
+    0.06,
+    0.04,
+    0.04
+   ],
+   "LIris": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  "head_z": 0.7,
+  "keep_iris_layers": true
+ },
+ "MUK": {
+  "head_z": 0.45,
+  "head_r": 0.3
+ },
+ "CATERPIE": {
+  "eyes_kind": "baked"
+ },
+ "MISSINGNO": {
+  "eyes_kind": "none"
  }
 }

@@ -125,13 +125,17 @@ func bag_say(text: String) -> void:
 	busy = false
 
 static func needs_target(id: String) -> bool:
-	return HEAL.has(id) or CURE.has(id) or id in ["REVIVE", "MAX_REVIVE", "RARE_CANDY"]
+	return HEAL.has(id) or CURE.has(id) or id in ["REVIVE", "MAX_REVIVE", "RARE_CANDY"] or FieldItems.handles(id)
 
 func use_item_field(id: String) -> void:
 	if needs_target(id) and party_menu:
 		busy = true
 		close()
-		party_menu.open_with({"msg": "Use on which POKéMON?", "pick": func(m, _i, ps): return await BagMenu.apply_to_mon(id, m, ps)})
+		var prompt := "Use on which POKéMON?"
+		if id.begins_with("TM_") or id.begins_with("HM_"):
+			var mv: String = str(GameData.items.get(id, {}).get("move", ""))
+			prompt = "Teach %s to which POKéMON?" % str(GameData.get_move(mv).get("name", mv))
+		party_menu.open_with({"msg": prompt, "pick": func(m, _i, ps): return await BagMenu.apply_to_mon(id, m, ps)})
 		await party_menu.picked
 		visible = true
 		busy = false
@@ -171,6 +175,7 @@ static func apply_to_mon(id: String, m: GameState.PartyMon, ps: PartyMenu) -> bo
 		var before := m.hp
 		if heals:
 			m.hp = mini(m.max_hp, m.hp + int(HEAL[id]))
+			PikachuBuddy.event(PikachuBuddy.HP_RESTORE, m)
 		if cures:
 			m.status = ""
 		await ps.party_say((m.nickname + " recovered by %d!" % (m.hp - before)) if heals else (m.nickname + " was cured!"))
@@ -188,11 +193,20 @@ static func apply_to_mon(id: String, m: GameState.PartyMon, ps: PartyMenu) -> bo
 			await ps.party_say("It won't have any effect.")
 			return false
 		m.level += 1
+		PikachuBuddy.event(PikachuBuddy.LEVEL_UP, m)
 		m.xp = maxi(m.xp, m.exp_this())
 		m.recalc_keep_hp()
 		for nm in m.moves_at_level(m.level):
 			m.add_move(nm)
 		await ps.party_say(m.nickname + " grew to level %d!" % m.level)
+		ok = true
+	elif FieldItems.handles(id):
+		# TMs / HMs, evolution stones, vitamins, PP UP, ETHER, ELIXER (ui/FieldItems.gd)
+		var used: int = await FieldItems.use(id, m, ps)
+		if used == FieldItems.NOTHING:
+			return false
+		if used == FieldItems.KEPT:
+			return true   # an HM is never used up
 		ok = true
 	if ok:
 		GameState.bag[id] = int(GameState.bag.get(id, 1)) - 1

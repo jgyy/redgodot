@@ -4,9 +4,6 @@ import copy
 import numpy as np
 
 import char_body as B
-import char_hair as H
-import char_outfit as O
-import char_extras as X
 
 
 def deep_merge(a, b):
@@ -54,65 +51,42 @@ def resolve_look(key, cast, looks):
     return deep_merge(base, looks.get(key, {}))
 
 
-def build(key, cast, look):
+def build(key, cast, look, log=None):
+    import char_face as FC
+    import char_outfit as O
+    import char_hair as H
+    import char_extras as X
     ctx = B.Ctx(key, cast, look)
+    ctx.log = log
+    B.build_body(ctx)
+    ctx.headref = H.HeadRef(ctx)
     face = look.get('face', {})
-    hair = dict(look.get('hair', {}))
     hw = look.get('headwear')
     ctx.cover = bool(hw and hw.get('type') in ('cap', 'beanie') and hw.get('covers', True))
-    if ctx.cover:
-        rim = hw.get('rim') or (X.CAP_RIM if hw['type'] == 'cap' else X.BEANIE_RIM)
-        hair['top'] = [(a, t - 4.0) for a, t in rim]
-        hair.setdefault('thick', 0.55)
-        hair.setdefault('volume', 0.0)
+    FC.build_face(ctx, face)
+    if hw:
+        X.build_hat(ctx, hw)
+    hair = dict(look.get('hair', {}))
     if hw and hw.get('type') in ('wide', 'sailor', 'chef', 'nurse', 'headband'):
-        hair['thick'] = min(hair.get('thick', 0.4), 0.34)
+        hair['thick'] = min(hair.get('thick', 0.4), 0.4)
         hair['volume'] = 0.0
-    # ---- head & face
-    B.build_head(ctx, ear=face.get('ears', True), nose=face.get('nose', 'dot'))
-    B.build_face(ctx, face)
+    if hair.get('style', 'short') != 'none':
+        H.build_hair(ctx, hair)
     if face.get('glasses'):
         X.glasses(ctx, face['glasses'])
     if face.get('moustache'):
         X.moustache(ctx, face['moustache'])
     if face.get('beard'):
         X.beard(ctx, face['beard'])
-    if hair.get('style', 'short') != 'none':
-        H.build_hair(ctx, hair)
-    if hw:
-        X.build_hat(ctx, hw)
-    # ---- body
-    top = look.get('top', {})
-    long_sleeves = top.get('type') in ('coat', 'robe') or top.get('sleeves') == 'long'
-    if not long_sleeves:
-        for s in (1, -1):
-            ctx.add(B.build_arm(ctx, s, 'skin', name='arm', s_from=0.0 if top.get('type') in ('bare',) or top.get('sleeves') == 'none' else 0.2))
-    else:
-        for s in (1, -1):
-            ctx.add(B.build_arm(ctx, s, 'skin', name='arm', s_from=0.88, cap_end=0.7))
-    O.build_top(ctx, top)
+    O.build_top(ctx, look.get('top', {}))
     O.build_legs(ctx, look.get('legs', {}))
     O.build_shoes(ctx, look.get('shoes', {}))
     O.build_hands(ctx, look.get('gloves'))
     ex = look.get('extras', {})
-    if ex.get('belt'):
-        X.belt(ctx, ex['belt'])
-    if ex.get('emblem'):
-        X.emblem(ctx, ex['emblem'])
-    if ex.get('tie'):
-        X.tie(ctx, ex['tie'])
-    if ex.get('bowtie'):
-        X.bowtie(ctx, ex['bowtie'])
-    if ex.get('scarf'):
-        X.scarf(ctx, ex['scarf'])
-    if ex.get('necklace'):
-        X.necklace(ctx, ex['necklace'])
-    if ex.get('suspenders'):
-        X.suspenders(ctx, ex['suspenders'])
-    if ex.get('wristbands'):
-        X.wristbands(ctx, ex['wristbands'])
+    for nm in ('belt', 'emblem', 'tie', 'bowtie', 'scarf', 'necklace', 'suspenders', 'wristbands', 'cape'):
+        if ex.get(nm):
+            getattr(X, nm)(ctx, ex[nm])
     if ex.get('backpack') is not None and ex.get('backpack') is not False:
         X.backpack(ctx, ex['backpack'])
-    if ex.get('cape'):
-        X.cape(ctx, ex['cape'])
+    ctx.add(B.skin_part(ctx, drop_covered=True))
     return ctx

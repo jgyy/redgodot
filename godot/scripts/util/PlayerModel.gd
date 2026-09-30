@@ -42,8 +42,8 @@ static func build(look: PlayerLook, toon: bool = true) -> Node3D:
 		CharacterSkin._fit_bounds(root)
 	if toon:
 		Toon.apply(root, 1.3, 0.02)
-		Toon.set_param(root, "ramp_bias", 0.28)
-		Toon.set_param(root, "ramp_strength", 0.6)
+		Toon.set_param(root, "ramp_bias", CharacterSkin.RAMP_BIAS)
+		Toon.set_param(root, "ramp_strength", CharacterSkin.RAMP_STRENGTH)
 	_texture(head_mi, DIR + look.head_key() + ".png", colors)
 	_texture(body_mi, DIR + look.body_key() + ".png", colors)
 	CharacterSkin.finish_model(root)

@@ -21,6 +21,9 @@ class PartyMon:
 	var sleep: int = 0           # sleep turns left while status == "SLP"
 	var ot: String = ""
 	var leveled_in_battle := false
+	## YELLOW: this is the PIKACHU Prof. Oak gave the player (it follows, has friendship, refuses to evolve by stone
+	## only when the player says so ... see PikachuBuddy). Saved with the mon.
+	var buddy := false
 
 	## `dv_opts` = {atk,def,spd,spc} (0..15); omitted -> all zero (deterministic,
 	## identical to the pre-battle-port stat formula). {"random": true} rolls
@@ -152,7 +155,7 @@ class PartyMon:
 		return {
 			"species_id": species_id, "nickname": nickname, "level": level, "xp": xp,
 			"hp": hp, "max_hp": max_hp, "moves": moves, "pp": pp, "status": status,
-			"dvs": dvs, "sexp": sexp, "pp_max": pp_max, "sleep": sleep, "ot": ot,
+			"dvs": dvs, "sexp": sexp, "pp_max": pp_max, "sleep": sleep, "ot": ot, "buddy": buddy,
 		}
 
 	static func from_dict(d: Dictionary) -> PartyMon:
@@ -180,6 +183,7 @@ class PartyMon:
 		m.status = d.get("status", "")
 		m.sleep = int(d.get("sleep", 0))
 		m.ot = d.get("ot", "")
+		m.buddy = bool(d.get("buddy", false))
 		return m
 
 ## Gen 1 stat formula (upstream calcStat).
@@ -237,6 +241,13 @@ var flags: Dictionary = {}          # event flags (G.state.flags)
 var toggles: Dictionary = {}        # "Map:OBJ_ID" -> shown (G.state.toggles)
 var coins: int = 0
 var starter: String = ""
+## POKeMON RED / BLUE / YELLOW (chosen on NEW GAME, saved with the game; old saves have none = RED).
+var version: String = "RED"
+## The version NEW GAME will start (set by the title menu / --version=); start_new_adventure() applies it.
+var pending_version: String = "RED"
+## YELLOW: PIKACHU's friendship 0..255 (engine/events/pikachu_happiness.asm) and the rival's Eevee evolution plan.
+var pikachu_happiness: int = 90
+var rival_eevee: String = "JOLTEON"
 var last_heal: Dictionary = {}      # {map,x,y} of the last nurse visit
 var last_heal_town: Dictionary = {} # blackout / ESCAPE ROPE destination {map,x,y}
 var daycare: Dictionary = {}        # {mon: PartyMon dict, steps: int} or {}
@@ -250,7 +261,8 @@ var lucky_slot: int = 0
 var vermilion_trash: Dictionary = {}
 
 const STORY_KEYS := ["flags", "toggles", "coins", "starter", "last_heal", "last_heal_town", "daycare", "safari_balls",
-	"safari_steps", "steps", "repel", "always_on_bike", "hall_of_fame", "lucky_slot", "vermilion_trash"]
+	"safari_steps", "steps", "repel", "always_on_bike", "hall_of_fame", "lucky_slot", "vermilion_trash",
+	"pikachu_happiness", "rival_eevee"]
 
 func story_to_dict() -> Dictionary:
 	var d := {}
@@ -274,6 +286,8 @@ func reset_story_state() -> void:
 	toggles = {}
 	coins = 0
 	starter = ""
+	pikachu_happiness = 90
+	rival_eevee = "JOLTEON"
 	last_heal = {}
 	last_heal_town = {}
 	daycare = {}
@@ -324,9 +338,32 @@ static func exp_for_level(growth: String, n: int) -> int:
 		_:
 			return n3
 
+## Selects RED / BLUE / YELLOW: swaps the wild tables, trainer teams, species data, trades, prizes and NPC layout.
+func set_version(v: String) -> void:
+	if not GameData.VERSIONS.has(v):
+		v = "RED"
+	version = v
+	pending_version = v
+	GameData.apply_version(v)
+
+func is_yellow() -> bool:
+	return version == "YELLOW"
+
+## "POKéMON RED" / "POKéMON BLUE" / "POKéMON YELLOW" (title text, save label).
+static func version_title(v: String) -> String:
+	return "POKéMON " + v
+
+## The Game Boy palette tint the version label uses: RED red, BLUE blue, YELLOW yellow.
+static func version_color(v: String) -> Color:
+	match v:
+		"BLUE": return Color("#3a5fd0")
+		"YELLOW": return Color("#e8c018")
+		_: return Color("#d03030")
+
 ## Upstream G.newState() for NEW GAME (title.js newGameIntro): no POKéMON yet,
 ## an empty bag, a POTION in the PC, ₽3000, standing in RED's room facing up.
 func start_new_adventure() -> void:
+	set_version(pending_version)
 	look = {}
 	_look_obj = null
 	party.clear()
@@ -444,7 +481,10 @@ func set_look(l: PlayerLook) -> void:
 
 func new_game(starter_id: String) -> void:
 	party.clear()
-	add_to_party(starter_id, 5)
+	var starter_mon := add_to_party(starter_id, 5)
+	if is_yellow() and starter_id == "PIKACHU":
+		starter_mon.buddy = true   # YELLOW: the starter PIKACHU walks behind the player
+		starter = "PIKACHU"
 	bag = {"POTION": 3, "SUPER_POTION": 3, "POKE_BALL": 3, "GREAT_BALL": 3,
 		"ULTRA_BALL": 3, "REVIVE": 3, "ESCAPE_ROPE": 3, "TOWN_MAP": 1}
 	badges.clear()
@@ -495,6 +535,7 @@ func save() -> bool:
 		"current_box": current_box, "pc_items": pc_items,
 		"visited": visited, "last_outdoor": last_outdoor,
 		"story": story_to_dict(),
+		"version": version,
 	}
 	var f := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if f == null:
@@ -517,6 +558,7 @@ func load_save() -> bool:
 	if not (parsed is Dictionary):
 		return false
 	var d: Dictionary = parsed
+	set_version(str(d.get("version", "RED")))   # first: species stats (Yellow differs) feed the party's max HP; old saves are RED
 	party = []
 	for pm in d.get("party", []):
 		party.append(PartyMon.from_dict(pm))

@@ -29,6 +29,7 @@ static func run(t: TestSuite) -> void:
 	_special_battles(t)
 	_env_and_vfx(t)
 	_scene_smoke(t)
+	MechanicsTests.run(t)   # Gen 1 rules one by one (scripts/battle/MechanicsTests.gd)
 	GameState.party = saved_party
 	GameState.bag = saved_bag
 	GameState.money = saved_money

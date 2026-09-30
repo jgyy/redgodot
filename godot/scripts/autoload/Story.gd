@@ -63,7 +63,7 @@ const BOOKSHELF_FALLBACK := {"BookOrSculptureText": "Crammed full of POKéMON bo
 	"PokemonStuffText": "Wow! Tons of POKéMON stuff!", "ElevatorText": "This is an elevator.",
 	"IndigoPlateauStatues": "INDIGO PLATEAU\fThe ultimate goal of trainers! POKéMON LEAGUE HQ"}
 const SCRIPT_FILES := ["res://scripts/story/Pallet.gd", "res://scripts/story/Early.gd", "res://scripts/story/Mid.gd",
-	"res://scripts/story/Late.gd", "res://scripts/story/Extra.gd"]
+	"res://scripts/story/Late.gd", "res://scripts/story/Extra.gd", "res://scripts/story/Yellow.gd"]
 
 # ------------------------------------------------------------------ injection points (tests / integration)
 ## Optional explicit Overworld host (the Overworld may call Story.set_host(self)); tests put a fake here.
@@ -110,6 +110,7 @@ var _last_enc: Dictionary = {}   # the encounter of the battle overlay currently
 
 func _ready() -> void:
 	pokedata = _load_json("res://data/pokedata.json")
+	GameData.sync_story(pokedata)   # the active version's trades / rods / marts / prizes
 	_patch_trainer_headers()
 	for path in SCRIPT_FILES:
 		if not ResourceLoader.exists(path):
@@ -276,6 +277,8 @@ func raw(label: String) -> String:
 	var key := label.trim_prefix("_")
 	if text_override.has(key):
 		return str(text_override[key])
+	if GameData.version_text.has(key):   # this version's own wording (Yellow rewrote many NPC lines)
+		return str(GameData.version_text[key])
 	var u := get_ui()
 	if u and u.has_method("raw_text"):
 		return str(u.call("raw_text", key))
@@ -413,6 +416,8 @@ func is_shown(id: String, map_name: String = "") -> bool:
 	var m := map_name if map_name != "" else mapname()
 	var k := key(m, id)
 	var o := obj(id, m)
+	if o.get("removed", false):   # an NPC this version's map doesn't have (the YELLOW overlay): scripts can't bring it back
+		return false
 	if o.has("item") and flag("GOT_" + k):
 		return false
 	if GameState.toggles.has(k):
@@ -442,7 +447,7 @@ func show(id: String, map_name: String = "", pos: Vector2i = Vector2i(-1, -1)) -
 	if m != mapname():
 		return id
 	var o := obj(id, m)
-	if o.is_empty():
+	if o.is_empty() or o.get("removed", false):
 		return ""
 	if not actor(id):
 		var c := pos if pos.x >= 0 else Vector2i(int(o.get("x", 0)), int(o.get("y", 0)))
@@ -741,6 +746,20 @@ func rival_party(base: int) -> int:
 	var off := {"CHARMANDER": 1, "SQUIRTLE": 2, "BULBASAUR": 3}
 	return base + int(off.get(GameState.starter, 1)) - 1
 
+## YELLOW: the rival always has EEVEE; his later parties differ by which Eevee evolution he is heading for
+## (GameState.rival_eevee). Callers pass the RED party number (RED = base + starter offset; here starter offset is 1).
+func yellow_rival_party(cls: String, red_n: int) -> int:
+	var v := ["JOLTEON", "FLAREON", "VAPOREON"].find(GameState.rival_eevee)
+	v = maxi(v, 0)
+	match cls:
+		"RIVAL1":
+			return {1: 1, 4: 2, 7: 3}.get(red_n, red_n)
+		"RIVAL2":
+			return {1: 1, 4: 2 + v, 7: 5 + v, 10: 8 + v}.get(red_n, red_n)
+		"RIVAL3":
+			return 1 + v
+	return red_n
+
 ## S.give: "{PLAYER} received ITEM!" (or `msg`), with the right jingle.
 func give(item: String, n: int = 1, msg: String = "") -> bool:
 	if not bag_add(item, n):
@@ -887,6 +906,25 @@ func in_game_trade(idx: int, texts: Dictionary) -> void:
 	await say(GameState.player_name + " traded " + mon_name(m) + " for " + str(tr["nick"]) + "!")
 	await say(texts.get("done", "Thanks!"))
 
+## Cable Club TRADE CENTER with nobody on the other end of the link cable. The cartridges need a second Game Boy to
+## trade, which is the only way KADABRA, MACHOKE, GRAVELER and HAUNTER evolve; this port lets you send one of your own
+## POKeMON through the machine (to yourself) so those four lines, and everything that needs them, stay reachable.
+func solo_trade_center() -> void:
+	if not await ask("Use the TRADE CENTER by yourself?\fA POKéMON sent through the link comes back changed, if it evolves by trading."):
+		return
+	var i := await party_screen("Send which POKéMON?")
+	if i < 0:
+		return
+	var m: GameState.PartyMon = GameState.party[i]
+	var to := FieldItems.trade_target(m)
+	if to == "":
+		await say("Nothing happened. %s doesn't evolve by trading." % m.display_name())
+		return
+	await fade_out(10)
+	await wait(40)
+	await fade_in(10)
+	await FieldItems.evolve(m, to, FieldItems.StoryPS.new())
+
 func trade_animation(give_m: Object, get_m: Object) -> void:
 	var u := get_ui()
 	if u and u.has_method("trade_animation"):
@@ -900,6 +938,8 @@ func trade_animation(give_m: Object, get_m: Object) -> void:
 # ================================================================== battles
 ## S.battle(cls, n, {win_text, lose_text, no_blackout}) -> "win"|"lose"|"run"|"caught"
 func battle(cls: String, n: int = 1, opts: Dictionary = {}) -> String:
+	if GameState.is_yellow() and cls.begins_with("RIVAL"):
+		n = yellow_rival_party(cls, n)
 	var tc: Dictionary = GameData.trainer_classes.get(cls, {"name": cls, "money": 1000})
 	var is_rival := cls.begins_with("RIVAL")
 	var display: String = opts.get("display_name", GameState.rival_name if is_rival else LEADERS.get(cls, str(tc.get("name", cls))))
@@ -943,6 +983,8 @@ func in_safari() -> bool:
 	return flag("EVENT_IN_SAFARI_ZONE") and GameState.safari_steps >= 0
 
 func _run_battle(enc: Dictionary) -> String:
+	if str(enc.get("kind", "wild")) == "trainer":
+		GameState.flags.erase(EncounterSystem.GLITCH_FLAG)   # a trainer's name overwrites the Old Man glitch's name buffer
 	var r := "win"
 	if battle_override.is_valid():
 		r = str(await battle_override.call(enc))
@@ -972,6 +1014,7 @@ func award_badge(badge: String, text: String = "") -> void:
 		GameState.badges.append(badge)
 		GameState.badge_earned.emit(badge)
 	sfx("get_badge")
+	PikachuBuddy.react("badge")
 	music("badge", true)
 	await say(text if text != "" else GameState.player_name + " received the " + badge + "!")
 	map_music()
@@ -1119,6 +1162,8 @@ func on_step(c: Variant = null) -> bool:
 	if _scripted > 0:
 		return false
 	GameState.steps += 1
+	if GameState.steps % 256 == 0:
+		PikachuBuddy.event(PikachuBuddy.WALKING)   # YELLOW: a long walk together makes PIKACHU fonder of you
 	if not GameState.daycare.is_empty():
 		GameState.daycare["steps"] = int(GameState.daycare.get("steps", 0)) + 1
 	var m := mapname()
@@ -1364,6 +1409,7 @@ func nurse_heal(o: Dictionary) -> void:
 		GameState.last_heal_cell = spot
 	face(id, "down")
 	map_music()
+	PikachuBuddy.react("heal")   # YELLOW: PIKACHU is happy to be rested
 	await say(tf("PokemonFightingFitText", "Thank you!\fYour POKéMON are fighting fit!"))
 	await say(tf("PokemonCenterFarewellText", "We hope to see you again!"))
 

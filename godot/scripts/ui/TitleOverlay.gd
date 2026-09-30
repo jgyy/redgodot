@@ -10,11 +10,19 @@ const LOGO_RED: Texture2D = preload("res://assets/ui/title_logo_red.png")
 var t := 0
 var hide_hints := false
 var fade_color := Color(0, 0, 0, 0)
+## The version picked on NEW GAME ("RED" | "BLUE" | "YELLOW"): shown under the logo in that version's colour.
+var version := "":
+	set(v):
+		version = v
+		queue_redraw()
 
 func _draw() -> void:
 	var bob := roundf(sin(t / 30.0) * 2.0)
 	Px.blit(self, LOGO_BIG, 160 - (LOGO_BIG.get_width() >> 1), 12 + bob)
 	Px.blit(self, LOGO_RED, 160 - (LOGO_RED.get_width() >> 1), 44 + bob)
+	if version != "":
+		var lab := GameState.version_title(version) + " VERSION"
+		Px.text_outlined(self, lab, 160 - Px.measure(lab) / 2.0, 84, GameState.version_color(version).lightened(0.35), Color("#101018"))
 	if not hide_hints and (t / 30) % 2 == 0:
 		var tx := "PRESS START"
 		Px.text_outlined(self, tx, 160 - Px.measure(tx) / 2.0, 164, Color("#fff8e0"), Color("#301818"))

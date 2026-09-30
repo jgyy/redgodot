@@ -1,0 +1,5927 @@
+{
+ "tolerance_mm": 6.0,
+ "frames_per_clip": 3,
+ "clips": "19 gameplay clips (Surf excluded)",
+ "root_exclusion_rows": 1.9,
+ "budget": {
+  "static_per_character": 35,
+  "animated_per_character": 600
+ },
+ "characters": {
+  "red": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 1,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 134,
+    "skin_poke": 41,
+    "limb_vs_rest": 16
+   },
+   "worst_mm": {
+    "cloth_in_body": 90.3,
+    "skin_poke": 25.2,
+    "limb_vs_rest": 25.1
+   },
+   "total": 191,
+   "per_clip_new": {
+    "Idle": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Walk": {
+     "cloth_in_body": 4,
+     "skin_poke": 1,
+     "limb_vs_rest": 3
+    },
+    "Run": {
+     "cloth_in_body": 8,
+     "skin_poke": 1,
+     "limb_vs_rest": 3
+    },
+    "Wave": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 8
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 2,
+     "limb_vs_rest": 1
+    },
+    "Bow": {
+     "cloth_in_body": 19,
+     "skin_poke": 1,
+     "limb_vs_rest": 0
+    },
+    "Point": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sleep": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Surprised": {
+     "cloth_in_body": 19,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 11,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 6,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 23,
+     "skin_poke": 1,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 32,
+     "skin_poke": 34,
+     "limb_vs_rest": 1
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "placket": 133,
+     "sleeveL": 54,
+     "top": 45,
+     "sleeveR": 44,
+     "sole": 34,
+     "shoe": 21
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 17,
+     "pants>thigh_R": 6,
+     "top>upper_arm_R": 5,
+     "body>thigh_R": 4,
+     "body>upper_arm_L": 4,
+     "body>trunk": 1
+    }
+   },
+   "seconds": 23.7
+  },
+  "daisy": {
+   "rest": {
+    "cloth_in_body": 28,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 351,
+    "skin_poke": 35,
+    "limb_vs_rest": 113
+   },
+   "worst_mm": {
+    "cloth_in_body": 104.3,
+    "skin_poke": 24.9,
+    "limb_vs_rest": 104.0
+   },
+   "total": 499,
+   "per_clip_new": {
+    "Idle": {
+     "cloth_in_body": 17,
+     "skin_poke": 0,
+     "limb_vs_rest": 4
+    },
+    "Walk": {
+     "cloth_in_body": 34,
+     "skin_poke": 0,
+     "limb_vs_rest": 30
+    },
+    "Run": {
+     "cloth_in_body": 84,
+     "skin_poke": 4,
+     "limb_vs_rest": 36
+    },
+    "Talk": {
+     "cloth_in_body": 10,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Wave": {
+     "cloth_in_body": 20,
+     "skin_poke": 0,
+     "limb_vs_rest": 8
+    },
+    "Cheer": {
+     "cloth_in_body": 14,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Nod": {
+     "cloth_in_body": 5,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 21,
+     "skin_poke": 0,
+     "limb_vs_rest": 15
+    },
+    "Laugh": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 8
+    },
+    "Bow": {
+     "cloth_in_body": 24,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Point": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sleep": {
+     "cloth_in_body": 21,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Surprised": {
+     "cloth_in_body": 13,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Stretch": {
+     "cloth_in_body": 18,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Dance": {
+     "cloth_in_body": 7,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 29,
+     "skin_poke": 31,
+     "limb_vs_rest": 5
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "side_lock": 1436,
+     "hair_back": 429,
+     "skirt": 138,
+     "sole": 29,
+     "top": 23,
+     "sleeveR": 18
+    },
+    "limb_vs_rest": {
+     "hair_back>thigh_L": 42,
+     "hair_back>thigh_R": 36,
+     "skirt>thigh_R": 29,
+     "hair_back>upper_arm_L": 22,
+     "skirt>thigh_L": 21,
+     "top>upper_arm_L": 21
+    }
+   },
+   "seconds": 29.3
+  },
+  "beauty": {
+   "rest": {
+    "cloth_in_body": 31,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 329,
+    "skin_poke": 31,
+    "limb_vs_rest": 111
+   },
+   "worst_mm": {
+    "cloth_in_body": 96.3,
+    "skin_poke": 25.1,
+    "limb_vs_rest": 132.7
+   },
+   "total": 471,
+   "per_clip_new": {
+    "Idle": {
+     "cloth_in_body": 15,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Walk": {
+     "cloth_in_body": 36,
+     "skin_poke": 0,
+     "limb_vs_rest": 32
+    },
+    "Run": {
+     "cloth_in_body": 78,
+     "skin_poke": 3,
+     "limb_vs_rest": 37
+    },
+    "Talk": {
+     "cloth_in_body": 8,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Wave": {
+     "cloth_in_body": 19,
+     "skin_poke": 0,
+     "limb_vs_rest": 7
+    },
+    "Cheer": {
+     "cloth_in_body": 12,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Nod": {
+     "cloth_in_body": 7,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Shake": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 13,
+     "skin_poke": 0,
+     "limb_vs_rest": 12
+    },
+    "Laugh": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 6
+    },
+    "Bow": {
+     "cloth_in_body": 21,
+     "skin_poke": 2,
+     "limb_vs_rest": 0
+    },
+    "Point": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sleep": {
+     "cloth_in_body": 19,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Surprised": {
+     "cloth_in_body": 5,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Stretch": {
+     "cloth_in_body": 13,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Dance": {
+     "cloth_in_body": 8,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sad": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 35,
+     "skin_poke": 26,
+     "limb_vs_rest": 7
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "side_lock": 1434,
+     "hair_back": 426,
+     "skirt": 145,
+     "brim": 62,
+     "top": 43,
+     "sole": 39
+    },
+    "limb_vs_rest": {
+     "hair_back>thigh_R": 34,
+     "hair_back>thigh_L": 33,
+     "skirt>thigh_R": 32,
+     "skirt>thigh_L": 22,
+     "hair_back>upper_arm_L": 20,
+     "top>upper_arm_L": 18
+    }
+   },
+   "seconds": 24.9
+  },
+  "little_boy": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 49,
+    "skin_poke": 29,
+    "limb_vs_rest": 11
+   },
+   "worst_mm": {
+    "cloth_in_body": 17.1,
+    "skin_poke": 21.5,
+    "limb_vs_rest": 23.9
+   },
+   "total": 89,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Run": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Wave": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 7
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Surprised": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 34,
+     "skin_poke": 29,
+     "limb_vs_rest": 1
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "sole": 36,
+     "top": 29,
+     "shoe": 23,
+     "pants": 4
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 8,
+     "body>upper_arm_L": 4,
+     "pants>thigh_R": 3,
+     "pants>thigh_L": 2,
+     "top>upper_arm_R": 2
+    }
+   },
+   "seconds": 23.3
+  },
+  "hiker": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 250,
+    "skin_poke": 26,
+    "limb_vs_rest": 26
+   },
+   "worst_mm": {
+    "cloth_in_body": 53.5,
+    "skin_poke": 25.5,
+    "limb_vs_rest": 32.0
+   },
+   "total": 302,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Run": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Wave": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 12
+    },
+    "Laugh": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 10
+    },
+    "Bow": {
+     "cloth_in_body": 32,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sleep": {
+     "cloth_in_body": 137,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 37,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sad": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 31,
+     "skin_poke": 26,
+     "limb_vs_rest": 1
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "beard": 503,
+     "top": 33,
+     "sole": 33,
+     "backpack": 31,
+     "strap": 23,
+     "shoe": 21
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 23,
+     "top>upper_arm_R": 18,
+     "body>upper_arm_L": 15,
+     "body>upper_arm_R": 8,
+     "pants>thigh_R": 2,
+     "top>trunk": 2
+    }
+   },
+   "seconds": 27.1
+  },
+  "gambler": {
+   "rest": {
+    "cloth_in_body": 9,
+    "skin_poke": 2,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 79,
+    "skin_poke": 29,
+    "limb_vs_rest": 20
+   },
+   "worst_mm": {
+    "cloth_in_body": 21.3,
+    "skin_poke": 23.7,
+    "limb_vs_rest": 35.5
+   },
+   "total": 128,
+   "per_clip_new": {
+    "Idle": {
+     "cloth_in_body": 1,
+     "skin_poke": 1,
+     "limb_vs_rest": 0
+    },
+    "Walk": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Run": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Wave": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 9,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 12
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Bow": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Surprised": {
+     "cloth_in_body": 7,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 6,
+     "skin_poke": 1,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 30,
+     "skin_poke": 25,
+     "limb_vs_rest": 2
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "temple": 503,
+     "top": 79,
+     "sole": 39,
+     "shoe": 26,
+     "tie": 2
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 17,
+     "top>upper_arm_R": 9,
+     "body>upper_arm_L": 8,
+     "top>trunk": 3,
+     "pants>thigh_L": 2,
+     "body>upper_arm_R": 2
+    }
+   },
+   "seconds": 25.5
+  },
+  "clerk": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 2,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 43,
+    "skin_poke": 27,
+    "limb_vs_rest": 19
+   },
+   "worst_mm": {
+    "cloth_in_body": 17.9,
+    "skin_poke": 23.7,
+    "limb_vs_rest": 32.4
+   },
+   "total": 89,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Run": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Cheer": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 12
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Surprised": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 29,
+     "skin_poke": 25,
+     "limb_vs_rest": 2
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "sole": 39,
+     "top": 28,
+     "shoe": 26
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 13,
+     "body>upper_arm_L": 8,
+     "top>upper_arm_R": 7,
+     "top>trunk": 3,
+     "pants>thigh_L": 2,
+     "body>trunk": 2
+    }
+   },
+   "seconds": 24.7
+  },
+  "nurse": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 385,
+    "skin_poke": 32,
+    "limb_vs_rest": 161
+   },
+   "worst_mm": {
+    "cloth_in_body": 94.2,
+    "skin_poke": 24.4,
+    "limb_vs_rest": 110.8
+   },
+   "total": 578,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 41,
+     "skin_poke": 0,
+     "limb_vs_rest": 24
+    },
+    "Run": {
+     "cloth_in_body": 158,
+     "skin_poke": 3,
+     "limb_vs_rest": 113
+    },
+    "Wave": {
+     "cloth_in_body": 8,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shake": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 5,
+     "skin_poke": 0,
+     "limb_vs_rest": 11
+    },
+    "Laugh": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Bow": {
+     "cloth_in_body": 118,
+     "skin_poke": 1,
+     "limb_vs_rest": 5
+    },
+    "Point": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sleep": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Surprised": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 6,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 34,
+     "skin_poke": 28,
+     "limb_vs_rest": 5
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "apron": 359,
+     "skirt": 135,
+     "top": 74,
+     "sole": 33,
+     "shoe": 15
+    },
+    "limb_vs_rest": {
+     "apron>thigh_L": 54,
+     "apron>thigh_R": 50,
+     "skirt>thigh_R": 32,
+     "top>upper_arm_L": 25,
+     "skirt>thigh_L": 21,
+     "body>upper_arm_L": 16
+    }
+   },
+   "seconds": 23.8
+  },
+  "middle_aged_man": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 51,
+    "skin_poke": 27,
+    "limb_vs_rest": 34
+   },
+   "worst_mm": {
+    "cloth_in_body": 17.9,
+    "skin_poke": 24.0,
+    "limb_vs_rest": 27.2
+   },
+   "total": 112,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Run": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Wave": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shake": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 6,
+     "skin_poke": 0,
+     "limb_vs_rest": 26
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 4
+    },
+    "Salute": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sad": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 32,
+     "skin_poke": 27,
+     "limb_vs_rest": 1
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "sole": 38,
+     "top": 33,
+     "shoe": 25
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 33,
+     "body>upper_arm_L": 13,
+     "top>upper_arm_R": 7,
+     "top>trunk": 5,
+     "pants>thigh_L": 3,
+     "body>trunk": 2
+    }
+   },
+   "seconds": 25.6
+  },
+  "cook": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 2,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 91,
+    "skin_poke": 29,
+    "limb_vs_rest": 20
+   },
+   "worst_mm": {
+    "cloth_in_body": 17.9,
+    "skin_poke": 23.7,
+    "limb_vs_rest": 35.5
+   },
+   "total": 140,
+   "per_clip_new": {
+    "Idle": {
+     "cloth_in_body": 1,
+     "skin_poke": 1,
+     "limb_vs_rest": 0
+    },
+    "Walk": {
+     "cloth_in_body": 6,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Run": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Wave": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 19,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 12
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Sleep": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Surprised": {
+     "cloth_in_body": 9,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 9,
+     "skin_poke": 1,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 31,
+     "skin_poke": 25,
+     "limb_vs_rest": 2
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "top": 83,
+     "scarf": 65,
+     "sole": 39,
+     "shoe": 26
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 17,
+     "top>upper_arm_R": 9,
+     "body>upper_arm_L": 8,
+     "top>trunk": 3,
+     "pants>thigh_L": 2,
+     "body>upper_arm_R": 2
+    }
+   },
+   "seconds": 28.1
+  },
+  "gameboy_kid": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 39,
+    "skin_poke": 30,
+    "limb_vs_rest": 8
+   },
+   "worst_mm": {
+    "cloth_in_body": 21.3,
+    "skin_poke": 24.6,
+    "limb_vs_rest": 17.6
+   },
+   "total": 77,
+   "per_clip_new": {
+    "Run": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 8
+    },
+    "Surprised": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 29,
+     "skin_poke": 30,
+     "limb_vs_rest": 0
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "sole": 35,
+     "shoe": 25,
+     "top": 12
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 6,
+     "body>upper_arm_L": 3,
+     "top>trunk": 2
+    }
+   },
+   "seconds": 26.3
+  },
+  "mr_fuji": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 192,
+    "skin_poke": 56,
+    "limb_vs_rest": 53
+   },
+   "worst_mm": {
+    "cloth_in_body": 54.4,
+    "skin_poke": 24.4,
+    "limb_vs_rest": 74.5
+   },
+   "total": 301,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 37,
+     "skin_poke": 19,
+     "limb_vs_rest": 30
+    },
+    "Run": {
+     "cloth_in_body": 19,
+     "skin_poke": 18,
+     "limb_vs_rest": 9
+    },
+    "Wave": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 13,
+     "skin_poke": 1,
+     "limb_vs_rest": 2
+    },
+    "Think": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 8
+    },
+    "Sleep": {
+     "cloth_in_body": 76,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Surprised": {
+     "cloth_in_body": 7,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 28,
+     "skin_poke": 18,
+     "limb_vs_rest": 2
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "beard": 185,
+     "robe_skirt": 127,
+     "robe": 72,
+     "sleeve_cuff": 37,
+     "sole": 33,
+     "shoe": 24
+    },
+    "limb_vs_rest": {
+     "robe_skirt>thigh_L": 37,
+     "robe_skirt>thigh_R": 31,
+     "robe_skirt>shin_L": 18,
+     "robe_skirt>shin_R": 14,
+     "robe>upper_arm_L": 13,
+     "body>upper_arm_L": 5
+    }
+   },
+   "seconds": 26.8
+  },
+  "lance": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 136,
+    "skin_poke": 27,
+    "limb_vs_rest": 89
+   },
+   "worst_mm": {
+    "cloth_in_body": 84.3,
+    "skin_poke": 26.2,
+    "limb_vs_rest": 63.8
+   },
+   "total": 252,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Run": {
+     "cloth_in_body": 6,
+     "skin_poke": 0,
+     "limb_vs_rest": 6
+    },
+    "Talk": {
+     "cloth_in_body": 7,
+     "skin_poke": 0,
+     "limb_vs_rest": 11
+    },
+    "Wave": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 36,
+     "skin_poke": 0,
+     "limb_vs_rest": 14
+    },
+    "Think": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 13
+    },
+    "Laugh": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 8
+    },
+    "Point": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sleep": {
+     "cloth_in_body": 5,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Surprised": {
+     "cloth_in_body": 6,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Salute": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 30,
+     "skin_poke": 0,
+     "limb_vs_rest": 31
+    },
+    "Dance": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 32,
+     "skin_poke": 27,
+     "limb_vs_rest": 2
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "cape": 183,
+     "top": 38,
+     "sole": 33,
+     "shoe": 29,
+     "collar": 5
+    },
+    "limb_vs_rest": {
+     "cape>shin_L": 43,
+     "cape>thigh_L": 40,
+     "cape>shin_R": 37,
+     "cape>thigh_R": 36,
+     "top>upper_arm_L": 26,
+     "body>upper_arm_L": 17
+    }
+   },
+   "seconds": 26.0
+  },
+  "agatha": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 391,
+    "skin_poke": 35,
+    "limb_vs_rest": 163
+   },
+   "worst_mm": {
+    "cloth_in_body": 55.0,
+    "skin_poke": 24.6,
+    "limb_vs_rest": 96.7
+   },
+   "total": 589,
+   "per_clip_new": {
+    "Idle": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Walk": {
+     "cloth_in_body": 51,
+     "skin_poke": 0,
+     "limb_vs_rest": 24
+    },
+    "Run": {
+     "cloth_in_body": 147,
+     "skin_poke": 4,
+     "limb_vs_rest": 108
+    },
+    "Wave": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shake": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 8
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 4
+    },
+    "Bow": {
+     "cloth_in_body": 134,
+     "skin_poke": 0,
+     "limb_vs_rest": 14
+    },
+    "Point": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sleep": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Surprised": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sad": {
+     "cloth_in_body": 0,
+     "skin_poke": 2,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 32,
+     "skin_poke": 29,
+     "limb_vs_rest": 5
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "apron": 481,
+     "skirt": 135,
+     "top": 46,
+     "sole": 33,
+     "shoe": 17
+    },
+    "limb_vs_rest": {
+     "apron>thigh_L": 60,
+     "apron>thigh_R": 59,
+     "skirt>thigh_R": 28,
+     "skirt>thigh_L": 19,
+     "top>upper_arm_R": 16,
+     "top>upper_arm_L": 14
+    }
+   },
+   "seconds": 26.4
+  },
+  "erika": {
+   "rest": {
+    "cloth_in_body": 1,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 158,
+    "skin_poke": 55,
+    "limb_vs_rest": 56
+   },
+   "worst_mm": {
+    "cloth_in_body": 58.2,
+    "skin_poke": 24.4,
+    "limb_vs_rest": 74.5
+   },
+   "total": 269,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 39,
+     "skin_poke": 18,
+     "limb_vs_rest": 25
+    },
+    "Run": {
+     "cloth_in_body": 22,
+     "skin_poke": 16,
+     "limb_vs_rest": 8
+    },
+    "Wave": {
+     "cloth_in_body": 14,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 11,
+     "skin_poke": 2,
+     "limb_vs_rest": 2
+    },
+    "Think": {
+     "cloth_in_body": 9,
+     "skin_poke": 0,
+     "limb_vs_rest": 12
+    },
+    "Laugh": {
+     "cloth_in_body": 5,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Bow": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Point": {
+     "cloth_in_body": 7,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sleep": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Surprised": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 36,
+     "skin_poke": 19,
+     "limb_vs_rest": 5
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "robe": 128,
+     "robe_skirt": 121,
+     "sole": 33,
+     "sleeve_cuff": 31,
+     "shoe": 15
+    },
+    "limb_vs_rest": {
+     "robe_skirt>thigh_L": 33,
+     "robe_skirt>thigh_R": 29,
+     "robe>upper_arm_L": 27,
+     "body>upper_arm_L": 16,
+     "robe_skirt>shin_L": 14,
+     "robe_skirt>shin_R": 14
+    }
+   },
+   "seconds": 25.3
+  },
+  "blue": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 52,
+    "skin_poke": 32,
+    "limb_vs_rest": 21
+   },
+   "worst_mm": {
+    "cloth_in_body": 17.1,
+    "skin_poke": 25.8,
+    "limb_vs_rest": 27.7
+   },
+   "total": 105,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Run": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 4
+    },
+    "Wave": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 11
+    },
+    "Laugh": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Sleep": {
+     "cloth_in_body": 5,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 39,
+     "skin_poke": 32,
+     "limb_vs_rest": 3
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "sole": 43,
+     "shoe": 37,
+     "top": 26,
+     "collar": 5
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 16,
+     "body>upper_arm_L": 8,
+     "top>upper_arm_R": 8,
+     "pants>thigh_R": 3,
+     "top>thigh_L": 2,
+     "pants>thigh_L": 2
+    }
+   },
+   "seconds": 28.9
+  },
+  "girl": {
+   "rest": {
+    "cloth_in_body": 1,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 160,
+    "skin_poke": 33,
+    "limb_vs_rest": 58
+   },
+   "worst_mm": {
+    "cloth_in_body": 63.1,
+    "skin_poke": 24.6,
+    "limb_vs_rest": 118.6
+   },
+   "total": 251,
+   "per_clip_new": {
+    "Idle": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Walk": {
+     "cloth_in_body": 24,
+     "skin_poke": 0,
+     "limb_vs_rest": 20
+    },
+    "Run": {
+     "cloth_in_body": 29,
+     "skin_poke": 4,
+     "limb_vs_rest": 18
+    },
+    "Wave": {
+     "cloth_in_body": 5,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 28,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 12
+    },
+    "Laugh": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 4
+    },
+    "Bow": {
+     "cloth_in_body": 16,
+     "skin_poke": 2,
+     "limb_vs_rest": 0
+    },
+    "Point": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sleep": {
+     "cloth_in_body": 5,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Surprised": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 8,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 32,
+     "skin_poke": 27,
+     "limb_vs_rest": 4
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "skirt": 140,
+     "hair_tail": 77,
+     "sole": 35,
+     "top": 24,
+     "shoe": 15
+    },
+    "limb_vs_rest": {
+     "skirt>thigh_R": 29,
+     "top>upper_arm_L": 22,
+     "skirt>thigh_L": 21,
+     "top>upper_arm_R": 13,
+     "body>upper_arm_L": 12,
+     "skirt>shin_R": 5
+    }
+   },
+   "seconds": 25.3
+  },
+  "cooltrainer_f": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 210,
+    "skin_poke": 26,
+    "limb_vs_rest": 22
+   },
+   "worst_mm": {
+    "cloth_in_body": 33.4,
+    "skin_poke": 25.1,
+    "limb_vs_rest": 37.7
+   },
+   "total": 258,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Run": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Wave": {
+     "cloth_in_body": 8,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 31,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 10
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 4
+    },
+    "Bow": {
+     "cloth_in_body": 129,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Surprised": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 35,
+     "skin_poke": 26,
+     "limb_vs_rest": 6
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "buckle": 183,
+     "top": 74,
+     "ball": 67,
+     "sole": 39,
+     "shoe": 28,
+     "hair_tail": 26
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 18,
+     "top>upper_arm_R": 13,
+     "body>upper_arm_L": 12,
+     "body>upper_arm_R": 7,
+     "pants>thigh_R": 4,
+     "pants>thigh_L": 3
+    }
+   },
+   "seconds": 26.0
+  },
+  "super_nerd": {
+   "rest": {
+    "cloth_in_body": 6,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 45,
+    "skin_poke": 28,
+    "limb_vs_rest": 20
+   },
+   "worst_mm": {
+    "cloth_in_body": 19.3,
+    "skin_poke": 25.1,
+    "limb_vs_rest": 20.9
+   },
+   "total": 93,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Run": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Cheer": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 10
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Bow": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Surprised": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 30,
+     "skin_poke": 28,
+     "limb_vs_rest": 4
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "temple": 348,
+     "sole": 39,
+     "shoe": 27,
+     "top": 13,
+     "tie": 1
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 13,
+     "body>upper_arm_L": 8,
+     "top>upper_arm_R": 8,
+     "pants>thigh_R": 3,
+     "pants>thigh_L": 2,
+     "body>upper_arm_R": 2
+    }
+   },
+   "seconds": 23.2
+  },
+  "swimmer": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 0,
+    "skin_poke": 0,
+    "limb_vs_rest": 12
+   },
+   "worst_mm": {
+    "cloth_in_body": 0.0,
+    "skin_poke": 0.0,
+    "limb_vs_rest": 28.0
+   },
+   "total": 12,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Run": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 4
+    },
+    "Think": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 6
+    }
+   },
+   "culprits": {
+    "limb_vs_rest": {
+     "body>upper_arm_L": 10,
+     "pants>thigh_L": 7,
+     "pants>thigh_R": 2,
+     "body>thigh_L": 1
+    }
+   },
+   "seconds": 21.9
+  },
+  "channeler": {
+   "rest": {
+    "cloth_in_body": 11,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 325,
+    "skin_poke": 59,
+    "limb_vs_rest": 137
+   },
+   "worst_mm": {
+    "cloth_in_body": 90.3,
+    "skin_poke": 24.9,
+    "limb_vs_rest": 75.3
+   },
+   "total": 521,
+   "per_clip_new": {
+    "Idle": {
+     "cloth_in_body": 21,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Walk": {
+     "cloth_in_body": 42,
+     "skin_poke": 17,
+     "limb_vs_rest": 37
+    },
+    "Run": {
+     "cloth_in_body": 72,
+     "skin_poke": 18,
+     "limb_vs_rest": 25
+    },
+    "Talk": {
+     "cloth_in_body": 11,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Wave": {
+     "cloth_in_body": 11,
+     "skin_poke": 0,
+     "limb_vs_rest": 8
+    },
+    "Cheer": {
+     "cloth_in_body": 13,
+     "skin_poke": 2,
+     "limb_vs_rest": 2
+    },
+    "Nod": {
+     "cloth_in_body": 5,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 20,
+     "skin_poke": 0,
+     "limb_vs_rest": 19
+    },
+    "Laugh": {
+     "cloth_in_body": 14,
+     "skin_poke": 0,
+     "limb_vs_rest": 30
+    },
+    "Bow": {
+     "cloth_in_body": 15,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Point": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sleep": {
+     "cloth_in_body": 20,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Surprised": {
+     "cloth_in_body": 7,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 5,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Stretch": {
+     "cloth_in_body": 8,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Dance": {
+     "cloth_in_body": 8,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sad": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 36,
+     "skin_poke": 22,
+     "limb_vs_rest": 6
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "side_lock": 805,
+     "hair_back": 419,
+     "robe_skirt": 124,
+     "robe": 100,
+     "sleeve_cuff": 68,
+     "sole": 29
+    },
+    "limb_vs_rest": {
+     "hair_back>thigh_L": 45,
+     "hair_back>thigh_R": 45,
+     "robe_skirt>thigh_L": 33,
+     "robe_skirt>thigh_R": 28,
+     "robe>upper_arm_L": 22,
+     "hair_back>upper_arm_L": 19
+    }
+   },
+   "seconds": 24.1
+  },
+  "guard": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 2,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 96,
+    "skin_poke": 28,
+    "limb_vs_rest": 20
+   },
+   "worst_mm": {
+    "cloth_in_body": 18.2,
+    "skin_poke": 25.5,
+    "limb_vs_rest": 35.5
+   },
+   "total": 144,
+   "per_clip_new": {
+    "Idle": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Walk": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Run": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Wave": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 9,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 12
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Bow": {
+     "cloth_in_body": 27,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Surprised": {
+     "cloth_in_body": 7,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 6,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 31,
+     "skin_poke": 26,
+     "limb_vs_rest": 2
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "top": 79,
+     "sole": 39,
+     "buckle": 34,
+     "shoe": 28,
+     "tie": 2
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 17,
+     "top>upper_arm_R": 9,
+     "body>upper_arm_L": 8,
+     "top>trunk": 3,
+     "pants>thigh_L": 2,
+     "body>upper_arm_R": 2
+    }
+   },
+   "seconds": 25.6
+  },
+  "silph_worker_m": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 2,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 89,
+    "skin_poke": 29,
+    "limb_vs_rest": 20
+   },
+   "worst_mm": {
+    "cloth_in_body": 93.1,
+    "skin_poke": 23.7,
+    "limb_vs_rest": 35.5
+   },
+   "total": 138,
+   "per_clip_new": {
+    "Idle": {
+     "cloth_in_body": 1,
+     "skin_poke": 1,
+     "limb_vs_rest": 0
+    },
+    "Walk": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Run": {
+     "cloth_in_body": 14,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Wave": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 9,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 12
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Bow": {
+     "cloth_in_body": 9,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Surprised": {
+     "cloth_in_body": 7,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 6,
+     "skin_poke": 1,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 30,
+     "skin_poke": 25,
+     "limb_vs_rest": 2
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "placket": 110,
+     "top": 79,
+     "sole": 39,
+     "shoe": 26
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 17,
+     "top>upper_arm_R": 9,
+     "body>upper_arm_L": 8,
+     "top>trunk": 3,
+     "pants>thigh_L": 2,
+     "body>upper_arm_R": 2
+    }
+   },
+   "seconds": 26.0
+  },
+  "middle_aged_woman": {
+   "rest": {
+    "cloth_in_body": 1,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 364,
+    "skin_poke": 38,
+    "limb_vs_rest": 164
+   },
+   "worst_mm": {
+    "cloth_in_body": 96.3,
+    "skin_poke": 24.4,
+    "limb_vs_rest": 104.7
+   },
+   "total": 566,
+   "per_clip_new": {
+    "Idle": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Walk": {
+     "cloth_in_body": 46,
+     "skin_poke": 0,
+     "limb_vs_rest": 24
+    },
+    "Run": {
+     "cloth_in_body": 150,
+     "skin_poke": 5,
+     "limb_vs_rest": 111
+    },
+    "Wave": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shake": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 14
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 6
+    },
+    "Bow": {
+     "cloth_in_body": 102,
+     "skin_poke": 3,
+     "limb_vs_rest": 6
+    },
+    "Point": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sleep": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Surprised": {
+     "cloth_in_body": 5,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 7,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 35,
+     "skin_poke": 30,
+     "limb_vs_rest": 3
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "apron": 331,
+     "skirt": 122,
+     "top": 95,
+     "sole": 33,
+     "shoe": 15
+    },
+    "limb_vs_rest": {
+     "apron>thigh_L": 55,
+     "apron>thigh_R": 52,
+     "skirt>thigh_R": 30,
+     "top>upper_arm_L": 21,
+     "skirt>thigh_L": 19,
+     "top>upper_arm_R": 14
+    }
+   },
+   "seconds": 26.5
+  },
+  "safari_zone_worker": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 2,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 44,
+    "skin_poke": 28,
+    "limb_vs_rest": 19
+   },
+   "worst_mm": {
+    "cloth_in_body": 18.2,
+    "skin_poke": 25.5,
+    "limb_vs_rest": 32.4
+   },
+   "total": 91,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Run": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Cheer": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 12
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Surprised": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 30,
+     "skin_poke": 26,
+     "limb_vs_rest": 2
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "sole": 39,
+     "top": 28,
+     "shoe": 28
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 13,
+     "body>upper_arm_L": 8,
+     "top>upper_arm_R": 7,
+     "top>trunk": 3,
+     "pants>thigh_L": 2,
+     "body>trunk": 2
+    }
+   },
+   "seconds": 30.0
+  },
+  "giovanni": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 52,
+    "skin_poke": 28,
+    "limb_vs_rest": 8
+   },
+   "worst_mm": {
+    "cloth_in_body": 17.6,
+    "skin_poke": 23.9,
+    "limb_vs_rest": 18.0
+   },
+   "total": 88,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Run": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Wave": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 8,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Bow": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Surprised": {
+     "cloth_in_body": 1,
+     "skin_poke": 1,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 32,
+     "skin_poke": 27,
+     "limb_vs_rest": 1
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "sole": 39,
+     "top": 26,
+     "shoe": 24,
+     "tie": 2
+    },
+    "limb_vs_rest": {
+     "body>thigh_L": 5,
+     "pants>thigh_L": 5,
+     "top>upper_arm_R": 3,
+     "top>upper_arm_L": 2,
+     "body>upper_arm_L": 1
+    }
+   },
+   "seconds": 28.3
+  },
+  "bike_shop_clerk": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 2,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 43,
+    "skin_poke": 27,
+    "limb_vs_rest": 19
+   },
+   "worst_mm": {
+    "cloth_in_body": 17.9,
+    "skin_poke": 23.7,
+    "limb_vs_rest": 32.4
+   },
+   "total": 89,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Run": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Cheer": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 12
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Surprised": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 29,
+     "skin_poke": 25,
+     "limb_vs_rest": 2
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "sole": 39,
+     "top": 28,
+     "shoe": 26
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 13,
+     "body>upper_arm_L": 8,
+     "top>upper_arm_R": 7,
+     "top>trunk": 3,
+     "pants>thigh_L": 2,
+     "body>trunk": 2
+    }
+   },
+   "seconds": 26.7
+  },
+  "koga": {
+   "rest": {
+    "cloth_in_body": 19,
+    "skin_poke": 8,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 147,
+    "skin_poke": 41,
+    "limb_vs_rest": 21
+   },
+   "worst_mm": {
+    "cloth_in_body": 18.2,
+    "skin_poke": 25.0,
+    "limb_vs_rest": 32.4
+   },
+   "total": 209,
+   "per_clip_new": {
+    "Idle": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Walk": {
+     "cloth_in_body": 6,
+     "skin_poke": 5,
+     "limb_vs_rest": 2
+    },
+    "Run": {
+     "cloth_in_body": 8,
+     "skin_poke": 2,
+     "limb_vs_rest": 5
+    },
+    "Cheer": {
+     "cloth_in_body": 5,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 11
+    },
+    "Laugh": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Bow": {
+     "cloth_in_body": 39,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sleep": {
+     "cloth_in_body": 12,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Surprised": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 8,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 6,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 34,
+     "skin_poke": 26,
+     "limb_vs_rest": 2
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "scarf_tail": 1122,
+     "scarf": 54,
+     "buckle": 39,
+     "sole": 39,
+     "top": 28,
+     "shoe": 28
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 13,
+     "body>upper_arm_L": 8,
+     "top>upper_arm_R": 7,
+     "top>trunk": 3,
+     "pants>thigh_R": 2,
+     "pants>thigh_L": 2
+    }
+   },
+   "seconds": 28.0
+  },
+  "brock": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 46,
+    "skin_poke": 27,
+    "limb_vs_rest": 21
+   },
+   "worst_mm": {
+    "cloth_in_body": 17.3,
+    "skin_poke": 24.1,
+    "limb_vs_rest": 29.2
+   },
+   "total": 94,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Run": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Cheer": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 10
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 6
+    },
+    "Surprised": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 36,
+     "skin_poke": 27,
+     "limb_vs_rest": 2
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "sole": 41,
+     "shoe": 25,
+     "collar": 7,
+     "top": 7
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 21,
+     "top>upper_arm_R": 11,
+     "body>upper_arm_L": 9,
+     "body>upper_arm_R": 3,
+     "body>thigh_R": 2,
+     "pants>thigh_R": 2
+    }
+   },
+   "seconds": 25.4
+  },
+  "blaine": {
+   "rest": {
+    "cloth_in_body": 6,
+    "skin_poke": 2,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 189,
+    "skin_poke": 38,
+    "limb_vs_rest": 89
+   },
+   "worst_mm": {
+    "cloth_in_body": 54.0,
+    "skin_poke": 25.0,
+    "limb_vs_rest": 64.8
+   },
+   "total": 316,
+   "per_clip_new": {
+    "Idle": {
+     "cloth_in_body": 0,
+     "skin_poke": 1,
+     "limb_vs_rest": 0
+    },
+    "Walk": {
+     "cloth_in_body": 51,
+     "skin_poke": 2,
+     "limb_vs_rest": 44
+    },
+    "Run": {
+     "cloth_in_body": 28,
+     "skin_poke": 0,
+     "limb_vs_rest": 16
+    },
+    "Wave": {
+     "cloth_in_body": 8,
+     "skin_poke": 1,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 25,
+     "skin_poke": 1,
+     "limb_vs_rest": 0
+    },
+    "Shake": {
+     "cloth_in_body": 0,
+     "skin_poke": 2,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 24
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 1,
+     "limb_vs_rest": 1
+    },
+    "Bow": {
+     "cloth_in_body": 2,
+     "skin_poke": 1,
+     "limb_vs_rest": 0
+    },
+    "Point": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Surprised": {
+     "cloth_in_body": 9,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 6,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 10,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sad": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 37,
+     "skin_poke": 27,
+     "limb_vs_rest": 4
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "temple": 334,
+     "coat_tail": 142,
+     "coat": 75,
+     "lapel": 58,
+     "sole": 40,
+     "shoe": 17
+    },
+    "limb_vs_rest": {
+     "coat_tail>thigh_L": 54,
+     "coat_tail>thigh_R": 47,
+     "coat>upper_arm_L": 18,
+     "lapel>upper_arm_L": 15,
+     "top>upper_arm_L": 12,
+     "coat_tail>shin_L": 7
+    }
+   },
+   "seconds": 27.7
+  },
+  "oak": {
+   "rest": {
+    "cloth_in_body": 1,
+    "skin_poke": 3,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 180,
+    "skin_poke": 42,
+    "limb_vs_rest": 95
+   },
+   "worst_mm": {
+    "cloth_in_body": 54.3,
+    "skin_poke": 25.1,
+    "limb_vs_rest": 65.6
+   },
+   "total": 317,
+   "per_clip_new": {
+    "Idle": {
+     "cloth_in_body": 0,
+     "skin_poke": 3,
+     "limb_vs_rest": 0
+    },
+    "Walk": {
+     "cloth_in_body": 63,
+     "skin_poke": 4,
+     "limb_vs_rest": 44
+    },
+    "Run": {
+     "cloth_in_body": 36,
+     "skin_poke": 0,
+     "limb_vs_rest": 17
+    },
+    "Wave": {
+     "cloth_in_body": 0,
+     "skin_poke": 1,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 14,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 9,
+     "skin_poke": 1,
+     "limb_vs_rest": 26
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 1,
+     "limb_vs_rest": 1
+    },
+    "Surprised": {
+     "cloth_in_body": 10,
+     "skin_poke": 2,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 10,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 1,
+     "skin_poke": 1,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 6,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 30,
+     "skin_poke": 26,
+     "limb_vs_rest": 7
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "coat_tail": 141,
+     "coat": 77,
+     "pocket": 65,
+     "sole": 39,
+     "lapel": 28,
+     "shoe": 24
+    },
+    "limb_vs_rest": {
+     "coat_tail>thigh_L": 56,
+     "coat_tail>thigh_R": 49,
+     "coat>upper_arm_L": 29,
+     "lapel>upper_arm_L": 23,
+     "top>upper_arm_L": 17,
+     "body>upper_arm_L": 7
+    }
+   },
+   "seconds": 26.1
+  },
+  "little_girl": {
+   "rest": {
+    "cloth_in_body": 8,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 152,
+    "skin_poke": 30,
+    "limb_vs_rest": 69
+   },
+   "worst_mm": {
+    "cloth_in_body": 43.2,
+    "skin_poke": 24.2,
+    "limb_vs_rest": 65.3
+   },
+   "total": 251,
+   "per_clip_new": {
+    "Idle": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Walk": {
+     "cloth_in_body": 14,
+     "skin_poke": 0,
+     "limb_vs_rest": 11
+    },
+    "Run": {
+     "cloth_in_body": 33,
+     "skin_poke": 4,
+     "limb_vs_rest": 18
+    },
+    "Talk": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Wave": {
+     "cloth_in_body": 9,
+     "skin_poke": 0,
+     "limb_vs_rest": 7
+    },
+    "Cheer": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 14
+    },
+    "Think": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 6
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Bow": {
+     "cloth_in_body": 13,
+     "skin_poke": 1,
+     "limb_vs_rest": 0
+    },
+    "Point": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sleep": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Surprised": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 12,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Dance": {
+     "cloth_in_body": 25,
+     "skin_poke": 0,
+     "limb_vs_rest": 4
+    },
+    "Sad": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 25,
+     "skin_poke": 25,
+     "limb_vs_rest": 3
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "twin_tail": 384,
+     "skirt": 147,
+     "sole": 25,
+     "shoe": 10,
+     "top": 8
+    },
+    "limb_vs_rest": {
+     "twin_tail>upper_arm_R": 22,
+     "skirt>thigh_R": 19,
+     "twin_tail>upper_arm_L": 17,
+     "skirt>thigh_L": 13,
+     "top>upper_arm_L": 12,
+     "top>upper_arm_R": 8
+    }
+   },
+   "seconds": 24.5
+  },
+  "cooltrainer_m": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 2,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 118,
+    "skin_poke": 28,
+    "limb_vs_rest": 27
+   },
+   "worst_mm": {
+    "cloth_in_body": 92.8,
+    "skin_poke": 25.0,
+    "limb_vs_rest": 28.9
+   },
+   "total": 173,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Run": {
+     "cloth_in_body": 14,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Wave": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 8,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 6,
+     "skin_poke": 0,
+     "limb_vs_rest": 15
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 4
+    },
+    "Bow": {
+     "cloth_in_body": 31,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sleep": {
+     "cloth_in_body": 11,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Surprised": {
+     "cloth_in_body": 5,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 30,
+     "skin_poke": 26,
+     "limb_vs_rest": 4
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "placket": 110,
+     "top": 85,
+     "sole": 39,
+     "buckle": 29,
+     "shoe": 28,
+     "collar": 12
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 28,
+     "top>upper_arm_R": 16,
+     "body>upper_arm_L": 12,
+     "body>upper_arm_R": 4,
+     "pants>thigh_L": 2,
+     "body>thigh_R": 1
+    }
+   },
+   "seconds": 28.7
+  },
+  "scientist": {
+   "rest": {
+    "cloth_in_body": 5,
+    "skin_poke": 6,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 184,
+    "skin_poke": 42,
+    "limb_vs_rest": 107
+   },
+   "worst_mm": {
+    "cloth_in_body": 58.6,
+    "skin_poke": 23.7,
+    "limb_vs_rest": 65.9
+   },
+   "total": 333,
+   "per_clip_new": {
+    "Idle": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Walk": {
+     "cloth_in_body": 55,
+     "skin_poke": 0,
+     "limb_vs_rest": 45
+    },
+    "Run": {
+     "cloth_in_body": 25,
+     "skin_poke": 1,
+     "limb_vs_rest": 21
+    },
+    "Wave": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 18,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shake": {
+     "cloth_in_body": 0,
+     "skin_poke": 5,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 11,
+     "skin_poke": 1,
+     "limb_vs_rest": 31
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 2,
+     "limb_vs_rest": 4
+    },
+    "Sleep": {
+     "cloth_in_body": 0,
+     "skin_poke": 1,
+     "limb_vs_rest": 0
+    },
+    "Surprised": {
+     "cloth_in_body": 11,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 9,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 10,
+     "skin_poke": 1,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 31,
+     "skin_poke": 25,
+     "limb_vs_rest": 6
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "temple": 260,
+     "coat_tail": 144,
+     "coat": 121,
+     "lapel": 51,
+     "sole": 39,
+     "shoe": 26
+    },
+    "limb_vs_rest": {
+     "coat_tail>thigh_L": 58,
+     "coat_tail>thigh_R": 51,
+     "lapel>upper_arm_L": 25,
+     "coat>upper_arm_L": 19,
+     "coat>upper_arm_R": 11,
+     "top>upper_arm_L": 10
+    }
+   },
+   "seconds": 26.3
+  },
+  "gentleman": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 2,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 68,
+    "skin_poke": 29,
+    "limb_vs_rest": 20
+   },
+   "worst_mm": {
+    "cloth_in_body": 17.9,
+    "skin_poke": 23.7,
+    "limb_vs_rest": 35.5
+   },
+   "total": 117,
+   "per_clip_new": {
+    "Idle": {
+     "cloth_in_body": 1,
+     "skin_poke": 1,
+     "limb_vs_rest": 0
+    },
+    "Walk": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Run": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Wave": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 9,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 12
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Surprised": {
+     "cloth_in_body": 7,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 6,
+     "skin_poke": 1,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 30,
+     "skin_poke": 25,
+     "limb_vs_rest": 2
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "top": 79,
+     "sole": 39,
+     "shoe": 26
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 17,
+     "top>upper_arm_R": 9,
+     "body>upper_arm_L": 8,
+     "top>trunk": 3,
+     "pants>thigh_L": 2,
+     "body>upper_arm_R": 2
+    }
+   },
+   "seconds": 23.1
+  },
+  "fisher": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 2,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 44,
+    "skin_poke": 28,
+    "limb_vs_rest": 19
+   },
+   "worst_mm": {
+    "cloth_in_body": 18.2,
+    "skin_poke": 25.5,
+    "limb_vs_rest": 32.4
+   },
+   "total": 91,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Run": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Cheer": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 12
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Surprised": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 30,
+     "skin_poke": 26,
+     "limb_vs_rest": 2
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "sole": 39,
+     "top": 28,
+     "shoe": 28
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 13,
+     "body>upper_arm_L": 8,
+     "top>upper_arm_R": 7,
+     "top>trunk": 3,
+     "pants>thigh_L": 2,
+     "body>trunk": 2
+    }
+   },
+   "seconds": 25.2
+  },
+  "sailor": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 5,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 73,
+    "skin_poke": 40,
+    "limb_vs_rest": 19
+   },
+   "worst_mm": {
+    "cloth_in_body": 18.2,
+    "skin_poke": 25.5,
+    "limb_vs_rest": 32.4
+   },
+   "total": 132,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 7,
+     "skin_poke": 5,
+     "limb_vs_rest": 2
+    },
+    "Run": {
+     "cloth_in_body": 7,
+     "skin_poke": 4,
+     "limb_vs_rest": 3
+    },
+    "Cheer": {
+     "cloth_in_body": 6,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 11
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Sleep": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Surprised": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 8,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 34,
+     "skin_poke": 26,
+     "limb_vs_rest": 2
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "scarf": 48,
+     "sole": 39,
+     "top": 28,
+     "shoe": 28,
+     "pants": 18
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 13,
+     "body>upper_arm_L": 8,
+     "top>upper_arm_R": 7,
+     "top>trunk": 3,
+     "pants>thigh_R": 2,
+     "pants>thigh_L": 2
+    }
+   },
+   "seconds": 26.1
+  },
+  "silph_worker_f": {
+   "rest": {
+    "cloth_in_body": 28,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 336,
+    "skin_poke": 36,
+    "limb_vs_rest": 113
+   },
+   "worst_mm": {
+    "cloth_in_body": 104.3,
+    "skin_poke": 24.9,
+    "limb_vs_rest": 104.0
+   },
+   "total": 485,
+   "per_clip_new": {
+    "Idle": {
+     "cloth_in_body": 17,
+     "skin_poke": 0,
+     "limb_vs_rest": 4
+    },
+    "Walk": {
+     "cloth_in_body": 34,
+     "skin_poke": 0,
+     "limb_vs_rest": 30
+    },
+    "Run": {
+     "cloth_in_body": 84,
+     "skin_poke": 4,
+     "limb_vs_rest": 36
+    },
+    "Talk": {
+     "cloth_in_body": 10,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Wave": {
+     "cloth_in_body": 17,
+     "skin_poke": 0,
+     "limb_vs_rest": 8
+    },
+    "Cheer": {
+     "cloth_in_body": 11,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Nod": {
+     "cloth_in_body": 5,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 22,
+     "skin_poke": 0,
+     "limb_vs_rest": 15
+    },
+    "Laugh": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 8
+    },
+    "Bow": {
+     "cloth_in_body": 24,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Point": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sleep": {
+     "cloth_in_body": 21,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Surprised": {
+     "cloth_in_body": 5,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Stretch": {
+     "cloth_in_body": 17,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Dance": {
+     "cloth_in_body": 6,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 29,
+     "skin_poke": 32,
+     "limb_vs_rest": 5
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "side_lock": 1436,
+     "hair_back": 429,
+     "skirt": 138,
+     "top": 32,
+     "sole": 29,
+     "shoe": 16
+    },
+    "limb_vs_rest": {
+     "hair_back>thigh_L": 42,
+     "hair_back>thigh_R": 36,
+     "skirt>thigh_R": 29,
+     "hair_back>upper_arm_L": 22,
+     "skirt>thigh_L": 21,
+     "top>upper_arm_L": 21
+    }
+   },
+   "seconds": 26.6
+  },
+  "gym_guide": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 2,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 47,
+    "skin_poke": 27,
+    "limb_vs_rest": 19
+   },
+   "worst_mm": {
+    "cloth_in_body": 17.9,
+    "skin_poke": 23.7,
+    "limb_vs_rest": 32.4
+   },
+   "total": 93,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Run": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Cheer": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 12
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Surprised": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 29,
+     "skin_poke": 25,
+     "limb_vs_rest": 2
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "sole": 39,
+     "shoe": 26,
+     "sleeveL": 14,
+     "top": 12,
+     "sleeveR": 5
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 13,
+     "body>upper_arm_L": 8,
+     "top>upper_arm_R": 7,
+     "sleeveL>trunk": 3,
+     "pants>thigh_L": 2,
+     "body>trunk": 2
+    }
+   },
+   "seconds": 27.9
+  },
+  "granny": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 189,
+    "skin_poke": 36,
+    "limb_vs_rest": 47
+   },
+   "worst_mm": {
+    "cloth_in_body": 51.4,
+    "skin_poke": 25.2,
+    "limb_vs_rest": 80.9
+   },
+   "total": 272,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 25,
+     "skin_poke": 0,
+     "limb_vs_rest": 19
+    },
+    "Run": {
+     "cloth_in_body": 23,
+     "skin_poke": 7,
+     "limb_vs_rest": 15
+    },
+    "Wave": {
+     "cloth_in_body": 10,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 20,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 13,
+     "skin_poke": 0,
+     "limb_vs_rest": 6
+    },
+    "Laugh": {
+     "cloth_in_body": 9,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Bow": {
+     "cloth_in_body": 19,
+     "skin_poke": 1,
+     "limb_vs_rest": 0
+    },
+    "Point": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sleep": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Surprised": {
+     "cloth_in_body": 12,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 13,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 34,
+     "skin_poke": 28,
+     "limb_vs_rest": 4
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "skirt": 131,
+     "top": 81,
+     "scarf": 71,
+     "sole": 32,
+     "shoe": 22
+    },
+    "limb_vs_rest": {
+     "skirt>thigh_R": 26,
+     "top>upper_arm_L": 13,
+     "skirt>thigh_L": 12,
+     "top>upper_arm_R": 11,
+     "body>upper_arm_L": 6,
+     "skirt>shin_R": 5
+    }
+   },
+   "seconds": 24.1
+  },
+  "waiter": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 2,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 43,
+    "skin_poke": 27,
+    "limb_vs_rest": 18
+   },
+   "worst_mm": {
+    "cloth_in_body": 17.9,
+    "skin_poke": 23.7,
+    "limb_vs_rest": 32.4
+   },
+   "total": 88,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Run": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Cheer": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 11
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Surprised": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 29,
+     "skin_poke": 25,
+     "limb_vs_rest": 2
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "sole": 39,
+     "top": 28,
+     "shoe": 26
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 13,
+     "body>upper_arm_L": 8,
+     "top>upper_arm_R": 7,
+     "top>trunk": 3,
+     "pants>thigh_L": 2,
+     "body>upper_arm_R": 2
+    }
+   },
+   "seconds": 28.2
+  },
+  "warden": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 123,
+    "skin_poke": 29,
+    "limb_vs_rest": 12
+   },
+   "worst_mm": {
+    "cloth_in_body": 41.1,
+    "skin_poke": 25.3,
+    "limb_vs_rest": 20.3
+   },
+   "total": 164,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Run": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Wave": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 7
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Bow": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sleep": {
+     "cloth_in_body": 71,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sad": {
+     "cloth_in_body": 9,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 34,
+     "skin_poke": 29,
+     "limb_vs_rest": 1
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "beard": 214,
+     "sole": 41,
+     "shoe": 28,
+     "top": 14,
+     "pants": 1
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 9,
+     "body>upper_arm_L": 4,
+     "body>thigh_L": 3,
+     "top>upper_arm_R": 3,
+     "pants>thigh_L": 2,
+     "top>trunk": 1
+    }
+   },
+   "seconds": 28.6
+  },
+  "captain": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 279,
+    "skin_poke": 32,
+    "limb_vs_rest": 19
+   },
+   "worst_mm": {
+    "cloth_in_body": 52.0,
+    "skin_poke": 25.8,
+    "limb_vs_rest": 30.1
+   },
+   "total": 330,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Run": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Wave": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 8,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 5,
+     "skin_poke": 0,
+     "limb_vs_rest": 11
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Bow": {
+     "cloth_in_body": 62,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sleep": {
+     "cloth_in_body": 145,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Surprised": {
+     "cloth_in_body": 6,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 8,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 39,
+     "skin_poke": 32,
+     "limb_vs_rest": 3
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "beard": 542,
+     "top": 66,
+     "buckle": 54,
+     "sole": 43,
+     "shoe": 37
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 17,
+     "top>upper_arm_R": 10,
+     "body>upper_arm_L": 8,
+     "pants>thigh_R": 3,
+     "pants>thigh_L": 2,
+     "top>trunk": 1
+    }
+   },
+   "seconds": 29.3
+  },
+  "misty": {
+   "rest": {
+    "cloth_in_body": 5,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 99,
+    "skin_poke": 28,
+    "limb_vs_rest": 37
+   },
+   "worst_mm": {
+    "cloth_in_body": 47.9,
+    "skin_poke": 24.4,
+    "limb_vs_rest": 38.2
+   },
+   "total": 164,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Run": {
+     "cloth_in_body": 12,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Wave": {
+     "cloth_in_body": 7,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 5,
+     "skin_poke": 0,
+     "limb_vs_rest": 10
+    },
+    "Think": {
+     "cloth_in_body": 5,
+     "skin_poke": 0,
+     "limb_vs_rest": 13
+    },
+    "Laugh": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Bow": {
+     "cloth_in_body": 18,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Point": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 6,
+     "skin_poke": 0,
+     "limb_vs_rest": 4
+    },
+    "Shiver": {
+     "cloth_in_body": 35,
+     "skin_poke": 28,
+     "limb_vs_rest": 6
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "hair_tail": 240,
+     "suspender": 64,
+     "pants": 58,
+     "top": 33,
+     "sole": 33,
+     "shoe": 15
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 27,
+     "body>upper_arm_L": 19,
+     "hair_tail>upper_arm_L": 16,
+     "top>upper_arm_R": 11,
+     "body>upper_arm_R": 6,
+     "pants>thigh_L": 1
+    }
+   },
+   "seconds": 25.0
+  },
+  "sabrina": {
+   "rest": {
+    "cloth_in_body": 12,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 333,
+    "skin_poke": 30,
+    "limb_vs_rest": 138
+   },
+   "worst_mm": {
+    "cloth_in_body": 90.3,
+    "skin_poke": 25.1,
+    "limb_vs_rest": 132.7
+   },
+   "total": 501,
+   "per_clip_new": {
+    "Idle": {
+     "cloth_in_body": 21,
+     "skin_poke": 0,
+     "limb_vs_rest": 4
+    },
+    "Walk": {
+     "cloth_in_body": 30,
+     "skin_poke": 0,
+     "limb_vs_rest": 32
+    },
+    "Run": {
+     "cloth_in_body": 75,
+     "skin_poke": 3,
+     "limb_vs_rest": 36
+    },
+    "Talk": {
+     "cloth_in_body": 13,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Wave": {
+     "cloth_in_body": 13,
+     "skin_poke": 0,
+     "limb_vs_rest": 6
+    },
+    "Cheer": {
+     "cloth_in_body": 6,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Nod": {
+     "cloth_in_body": 6,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shake": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 11,
+     "skin_poke": 0,
+     "limb_vs_rest": 18
+    },
+    "Laugh": {
+     "cloth_in_body": 8,
+     "skin_poke": 0,
+     "limb_vs_rest": 29
+    },
+    "Bow": {
+     "cloth_in_body": 27,
+     "skin_poke": 1,
+     "limb_vs_rest": 0
+    },
+    "Point": {
+     "cloth_in_body": 5,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sleep": {
+     "cloth_in_body": 25,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Surprised": {
+     "cloth_in_body": 5,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 6,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Stretch": {
+     "cloth_in_body": 15,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Dance": {
+     "cloth_in_body": 10,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sad": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 40,
+     "skin_poke": 26,
+     "limb_vs_rest": 7
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "side_lock": 624,
+     "hair_back": 485,
+     "skirt": 147,
+     "top": 55,
+     "sole": 39,
+     "shoe": 28
+    },
+    "limb_vs_rest": {
+     "hair_back>thigh_L": 45,
+     "hair_back>thigh_R": 45,
+     "skirt>thigh_R": 32,
+     "skirt>thigh_L": 22,
+     "hair_back>upper_arm_L": 21,
+     "side_lock>upper_arm_L": 20
+    }
+   },
+   "seconds": 23.7
+  },
+  "mom": {
+   "rest": {
+    "cloth_in_body": 2,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 380,
+    "skin_poke": 30,
+    "limb_vs_rest": 172
+   },
+   "worst_mm": {
+    "cloth_in_body": 94.1,
+    "skin_poke": 23.8,
+    "limb_vs_rest": 95.8
+   },
+   "total": 582,
+   "per_clip_new": {
+    "Idle": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Walk": {
+     "cloth_in_body": 35,
+     "skin_poke": 0,
+     "limb_vs_rest": 22
+    },
+    "Run": {
+     "cloth_in_body": 167,
+     "skin_poke": 4,
+     "limb_vs_rest": 115
+    },
+    "Cheer": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shake": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 13
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 6
+    },
+    "Bow": {
+     "cloth_in_body": 121,
+     "skin_poke": 0,
+     "limb_vs_rest": 12
+    },
+    "Sleep": {
+     "cloth_in_body": 6,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 7,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 28,
+     "skin_poke": 26,
+     "limb_vs_rest": 4
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "apron": 366,
+     "skirt": 142,
+     "hair_tail": 55,
+     "sole": 29,
+     "top": 26,
+     "shoe": 11
+    },
+    "limb_vs_rest": {
+     "apron>thigh_L": 62,
+     "apron>thigh_R": 60,
+     "skirt>thigh_R": 30,
+     "top>upper_arm_L": 27,
+     "skirt>thigh_L": 24,
+     "body>upper_arm_L": 19
+    }
+   },
+   "seconds": 25.5
+  },
+  "brunette_girl": {
+   "rest": {
+    "cloth_in_body": 27,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 333,
+    "skin_poke": 35,
+    "limb_vs_rest": 113
+   },
+   "worst_mm": {
+    "cloth_in_body": 91.8,
+    "skin_poke": 24.9,
+    "limb_vs_rest": 104.0
+   },
+   "total": 481,
+   "per_clip_new": {
+    "Idle": {
+     "cloth_in_body": 18,
+     "skin_poke": 0,
+     "limb_vs_rest": 4
+    },
+    "Walk": {
+     "cloth_in_body": 35,
+     "skin_poke": 0,
+     "limb_vs_rest": 30
+    },
+    "Run": {
+     "cloth_in_body": 85,
+     "skin_poke": 4,
+     "limb_vs_rest": 36
+    },
+    "Talk": {
+     "cloth_in_body": 10,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Wave": {
+     "cloth_in_body": 16,
+     "skin_poke": 0,
+     "limb_vs_rest": 8
+    },
+    "Cheer": {
+     "cloth_in_body": 11,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Nod": {
+     "cloth_in_body": 6,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 20,
+     "skin_poke": 0,
+     "limb_vs_rest": 15
+    },
+    "Laugh": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 7
+    },
+    "Bow": {
+     "cloth_in_body": 25,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Point": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sleep": {
+     "cloth_in_body": 19,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Surprised": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Stretch": {
+     "cloth_in_body": 16,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Dance": {
+     "cloth_in_body": 6,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 29,
+     "skin_poke": 31,
+     "limb_vs_rest": 5
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "side_lock": 1484,
+     "hair_back": 422,
+     "skirt": 134,
+     "top": 29,
+     "sole": 29,
+     "shoe": 16
+    },
+    "limb_vs_rest": {
+     "hair_back>thigh_L": 41,
+     "hair_back>thigh_R": 36,
+     "skirt>thigh_R": 29,
+     "hair_back>upper_arm_L": 22,
+     "skirt>thigh_L": 21,
+     "top>upper_arm_L": 21
+    }
+   },
+   "seconds": 24.7
+  },
+  "youngster": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 39,
+    "skin_poke": 30,
+    "limb_vs_rest": 8
+   },
+   "worst_mm": {
+    "cloth_in_body": 21.3,
+    "skin_poke": 24.6,
+    "limb_vs_rest": 17.6
+   },
+   "total": 77,
+   "per_clip_new": {
+    "Run": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 8
+    },
+    "Surprised": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 29,
+     "skin_poke": 30,
+     "limb_vs_rest": 0
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "sole": 35,
+     "shoe": 25,
+     "top": 15
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 6,
+     "body>upper_arm_L": 3,
+     "top>trunk": 2
+    }
+   },
+   "seconds": 25.0
+  },
+  "rocket": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 2,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 52,
+    "skin_poke": 28,
+    "limb_vs_rest": 18
+   },
+   "worst_mm": {
+    "cloth_in_body": 18.2,
+    "skin_poke": 25.0,
+    "limb_vs_rest": 32.4
+   },
+   "total": 98,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Run": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Cheer": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 11
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Sleep": {
+     "cloth_in_body": 8,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Surprised": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 30,
+     "skin_poke": 26,
+     "limb_vs_rest": 2
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "sole": 39,
+     "top": 28,
+     "shoe": 28,
+     "collar": 8
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 13,
+     "body>upper_arm_L": 8,
+     "top>upper_arm_R": 7,
+     "top>trunk": 3,
+     "pants>thigh_L": 2,
+     "body>upper_arm_R": 2
+    }
+   },
+   "seconds": 25.4
+  },
+  "biker": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 108,
+    "skin_poke": 30,
+    "limb_vs_rest": 22
+   },
+   "worst_mm": {
+    "cloth_in_body": 93.4,
+    "skin_poke": 25.7,
+    "limb_vs_rest": 28.1
+   },
+   "total": 160,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Run": {
+     "cloth_in_body": 11,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Think": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 10
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 7
+    },
+    "Bow": {
+     "cloth_in_body": 38,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sleep": {
+     "cloth_in_body": 11,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Surprised": {
+     "cloth_in_body": 5,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 39,
+     "skin_poke": 30,
+     "limb_vs_rest": 1
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "placket": 102,
+     "buckle": 37,
+     "sole": 37,
+     "shoe": 26,
+     "top": 14,
+     "collar": 12
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 18,
+     "top>upper_arm_R": 16,
+     "body>upper_arm_R": 6,
+     "body>upper_arm_L": 4,
+     "body>trunk": 4,
+     "body>thigh_R": 2
+    }
+   },
+   "seconds": 26.5
+  },
+  "fishing_guru": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 199,
+    "skin_poke": 36,
+    "limb_vs_rest": 16
+   },
+   "worst_mm": {
+    "cloth_in_body": 65.2,
+    "skin_poke": 26.6,
+    "limb_vs_rest": 23.8
+   },
+   "total": 251,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 5,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Run": {
+     "cloth_in_body": 2,
+     "skin_poke": 1,
+     "limb_vs_rest": 3
+    },
+    "Wave": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 8
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Bow": {
+     "cloth_in_body": 11,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sleep": {
+     "cloth_in_body": 143,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sad": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 32,
+     "skin_poke": 35,
+     "limb_vs_rest": 1
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "beard": 319,
+     "beard_tuft": 134,
+     "sole": 34,
+     "top": 27,
+     "shoe": 25
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 14,
+     "pants>thigh_R": 6,
+     "body>upper_arm_L": 5,
+     "top>upper_arm_R": 5,
+     "body>thigh_R": 4,
+     "body>trunk": 1
+    }
+   },
+   "seconds": 24.4
+  },
+  "link_receptionist": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 140,
+    "skin_poke": 34,
+    "limb_vs_rest": 58
+   },
+   "worst_mm": {
+    "cloth_in_body": 94.2,
+    "skin_poke": 24.4,
+    "limb_vs_rest": 110.8
+   },
+   "total": 232,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 27,
+     "skin_poke": 0,
+     "limb_vs_rest": 21
+    },
+    "Run": {
+     "cloth_in_body": 32,
+     "skin_poke": 3,
+     "limb_vs_rest": 18
+    },
+    "Wave": {
+     "cloth_in_body": 8,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shake": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 5,
+     "skin_poke": 0,
+     "limb_vs_rest": 11
+    },
+    "Laugh": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Bow": {
+     "cloth_in_body": 13,
+     "skin_poke": 1,
+     "limb_vs_rest": 0
+    },
+    "Point": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sleep": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Surprised": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 6,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 34,
+     "skin_poke": 30,
+     "limb_vs_rest": 5
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "skirt": 135,
+     "top": 74,
+     "sole": 33,
+     "shoe": 15
+    },
+    "limb_vs_rest": {
+     "skirt>thigh_R": 32,
+     "top>upper_arm_L": 25,
+     "skirt>thigh_L": 21,
+     "body>upper_arm_L": 16,
+     "top>upper_arm_R": 11,
+     "skirt>shin_R": 5
+    }
+   },
+   "seconds": 22.7
+  },
+  "rocker": {
+   "rest": {
+    "cloth_in_body": 19,
+    "skin_poke": 3,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 189,
+    "skin_poke": 30,
+    "limb_vs_rest": 20
+   },
+   "worst_mm": {
+    "cloth_in_body": 93.1,
+    "skin_poke": 25.5,
+    "limb_vs_rest": 35.5
+   },
+   "total": 239,
+   "per_clip_new": {
+    "Idle": {
+     "cloth_in_body": 2,
+     "skin_poke": 1,
+     "limb_vs_rest": 0
+    },
+    "Walk": {
+     "cloth_in_body": 7,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Run": {
+     "cloth_in_body": 14,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Wave": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 18,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 12
+    },
+    "Laugh": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Bow": {
+     "cloth_in_body": 44,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sleep": {
+     "cloth_in_body": 16,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Surprised": {
+     "cloth_in_body": 8,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 10,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 9,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 32,
+     "skin_poke": 26,
+     "limb_vs_rest": 2
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "scarf_tail": 1122,
+     "placket": 110,
+     "scarf": 83,
+     "top": 79,
+     "sole": 39,
+     "buckle": 34
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 17,
+     "top>upper_arm_R": 9,
+     "body>upper_arm_L": 8,
+     "top>trunk": 3,
+     "pants>thigh_L": 2,
+     "body>upper_arm_R": 2
+    }
+   },
+   "seconds": 25.7
+  },
+  "gramps": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 2,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 208,
+    "skin_poke": 32,
+    "limb_vs_rest": 11
+   },
+   "worst_mm": {
+    "cloth_in_body": 65.1,
+    "skin_poke": 24.2,
+    "limb_vs_rest": 31.3
+   },
+   "total": 251,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Run": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Wave": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 9,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 8
+    },
+    "Sleep": {
+     "cloth_in_body": 153,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Surprised": {
+     "cloth_in_body": 6,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 5,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 25,
+     "skin_poke": 30,
+     "limb_vs_rest": 1
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "beard": 299,
+     "beard_tuft": 140,
+     "top": 46,
+     "sole": 30,
+     "shoe": 21
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 11,
+     "body>upper_arm_L": 5,
+     "pants>thigh_R": 2,
+     "pants>thigh_L": 1,
+     "top>trunk": 1,
+     "top>upper_arm_R": 1
+    }
+   },
+   "seconds": 23.3
+  },
+  "balding_guy": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 2,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 49,
+    "skin_poke": 27,
+    "limb_vs_rest": 31
+   },
+   "worst_mm": {
+    "cloth_in_body": 17.9,
+    "skin_poke": 23.7,
+    "limb_vs_rest": 33.4
+   },
+   "total": 107,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Run": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Cheer": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 18
+    },
+    "Laugh": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 4
+    },
+    "Surprised": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sad": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 31,
+     "skin_poke": 25,
+     "limb_vs_rest": 5
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "sole": 39,
+     "top": 37,
+     "shoe": 26
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 26,
+     "top>upper_arm_R": 15,
+     "body>upper_arm_L": 11,
+     "body>upper_arm_R": 3,
+     "pants>thigh_L": 2,
+     "top>trunk": 2
+    }
+   },
+   "seconds": 25.5
+  },
+  "silph_president": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 68,
+    "skin_poke": 34,
+    "limb_vs_rest": 26
+   },
+   "worst_mm": {
+    "cloth_in_body": 19.4,
+    "skin_poke": 22.6,
+    "limb_vs_rest": 26.7
+   },
+   "total": 128,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 1,
+     "skin_poke": 2,
+     "limb_vs_rest": 1
+    },
+    "Run": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Wave": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 8,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 6,
+     "skin_poke": 0,
+     "limb_vs_rest": 13
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 1,
+     "limb_vs_rest": 7
+    },
+    "Bow": {
+     "cloth_in_body": 3,
+     "skin_poke": 1,
+     "limb_vs_rest": 0
+    },
+    "Sleep": {
+     "cloth_in_body": 0,
+     "skin_poke": 1,
+     "limb_vs_rest": 0
+    },
+    "Surprised": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 5,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 35,
+     "skin_poke": 29,
+     "limb_vs_rest": 2
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "top": 50,
+     "sole": 40,
+     "shoe": 19,
+     "tie": 3
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 30,
+     "top>upper_arm_R": 18,
+     "body>upper_arm_L": 6,
+     "pants>thigh_L": 3,
+     "pants>trunk": 2,
+     "body>upper_arm_R": 2
+    }
+   },
+   "seconds": 28.3
+  },
+  "lorelei": {
+   "rest": {
+    "cloth_in_body": 19,
+    "skin_poke": 0,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 377,
+    "skin_poke": 34,
+    "limb_vs_rest": 119
+   },
+   "worst_mm": {
+    "cloth_in_body": 149.1,
+    "skin_poke": 25.4,
+    "limb_vs_rest": 142.4
+   },
+   "total": 530,
+   "per_clip_new": {
+    "Idle": {
+     "cloth_in_body": 23,
+     "skin_poke": 0,
+     "limb_vs_rest": 4
+    },
+    "Walk": {
+     "cloth_in_body": 41,
+     "skin_poke": 0,
+     "limb_vs_rest": 33
+    },
+    "Run": {
+     "cloth_in_body": 87,
+     "skin_poke": 4,
+     "limb_vs_rest": 40
+    },
+    "Talk": {
+     "cloth_in_body": 9,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Wave": {
+     "cloth_in_body": 19,
+     "skin_poke": 0,
+     "limb_vs_rest": 6
+    },
+    "Cheer": {
+     "cloth_in_body": 12,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Nod": {
+     "cloth_in_body": 10,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shake": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 10,
+     "skin_poke": 0,
+     "limb_vs_rest": 12
+    },
+    "Laugh": {
+     "cloth_in_body": 11,
+     "skin_poke": 0,
+     "limb_vs_rest": 8
+    },
+    "Bow": {
+     "cloth_in_body": 26,
+     "skin_poke": 1,
+     "limb_vs_rest": 0
+    },
+    "Point": {
+     "cloth_in_body": 10,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sleep": {
+     "cloth_in_body": 28,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Surprised": {
+     "cloth_in_body": 5,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Stretch": {
+     "cloth_in_body": 23,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Dance": {
+     "cloth_in_body": 5,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Sad": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 34,
+     "skin_poke": 29,
+     "limb_vs_rest": 9
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "side_lock": 819,
+     "hair_back": 523,
+     "temple": 219,
+     "skirt": 191,
+     "top": 66,
+     "hemband": 40
+    },
+    "limb_vs_rest": {
+     "hair_back>thigh_L": 38,
+     "hair_back>thigh_R": 37,
+     "skirt>thigh_R": 33,
+     "hair_back>upper_arm_L": 23,
+     "skirt>thigh_L": 22,
+     "top>upper_arm_L": 16
+    }
+   },
+   "seconds": 28.7
+  },
+  "bruno": {
+   "rest": {
+    "cloth_in_body": 1,
+    "skin_poke": 4,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 28,
+    "skin_poke": 7,
+    "limb_vs_rest": 27
+   },
+   "worst_mm": {
+    "cloth_in_body": 24.6,
+    "skin_poke": 14.0,
+    "limb_vs_rest": 21.7
+   },
+   "total": 62,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 3,
+     "skin_poke": 1,
+     "limb_vs_rest": 2
+    },
+    "Run": {
+     "cloth_in_body": 3,
+     "skin_poke": 1,
+     "limb_vs_rest": 15
+    },
+    "Cheer": {
+     "cloth_in_body": 21,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 8
+    },
+    "Shiver": {
+     "cloth_in_body": 0,
+     "skin_poke": 1,
+     "limb_vs_rest": 2
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "hair_tail": 70,
+     "pants": 15
+    },
+    "limb_vs_rest": {
+     "body>upper_arm_L": 12,
+     "body>trunk": 10,
+     "pants>trunk": 7,
+     "pants>thigh_R": 5,
+     "pants>thigh_L": 3,
+     "body>thigh_R": 2
+    }
+   },
+   "seconds": 28.0
+  },
+  "surge": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 1,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 97,
+    "skin_poke": 25,
+    "limb_vs_rest": 18
+   },
+   "worst_mm": {
+    "cloth_in_body": 15.5,
+    "skin_poke": 26.2,
+    "limb_vs_rest": 38.6
+   },
+   "total": 140,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Run": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 2
+    },
+    "Wave": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Cheer": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 4,
+     "skin_poke": 0,
+     "limb_vs_rest": 12
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Bow": {
+     "cloth_in_body": 54,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Stretch": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 26,
+     "skin_poke": 24,
+     "limb_vs_rest": 2
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "buckle": 84,
+     "sole": 29,
+     "shoe": 23,
+     "top": 19,
+     "collar": 3,
+     "cuff": 1
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 25,
+     "body>upper_arm_L": 9,
+     "top>upper_arm_R": 8,
+     "pants>thigh_R": 2,
+     "top>thigh_R": 1,
+     "pants>thigh_L": 1
+    }
+   },
+   "seconds": 29.3
+  },
+  "bill": {
+   "rest": {
+    "cloth_in_body": 0,
+    "skin_poke": 2,
+    "limb_vs_rest": 0
+   },
+   "animated": {
+    "cloth_in_body": 42,
+    "skin_poke": 27,
+    "limb_vs_rest": 19
+   },
+   "worst_mm": {
+    "cloth_in_body": 17.9,
+    "skin_poke": 23.7,
+    "limb_vs_rest": 32.4
+   },
+   "total": 88,
+   "per_clip_new": {
+    "Walk": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Run": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 3
+    },
+    "Cheer": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Think": {
+     "cloth_in_body": 2,
+     "skin_poke": 0,
+     "limb_vs_rest": 12
+    },
+    "Laugh": {
+     "cloth_in_body": 0,
+     "skin_poke": 0,
+     "limb_vs_rest": 1
+    },
+    "Surprised": {
+     "cloth_in_body": 3,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Salute": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Dance": {
+     "cloth_in_body": 1,
+     "skin_poke": 0,
+     "limb_vs_rest": 0
+    },
+    "Shiver": {
+     "cloth_in_body": 29,
+     "skin_poke": 25,
+     "limb_vs_rest": 2
+    }
+   },
+   "culprits": {
+    "cloth_in_body": {
+     "sole": 39,
+     "top": 32,
+     "shoe": 26
+    },
+    "limb_vs_rest": {
+     "top>upper_arm_L": 13,
+     "body>upper_arm_L": 8,
+     "top>upper_arm_R": 7,
+     "top>trunk": 3,
+     "pants>thigh_L": 2,
+     "body>trunk": 2
+    }
+   },
+   "seconds": 24.6
+  }
+ }
+}

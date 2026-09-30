@@ -9,8 +9,26 @@ static func wild_table_for_map(map_key: String, in_water: bool = false) -> Dicti
 	var table: Dictionary = GameData.wild.get(cnst, {})
 	return table.get("water" if in_water else "grass", {"rate": 0, "mons": []})
 
+## The Old Man glitch (all three versions): after the Viridian City old man's catching demo, surfing along the
+## eastern edge of Cinnabar Island reads the wild table from garbage (the demo's "OLD MAN" name buffer) and meets
+## MISSINGNO. Any trainer battle overwrites the buffer again (Story._run_battle clears the flag).
+const GLITCH_FLAG := "GLITCH_OLD_MAN"
+
+static func glitch_roll(map_key: String, in_water: bool, rng: RandomNumberGenerator = null) -> Dictionary:
+	if map_key != "CinnabarIsland" or not in_water or not bool(GameState.flags.get(GLITCH_FLAG, false)):
+		return {}
+	var w := int(GameData.get_map(map_key).get("w", 20))
+	if GameState.player_cell.x < w - 2:
+		return {}
+	var r: int = (rng.randi_range(0, 255) if rng else randi() % 256)
+	return {"level": 80, "species": "MISSINGNO"} if r < 25 else {}
+
 ## Returns {} if no encounter this step, else {species, level}.
 static func roll(map_key: String, in_water: bool = false, rng: RandomNumberGenerator = null) -> Dictionary:
+	if bool(GameState.flags.get(GLITCH_FLAG, false)):
+		var g := glitch_roll(map_key, in_water, rng)
+		if not g.is_empty():
+			return g
 	var table := wild_table_for_map(map_key, in_water)
 	var rate: int = table.get("rate", 0)
 	if rate <= 0:

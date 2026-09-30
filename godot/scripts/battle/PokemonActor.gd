@@ -19,6 +19,12 @@ const TYPE_COLORS := {
 ## Every glb carries these clips (pipeline/blender/gen_rigged_pokemon.py); Idle/Walk/Run/Sleep/Charge/Taunt/Hover/Talk loop.
 const CLIPS := ["Idle", "Walk", "Run", "Attack", "Special", "Hurt", "Faint", "Victory", "Sleep", "Roar",
 		"Dodge", "Spin", "Hop", "Charge", "Taunt", "Spawn", "Hover", "Talk"]
+## One-shot fidgets played now and then while resting in Idle (every glb has them).
+const IDLE_VARIANTS := ["IdleLook", "IdleStretch", "IdleFidget"]
+## Species-signature clips are named after the move ("Flamethrower", "ThunderShock" ...): CamelCase of the move id, with
+## these exceptions (a few move names would collide with a base clip or a looping NPC clip).
+const MOVE_CLIP_RENAME := {"FLY": "FlyUp", "ROAR": "RoarCall", "SPLASH": "SplashFlop", "HAZE": "HazeMist", "REST": "RestUp",
+		"SING": "SingSong"}
 ## Species that float or fly idle in Hover (flapping / bobbing) instead of standing.
 const HOVERERS := ["GASTLY", "HAUNTER", "GENGAR", "MAGNEMITE", "MAGNETON", "KOFFING", "WEEZING", "VOLTORB", "ELECTRODE",
 		"PORYGON", "STARYU", "STARMIE", "MEW", "MEWTWO"]
@@ -26,6 +32,9 @@ const HOVERERS := ["GASTLY", "HAUNTER", "GENGAR", "MAGNEMITE", "MAGNETON", "KOFF
 var species_id: String = ""
 var model: Node3D
 var _anim: AnimationPlayer
+## Occasionally plays an idle-variant clip (look around, stretch, fidget) while resting. Tools that seek paused poses turn it off.
+var idle_variety := true
+var _idle_left := 5.0
 ## Sleeping mons (status SLP) loop the Sleep clip instead of Idle.
 var sleeping := false:
 	set(v):
@@ -59,14 +68,68 @@ func setup(sid: String) -> void:
 		# cross-fade between clips (Idle <-> Walk <-> Attack ...): the baked clips start/end in different poses.
 		# (--noblend: contact-sheet tooling seeks paused poses, where a pending blend would hide the clip)
 		_anim.playback_default_blend_time = 0.0 if OS.get_cmdline_user_args().has("--noblend") else 0.12
+	_idle_left = randf_range(3.0, 7.0)
 	play("Idle")
 
-## Plays a baked clip: Idle / Walk (looping), Attack / Hurt / Faint / Special (one-shot).
+func _process(delta: float) -> void:
+	if not idle_variety or _anim == null or sleeping:
+		return
+	# only while plainly resting (a variant, an attack or a walk in progress is never interrupted)
+	if _anim.current_animation != idle_clip() or idle_clip() != "Idle":
+		_idle_left = maxf(_idle_left, 2.0)
+		return
+	_idle_left -= delta
+	if _idle_left <= 0.0:
+		_idle_left = randf_range(4.0, 10.0)
+		var pool: Array = []
+		for v in IDLE_VARIANTS:
+			if has_anim(v):
+				pool.append(v)
+		if not pool.is_empty():
+			play_once(pool[randi() % pool.size()])
+
+## Plays a baked clip: Idle / Walk (looping), Attack / Hurt / Faint / Special (one-shot).  An unknown clip name falls
+## back to the resting clip (never leaves the model frozen in whatever pose the last clip ended in).
 func play(anim_name: String) -> void:
 	if anim_name == "Idle":
 		anim_name = idle_clip()
-	if _anim and _anim.has_animation(anim_name):
+	if _anim == null:
+		return
+	if _anim.has_animation(anim_name):
 		_anim.play(anim_name)
+	elif _anim.has_animation("Idle"):
+		_anim.play("Idle")
+
+## Clip name a move id maps to ("FLAMETHROWER" -> "Flamethrower"), whether or not this species has it.
+static func move_clip_name(move_id: String) -> String:
+	if MOVE_CLIP_RENAME.has(move_id):
+		return MOVE_CLIP_RENAME[move_id]
+	var out := ""
+	for part in move_id.replace("PSYCHIC_M", "PSYCHIC").split("_", false):
+		out += part.substr(0, 1).to_upper() + part.substr(1).to_lower()
+	return out
+
+## The species-signature clip for a battle move, or "" when this species has no clip authored for it.
+func signature_clip(move_id: String) -> String:
+	var n := move_clip_name(move_id)
+	return n if has_anim(n) else ""
+
+## Signature clips of this model (everything that is neither a base clip nor an idle variant), from the manifest.
+func signature_clips() -> Array:
+	var sig: Variant = species_info(species_id).get("signature", [])
+	return sig if sig is Array else []
+
+func is_signature_clip(clip: String) -> bool:
+	return clip != "" and not CLIPS.has(clip) and not IDLE_VARIANTS.has(clip) and has_anim(clip)
+
+## Battle move -> animation: the species' own clip for that move when it has one, else Special (status moves) or Attack.
+## Returns the clip that was played.
+func play_move(move_id: String, status_move: bool = false) -> String:
+	var clip := signature_clip(move_id)
+	if clip == "":
+		clip = "Special" if status_move and has_anim("Special") else "Attack"
+	play_once(clip)
+	return clip
 
 ## The looping clip a mon rests in: Sleep when asleep, Hover for fliers and floaters, else Idle.
 func idle_clip() -> String:

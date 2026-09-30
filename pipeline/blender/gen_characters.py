@@ -1,31 +1,32 @@
-"""Chibi 3D trainers / NPCs for every humanoid in upstream's cast (src/data/cast.js).
+"""Realistic 3D trainers / NPCs for every humanoid in upstream's cast (src/data/cast.js).
 
-  python3 pipeline/blender/gen_characters.py [--only red,oak] [--no-humanoid] [--preview out.png]
+  python3 pipeline/blender/gen_characters.py [--only red,oak] [--jobs 4] [--no-humanoid]
 
-Design pipeline (all procedural, informed by how the characters look in Pokemon Red/Blue/
-FireRed and the anime/manga -- see pipeline/data/character_looks.json):
+Pipeline (procedural, numpy + headless Blender; designs in pipeline/data/character_looks.json):
 
-  cast.json (palette, head/body template)  +  character_looks.json (hair, face, outfit, extras)
-        -> char_build.py   assembles numpy parts: head/face (char_body), hair (char_hair),
-                           clothing (char_outfit), accessories + hats (char_extras)
-        -> char_paint.py   one procedural texture atlas per character (ramp cells: AO x gradient,
-                           detail cells: eyes / cheeks / emblems)
-        -> char_asm.py     baked AO, smooth <=4-influence skin weights, armature (char_rig.py),
-                           actions (char_anim.py) and the .glb export
+  build params (height, width, age, sex ...)                 char_rig.Prop        proportions + landmark heights
+        -> ONE implicit body: head, face, neck, torso, limbs, hands with fingers, feet   char_anat / char_sdf
+        -> marching cubes, graded vertex clustering, projection back onto the field     char_mesh   (welded, no seams)
+        -> skin weights from the anatomy primitives that own each vertex               char_skin
+        -> face details on the sculpted skin: painted eyes + rotating eyelids, brows, lips        char_face / char_eye
+        -> hair (scalp cap + soft locks / curtains / tails), hats, glasses, facial hair  char_hair / char_extras
+        -> clothing as offset shells cut from the body (no clipping by construction)  char_outfit / char_shell
+        -> one procedural texture atlas, baked AO, skinned + animated .glb              char_paint / char_asm / char_anim
+        -> automated clipping test over all 19 clips                                   char_clip
 
-Output: godot/assets/models/characters/<sprite>.glb (+ humanoid.glb legacy base, manifest.json).
-Conventions: front = Blender -Y (glTF/Godot +Z), feet at the origin, 1.5 m nominal height,
-bones root > hips > spine > chest > neck > head (+ arms, legs, eyes, mouth, hair chains),
-one material `mat_atlas`.  Clips (60 fps): Idle Walk Run Talk Wave Cheer + 13 gestures (Nod Shake Think Laugh Bow Point Sleep Surprised Salute Stretch Dance Sad Shiver).
+Output: godot/assets/models/characters/<sprite>.glb (+ humanoid.glb legacy fallback, manifest.json).
+Conventions: front = Blender -Y (glTF/Godot +Z), feet at the origin, 1.5 m nominal height (a standard adult is ~7 heads),
+bones root > hips > spine > chest > neck > head (+ arms, legs, eyes, mouth, hair chains), one material `mat_atlas`.
+Clips (60 fps): Idle Walk Run Talk Wave Cheer + 13 gestures (Nod Shake Think Laugh Bow Point Sleep Surprised Salute Stretch Dance Sad Shiver).
 """
 import json
 import os
+import subprocess
 import sys
 import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-import numpy as np  # noqa: E402
 
 ROOT = os.path.abspath(os.path.join(HERE, '..', '..'))
 EXTRACTED = os.path.join(ROOT, 'pipeline', 'extracted')
@@ -42,55 +43,74 @@ def load_looks():
         return json.load(fh)
 
 
-def main():
+def sprite_keys(cast, only=None):
+    return [k for k, d in cast.items() if not (d.get('creature') or d.get('object')) and k not in ALIASES and (not only or k in only)]
+
+
+def build_one(key, d, looks, tmp):
     import char_build as CB
+    import char_asm as AS
+    look = CB.resolve_look(key, d, looks)
+    ctx = CB.build(key, d, look)
+    # Godot extracts the glb's embedded atlas to <key>_<key>_atlas.png on import and never overwrites it, so a stale
+    # extraction would texture the new mesh with the old atlas: drop it, the next import writes a fresh one
+    for stale in ('_%s_atlas.png' % key, '_%s_atlas.png.import' % key):
+        p_ = os.path.join(OUT_DIR, key + stale)
+        if os.path.exists(p_):
+            os.remove(p_)
+    info = AS.build_and_export(ctx, os.path.join(OUT_DIR, key + '.glb'), tmp_dir=tmp, log=print)
+    info.update({'file': key + '.glb', 'head': d.get('head') or 'short', 'body': d.get('body') or 'normal'})
+    return {k: info[k] for k in ('file', 'tris', 'bytes', 'head', 'body', 'verts', 'bones')}
+
+
+def build_humanoid(looks, tmp):
+    """humanoid.glb: the neutral mannequin CharacterSkin falls back to for a sprite key without its own model."""
+    entry = {'head': 'short', 'body': 'normal', 'skin': '#e8c4a0', 'hair': '#6a5a50', 'shirt': '#9aa0b0', 'pants': '#6c7080',
+             'shoes': '#4a4a52', 'accent': '#f0f0f4'}
+    info = build_one('humanoid', entry, looks, tmp)
+    print('%-20s verts=%5d tris=%5d %4dKB (fallback mannequin)' % ('humanoid', info['verts'], info['tris'], info['bytes'] // 1024), flush=True)
+    return info
+
+
+def main():
     args = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else sys.argv[1:]
     only = set(args[args.index('--only') + 1].split(',')) if '--only' in args else None
-    preview = args[args.index('--preview') + 1] if '--preview' in args else None
+    jobs = int(args[args.index('--jobs') + 1]) if '--jobs' in args else 1
+    info_out = args[args.index('--info-out') + 1] if '--info-out' in args else None
     os.makedirs(OUT_DIR, exist_ok=True)
     cast = json.load(open(os.path.join(EXTRACTED, 'cast.json')))['cast']
     looks = load_looks().get('characters', {})
     t0 = time.time()
-    sprites = {}
-    previews = []
+    keys = sprite_keys(cast, only)
     tmp = os.environ.get('TMPDIR', '/tmp')
-    for key, d in cast.items():
-        if d.get('creature') or d.get('object'):
-            continue
-        if only and key not in only:
-            continue
-        if key in ALIASES:
-            continue
-        look = CB.resolve_look(key, d, looks)
-        ctx = CB.build(key, d, look)
-        if preview:
-            import char_preview as PV
-            previews.append((key, ctx))
-            print('%-20s verts=%5d' % (key, sum(len(p.V) for p in ctx.parts)), flush=True)
-            continue
-        import char_asm as AS
-        info = AS.build_and_export(ctx, os.path.join(OUT_DIR, key + '.glb'), tmp_dir=tmp, log=print)
-        info.update({'file': key + '.glb', 'head': d.get('head') or 'short', 'body': d.get('body') or 'normal'})
-        sprites[key] = {k: info[k] for k in ('file', 'tris', 'bytes', 'head', 'body', 'verts', 'bones')}
-        print('%-20s verts=%5d tris=%5d %4dKB %.1fs' % (key, info['verts'], info['tris'], info['bytes'] // 1024, info['seconds']), flush=True)
-    if preview:
-        import char_preview as PV
-        from PIL import Image
-        rows = []
-        for key, ctx in previews:
-            tiles = [PV.render_view([(p.V, p.F, PV.part_colors(ctx.atlas, p), __import__('char_geo').vertex_normals(p.V, p.F)) for p in ctx.parts
-                                     if len(p.V)], 300, yaw=y) for y in (0, 90, 180)]
-            rows.append(np.hstack(tiles))
-        Image.fromarray((np.vstack(rows) * 255).astype(np.uint8)).save(preview)
-        print('preview ->', preview)
+    sprites = {}
+    if jobs > 1 and len(keys) > 1:
+        procs = []
+        for i in range(jobs):
+            part = keys[i::jobs]
+            if part:
+                out = os.path.join(tmp, 'gen_characters_%d.json' % i)
+                procs.append((subprocess.Popen([sys.executable, os.path.abspath(__file__), '--only', ','.join(part), '--info-out', out]), out))
+        codes = [p.wait() for p, _ in procs]
+        if any(codes):
+            sys.exit(1)
+        for _, out in procs:
+            sprites.update(json.load(open(out)))
+    else:
+        for key in keys:
+            sprites[key] = build_one(key, cast[key], looks, tmp)
+            s = sprites[key]
+            print('%-20s verts=%5d tris=%5d %4dKB' % (key, s['verts'], s['tris'], s['bytes'] // 1024), flush=True)
+    if info_out:
+        json.dump(sprites, open(info_out, 'w'))
         return
     if only is None:
         humanoid_info = None
         if '--no-humanoid' not in args:
-            import humanoid_legacy
-            humanoid_info = humanoid_legacy.build_humanoid([])
+            humanoid_info = build_humanoid(looks, tmp)
+        order = [k for k in cast if k in sprites]
         manifest = {
-            'sprites': sprites,
+            'sprites': {k: sprites[k] for k in order},
             'aliases': ALIASES,
             'humanoid': humanoid_info,
             'height_m': 1.5,
@@ -103,10 +123,10 @@ def main():
                 **{n: {'loop': n not in ('Bow', 'Surprised'), 'note': 'NPC gesture'} for n in
                    ('Nod', 'Shake', 'Think', 'Laugh', 'Bow', 'Point', 'Sleep', 'Surprised', 'Salute', 'Stretch', 'Dance', 'Sad', 'Shiver')}},
             'conventions': {'front': 'Blender -Y == glTF/Godot +Z', 'origin': 'feet at origin',
-                            'materials': 'single mat_atlas (procedural atlas: AO x gradient ramps + eye/cheek/emblem decals); cel-shade with Toon.apply',
+                            'materials': 'single mat_atlas (procedural atlas: AO x gradient ramps + painted eye decals); cel-shade with Toon.apply',
                             'bones': 'root > hips > spine > chest > neck > head; chest > clavicle_X > upper_arm_X > forearm_X > hand_X; '
-                                     'hips > thigh_X > shin_X > foot_X; head > eye_L/eye_R (blink = scale z), mouth (talk = scale z); '
-                                     'optional hair_tail*/hair_back*/hair_twin*/cape*/scarf*/band_* chains'},
+                                     'hips > thigh_X > shin_X > foot_X; head > eye_L/eye_R (blink = the eyelid cap rotates about the eyeball, rot X), '
+                                     'mouth (talk = scale z); optional hair_tail*/hair_back*/hair_twin*/cape*/scarf*/band_* chains'},
             'source': 'pipeline/extracted/cast.json palettes + pipeline/data/character_looks.json designs',
             'elapsed_seconds': round(time.time() - t0, 1),
         }

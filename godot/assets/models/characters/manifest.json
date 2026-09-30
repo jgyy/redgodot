@@ -2,542 +2,542 @@
  "sprites": {
   "red": {
    "file": "red.glb",
-   "tris": 10623,
-   "bytes": 940148,
+   "tris": 18428,
+   "bytes": 1251368,
    "head": "cap",
    "body": "normal",
-   "verts": 5511,
+   "verts": 10189,
    "bones": 23
   },
   "blue": {
    "file": "blue.glb",
-   "tris": 8852,
-   "bytes": 876260,
+   "tris": 18939,
+   "bytes": 1262956,
    "head": "spiky",
    "body": "normal",
-   "verts": 4602,
+   "verts": 10284,
    "bones": 23
   },
   "oak": {
    "file": "oak.glb",
-   "tris": 9284,
-   "bytes": 892364,
+   "tris": 18643,
+   "bytes": 1262756,
    "head": "short",
    "body": "coat",
-   "verts": 4799,
+   "verts": 10350,
    "bones": 23
   },
   "mom": {
    "file": "mom.glb",
-   "tris": 9382,
-   "bytes": 988596,
+   "tris": 17402,
+   "bytes": 1303808,
    "head": "long",
    "body": "dress",
-   "verts": 4839,
+   "verts": 9414,
    "bones": 26
   },
   "daisy": {
    "file": "daisy.glb",
-   "tris": 10126,
-   "bytes": 985500,
+   "tris": 18480,
+   "bytes": 1345700,
    "head": "long",
    "body": "dress",
-   "verts": 5259,
-   "bones": 25
+   "verts": 10095,
+   "bones": 26
   },
   "girl": {
    "file": "girl.glb",
-   "tris": 8944,
-   "bytes": 970620,
+   "tris": 16863,
+   "bytes": 1280112,
    "head": "pony",
    "body": "dress",
-   "verts": 4607,
+   "verts": 9121,
    "bones": 26
   },
   "little_girl": {
    "file": "little_girl.glb",
-   "tris": 9218,
-   "bytes": 1078212,
+   "tris": 18182,
+   "bytes": 1422872,
    "head": "pony",
    "body": "dress",
-   "verts": 4756,
+   "verts": 9760,
    "bones": 29
   },
   "brunette_girl": {
    "file": "brunette_girl.glb",
-   "tris": 9624,
-   "bytes": 963732,
+   "tris": 17395,
+   "bytes": 1300752,
    "head": "long",
    "body": "dress",
-   "verts": 4949,
-   "bones": 25
+   "verts": 9391,
+   "bones": 26
   },
   "beauty": {
    "file": "beauty.glb",
-   "tris": 10824,
-   "bytes": 1003660,
+   "tris": 19422,
+   "bytes": 1372476,
    "head": "long",
    "body": "dress",
-   "verts": 5553,
-   "bones": 25
+   "verts": 10472,
+   "bones": 26
   },
   "cooltrainer_f": {
    "file": "cooltrainer_f.glb",
-   "tris": 9200,
-   "bytes": 979828,
+   "tris": 16981,
+   "bytes": 1288004,
    "head": "pony",
    "body": "normal",
-   "verts": 4715,
+   "verts": 9216,
    "bones": 26
   },
   "cooltrainer_m": {
    "file": "cooltrainer_m.glb",
-   "tris": 10010,
-   "bytes": 913236,
+   "tris": 18681,
+   "bytes": 1256168,
    "head": "spiky",
    "body": "normal",
-   "verts": 5177,
+   "verts": 10154,
    "bones": 23
   },
   "youngster": {
    "file": "youngster.glb",
-   "tris": 9463,
-   "bytes": 897924,
+   "tris": 18025,
+   "bytes": 1230004,
    "head": "beanie",
    "body": "normal",
-   "verts": 4896,
+   "verts": 9808,
    "bones": 23
   },
   "little_boy": {
    "file": "little_boy.glb",
-   "tris": 8630,
-   "bytes": 866812,
+   "tris": 17787,
+   "bytes": 1217672,
    "head": "short",
    "body": "normal",
-   "verts": 4456,
+   "verts": 9636,
    "bones": 23
   },
   "super_nerd": {
    "file": "super_nerd.glb",
-   "tris": 9316,
-   "bytes": 888556,
+   "tris": 16573,
+   "bytes": 1181744,
    "head": "short",
    "body": "normal",
-   "verts": 4807,
+   "verts": 8974,
    "bones": 23
   },
   "scientist": {
    "file": "scientist.glb",
-   "tris": 10344,
-   "bytes": 926604,
+   "tris": 20461,
+   "bytes": 1331064,
    "head": "short",
    "body": "coat",
-   "verts": 5341,
+   "verts": 11280,
    "bones": 23
   },
   "rocket": {
    "file": "rocket.glb",
-   "tris": 8981,
-   "bytes": 885768,
+   "tris": 17566,
+   "bytes": 1226664,
    "head": "beanie",
    "body": "normal",
-   "verts": 4678,
+   "verts": 9693,
    "bones": 23
   },
   "hiker": {
    "file": "hiker.glb",
-   "tris": 11454,
-   "bytes": 961976,
+   "tris": 21275,
+   "bytes": 1345560,
    "head": "hat",
    "body": "normal",
-   "verts": 5907,
+   "verts": 11558,
    "bones": 23
   },
   "swimmer": {
    "file": "swimmer.glb",
-   "tris": 7160,
-   "bytes": 819412,
+   "tris": 12622,
+   "bytes": 1034432,
    "head": "beanie",
    "body": "swim",
-   "verts": 3705,
+   "verts": 6671,
    "bones": 23
   },
   "gentleman": {
    "file": "gentleman.glb",
-   "tris": 8646,
-   "bytes": 867448,
+   "tris": 15637,
+   "bytes": 1152368,
    "head": "short",
    "body": "normal",
-   "verts": 4471,
+   "verts": 8542,
    "bones": 23
   },
   "biker": {
    "file": "biker.glb",
-   "tris": 9470,
-   "bytes": 1023904,
+   "tris": 17891,
+   "bytes": 1233232,
    "head": "beanie",
    "body": "normal",
-   "verts": 4893,
-   "bones": 27
+   "verts": 9852,
+   "bones": 23
   },
   "gambler": {
    "file": "gambler.glb",
-   "tris": 9188,
-   "bytes": 886972,
+   "tris": 16531,
+   "bytes": 1182984,
    "head": "short",
    "body": "normal",
-   "verts": 4775,
+   "verts": 9039,
    "bones": 23
   },
   "channeler": {
    "file": "channeler.glb",
-   "tris": 10174,
-   "bytes": 981668,
+   "tris": 18080,
+   "bytes": 1329076,
    "head": "long",
    "body": "dress",
-   "verts": 5229,
-   "bones": 25
+   "verts": 9832,
+   "bones": 26
   },
   "fisher": {
    "file": "fisher.glb",
-   "tris": 9964,
-   "bytes": 913464,
+   "tris": 17537,
+   "bytes": 1216888,
    "head": "hat",
    "body": "normal",
-   "verts": 5163,
+   "verts": 9479,
    "bones": 23
   },
   "fishing_guru": {
    "file": "fishing_guru.glb",
-   "tris": 10336,
-   "bytes": 928252,
+   "tris": 18600,
+   "bytes": 1245228,
    "head": "hat",
    "body": "normal",
-   "verts": 5383,
+   "verts": 10074,
    "bones": 23
   },
   "clerk": {
    "file": "clerk.glb",
-   "tris": 8430,
-   "bytes": 860816,
+   "tris": 15340,
+   "bytes": 1140532,
    "head": "short",
    "body": "normal",
-   "verts": 4360,
+   "verts": 8330,
    "bones": 23
   },
   "guard": {
    "file": "guard.glb",
-   "tris": 9877,
-   "bytes": 915148,
+   "tris": 16532,
+   "bytes": 1184508,
    "head": "beanie",
    "body": "normal",
-   "verts": 5145,
+   "verts": 8993,
    "bones": 23
   },
   "sailor": {
    "file": "sailor.glb",
-   "tris": 9006,
-   "bytes": 878416,
+   "tris": 18332,
+   "bytes": 1249188,
    "head": "beanie",
    "body": "normal",
-   "verts": 4637,
+   "verts": 10015,
    "bones": 23
   },
   "link_receptionist": {
    "file": "link_receptionist.glb",
-   "tris": 8886,
-   "bytes": 875508,
+   "tris": 16648,
+   "bytes": 1180892,
    "head": "bun",
    "body": "dress",
-   "verts": 4591,
+   "verts": 9005,
    "bones": 23
   },
   "nurse": {
    "file": "nurse.glb",
-   "tris": 10210,
-   "bytes": 920888,
+   "tris": 18482,
+   "bytes": 1243224,
    "head": "bun",
    "body": "dress",
-   "verts": 5268,
+   "verts": 9980,
    "bones": 23
   },
   "silph_worker_m": {
    "file": "silph_worker_m.glb",
-   "tris": 8532,
-   "bytes": 865092,
+   "tris": 15449,
+   "bytes": 1144988,
    "head": "short",
    "body": "normal",
-   "verts": 4420,
+   "verts": 8403,
    "bones": 23
   },
   "silph_worker_f": {
    "file": "silph_worker_f.glb",
-   "tris": 9546,
-   "bytes": 961168,
+   "tris": 18247,
+   "bytes": 1334800,
    "head": "long",
    "body": "dress",
-   "verts": 4909,
-   "bones": 25
+   "verts": 9930,
+   "bones": 26
   },
   "rocker": {
    "file": "rocker.glb",
-   "tris": 10306,
-   "bytes": 1013228,
+   "tris": 20227,
+   "bytes": 1341120,
    "head": "spiky",
    "body": "normal",
-   "verts": 5337,
+   "verts": 11051,
    "bones": 26
   },
   "middle_aged_man": {
    "file": "middle_aged_man.glb",
-   "tris": 8390,
-   "bytes": 857936,
+   "tris": 15895,
+   "bytes": 1156476,
    "head": "short",
    "body": "normal",
-   "verts": 4321,
+   "verts": 8639,
    "bones": 23
   },
   "middle_aged_woman": {
    "file": "middle_aged_woman.glb",
-   "tris": 9324,
-   "bytes": 891644,
+   "tris": 18237,
+   "bytes": 1231328,
    "head": "bun",
    "body": "dress",
-   "verts": 4823,
+   "verts": 9877,
    "bones": 23
   },
   "gym_guide": {
    "file": "gym_guide.glb",
-   "tris": 8925,
-   "bytes": 881388,
+   "tris": 16604,
+   "bytes": 1190996,
    "head": "cap",
    "body": "normal",
-   "verts": 4634,
+   "verts": 9133,
    "bones": 23
   },
   "gramps": {
    "file": "gramps.glb",
-   "tris": 8128,
-   "bytes": 853192,
+   "tris": 15341,
+   "bytes": 1131960,
    "head": "bald",
    "body": "normal",
-   "verts": 4244,
+   "verts": 8359,
    "bones": 23
   },
   "cook": {
    "file": "cook.glb",
-   "tris": 8940,
-   "bytes": 875668,
+   "tris": 18308,
+   "bytes": 1247108,
    "head": "bun",
    "body": "normal",
-   "verts": 4603,
+   "verts": 9994,
    "bones": 23
   },
   "safari_zone_worker": {
    "file": "safari_zone_worker.glb",
-   "tris": 10108,
-   "bytes": 918360,
+   "tris": 17897,
+   "bytes": 1229940,
    "head": "hat",
    "body": "normal",
-   "verts": 5239,
+   "verts": 9707,
    "bones": 23
   },
   "granny": {
    "file": "granny.glb",
-   "tris": 8770,
-   "bytes": 870244,
+   "tris": 18802,
+   "bytes": 1252804,
    "head": "bun",
    "body": "dress",
-   "verts": 4519,
+   "verts": 10225,
    "bones": 23
   },
   "balding_guy": {
    "file": "balding_guy.glb",
-   "tris": 7680,
-   "bytes": 834760,
+   "tris": 15400,
+   "bytes": 1141400,
    "head": "bald",
    "body": "normal",
-   "verts": 3978,
+   "verts": 8405,
    "bones": 23
   },
   "gameboy_kid": {
    "file": "gameboy_kid.glb",
-   "tris": 9253,
-   "bytes": 892972,
+   "tris": 17670,
+   "bytes": 1215564,
    "head": "beanie",
    "body": "normal",
-   "verts": 4811,
+   "verts": 9573,
    "bones": 23
   },
   "giovanni": {
    "file": "giovanni.glb",
-   "tris": 8288,
-   "bytes": 857464,
+   "tris": 14681,
+   "bytes": 1110348,
    "head": "short",
    "body": "normal",
-   "verts": 4295,
+   "verts": 8021,
    "bones": 23
   },
   "waiter": {
    "file": "waiter.glb",
-   "tris": 8556,
-   "bytes": 865532,
+   "tris": 15589,
+   "bytes": 1149600,
    "head": "short",
    "body": "normal",
-   "verts": 4435,
+   "verts": 8500,
    "bones": 23
   },
   "silph_president": {
    "file": "silph_president.glb",
-   "tris": 7302,
-   "bytes": 824448,
+   "tris": 14492,
+   "bytes": 1109424,
    "head": "bald",
    "body": "normal",
-   "verts": 3808,
+   "verts": 7913,
    "bones": 23
   },
   "mr_fuji": {
    "file": "mr_fuji.glb",
-   "tris": 8304,
-   "bytes": 858148,
+   "tris": 15731,
+   "bytes": 1148308,
    "head": "bald",
    "body": "coat",
-   "verts": 4322,
+   "verts": 8579,
    "bones": 23
   },
   "bike_shop_clerk": {
    "file": "bike_shop_clerk.glb",
-   "tris": 9259,
-   "bytes": 894780,
+   "tris": 15518,
+   "bytes": 1146912,
    "head": "beanie",
    "body": "normal",
-   "verts": 4826,
+   "verts": 8413,
    "bones": 23
   },
   "warden": {
    "file": "warden.glb",
-   "tris": 10506,
-   "bytes": 929700,
+   "tris": 18515,
+   "bytes": 1246316,
    "head": "bald",
    "body": "normal",
-   "verts": 5423,
+   "verts": 10076,
    "bones": 23
   },
   "lorelei": {
    "file": "lorelei.glb",
-   "tris": 10096,
-   "bytes": 980152,
+   "tris": 18785,
+   "bytes": 1355144,
    "head": "long",
    "body": "dress",
-   "verts": 5179,
-   "bones": 25
+   "verts": 10204,
+   "bones": 26
   },
   "lance": {
    "file": "lance.glb",
-   "tris": 9716,
-   "bytes": 963068,
+   "tris": 19642,
+   "bytes": 1405652,
    "head": "spiky",
    "body": "normal",
-   "verts": 5019,
-   "bones": 25
+   "verts": 10751,
+   "bones": 27
   },
   "koga": {
    "file": "koga.glb",
-   "tris": 10128,
-   "bytes": 1135540,
+   "tris": 22266,
+   "bytes": 1605728,
    "head": "beanie",
    "body": "normal",
-   "verts": 5265,
-   "bones": 30
+   "verts": 12253,
+   "bones": 32
   },
   "captain": {
    "file": "captain.glb",
-   "tris": 10246,
-   "bytes": 925780,
+   "tris": 19527,
+   "bytes": 1288100,
    "head": "beanie",
    "body": "normal",
-   "verts": 5320,
+   "verts": 10628,
    "bones": 23
   },
   "bruno": {
    "file": "bruno.glb",
-   "tris": 9360,
-   "bytes": 986992,
+   "tris": 14062,
+   "bytes": 1177480,
    "head": "bald",
    "body": "swim",
-   "verts": 4845,
+   "verts": 7467,
    "bones": 26
   },
   "agatha": {
    "file": "agatha.glb",
-   "tris": 8944,
-   "bytes": 878096,
+   "tris": 18262,
+   "bytes": 1229020,
    "head": "bun",
    "body": "dress",
-   "verts": 4617,
+   "verts": 9872,
    "bones": 23
   },
   "brock": {
    "file": "brock.glb",
-   "tris": 9150,
-   "bytes": 883880,
+   "tris": 16487,
+   "bytes": 1162452,
    "head": "spiky",
    "body": "normal",
-   "verts": 4761,
+   "verts": 8816,
    "bones": 23
   },
   "misty": {
    "file": "misty.glb",
-   "tris": 8936,
-   "bytes": 973604,
+   "tris": 17002,
+   "bytes": 1294420,
    "head": "pony",
    "body": "normal",
-   "verts": 4607,
+   "verts": 9300,
    "bones": 26
   },
   "surge": {
    "file": "surge.glb",
-   "tris": 9974,
-   "bytes": 913972,
+   "tris": 17219,
+   "bytes": 1206424,
    "head": "spiky",
    "body": "normal",
-   "verts": 5190,
+   "verts": 9443,
    "bones": 23
   },
   "erika": {
    "file": "erika.glb",
-   "tris": 9634,
-   "bytes": 899668,
+   "tris": 17434,
+   "bytes": 1208972,
    "head": "bun",
    "body": "dress",
-   "verts": 4973,
+   "verts": 9488,
    "bones": 23
   },
   "blaine": {
    "file": "blaine.glb",
-   "tris": 9520,
-   "bytes": 901384,
+   "tris": 19592,
+   "bytes": 1299024,
    "head": "bald",
    "body": "normal",
-   "verts": 4946,
+   "verts": 10877,
    "bones": 23
   },
   "sabrina": {
    "file": "sabrina.glb",
-   "tris": 9244,
-   "bytes": 951324,
+   "tris": 18549,
+   "bytes": 1343880,
    "head": "long",
    "body": "dress",
-   "verts": 4743,
-   "bones": 25
+   "verts": 10110,
+   "bones": 26
   },
   "bill": {
    "file": "bill.glb",
-   "tris": 8302,
-   "bytes": 854852,
+   "tris": 15342,
+   "bytes": 1139168,
    "head": "short",
    "body": "normal",
-   "verts": 4279,
+   "verts": 8326,
    "bones": 23
   }
  },
@@ -546,76 +546,12 @@
  },
  "humanoid": {
   "file": "humanoid.glb",
-  "base_style": {
-   "head": "short",
-   "body": "normal",
-   "source": "chars.json HEADS/BODY, down frame 0 (front) + up frame 0 (back)"
-  },
-  "height_m": 1.5,
-  "tris": 5472,
-  "material_slots": {
-   "mat_skin": {
-    "placeholder": "#e8c4a0",
-    "tint_from_cast_json": "skin"
-   },
-   "mat_hair": {
-    "placeholder": "#6a5a50",
-    "tint_from_cast_json": "hair"
-   },
-   "mat_top": {
-    "placeholder": "#b0b0b8",
-    "tint_from_cast_json": "shirt (coat for body=coat)"
-   },
-   "mat_pants": {
-    "placeholder": "#80808a",
-    "tint_from_cast_json": "pants"
-   },
-   "mat_shoes": {
-    "placeholder": "#606068",
-    "tint_from_cast_json": "shoes"
-   }
-  },
-  "fixed_materials": {
-   "mat_eye": "dark eye colour, not tinted"
-  },
-  "optional_materials": {
-   "mat_hat": "present only when the base head style has hat cells (C/c/K/B); tint from cast.json \"hat\""
-  },
-  "region_code_roles": {
-   "skin": "S s W M",
-   "eye": "E",
-   "hair": "H h L",
-   "top": "T t U A X x G g",
-   "pants": "P p",
-   "shoes": "F f",
-   "hat": "C c K B",
-   "outline O": "takes neighbouring role"
-  },
-  "bones": [
-   "root",
-   "hips",
-   "spine",
-   "head",
-   "arm_L",
-   "arm_R",
-   "leg_L",
-   "leg_R"
-  ],
-  "animations": {
-   "Idle": {
-    "seconds": 2.0,
-    "loop": true
-   },
-   "Walk": {
-    "seconds": 0.8,
-    "loop": true
-   }
-  },
-  "conventions": {
-   "front": "Blender -Y == glTF/Godot +Z",
-   "origin": "bottom centre (feet at y=0)"
-  },
-  "notes": "v1 approach: ONE base mesh for every humanoid in cast.json, recoloured at runtime by setting the mat_* slots from each cast entry's hex fields (skin/hair/shirt/pants/shoes). Per-style mesh variants (hats/caps, hairstyles, coats, dresses, backpacks, glasses) are a documented future extension and out of scope for this pass; gen_characters.py already takes --head/--body to voxelize any other HEADS/BODY style."
+  "tris": 15233,
+  "bytes": 1135588,
+  "head": "short",
+  "body": "normal",
+  "verts": 8257,
+  "bones": 23
  },
  "height_m": 1.5,
  "animations": {
@@ -704,9 +640,9 @@
  "conventions": {
   "front": "Blender -Y == glTF/Godot +Z",
   "origin": "feet at origin",
-  "materials": "single mat_atlas (procedural atlas: AO x gradient ramps + eye/cheek/emblem decals); cel-shade with Toon.apply",
-  "bones": "root > hips > spine > chest > neck > head; chest > clavicle_X > upper_arm_X > forearm_X > hand_X; hips > thigh_X > shin_X > foot_X; head > eye_L/eye_R (blink = scale z), mouth (talk = scale z); optional hair_tail*/hair_back*/hair_twin*/cape*/scarf*/band_* chains"
+  "materials": "single mat_atlas (procedural atlas: AO x gradient ramps + painted eye decals); cel-shade with Toon.apply",
+  "bones": "root > hips > spine > chest > neck > head; chest > clavicle_X > upper_arm_X > forearm_X > hand_X; hips > thigh_X > shin_X > foot_X; head > eye_L/eye_R (blink = the eyelid cap rotates about the eyeball, rot X), mouth (talk = scale z); optional hair_tail*/hair_back*/hair_twin*/cape*/scarf*/band_* chains"
  },
  "source": "pipeline/extracted/cast.json palettes + pipeline/data/character_looks.json designs",
- "elapsed_seconds": 204.6
+ "elapsed_seconds": 317.5
 }

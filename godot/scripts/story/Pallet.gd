@@ -3,6 +3,7 @@ extends RefCounted
 ## Viridian City (+ Mart parcel) and the Route 22 rival.
 
 const P := "PLAYER"
+const YELLOW := preload("res://scripts/story/Yellow.gd")
 const STARTERS := {"OAKSLAB_CHARMANDER_POKE_BALL": "CHARMANDER", "OAKSLAB_SQUIRTLE_POKE_BALL": "SQUIRTLE", "OAKSLAB_BULBASAUR_POKE_BALL": "BULBASAUR"}
 ## rival picks the starter that beats yours: [rival ball object, rival species, party offset]
 const RIVAL_PICK := {"CHARMANDER": ["OAKSLAB_SQUIRTLE_POKE_BALL", "SQUIRTLE", 1], "SQUIRTLE": ["OAKSLAB_BULBASAUR_POKE_BALL", "BULBASAUR", 2],
@@ -129,8 +130,11 @@ func _rival_leaves(rival: String) -> void:
 func _lab_enter() -> Callable:
 	# a starter pick that crashed part-way: put the balls back so the player can choose again
 	if Story.flag("EVENT_OAK_ASKED_TO_CHOOSE_MON") and not Story.flag("EVENT_GOT_STARTER") and GameState.party.is_empty():
-		for id in STARTERS:
-			Story.show(id)
+		if GameState.is_yellow():
+			Story.show("OAKSLAB_EEVEE_POKE_BALL")   # YELLOW: the one ball on the table
+		else:
+			for id in STARTERS:
+				Story.show(id)
 	if Story.flag("EVENT_OAK_WALKING_INTO_LAB"):
 		return _oak_walks_in
 	if not Story.flag("EVENT_FOLLOWED_OAK_INTO_LAB_2"):
@@ -183,14 +187,18 @@ func _lab_rival_battle() -> void:
 	Story.face(rival, "down")
 	Story.face(P, "up")
 	var pick: Array = RIVAL_PICK.get(GameState.starter, RIVAL_PICK["CHARMANDER"])
-	await Story.battle("RIVAL1", int(pick[2]), {"no_blackout": true,
+	var lab_result := await Story.battle("RIVAL1", int(pick[2]), {"no_blackout": true,
 		"win_text": Story.fmt(Story.t("OaksLabRivalIPickedTheWrongPokemonText")), "lose_text": Story.fmt(Story.t("OaksLabRivalAmIGreatOrWhatText"))})
+	if GameState.is_yellow():
+		YELLOW.after_lab_battle(lab_result)   # decides which EEVEE evolution the rival ends up with
 	Story.heal_all()
 	Story.setf("EVENT_BATTLED_RIVAL_IN_OAKS_LAB")
 	Story.music("rival")
 	await Story.say("OaksLabRivalSmellYouLaterText")
 	await _rival_leaves(rival)
 	Story.music("oak_lab")
+	if GameState.is_yellow():
+		await YELLOW.pikachu_dislikes_balls()   # PIKACHU won't stay in its POKe BALL
 
 func _oak1(_o: Dictionary) -> void:
 	if Story.bag_has("OAKS_PARCEL"):
@@ -379,6 +387,7 @@ static func catch_demo() -> void:
 	GameState.player_name = "OLD MAN"
 	await Story.wild_battle("WEEDLE", 5, {"demo": true, "no_blackout": true, "trainer_name": "OLD MAN"})
 	GameState.player_name = saved_name
+	GameState.flags[EncounterSystem.GLITCH_FLAG] = true   # leaves "OLD MAN" in the name buffer: the Old Man glitch is armed
 
 func _mart_enter() -> Callable:
 	if Story.flag("EVENT_OAK_GOT_PARCEL") or Story.bag_has("OAKS_PARCEL"):
@@ -428,6 +437,8 @@ func _route22_rival(first: bool) -> void:
 	if r == "lose":
 		Story.hide(id, "Route22")
 		return
+	if GameState.is_yellow() and first:
+		YELLOW.after_route22_first(r)
 	await Story.say("Route22RivalAfterBattleText1" if first else "Route22RivalAfterBattleText2")
 	# RIVAL1 heads past the player into the open ground to the south-east; RIVAL2 walks back west
 	await Story.move(rival, Story.path_to(rival, 30, 10) if first else "LLLLLLLL")

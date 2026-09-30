@@ -186,13 +186,22 @@ def blink_curve(t, at, width=0.02):
     return np.clip(1 - d / width, 0, 1) ** 0.8
 
 
+BLINK_DEG = 82.0      # eyelid rotation about the eyeball (char_face.BLINK_DEG)
+
+
+def set_lids(c, openness):
+    """Eyelids: `openness` is the old eye scale (1 open ... 0.12 shut, > 1 wide); the lid cap rotates about the eyeball."""
+    o = np.broadcast_to(np.asarray(openness, float), (c.n + 1,))
+    closed = np.clip((1.0 - o) / 0.88, 0.0, 1.0)
+    for eye in ('eye_L', 'eye_R'):
+        c.r(eye)[:, 0] = BLINK_DEG * closed
+
+
 def add_face(c, t, blinks=(0.32, 0.74), talk=None):
     b = np.zeros_like(t)
     for at in blinks:
         b = np.maximum(b, blink_curve(t, at, 0.022))
-    for eye in ('eye_L', 'eye_R'):
-        c.s(eye)[:, 2] = 1.0 - 0.88 * b
-        c.s(eye)[:, 0] = 1.0 + 0.06 * b
+    set_lids(c, 1.0 - 0.88 * b)
     if talk is not None:
         c.s('mouth')[:, 2] = talk
         c.s('mouth')[:, 0] = 1.0 - (talk - 1.0) * 0.2
@@ -415,8 +424,7 @@ def build_laugh(P, hair):
         c.r('forearm_' + side)[:, 0] += -55 - 6 * shake
     mouth = 1.0 + 1.6 * (0.5 + 0.5 * np.sin(w * 6 + 0.5))
     add_face(c, t, blinks=(), talk=mouth)
-    for eye in ('eye_L', 'eye_R'):
-        c.s(eye)[:, 2] = 0.35
+    set_lids(c, 0.35)
     return c
 
 
@@ -466,8 +474,7 @@ def build_sleep(P, hair):
         c.r('shin_' + side)[:, 0] += 30
         c.r('foot_' + side)[:, 0] += -15
     add_face(c, t, blinks=(), talk=1.0 + 0.5 * np.clip(np.sin(w) , 0, 1))
-    for eye in ('eye_L', 'eye_R'):
-        c.s(eye)[:, 2] = 0.1
+    set_lids(c, 0.1)
     return c
 
 
@@ -485,8 +492,7 @@ def build_surprised(P, hair):
         c.r('thigh_' + side)[:, 0] += -10 * jump
         c.r('shin_' + side)[:, 0] += 16 * jump
     add_face(c, t, blinks=(), talk=1.0 + 1.4 * s)
-    for eye in ('eye_L', 'eye_R'):
-        c.s(eye)[:, 2] = 1.0 + 0.3 * s
+    set_lids(c, 1.0 + 0.3 * s)
     return c
 
 
@@ -518,8 +524,7 @@ def build_stretch(P, hair):
     c.r('head')[:, 0] += -12 * a
     c.l('hips')[:, 2] += 0.1 * a
     add_face(c, t, blinks=(), talk=1.0 + 1.7 * a * np.clip(np.sin(math.pi * np.clip((t - 0.3) / 0.4, 0, 1)), 0, 1))
-    for eye in ('eye_L', 'eye_R'):
-        c.s(eye)[:, 2] = 1.0 - 0.8 * a
+    set_lids(c, 1.0 - 0.8 * a)
     return c
 
 
@@ -559,8 +564,7 @@ def build_sad(P, hair):
         c.r('upper_arm_' + side)[:, 1] += sg * 3 * a
         c.r('forearm_' + side)[:, 0] += -4 * a
     add_face(c, t, blinks=(0.3, 0.7), talk=1.0 - 0.35 * a)
-    for eye in ('eye_L', 'eye_R'):
-        c.s(eye)[:, 2] = 1.0 - 0.45 * a
+    set_lids(c, 1.0 - 0.45 * a)
     return c
 
 
@@ -621,7 +625,7 @@ def _quats_local(rot_deg, R):
     return out
 
 
-SCALE_BONES = ('chest', 'eye_L', 'eye_R', 'mouth')
+SCALE_BONES = ('chest', 'mouth')
 
 
 def write_actions(arm, clips, bone_names, unit=1.0):

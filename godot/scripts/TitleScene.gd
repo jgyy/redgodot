@@ -11,6 +11,8 @@ const TITLE_MONS := ["CHARMANDER", "SQUIRTLE", "BULBASAUR", "WEEDLE", "NIDORAN_M
 	"RHYDON", "ABRA", "GASTLY", "DITTO", "PIDGEOTTO", "ONIX", "PONYTA", "MAGIKARP"]
 ## Upstream's cycle starts at CHARMANDER; start on BULBASAUR like reference 001.
 const FIRST_MON := 2
+## NEW GAME > which version (order = GameData.VERSIONS)
+const VERSION_CHOICES := ["RED VERSION", "BLUE VERSION", "YELLOW VERSION"]
 
 const SKY_SHADER := """
 shader_type spatial;
@@ -204,6 +206,14 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		_open_menu()
 
+## Screenshots (--scene=version_menu): the NEW GAME version list open, with `v` highlighted and shown under the logo.
+func pose_version_menu(v: String = "YELLOW") -> void:
+	_menu_open = true
+	_overlay.version = v
+	var m := PxMenu.new()
+	m.setup(VERSION_CHOICES, {"x": 6, "y": 6, "w": 190, "sel": maxi(0, GameData.VERSIONS.find(v))})
+	_overlay.get_parent().add_child(m)
+
 func _open_menu() -> void:
 	_menu_open = true
 	UI.sfx("select")
@@ -227,6 +237,16 @@ func _open_menu() -> void:
 		if opts[r] == "CONTINUE" and not GameState.load_save():
 			await UI.say("The save file could not be loaded.")   # stay on the title instead of starting with empty state
 			continue
+		if opts[r] == "NEW GAME":
+			# which game to play: the wild POKéMON, trainer teams, NPC gifts and the starter differ (data/versions.json)
+			var vi := await PxMenu.pick(_overlay.get_parent(), VERSION_CHOICES, {"x": 6, "y": 6, "w": 190})
+			if vi < 0:
+				_overlay.version = ""
+				continue
+			GameState.pending_version = GameData.VERSIONS[vi]
+			_overlay.version = GameState.pending_version
+			UI.sfx("select")
+			await get_tree().create_timer(0.6).timeout
 		done = true
 		await _overlay.fade(20, Color.BLACK, true)
 		if opts[r] == "CONTINUE":

@@ -238,6 +238,8 @@ func _bench(_h: Dictionary, label: String) -> void:
 ## cable club receptionist (engine/link/cable_club_npc.asm, no link partner)
 func _cable_club(_o: Dictionary) -> void:
 	await Story.say("CableClubNPCWelcomeText")
+	if Story.flag("EVENT_GOT_POKEDEX"):
+		await Story.solo_trade_center()   # port extension: trade evolution without a second Game Boy
 	await Story.wait(60)
 	await Story.say("CableClubNPCAreaReservedFor2FriendsLinkedByCableText" if Story.flag("EVENT_GOT_POKEDEX") else "CableClubNPCMakingPreparationsText")
 
@@ -743,20 +745,20 @@ static func prize_menu(which: int) -> void:
 		await Story.say("RequireCoinCaseText")
 		return
 	await Story.say("ExchangeCoinsForPrizesText")
-	var list: Array = PRIZES[which]
+	var list: Array = (Story.pokedata.get("prizes", PRIZES) as Array)[which]   # the active version's window (RED / BLUE / YELLOW)
 	var is_tm := which == 2
 	var box := Story.info_box(func() -> Array: return [Story.coin_str()])
 	var items: Array = []
 	for e in list:
 		var nm := Story.item_name(e[0]) if is_tm else Story.species_name(e[0])
-		items.append(nm.rpad(10) + str(e[1]).lpad(5))
+		items.append(nm.rpad(10) + str(int(e[1])).lpad(5))
 	items.append("NO THANKS")
 	var r := await Story.menu_with_text("WhichPrizeText", items, {"x": 6, "y": 30, "w": 200})
 	if r < 0 or r == 3:
 		Story.close_box(box)
 		return
 	var id: String = list[r][0]
-	var cost: int = list[r][1]
+	var cost: int = int(list[r][1])
 	Story.setvar("wNameBuffer", Story.item_name(id) if is_tm else Story.species_name(id))
 	if not await Story.ask("SoYouWantPrizeText"):
 		await Story.say("OhFineThenText")

@@ -39,6 +39,34 @@ The result: **151/151 species** (full stats, movesets, learnsets, evolutions),
 tile-accurate), **73 named cast members**, all sourced directly from the
 original game's real data tables — nothing here is invented.
 
+### 1b. Game versions: RED / BLUE / YELLOW (`pipeline/scripts/extract_versions.py`, Python 3, needs network)
+
+The upstream remake is Red only. `godot/data/versions.json` holds everything that differs in the other two cartridges,
+extracted from the real disassemblies ([pret/pokered](https://github.com/pret/pokered) for RED and BLUE,
+[pret/pokeyellow](https://github.com/pret/pokeyellow)) so it is reproducible:
+
+```sh
+python3 pipeline/scripts/extract_versions.py [--cache /tmp/pret-cache]   # writes godot/data/versions.json
+cp godot/data/versions.json pipeline/extracted/versions.json
+python3 pipeline/scripts/content_audit.py                                 # the numbers behind docs/CONTENT_AUDIT.md
+```
+
+| Key | Content | Source file(s) |
+| --- | --- | --- |
+| `wild` | grass/water tables per map, RED / BLUE / YELLOW (`IF DEF(_RED)` blocks resolved) | `data/wild/grass_water.asm`, `data/wild/maps/*.asm` |
+| `goodRod`, `superRod` | fishing groups | `data/wild/good_rod.asm`, `super_rod.asm` |
+| `trades` | the ten in-game trades | `data/events/trades.asm` |
+| `prizes` | Game Corner prize windows (species, coins, level) | `data/events/prizes.asm`, `prize_mon_levels.asm` |
+| `marts` (YELLOW) | stock of the marts that differ | `data/items/marts.asm` |
+| `parties`, `specialMoves`, `jessieJames` (YELLOW) | every trainer team, custom movesets, the four Jessie & James teams | `data/trainers/parties.asm`, `special_moves.asm` |
+| `species` (YELLOW) | base stats / start moves / learnset / evolution changes (34 POKeMON) | `data/pokemon/base_stats/*.asm`, `evos_moves.asm` |
+| `objects` (YELLOW) | per map: trainer/item/position patches, added and removed NPCs (matched by `TEXT_*` constant) | `data/maps/objects/*.asm` |
+| `text` (YELLOW) | dialogue that differs from RED (326 labels) | `text/*.asm` |
+
+`GameData.apply_version()` swaps all of this over the RED base data at runtime (`GameState.set_version`), and
+`VersionTests.gd` checks the results against the values the disassemblies document. RED's tables parsed from pokered are
+asserted equal to the upstream Red data, so the extractor itself is verified on every run.
+
 ## 2. 3D generation (`pipeline/blender/*.py`, run with headless Blender)
 
 Pokemon and trainer models are built from upstream's own art definitions — see
@@ -110,7 +138,7 @@ originally Sketchfab uploads). They are Draco-compressed, mostly unrigged and po
 git clone --depth 1 https://github.com/Pokemon-3D-api/assets.git pipeline/_assets     # or set SRC_ASSETS=<clone>
 python3 pipeline/blender/gen_rigged_pokemon.py -- --all --jobs 4                      # 151 + MISSINGNO., ~1.5 min on 4 cores
 python3 pipeline/blender/gen_rigged_pokemon.py -- --only PIKACHU,CHARIZARD           # while iterating
-python3 pipeline/blender/verify_glb.py godot/assets/models/pokemon --require-skin --anims Idle,Walk,Run,Attack,Special,Hurt,Faint,Victory,Sleep,Roar,Dodge,Spin,Hop,Charge,Taunt,Spawn,Hover,Talk
+python3 pipeline/blender/verify_glb.py godot/assets/models/pokemon --require-skin --min-anims 24 --tpose --bones-report
 # contact sheets -> docs/gallery/{pokemon-151-3d,characters-3d}[-back].png
 UPSTREAM=/path/to/pokemon-claude-red GODOT_BIN=/opt/godot/godot4 pipeline/scripts/model_sheets.sh
 ```
@@ -122,14 +150,47 @@ Steps per species (all in `gen_rigged_pokemon.py`):
 2. **Normalise** - feet on the ground, centred, facing +Z (glTF/Godot), scaled to the Pokedex height, decimated to at most
    14k triangles, textures capped at 512 px. `pipeline/data/pokemon_model_overrides.json` fixes the odd model (Pikachu's axes,
    Rapidash's flame masks, T-posed arms that get lowered).
-3. **Rig** - 17 bones fitted to each mesh's own proportions (upright vs horizontal body plan, head slab, tail cluster,
-   feet/hands found from the vertex cloud): Root, Hips, Spine, Chest, Neck, Head, Tail1-3 and four 2-bone limbs. Smooth
-   inverse-distance skin weights, 4 influences per vertex.
-4. **Animate** - 18 clips baked at 30 fps, expressed as world-axis rotations/translations per bone so they work on every
-   skeleton: `Idle Walk Run Attack Special Hurt Faint Victory Sleep Roar Dodge Spin Hop Charge Taunt Spawn Hover Talk`.
-   `Idle Walk Run Sleep Charge Taunt Hover Talk` loop seamlessly (last key == first key).
-5. **Export** - glb (JPEG textures, extracted by Godot's importer next to the glb like the character atlases) and an updated
-   `manifest.json` (`height_m`, `px_height` used to size battlers like upstream's 64 px sprites, tris, bones).
+3. **Rig** (`pokemon_rig.py`, `pokemon_geom.py`, `pokemon_skin.py`) - a *species-specific* skeleton. The surface graph of the mesh is
+   swept by geodesic distance from the body centre; every persistent extremity (topological persistence, so fingers and
+   toes fold into their limb) is a limb / ear / tail / wing / fin / tentacle / leaf chain, its role decided from where it sits
+   on the body and from that species' row in `pipeline/data/pokemon_species_rig.json` (body plan, arm/leg/wing/ear/tail counts,
+   temper, notes). The trunk (Hips, Spine1-n, Neck, Head, Jaw) is sized from the real body length, serpents get an 8-14 bone
+   body chain, blobs and balls a Body/Crown/Side/Face core, and so on, so bone **count and names differ per species** (8-39
+   bones; 150+ distinct name sets). Weights are radius-aware (a thin limb cannot capture the torso beside it), 4 influences,
+   Laplacian-relaxed on the welded surface. A **corrective natural rest pose** is then computed through the rig and *baked
+   into the mesh*: arms that stick out sideways (T/A pose) are aimed to hang, splayed legs are rolled under the body, wings are
+   half-folded - the exported rest pose *is* the natural pose, no clip starts in a T.
+4. **Animate** (`pokemon_clips.py`, `pokemon_arch.py`, `pokemon_anim.py`, `pokemon_species.py`) - 30 clips per species at 30 fps
+   (keys every 2nd frame, linear), authored from the species' own rig by semantic layers (`bend(bone, toward, deg)` in world
+   directions, so they are correct on any skeleton): the 18 game clips `Idle Walk Run Attack Special Hurt Faint Victory Sleep
+   Roar Dodge Spin Hop Charge Taunt Spawn Hover Talk` (body-plan gaits: biped stride, quadruped trot/gallop, bird head-bob,
+   serpent slither, fish undulation, blob squash-hop, multi-leg tripod, plant sway, float bob, starfish roll ...; mass, tempo,
+   temper and per-species jitter pick amplitudes, durations and between 2-3 authored variants of each clip), three idle variants
+   (`IdleLook IdleStretch IdleFidget`) and 6-9 **signature clips** named after moves from the species' own learnset
+   (`Flamethrower`, `ThunderShock`, `Slash`, `Bind` ...) drawn from ~30 move archetypes (strike, bite, headbutt, beam, burst,
+   shock, whip, bind, dive, fly_up, harden, psychic ...). `Idle Walk Run Sleep Charge Taunt Hover Talk` loop seamlessly.
+5. **Export** - glb (JPEG textures) post-processed by `pokemon_glb.py` (channels that never leave the rest pose are dropped, identical
+   accessors are shared: ~0.4 MB less per file) and an updated `manifest.json` (`height_m`, `px_height` used to size battlers
+   like upstream's 64 px sprites, tris, bones, plan, signature clips).
+
+```mermaid
+flowchart LR
+  M[source mesh] --> G[surface graph + geodesic tips]
+  G --> S[skeleton: trunk + limb/ear/tail/wing chains]
+  T[species_rig.json<br/>plan, counts, temper] --> S
+  S --> W[radius-aware skin weights]
+  W --> P[natural rest pose baked into mesh]
+  S --> C[clip catalog: 18 base + 3 idle + 6-9 signature]
+  L[pokedata learnset] --> C
+  P --> B[Blender bake + glb]
+  C --> B
+  B --> X[prune static channels] --> O[(POKEMON.glb)]
+```
+
+Checks: `verify_glb.py ... --min-anims 24 --tpose --bones-report` (plain python; CI) and
+`python3 -m unittest discover -s pipeline/tests` (numpy): unique skeletons, >= 24 clips, no T-pose (limb angle measured on the
+skinned Idle frame 0), every clip of a species differs from every other, the same clip differs between species of one plan, no
+clip stretches an edge more than 15x, looping clips close. `pipeline/blender/pokemon_check.py <dir>` prints the numbers.
 
 MISSINGNO. has no public model: `pipeline/data/MISSINGNO_source.glb` (the glitch slab built earlier from upstream's
 `glitchSprite()` output) goes through the same rig + animation step.
@@ -270,3 +331,31 @@ sprite's glass pixels.
   slots are vertex alpha ids 11-15 (wall / roof / trim / door / shutter) on a grey ramp; `BuildingBuilder._part`
   recolours them per building and bakes the instance into the building's single mesh. Fixed-colour parts
   (glass, steel, lamp glow) use alpha 1.
+
+### Furniture, nature, town and building-module models (`env_furn.py`, `env_nature.py`, `env_town.py`, `env_mods.py`)
+
+153 more props built on the same `Prop` kit (bevelled boxes with 1-2 segment rounds, lathes, swept tubes, faceted
+blobs; ramp-lit vertex colours, baked ground AO). Self-lit ramps (screens, LEDs, lamp glass) use vertex alpha 15/16
+so `tree.gdshader` keeps them bright at night. `env_ext.py` registers the extra ramps (plastics, cloth, crystals,
+ice, lava ...); `env_registry.py` lists the four sets for `gen_world.py`, which writes
+`assets/models/world/<name>.glb` plus the manifest (`GEN_SET=furniture,nature,town,building` or
+`GEN_ONLY=pc,heal_machine` regenerate a subset; without them everything is rebuilt). `gen_tiles.py` also writes
+textured copies of the hero props into `assets/models/tiles/`.
+
+- `env_furn.py` - PC, laptop, CRT TVs, Poke Ball healing machine (2 x 2 cells), bookshelves, mart shelves, racks,
+  vending / slot machines, stove, sink, fridge, seating, lab machines, generator, table-top items ... and five
+  modular *sets* (`table_set`, `desk_set`, `counter_center_set`, `counter_mart_set`, `bench_set`): one glb holding a
+  mesh per neighbour mask (`m0..m15`), so a run of table cells gets end / middle / corner pieces.
+- `env_nature.py` - tree species (pine, slim pine, oak, birch, dead, cherry, palm, autumn, apple), bushes, ferns,
+  reeds, lily pads, flower patches, rocks, stalagmites, crystals, ice, lava rock, logs, stumps, driftwood ...
+- `env_town.py` - mailbox, lamp, benches, fountain, hydrant, market stall, flag, windmill, gates and arches, bridge /
+  dock parts, boats, lighthouse, pylon, water tower, truck, container, incense burner ...
+- `env_mods.py` - roof aerials / vanes / masts / hatches / tanks and one roof ornament per gym type.
+
+Godot side: `FurnitureKit.gd` (label cells -> furniture, neighbour-aware), `DressingKit.gd` (tree species, shores,
+meadows, caves, nooks, bridge rails, roofs, hand-placed landmarks), both drawing through `PropKit`'s chunked
+MultiMeshes; `EnvTests.gd` covers them (and builds the props of all 223 maps in the unit tests).
+`python3 pipeline/blender/verify_glb.py godot/assets/models/world --min-kb 1 --max-kb 300 --max-tris 4000 --meshes
+table_set=16,desk_set=16,counter_center_set=16,counter_mart_set=16,bench_set=4` checks the files;
+`--scene=model_sheet --kind=props|kit --dir=world|tiles --view=game|close` renders the contact sheets
+(`docs/gallery/props-sheet.png`).

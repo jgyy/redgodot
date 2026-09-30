@@ -131,8 +131,12 @@ func _setup_camera() -> void:
 	_camera.near = 0.5
 	_camera.far = 200.0
 	var pitch := deg_to_rad(WorldData.CAM_PITCH_DEG)
+	var dist := CAM_DIST
+	for a in OS.get_cmdline_user_args():   # --cam_dist=N : closer inspection shots of props (screenshots only)
+		if a.begins_with("--cam_dist="):
+			dist = float(a.substr("--cam_dist=".length()))
 	_camera.transform = Transform3D.IDENTITY
-	_camera.position = Vector3(0.0, sin(pitch) * CAM_DIST, cos(pitch) * CAM_DIST)
+	_camera.position = Vector3(0.0, sin(pitch) * dist, cos(pitch) * dist)
 	_camera.rotation = Vector3(-pitch, 0.0, 0.0)
 	_camera.current = true
 	_sun.shadow_enabled = false
@@ -631,8 +635,11 @@ func _try_interact() -> void:
 		follower.face(OPP[player.facing])
 		interacted.emit("follower", {"species": _follower_species})
 		var mon: GameState.PartyMon = GameState.party[0] if not GameState.party.is_empty() else null
+		if GameState.is_yellow() and PikachuBuddy.buddy() != null:
+			mon = PikachuBuddy.buddy()   # YELLOW: the partner is always the starter PIKACHU, wherever it stands in the party
 		if mon:
-			var mood := follower_mood(mon, _map_loader.map_name, _map_loader.is_tall_grass(player.cell), _rng)
+			var mood: Array = PikachuBuddy.mood(mon, _map_loader.map_name, _map_loader.is_tall_grass(player.cell), _rng) if mon.buddy \
+				else follower_mood(mon, _map_loader.map_name, _map_loader.is_tall_grass(player.cell), _rng)
 			var au := get_node_or_null("/root/Audio")
 			if au and au.has_method("cry"):
 				au.cry(mon.species_id)
@@ -785,6 +792,9 @@ static func follower_mood(m: GameState.PartyMon, map_name: String, in_grass: boo
 func _lead_species() -> String:
 	if bool(GameState.get_meta("no_follower", false)) or not bool(GameState.options.get("follower", true)) or GameState.party.is_empty():
 		return ""
+	if GameState.is_yellow():   # YELLOW: PIKACHU walks behind you (and only PIKACHU), while it is up
+		var b := PikachuBuddy.buddy()
+		return b.species_id if b != null and b.hp > 0 else ""
 	var pm: GameState.PartyMon = GameState.party[0]
 	return pm.species_id if pm.hp > 0 else ""
 

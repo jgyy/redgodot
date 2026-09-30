@@ -41,10 +41,19 @@ jobs:
       - name: Install Xvfb + Mesa software renderer
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends xvfb libgl1-mesa-dri
 
-      - name: Verify Pokémon glbs (rigged, 18 clips each)
+      - name: Verify Pokémon glbs (species-specific rigs, >= 24 clips each, no T-pose)
         run: |
-          python3 pipeline/blender/verify_glb.py godot/assets/models/pokemon --require-skin --min-kb 20 \
-            --anims Idle,Walk,Run,Attack,Special,Hurt,Faint,Victory,Sleep,Roar,Dodge,Spin,Hop,Charge,Taunt,Spawn,Hover,Talk
+          python3 pipeline/blender/verify_glb.py godot/assets/models/pokemon --require-skin --min-kb 20 --max-kb 2200 \
+            --min-anims 24 --tpose --bones-report \
+            --anims Idle,Walk,Run,Attack,Special,Hurt,Faint,Victory,Sleep,Roar,Dodge,Spin,Hop,Charge,Taunt,Spawn,Hover,Talk,IdleLook,IdleStretch,IdleFidget
+
+      - name: Pokémon rig tests (T-pose angles, unique skeletons, clip distinctness, mesh stretch)
+        run: |
+          python3 -m pip install --quiet numpy
+          python3 -m unittest discover -s pipeline/tests -v
+
+      - name: Verify Pokémon eyes and materials (no alpha layers, non-metallic, eyes present, textures <= 512)
+        run: python3 pipeline/scripts/check_pokemon_eyes.py
 
       - name: Verify NPC glbs (rigged, 19 clips each)
         run: |
@@ -52,6 +61,26 @@ jobs:
             --anims Idle,Walk,Run,Talk,Wave,Cheer,Nod,Shake,Think,Laugh,Bow,Point,Sleep,Surprised,Salute,Stretch,Dance,Sad,Shiver
           python3 pipeline/blender/verify_glb.py godot/assets/models/player --prefix head_ --require-skin --min-kb 20 \
             --anims Idle,Walk,Run,Talk,Wave,Cheer,Nod,Shake,Think,Laugh,Bow,Point,Sleep,Surprised,Salute,Stretch,Dance,Sad,Shiver
+
+      - name: Version data (RED / BLUE / YELLOW) is complete and in sync with pipeline/extracted
+        run: |
+          cmp godot/data/versions.json pipeline/extracted/versions.json
+          python3 - <<'EOF'
+          import json
+          v = json.load(open("godot/data/versions.json"))
+          assert v["versions"] == ["RED", "BLUE", "YELLOW"]
+          for k in ("wild", "goodRod", "superRod", "trades", "prizes"):
+              assert set(v[k]) == {"RED", "BLUE", "YELLOW"}, k
+          assert v["redPartiesMatchBase"], "pokered trainer parties must equal the base Red data"
+          assert len(v["parties"]["YELLOW"]) == 47 and len(v["species"]["YELLOW"]) >= 20
+          print("versions.json OK:", {k: len(v["wild"][k]) for k in v["wild"]}, "wild maps")
+          EOF
+
+      - name: Check the character clipping report (nothing pokes through at rest, animated penetrations within budget)
+        run: python3 pipeline/blender/check_clipping_report.py
+
+      - name: Verify environment prop glbs
+        run: python3 pipeline/blender/verify_glb.py godot/assets/models/world --min-kb 1 --max-kb 300 --max-tris 4000 --meshes table_set=16,desk_set=16,counter_center_set=16,counter_mart_set=16,bench_set=4
 
       - name: Import project
         run: timeout 20m /opt/godot/godot4 --headless --path godot --import
@@ -64,6 +93,17 @@ jobs:
 
       - name: New-game playtest (Pallet -> Oak -> starter -> rival battle)
         run: timeout 10m /opt/godot/godot4 --headless --path godot -- --scene=ow_playtest
+
+      - name: New-game playtest, BLUE (SQUIRTLE, Blue's wild tables)
+        run: timeout 10m /opt/godot/godot4 --headless --path godot -- --scene=ow_playtest --version=BLUE --starter=SQUIRTLE
+
+      - name: New-game playtest, YELLOW (PIKACHU from Oak, follows the player, rival EEVEE)
+        run: timeout 10m /opt/godot/godot4 --headless --path godot -- --scene=ow_playtest --version=YELLOW
+
+      - name: Title screen -> NEW GAME -> version list -> Oak's speech (YELLOW, then BLUE)
+        run: |
+          timeout 5m /opt/godot/godot4 --headless --path godot -- --scene=title_playtest --version=YELLOW
+          timeout 5m /opt/godot/godot4 --headless --path godot -- --scene=title_playtest --version=BLUE
 
       - name: Spinner tiles (Viridian Gym arrow ride ends on the stop tile)
         run: timeout 5m /opt/godot/godot4 --headless --path godot -- --scene=ow_spinner_test
@@ -81,6 +121,11 @@ jobs:
             shot "$scene" --scene="$scene" --wait=1.5
           done
           shot wtp-quiz --scene=wtp --wait=1.5
+          shot version-menu --scene=version_menu --version=YELLOW --wait=1.5
+          shot yellow-pikachu-follower --scene=overworld --version=YELLOW --player=PIKACHU --map=PalletTown --pc=14,14 \
+            --facing=left --time=day --wait=1.5
+          shot yellow-oaks-lab --scene=overworld --version=YELLOW --player=PIKACHU --map=OaksLab --pc=5,7 --facing=up \
+            --time=day --story=off --wait=1.5
           shot pallet-town --scene=overworld --map=PalletTown --pc=10,9 --wait=1.5
           shot battle-flamethrower --scene=battle --wait=0.3 --player=CHARIZARD --player_level=50 \
             --enemy=BLASTOISE --level=50 --env=grass --state=vfx --move=FLAMETHROWER --vfx_t=0.4

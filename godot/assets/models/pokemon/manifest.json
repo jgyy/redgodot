@@ -158,649 +158,1945 @@
    "height_m": 0.711,
    "px_height": 42.95,
    "tris": 4338,
-   "bones": 17,
+   "bones": 29,
    "file": "BULBASAUR.glb",
-   "bytes": 523848,
-   "status": "generated"
+   "bytes": 684756,
+   "status": "generated",
+   "plan": "quadruped",
+   "signature": [
+    "Tackle",
+    "Growl",
+    "LeechSeed",
+    "VineWhip",
+    "Growth",
+    "Solarbeam",
+    "BodySlam",
+    "Rage",
+    "MegaDrain"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "CHARMELEON": {
    "height_m": 1.092,
    "px_height": 58.85,
-   "tris": 5404,
-   "bones": 17,
+   "tris": 5256,
+   "bones": 29,
    "file": "CHARMELEON.glb",
-   "bytes": 529172,
-   "status": "generated"
+   "bytes": 651612,
+   "status": "generated",
+   "plan": "biped_tail",
+   "signature": [
+    "Scratch",
+    "Growl",
+    "Ember",
+    "Rage",
+    "Flamethrower",
+    "FireSpin",
+    "SwordsDance",
+    "MegaKick",
+    "Toxic"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "BLASTOISE": {
    "height_m": 1.6,
    "px_height": 53.41,
-   "tris": 6305,
-   "bones": 17,
+   "tris": 6101,
+   "bones": 20,
    "file": "BLASTOISE.glb",
-   "bytes": 586748,
-   "status": "generated"
+   "bytes": 604712,
+   "status": "generated",
+   "plan": "shell",
+   "signature": [
+    "Tackle",
+    "TailWhip",
+    "Bubble",
+    "Bite",
+    "Withdraw",
+    "SkullBash",
+    "MegaPunch",
+    "Toxic",
+    "BodySlam"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "WEEDLE": {
    "height_m": 0.305,
    "px_height": 36.67,
    "tris": 4476,
-   "bones": 17,
+   "bones": 24,
    "file": "WEEDLE.glb",
-   "bytes": 486940,
-   "status": "generated"
+   "bytes": 525800,
+   "status": "generated",
+   "plan": "multileg",
+   "signature": [
+    "PoisonSting",
+    "LeechLife",
+    "Acid",
+    "Smog",
+    "Tackle",
+    "Headbutt",
+    "Slam",
+    "Growl",
+    "Harden"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "PIDGEOTTO": {
    "height_m": 1.092,
    "px_height": 52.51,
-   "tris": 5640,
-   "bones": 17,
+   "tris": 5608,
+   "bones": 27,
    "file": "PIDGEOTTO.glb",
-   "bytes": 599556,
-   "status": "generated"
+   "bytes": 650948,
+   "status": "generated",
+   "plan": "bird",
+   "signature": [
+    "Gust",
+    "SandAttack",
+    "QuickAttack",
+    "Whirlwind",
+    "MirrorMove",
+    "Toxic",
+    "TakeDown",
+    "Rage",
+    "SkyAttack"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "SPEAROW": {
    "height_m": 0.305,
    "px_height": 52.55,
    "tris": 4822,
-   "bones": 17,
+   "bones": 31,
    "file": "SPEAROW.glb",
-   "bytes": 559088,
-   "status": "generated"
+   "bytes": 682072,
+   "status": "generated",
+   "plan": "bird",
+   "signature": [
+    "Growl",
+    "FuryAttack",
+    "MirrorMove",
+    "Agility",
+    "RazorWind",
+    "Whirlwind",
+    "Toxic",
+    "TakeDown",
+    "Rage"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "PIKACHU": {
    "height_m": 0.406,
    "px_height": 61.69,
    "tris": 4556,
-   "bones": 17,
+   "bones": 31,
    "file": "PIKACHU.glb",
-   "bytes": 471756,
-   "status": "generated"
+   "bytes": 586028,
+   "status": "generated",
+   "plan": "biped_tail",
+   "signature": [
+    "Thundershock",
+    "Growl",
+    "QuickAttack",
+    "MegaPunch",
+    "Toxic",
+    "BodySlam",
+    "TakeDown",
+    "PayDay",
+    "Rage"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "NIDORAN_F": {
    "height_m": 0.406,
    "px_height": 38.49,
    "tris": 4352,
-   "bones": 17,
+   "bones": 31,
    "file": "NIDORAN_F.glb",
-   "bytes": 477192,
-   "status": "generated"
+   "bytes": 620324,
+   "status": "generated",
+   "plan": "quadruped_small",
+   "signature": [
+    "Growl",
+    "Tackle",
+    "Scratch",
+    "PoisonSting",
+    "TailWhip",
+    "DoubleKick",
+    "BodySlam",
+    "Blizzard",
+    "Rage"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "NIDORINO": {
    "height_m": 0.889,
    "px_height": 40.36,
    "tris": 4914,
-   "bones": 17,
+   "bones": 31,
    "file": "NIDORINO.glb",
-   "bytes": 504260,
-   "status": "generated"
+   "bytes": 620156,
+   "status": "generated",
+   "plan": "quadruped_small",
+   "signature": [
+    "Leer",
+    "Tackle",
+    "HornAttack",
+    "PoisonSting",
+    "FocusEnergy",
+    "DoubleKick",
+    "Thrash",
+    "Toxic",
+    "BodySlam"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "VULPIX": {
    "height_m": 0.61,
    "px_height": 39.17,
    "tris": 5631,
-   "bones": 17,
+   "bones": 39,
    "file": "VULPIX.glb",
-   "bytes": 573792,
-   "status": "generated"
+   "bytes": 822468,
+   "status": "generated",
+   "plan": "quadruped",
+   "signature": [
+    "Ember",
+    "TailWhip",
+    "QuickAttack",
+    "RoarCall",
+    "ConfuseRay",
+    "Flamethrower",
+    "FireSpin",
+    "Toxic",
+    "BodySlam"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "ZUBAT": {
    "height_m": 0.787,
    "px_height": 50.38,
    "tris": 3784,
-   "bones": 17,
+   "bones": 20,
    "file": "ZUBAT.glb",
-   "bytes": 467016,
-   "status": "generated"
+   "bytes": 485112,
+   "status": "generated",
+   "plan": "winged",
+   "signature": [
+    "LeechLife",
+    "Supersonic",
+    "WingAttack",
+    "HazeMist",
+    "Whirlwind",
+    "Toxic",
+    "TakeDown",
+    "Rage",
+    "Mimic"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "VILEPLUME": {
    "height_m": 1.194,
    "px_height": 44.75,
    "tris": 4816,
-   "bones": 17,
+   "bones": 23,
    "file": "VILEPLUME.glb",
-   "bytes": 507012,
-   "status": "generated"
+   "bytes": 607948,
+   "status": "generated",
+   "plan": "plant",
+   "signature": [
+    "Acid",
+    "PetalDance",
+    "SwordsDance",
+    "TakeDown",
+    "Rage",
+    "MegaDrain",
+    "Mimic",
+    "DoubleTeam",
+    "Reflect"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "VENOMOTH": {
    "height_m": 1.499,
    "px_height": 53.56,
-   "tris": 4940,
-   "bones": 17,
+   "tris": 4626,
+   "bones": 31,
    "file": "VENOMOTH.glb",
-   "bytes": 531540,
-   "status": "generated"
+   "bytes": 614732,
+   "status": "generated",
+   "plan": "winged",
+   "signature": [
+    "Tackle",
+    "Disable",
+    "LeechLife",
+    "Psybeam",
+    "Psychic",
+    "RazorWind",
+    "Whirlwind",
+    "Rage",
+    "Teleport"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "PERSIAN": {
    "height_m": 0.991,
    "px_height": 50.67,
-   "tris": 4946,
-   "bones": 17,
+   "tris": 4810,
+   "bones": 28,
    "file": "PERSIAN.glb",
-   "bytes": 538440,
-   "status": "generated"
+   "bytes": 636440,
+   "status": "generated",
+   "plan": "quadruped",
+   "signature": [
+    "Scratch",
+    "Growl",
+    "Screech",
+    "PayDay",
+    "FurySwipes",
+    "Toxic",
+    "BodySlam",
+    "TakeDown",
+    "Bubblebeam"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "PRIMEAPE": {
    "height_m": 0.991,
    "px_height": 51.71,
    "tris": 3910,
-   "bones": 17,
+   "bones": 22,
    "file": "PRIMEAPE.glb",
-   "bytes": 485692,
-   "status": "generated"
+   "bytes": 471672,
+   "status": "generated",
+   "plan": "biped_humanoid",
+   "signature": [
+    "Scratch",
+    "Leer",
+    "FurySwipes",
+    "SeismicToss",
+    "Thrash",
+    "Toxic",
+    "TakeDown",
+    "HyperBeam",
+    "PayDay"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "POLIWHIRL": {
    "height_m": 0.991,
    "px_height": 40.37,
-   "tris": 4562,
-   "bones": 17,
+   "tris": 4386,
+   "bones": 19,
    "file": "POLIWHIRL.glb",
-   "bytes": 498480,
-   "status": "generated"
+   "bytes": 445464,
+   "status": "generated",
+   "plan": "biped_humanoid",
+   "signature": [
+    "Hypnosis",
+    "Doubleslap",
+    "BodySlam",
+    "Amnesia",
+    "HydroPump",
+    "MegaPunch",
+    "MegaKick",
+    "Toxic",
+    "Counter"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "ALAKAZAM": {
    "height_m": 1.499,
    "px_height": 59.0,
-   "tris": 5116,
-   "bones": 17,
+   "tris": 4788,
+   "bones": 27,
    "file": "ALAKAZAM.glb",
-   "bytes": 518488,
-   "status": "generated"
+   "bytes": 590968,
+   "status": "generated",
+   "plan": "biped_humanoid",
+   "signature": [
+    "Teleport",
+    "Disable",
+    "Psybeam",
+    "Recover",
+    "Reflect",
+    "MegaPunch",
+    "MegaKick",
+    "Toxic",
+    "BodySlam"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "BELLSPROUT": {
    "height_m": 0.711,
    "px_height": 43.54,
    "tris": 3718,
-   "bones": 17,
+   "bones": 16,
    "file": "BELLSPROUT.glb",
-   "bytes": 457476,
-   "status": "generated"
+   "bytes": 455000,
+   "status": "generated",
+   "plan": "plant",
+   "signature": [
+    "VineWhip",
+    "Growth",
+    "Wrap",
+    "Acid",
+    "RazorLeaf",
+    "TakeDown",
+    "Rage",
+    "MegaDrain",
+    "Mimic"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "TENTACRUEL": {
    "height_m": 1.6,
    "px_height": 53.22,
    "tris": 4982,
-   "bones": 17,
+   "bones": 28,
    "file": "TENTACRUEL.glb",
-   "bytes": 511976,
-   "status": "generated"
+   "bytes": 666920,
+   "status": "generated",
+   "plan": "multileg",
+   "signature": [
+    "Acid",
+    "Supersonic",
+    "Wrap",
+    "PoisonSting",
+    "WaterGun",
+    "Barrier",
+    "SwordsDance",
+    "Rage",
+    "MegaDrain"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "PONYTA": {
    "height_m": 0.991,
    "px_height": 47.56,
    "tris": 13999,
-   "bones": 17,
+   "bones": 33,
    "file": "PONYTA.glb",
-   "bytes": 838060,
-   "status": "generated"
+   "bytes": 974572,
+   "status": "generated",
+   "plan": "quadruped",
+   "signature": [
+    "TailWhip",
+    "Stomp",
+    "Growl",
+    "FireSpin",
+    "TakeDown",
+    "Agility",
+    "Toxic",
+    "HornDrill",
+    "Rage"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "MAGNEMITE": {
    "height_m": 0.305,
    "px_height": 30.38,
    "tris": 13506,
-   "bones": 17,
+   "bones": 14,
    "file": "MAGNEMITE.glb",
-   "bytes": 1083624,
-   "status": "generated"
+   "bytes": 1051188,
+   "status": "generated",
+   "plan": "floating",
+   "signature": [
+    "Tackle",
+    "Sonicboom",
+    "Supersonic",
+    "Swift",
+    "Toxic",
+    "Rage",
+    "Mimic",
+    "Reflect",
+    "RestUp"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "DODRIO": {
    "height_m": 1.803,
    "px_height": 57.96,
    "tris": 5687,
-   "bones": 17,
+   "bones": 29,
    "file": "DODRIO.glb",
-   "bytes": 560736,
-   "status": "generated"
+   "bytes": 640116,
+   "status": "generated",
+   "plan": "bird",
+   "signature": [
+    "Peck",
+    "Growl",
+    "FuryAttack",
+    "Rage",
+    "Agility",
+    "Whirlwind",
+    "Toxic",
+    "BodySlam",
+    "TakeDown"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "MUK": {
    "height_m": 1.194,
    "px_height": 48.26,
    "tris": 5060,
-   "bones": 17,
+   "bones": 18,
    "file": "MUK.glb",
-   "bytes": 500812,
-   "status": "generated"
+   "bytes": 475676,
+   "status": "generated",
+   "plan": "blob",
+   "signature": [
+    "Pound",
+    "Disable",
+    "PoisonGas",
+    "Minimize",
+    "Sludge",
+    "Screech",
+    "Rage",
+    "MegaDrain",
+    "Thunderbolt"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "HAUNTER": {
    "height_m": 1.6,
    "px_height": 56.0,
    "tris": 8193,
-   "bones": 17,
+   "bones": 18,
    "file": "HAUNTER.glb",
-   "bytes": 693192,
-   "status": "generated"
+   "bytes": 651448,
+   "status": "generated",
+   "plan": "floating",
+   "signature": [
+    "Lick",
+    "NightShade",
+    "DreamEater",
+    "Toxic",
+    "Rage",
+    "Thunderbolt",
+    "Mimic",
+    "DoubleTeam",
+    "Selfdestruct"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "HYPNO": {
    "height_m": 1.6,
    "px_height": 58.69,
    "tris": 6110,
-   "bones": 17,
+   "bones": 23,
    "file": "HYPNO.glb",
-   "bytes": 555280,
-   "status": "generated"
+   "bytes": 605884,
+   "status": "generated",
+   "plan": "biped_humanoid",
+   "signature": [
+    "Pound",
+    "Hypnosis",
+    "Disable",
+    "Headbutt",
+    "PoisonGas",
+    "Meditate",
+    "MegaKick",
+    "Toxic",
+    "BodySlam"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "ELECTRODE": {
    "height_m": 1.194,
    "px_height": 39.19,
    "tris": 5136,
-   "bones": 17,
+   "bones": 14,
    "file": "ELECTRODE.glb",
-   "bytes": 495152,
-   "status": "generated"
+   "bytes": 392764,
+   "status": "generated",
+   "plan": "sphere",
+   "signature": [
+    "Tackle",
+    "Screech",
+    "Sonicboom",
+    "Selfdestruct",
+    "Swift",
+    "Toxic",
+    "HyperBeam",
+    "Rage",
+    "Thunderbolt"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "MAROWAK": {
    "height_m": 0.991,
    "px_height": 63.74,
-   "tris": 5034,
-   "bones": 17,
+   "tris": 4950,
+   "bones": 25,
    "file": "MAROWAK.glb",
-   "bytes": 502764,
-   "status": "generated"
+   "bytes": 567648,
+   "status": "generated",
+   "plan": "biped_tail",
+   "signature": [
+    "BoneClub",
+    "Growl",
+    "FocusEnergy",
+    "Thrash",
+    "MegaPunch",
+    "MegaKick",
+    "Toxic",
+    "Bubblebeam",
+    "WaterGun"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "KOFFING": {
    "height_m": 0.61,
    "px_height": 48.1,
    "tris": 14000,
-   "bones": 17,
+   "bones": 12,
    "file": "KOFFING.glb",
-   "bytes": 754120,
-   "status": "generated"
+   "bytes": 654492,
+   "status": "generated",
+   "plan": "sphere",
+   "signature": [
+    "Tackle",
+    "Smog",
+    "Sludge",
+    "Selfdestruct",
+    "HazeMist",
+    "Rage",
+    "Thunderbolt",
+    "Mimic",
+    "DoubleTeam"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "CHANSEY": {
    "height_m": 1.092,
    "px_height": 50.7,
    "tris": 7320,
-   "bones": 17,
+   "bones": 27,
    "file": "CHANSEY.glb",
-   "bytes": 599888,
-   "status": "generated"
+   "bytes": 734016,
+   "status": "generated",
+   "plan": "biped_tail",
+   "signature": [
+    "Doubleslap",
+    "SingSong",
+    "Growl",
+    "Minimize",
+    "LightScreen",
+    "DoubleEdge",
+    "MegaKick",
+    "Toxic",
+    "BodySlam"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "SEADRA": {
    "height_m": 1.194,
    "px_height": 57.44,
    "tris": 10320,
-   "bones": 17,
+   "bones": 24,
    "file": "SEADRA.glb",
-   "bytes": 756640,
-   "status": "generated"
+   "bytes": 815408,
+   "status": "generated",
+   "plan": "fish",
+   "signature": [
+    "Bubble",
+    "Leer",
+    "Agility",
+    "Toxic",
+    "TakeDown",
+    "Rage",
+    "Mimic",
+    "SkullBash",
+    "RestUp"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "STARMIE": {
    "height_m": 1.092,
    "px_height": 54.4,
    "tris": 2880,
-   "bones": 17,
+   "bones": 13,
    "file": "STARMIE.glb",
-   "bytes": 441616,
-   "status": "generated"
+   "bytes": 397816,
+   "status": "generated",
+   "plan": "radial",
+   "signature": [
+    "Tackle",
+    "WaterGun",
+    "Harden",
+    "Toxic",
+    "Bubblebeam",
+    "Rage",
+    "Thunderbolt",
+    "Psychic",
+    "Teleport"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "ELECTABUZZ": {
    "height_m": 1.092,
    "px_height": 67.35,
    "tris": 9988,
-   "bones": 17,
+   "bones": 23,
    "file": "ELECTABUZZ.glb",
-   "bytes": 714584,
-   "status": "generated"
+   "bytes": 732756,
+   "status": "generated",
+   "plan": "biped_humanoid",
+   "signature": [
+    "QuickAttack",
+    "Leer",
+    "Thundershock",
+    "Screech",
+    "Thunderpunch",
+    "Toxic",
+    "BodySlam",
+    "TakeDown",
+    "HyperBeam"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "MAGIKARP": {
    "height_m": 0.889,
    "px_height": 41.94,
    "tris": 3667,
-   "bones": 17,
+   "bones": 21,
    "file": "MAGIKARP.glb",
-   "bytes": 449596,
-   "status": "generated"
+   "bytes": 451668,
+   "status": "generated",
+   "plan": "fish",
+   "signature": [
+    "SplashFlop",
+    "Tackle",
+    "Bite",
+    "Leer",
+    "HydroPump",
+    "Surf",
+    "Headbutt",
+    "Slam",
+    "Harden"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "EEVEE": {
    "height_m": 0.305,
    "px_height": 51.5,
    "tris": 4850,
-   "bones": 17,
+   "bones": 29,
    "file": "EEVEE.glb",
-   "bytes": 482736,
-   "status": "generated"
+   "bytes": 579804,
+   "status": "generated",
+   "plan": "quadruped",
+   "signature": [
+    "Tackle",
+    "SandAttack",
+    "QuickAttack",
+    "TailWhip",
+    "Bite",
+    "Leer",
+    "FireSpin",
+    "Rage",
+    "Thundershock"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "PORYGON": {
    "height_m": 0.787,
    "px_height": 52.01,
    "tris": 182,
-   "bones": 17,
+   "bones": 19,
    "file": "PORYGON.glb",
-   "bytes": 314148,
-   "status": "generated"
+   "bytes": 413016,
+   "status": "generated",
+   "plan": "floating",
+   "signature": [
+    "Sharpen",
+    "Conversion",
+    "Psybeam",
+    "Recover",
+    "Agility",
+    "Toxic",
+    "Blizzard",
+    "Rage",
+    "Thunderbolt"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "KABUTOPS": {
    "height_m": 1.295,
    "px_height": 54.02,
    "tris": 11092,
-   "bones": 17,
+   "bones": 31,
    "file": "KABUTOPS.glb",
-   "bytes": 789108,
-   "status": "generated"
+   "bytes": 891872,
+   "status": "generated",
+   "plan": "biped_tail",
+   "signature": [
+    "Harden",
+    "Absorb",
+    "Leer",
+    "HydroPump",
+    "RazorWind",
+    "SwordsDance",
+    "MegaKick",
+    "Toxic",
+    "BodySlam"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "ZAPDOS": {
    "height_m": 1.6,
    "px_height": 66.9,
    "tris": 5221,
-   "bones": 17,
+   "bones": 27,
    "file": "ZAPDOS.glb",
-   "bytes": 552608,
-   "status": "generated"
+   "bytes": 607768,
+   "status": "generated",
+   "plan": "bird",
+   "signature": [
+    "Agility",
+    "LightScreen",
+    "RazorWind",
+    "Whirlwind",
+    "Toxic",
+    "TakeDown",
+    "HyperBeam",
+    "Rage",
+    "Mimic"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "DRAGONITE": {
    "height_m": 2.21,
    "px_height": 67.55,
    "tris": 5699,
-   "bones": 17,
+   "bones": 29,
    "file": "DRAGONITE.glb",
-   "bytes": 1243540,
-   "status": "generated"
+   "bytes": 1365948,
+   "status": "generated",
+   "plan": "winged",
+   "signature": [
+    "Wrap",
+    "Leer",
+    "ThunderWave",
+    "Agility",
+    "Slam",
+    "HyperBeam",
+    "RazorWind",
+    "Toxic",
+    "HornDrill"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "IVYSAUR": {
    "height_m": 0.991,
    "px_height": 53.55,
    "tris": 6324,
-   "bones": 17,
+   "bones": 28,
    "file": "IVYSAUR.glb",
-   "bytes": 575704,
-   "status": "generated"
+   "bytes": 715336,
+   "status": "generated",
+   "plan": "quadruped",
+   "signature": [
+    "Tackle",
+    "Growl",
+    "LeechSeed",
+    "VineWhip",
+    "Growth",
+    "Solarbeam",
+    "BodySlam",
+    "Rage",
+    "MegaDrain"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "CHARIZARD": {
    "height_m": 1.702,
    "px_height": 66.78,
    "tris": 6218,
-   "bones": 17,
+   "bones": 33,
    "file": "CHARIZARD.glb",
-   "bytes": 599124,
-   "status": "generated"
+   "bytes": 725604,
+   "status": "generated",
+   "plan": "winged",
+   "signature": [
+    "Scratch",
+    "Growl",
+    "Ember",
+    "Rage",
+    "Flamethrower",
+    "FireSpin",
+    "SwordsDance",
+    "MegaKick",
+    "Toxic"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "CATERPIE": {
    "height_m": 0.305,
    "px_height": 38.33,
    "tris": 4362,
-   "bones": 17,
+   "bones": 14,
    "file": "CATERPIE.glb",
-   "bytes": 466968,
-   "status": "generated"
+   "bytes": 403280,
+   "status": "generated",
+   "plan": "multileg",
+   "signature": [
+    "StringShot",
+    "PinMissile",
+    "LeechLife",
+    "Headbutt",
+    "Slam",
+    "Growl",
+    "Harden",
+    "QuickAttack",
+    "Meditate"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "KAKUNA": {
    "height_m": 0.61,
    "px_height": 48.7,
    "tris": 3850,
-   "bones": 17,
+   "bones": 13,
    "file": "KAKUNA.glb",
-   "bytes": 460092,
-   "status": "generated"
+   "bytes": 431192,
+   "status": "generated",
+   "plan": "rock",
+   "signature": [
+    "Harden",
+    "FuryAttack",
+    "FocusEnergy",
+    "Rage",
+    "Agility",
+    "StringShot",
+    "LeechLife",
+    "Acid",
+    "Smog"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "PIDGEOT": {
    "height_m": 1.493,
    "px_height": 55.26,
-   "tris": 6080,
-   "bones": 17,
+   "tris": 6052,
+   "bones": 24,
    "file": "PIDGEOT.glb",
-   "bytes": 621340,
-   "status": "generated"
+   "bytes": 680096,
+   "status": "generated",
+   "plan": "bird",
+   "signature": [
+    "Gust",
+    "SandAttack",
+    "QuickAttack",
+    "Whirlwind",
+    "MirrorMove",
+    "Toxic",
+    "TakeDown",
+    "Rage",
+    "Reflect"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "FEAROW": {
    "height_m": 0.802,
    "px_height": 56.26,
    "tris": 6496,
-   "bones": 17,
+   "bones": 25,
    "file": "FEAROW.glb",
-   "bytes": 646908,
-   "status": "generated"
+   "bytes": 686044,
+   "status": "generated",
+   "plan": "bird",
+   "signature": [
+    "Peck",
+    "Growl",
+    "FuryAttack",
+    "MirrorMove",
+    "Agility",
+    "RazorWind",
+    "Whirlwind",
+    "Toxic",
+    "TakeDown"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "RAICHU": {
    "height_m": 0.665,
    "px_height": 58.65,
-   "tris": 4758,
-   "bones": 17,
+   "tris": 4622,
+   "bones": 27,
    "file": "RAICHU.glb",
-   "bytes": 507340,
-   "status": "generated"
+   "bytes": 572404,
+   "status": "generated",
+   "plan": "biped_tail",
+   "signature": [
+    "Growl",
+    "MegaPunch",
+    "MegaKick",
+    "Toxic",
+    "BodySlam",
+    "HyperBeam",
+    "PayDay",
+    "Rage",
+    "Mimic"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "NIDORINA": {
    "height_m": 0.787,
    "px_height": 39.23,
-   "tris": 5097,
-   "bones": 17,
+   "tris": 4941,
+   "bones": 26,
    "file": "NIDORINA.glb",
-   "bytes": 504996,
-   "status": "generated"
+   "bytes": 617828,
+   "status": "generated",
+   "plan": "quadruped_small",
+   "signature": [
+    "Growl",
+    "Tackle",
+    "Scratch",
+    "PoisonSting",
+    "TailWhip",
+    "Bite",
+    "DoubleKick",
+    "BodySlam",
+    "Toxic"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "NIDOKING": {
    "height_m": 1.397,
    "px_height": 55.74,
    "tris": 5590,
-   "bones": 17,
+   "bones": 23,
    "file": "NIDOKING.glb",
-   "bytes": 552220,
-   "status": "generated"
+   "bytes": 571732,
+   "status": "generated",
+   "plan": "biped_tail",
+   "signature": [
+    "HornAttack",
+    "PoisonSting",
+    "Thrash",
+    "MegaPunch",
+    "MegaKick",
+    "Toxic",
+    "BodySlam",
+    "Bubblebeam",
+    "WaterGun"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "NINETALES": {
    "height_m": 0.939,
    "px_height": 46.16,
    "tris": 6783,
-   "bones": 17,
+   "bones": 36,
    "file": "NINETALES.glb",
-   "bytes": 629600,
-   "status": "generated"
+   "bytes": 858580,
+   "status": "generated",
+   "plan": "quadruped",
+   "signature": [
+    "Ember",
+    "TailWhip",
+    "QuickAttack",
+    "RoarCall",
+    "Toxic",
+    "BodySlam",
+    "TakeDown",
+    "HyperBeam",
+    "Rage"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "GOLBAT": {
    "height_m": 1.551,
    "px_height": 57.42,
    "tris": 1553,
-   "bones": 17,
+   "bones": 14,
    "file": "GOLBAT.glb",
-   "bytes": 351060,
-   "status": "generated"
+   "bytes": 263528,
+   "status": "generated",
+   "plan": "winged",
+   "signature": [
+    "LeechLife",
+    "Screech",
+    "WingAttack",
+    "Whirlwind",
+    "Toxic",
+    "TakeDown",
+    "HyperBeam",
+    "Rage",
+    "Mimic"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "PARAS": {
    "height_m": 0.305,
    "px_height": 37.07,
-   "tris": 5038,
-   "bones": 17,
+   "tris": 4865,
+   "bones": 31,
    "file": "PARAS.glb",
-   "bytes": 522400,
-   "status": "generated"
+   "bytes": 631344,
+   "status": "generated",
+   "plan": "multileg",
+   "signature": [
+    "LeechLife",
+    "Growth",
+    "BodySlam",
+    "TakeDown",
+    "Rage",
+    "Solarbeam",
+    "Dig",
+    "Mimic",
+    "DoubleTeam"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "DIGLETT": {
    "height_m": 0.203,
    "px_height": 33.2,
    "tris": 1548,
-   "bones": 17,
+   "bones": 14,
    "file": "DIGLETT.glb",
-   "bytes": 358708,
-   "status": "generated"
+   "bytes": 270400,
+   "status": "generated",
+   "plan": "blob",
+   "signature": [
+    "Scratch",
+    "Growl",
+    "Dig",
+    "SandAttack",
+    "Toxic",
+    "TakeDown",
+    "Rage",
+    "Mimic",
+    "DoubleTeam"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "PSYDUCK": {
    "height_m": 0.787,
    "px_height": 47.52,
-   "tris": 4658,
-   "bones": 17,
+   "tris": 4576,
+   "bones": 22,
    "file": "PSYDUCK.glb",
-   "bytes": 498420,
-   "status": "generated"
+   "bytes": 551532,
+   "status": "generated",
+   "plan": "biped_humanoid",
+   "signature": [
+    "Scratch",
+    "TailWhip",
+    "Disable",
+    "Confusion",
+    "FurySwipes",
+    "Toxic",
+    "BodySlam",
+    "TakeDown",
+    "WaterGun"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "GROWLITHE": {
    "height_m": 0.711,
    "px_height": 35.4,
-   "tris": 5342,
-   "bones": 17,
+   "tris": 5282,
+   "bones": 28,
    "file": "GROWLITHE.glb",
-   "bytes": 564780,
-   "status": "generated"
+   "bytes": 665168,
+   "status": "generated",
+   "plan": "quadruped",
+   "signature": [
+    "Bite",
+    "RoarCall",
+    "TakeDown",
+    "Agility",
+    "Flamethrower",
+    "Toxic",
+    "BodySlam",
+    "Rage",
+    "Dig"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "POLIWRATH": {
    "height_m": 1.295,
    "px_height": 47.88,
-   "tris": 4906,
-   "bones": 17,
+   "tris": 4730,
+   "bones": 21,
    "file": "POLIWRATH.glb",
-   "bytes": 514688,
-   "status": "generated"
+   "bytes": 533536,
+   "status": "generated",
+   "plan": "biped_humanoid",
+   "signature": [
+    "Hypnosis",
+    "WaterGun",
+    "Doubleslap",
+    "BodySlam",
+    "MegaPunch",
+    "MegaKick",
+    "Toxic",
+    "Bubblebeam",
+    "Counter"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "MACHOP": {
    "height_m": 0.787,
    "px_height": 39.56,
-   "tris": 4666,
-   "bones": 17,
+   "tris": 4506,
+   "bones": 28,
    "file": "MACHOP.glb",
-   "bytes": 484496,
-   "status": "generated"
+   "bytes": 578808,
+   "status": "generated",
+   "plan": "biped_humanoid",
+   "signature": [
+    "KarateChop",
+    "LowKick",
+    "Leer",
+    "FocusEnergy",
+    "SeismicToss",
+    "Toxic",
+    "Counter",
+    "Dig",
+    "Mimic"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "WEEPINBELL": {
    "height_m": 0.991,
    "px_height": 42.9,
    "tris": 3260,
-   "bones": 17,
+   "bones": 16,
    "file": "WEEPINBELL.glb",
-   "bytes": 424580,
-   "status": "generated"
+   "bytes": 390164,
+   "status": "generated",
+   "plan": "plant",
+   "signature": [
+    "VineWhip",
+    "Growth",
+    "Wrap",
+    "Acid",
+    "RazorLeaf",
+    "TakeDown",
+    "Rage",
+    "MegaDrain",
+    "Mimic"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "GEODUDE": {
    "height_m": 0.191,
    "px_height": 29.89,
-   "tris": 4476,
-   "bones": 17,
+   "tris": 4348,
+   "bones": 9,
    "file": "GEODUDE.glb",
-   "bytes": 487232,
-   "status": "generated"
+   "bytes": 361664,
+   "status": "generated",
+   "plan": "rock",
+   "signature": [
+    "Tackle",
+    "DefenseCurl",
+    "Selfdestruct",
+    "MegaPunch",
+    "Toxic",
+    "Counter",
+    "Dig",
+    "Mimic",
+    "DoubleTeam"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "RAPIDASH": {
    "height_m": 1.702,
    "px_height": 60.24,
    "tris": 5788,
-   "bones": 17,
+   "bones": 22,
    "file": "RAPIDASH.glb",
-   "bytes": 592576,
-   "status": "generated"
+   "bytes": 656408,
+   "status": "generated",
+   "plan": "quadruped",
+   "signature": [
+    "TailWhip",
+    "Stomp",
+    "Growl",
+    "FireSpin",
+    "TakeDown",
+    "Agility",
+    "Toxic",
+    "HornDrill",
+    "HyperBeam"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "MAGNETON": {
    "height_m": 0.991,
    "px_height": 39.81,
    "tris": 8394,
-   "bones": 17,
+   "bones": 18,
    "file": "MAGNETON.glb",
-   "bytes": 754292,
-   "status": "generated"
+   "bytes": 746668,
+   "status": "generated",
+   "plan": "floating",
+   "signature": [
+    "Tackle",
+    "Sonicboom",
+    "Supersonic",
+    "Swift",
+    "Toxic",
+    "HyperBeam",
+    "Rage",
+    "Mimic",
+    "Reflect"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "SEEL": {
    "height_m": 1.092,
    "px_height": 43.45,
    "tris": 4622,
-   "bones": 17,
+   "bones": 24,
    "file": "SEEL.glb",
-   "bytes": 475016,
-   "status": "generated"
+   "bytes": 565764,
+   "status": "generated",
+   "plan": "fish",
+   "signature": [
+    "Headbutt",
+    "Growl",
+    "RestUp",
+    "TakeDown",
+    "Toxic",
+    "BodySlam",
+    "WaterGun",
+    "PayDay",
+    "Rage"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "SHELLDER": {
    "height_m": 0.305,
    "px_height": 36.33,
    "tris": 7040,
-   "bones": 17,
+   "bones": 7,
    "file": "SHELLDER.glb",
-   "bytes": 589704,
-   "status": "generated"
+   "bytes": 425132,
+   "status": "generated",
+   "plan": "shell",
+   "signature": [
+    "Withdraw",
+    "Supersonic",
+    "Clamp",
+    "AuroraBeam",
+    "Leer",
+    "SpikeCannon",
+    "Toxic",
+    "Rage",
+    "Teleport"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "GENGAR": {
    "height_m": 1.499,
    "px_height": 57.78,
    "tris": 4308,
-   "bones": 17,
+   "bones": 22,
    "file": "GENGAR.glb",
-   "bytes": 453388,
-   "status": "generated"
+   "bytes": 457472,
+   "status": "generated",
+   "plan": "biped_tail",
+   "signature": [
+    "Lick",
+    "ConfuseRay",
+    "NightShade",
+    "DreamEater",
+    "MegaKick",
+    "BodySlam",
+    "TakeDown",
+    "HyperBeam",
+    "Counter"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "KRABBY": {
    "height_m": 0.406,
    "px_height": 38.69,
    "tris": 10892,
-   "bones": 17,
+   "bones": 25,
    "file": "KRABBY.glb",
-   "bytes": 759476,
-   "status": "generated"
+   "bytes": 790420,
+   "status": "generated",
+   "plan": "multileg",
+   "signature": [
+    "Leer",
+    "Vicegrip",
+    "Guillotine",
+    "Stomp",
+    "Harden",
+    "SwordsDance",
+    "Toxic",
+    "TakeDown",
+    "Bubblebeam"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "EXEGGCUTE": {
    "height_m": 0.361,
    "px_height": 39.87,
    "tris": 8160,
-   "bones": 17,
+   "bones": 14,
    "file": "EXEGGCUTE.glb",
-   "bytes": 689476,
-   "status": "generated"
+   "bytes": 624072,
+   "status": "generated",
+   "plan": "sphere",
+   "signature": [
+    "Barrage",
+    "Hypnosis",
+    "Reflect",
+    "Solarbeam",
+    "TakeDown",
+    "Rage",
+    "Psychic",
+    "Teleport",
+    "Mimic"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "HITMONLEE": {
    "height_m": 1.499,
    "px_height": 51.36,
    "tris": 9492,
-   "bones": 17,
+   "bones": 20,
    "file": "HITMONLEE.glb",
-   "bytes": 676272,
-   "status": "generated"
+   "bytes": 642508,
+   "status": "generated",
+   "plan": "biped_humanoid",
+   "signature": [
+    "DoubleKick",
+    "HiJumpKick",
+    "MegaPunch",
+    "Toxic",
+    "BodySlam",
+    "Counter",
+    "Mimic",
+    "DoubleTeam",
+    "SkullBash"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "WEEZING": {
    "height_m": 1.194,
    "px_height": 62.55,
    "tris": 13999,
-   "bones": 17,
+   "bones": 12,
    "file": "WEEZING.glb",
-   "bytes": 1229296,
-   "status": "generated"
+   "bytes": 1082436,
+   "status": "generated",
+   "plan": "sphere",
+   "signature": [
+    "Tackle",
+    "Smog",
+    "Sludge",
+    "Selfdestruct",
+    "HazeMist",
+    "Rage",
+    "Thunderbolt",
+    "Mimic",
+    "DoubleTeam"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "TANGELA": {
    "height_m": 0.991,
    "px_height": 53.52,
    "tris": 10756,
-   "bones": 17,
+   "bones": 25,
    "file": "TANGELA.glb",
-   "bytes": 738936,
-   "status": "generated"
+   "bytes": 800908,
+   "status": "generated",
+   "plan": "plant",
+   "signature": [
+    "Constrict",
+    "Absorb",
+    "Growth",
+    "TakeDown",
+    "HyperBeam",
+    "Rage",
+    "Mimic",
+    "DoubleTeam",
+    "SkullBash"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "GOLDEEN": {
    "height_m": 0.58,
    "px_height": 51.94,
    "tris": 8604,
-   "bones": 17,
+   "bones": 28,
    "file": "GOLDEEN.glb",
-   "bytes": 645328,
-   "status": "generated"
+   "bytes": 766416,
+   "status": "generated",
+   "plan": "fish",
+   "signature": [
+    "Peck",
+    "TailWhip",
+    "Supersonic",
+    "FuryAttack",
+    "Waterfall",
+    "Agility",
+    "Toxic",
+    "WaterGun",
+    "Rage"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "MR_MIME": {
    "height_m": 1.295,
    "px_height": 64.08,
-   "tris": 4994,
-   "bones": 17,
+   "tris": 4946,
+   "bones": 20,
    "file": "MR_MIME.glb",
-   "bytes": 509728,
-   "status": "generated"
+   "bytes": 474076,
+   "status": "generated",
+   "plan": "biped_humanoid",
+   "signature": [
+    "Barrier",
+    "LightScreen",
+    "Doubleslap",
+    "Meditate",
+    "Substitute",
+    "MegaKick",
+    "Toxic",
+    "BodySlam",
+    "TakeDown"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "MAGMAR": {
    "height_m": 1.295,
    "px_height": 64.25,
    "tris": 12510,
-   "bones": 17,
+   "bones": 32,
    "file": "MAGMAR.glb",
-   "bytes": 901464,
-   "status": "generated"
+   "bytes": 1033396,
+   "status": "generated",
+   "plan": "biped_humanoid",
+   "signature": [
+    "Leer",
+    "ConfuseRay",
+    "Flamethrower",
+    "MegaKick",
+    "Toxic",
+    "BodySlam",
+    "TakeDown",
+    "Counter",
+    "Psychic"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "GYARADOS": {
    "height_m": 6.502,
    "px_height": 70.64,
-   "tris": 5306,
-   "bones": 17,
+   "tris": 5254,
+   "bones": 24,
    "file": "GYARADOS.glb",
-   "bytes": 554164,
-   "status": "generated"
+   "bytes": 643468,
+   "status": "generated",
+   "plan": "serpent",
+   "signature": [
+    "Bite",
+    "DragonRage",
+    "Leer",
+    "HydroPump",
+    "Toxic",
+    "BodySlam",
+    "TakeDown",
+    "Rage",
+    "Thunderbolt"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "VAPOREON": {
    "height_m": 0.991,
    "px_height": 58.94,
    "tris": 5240,
-   "bones": 17,
+   "bones": 29,
    "file": "VAPOREON.glb",
-   "bytes": 521188,
-   "status": "generated"
+   "bytes": 675972,
+   "status": "generated",
+   "plan": "quadruped",
+   "signature": [
+    "Tackle",
+    "QuickAttack",
+    "TailWhip",
+    "Bite",
+    "AcidArmor",
+    "HazeMist",
+    "HydroPump",
+    "Toxic",
+    "BodySlam"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "OMANYTE": {
    "height_m": 0.406,
@@ -808,197 +2104,593 @@
    "tris": 4646,
    "bones": 17,
    "file": "OMANYTE.glb",
-   "bytes": 471780,
-   "status": "generated"
+   "bytes": 442280,
+   "status": "generated",
+   "plan": "shell",
+   "signature": [
+    "Withdraw",
+    "HornAttack",
+    "Leer",
+    "SpikeCannon",
+    "HydroPump",
+    "Toxic",
+    "BodySlam",
+    "TakeDown",
+    "Rage"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "AERODACTYL": {
    "height_m": 1.609,
    "px_height": 57.46,
    "tris": 5374,
-   "bones": 17,
+   "bones": 24,
    "file": "AERODACTYL.glb",
-   "bytes": 538096,
-   "status": "generated"
+   "bytes": 548332,
+   "status": "generated",
+   "plan": "winged",
+   "signature": [
+    "WingAttack",
+    "Agility",
+    "Supersonic",
+    "TakeDown",
+    "HyperBeam",
+    "Whirlwind",
+    "Toxic",
+    "Rage",
+    "DragonRage"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "MOLTRES": {
    "height_m": 1.522,
    "px_height": 66.89,
-   "tris": 8409,
-   "bones": 17,
+   "tris": 8403,
+   "bones": 32,
    "file": "MOLTRES.glb",
-   "bytes": 699328,
-   "status": "generated"
+   "bytes": 868536,
+   "status": "generated",
+   "plan": "bird",
+   "signature": [
+    "Peck",
+    "FireSpin",
+    "Leer",
+    "Agility",
+    "SkyAttack",
+    "RazorWind",
+    "Toxic",
+    "TakeDown",
+    "HyperBeam"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "MEWTWO": {
    "height_m": 2.007,
    "px_height": 62.74,
    "tris": 9691,
-   "bones": 17,
+   "bones": 25,
    "file": "MEWTWO.glb",
-   "bytes": 1877544,
-   "status": "generated"
+   "bytes": 1947384,
+   "status": "generated",
+   "plan": "biped_tail",
+   "signature": [
+    "Confusion",
+    "Disable",
+    "Swift",
+    "Barrier",
+    "Recover",
+    "Amnesia",
+    "MegaKick",
+    "Toxic",
+    "BodySlam"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "VENUSAUR": {
    "height_m": 2.007,
    "px_height": 52.95,
    "tris": 6346,
-   "bones": 17,
+   "bones": 32,
    "file": "VENUSAUR.glb",
-   "bytes": 575752,
-   "status": "generated"
+   "bytes": 751748,
+   "status": "generated",
+   "plan": "quadruped",
+   "signature": [
+    "Tackle",
+    "Growl",
+    "LeechSeed",
+    "VineWhip",
+    "Growth",
+    "Solarbeam",
+    "BodySlam",
+    "Rage",
+    "MegaDrain"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "SQUIRTLE": {
    "height_m": 0.508,
    "px_height": 49.06,
    "tris": 4672,
-   "bones": 17,
+   "bones": 25,
    "file": "SQUIRTLE.glb",
-   "bytes": 485172,
-   "status": "generated"
+   "bytes": 554232,
+   "status": "generated",
+   "plan": "shell",
+   "signature": [
+    "Tackle",
+    "TailWhip",
+    "Bite",
+    "Withdraw",
+    "SkullBash",
+    "HydroPump",
+    "MegaKick",
+    "Toxic",
+    "BodySlam"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "METAPOD": {
    "height_m": 0.711,
    "px_height": 38.51,
    "tris": 3702,
-   "bones": 17,
+   "bones": 11,
    "file": "METAPOD.glb",
-   "bytes": 443164,
-   "status": "generated"
+   "bytes": 392196,
+   "status": "generated",
+   "plan": "rock",
+   "signature": [
+    "Harden",
+    "Confusion",
+    "Supersonic",
+    "Whirlwind",
+    "Psybeam",
+    "StringShot",
+    "PinMissile",
+    "LeechLife",
+    "Headbutt"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "BEEDRILL": {
    "height_m": 0.991,
    "px_height": 60.08,
    "tris": 4632,
-   "bones": 17,
+   "bones": 35,
    "file": "BEEDRILL.glb",
-   "bytes": 483376,
-   "status": "generated"
+   "bytes": 597768,
+   "status": "generated",
+   "plan": "winged",
+   "signature": [
+    "FuryAttack",
+    "FocusEnergy",
+    "Rage",
+    "Agility",
+    "TakeDown",
+    "HyperBeam",
+    "MegaDrain",
+    "Mimic",
+    "Reflect"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "RATTATA": {
    "height_m": 0.247,
    "px_height": 31.77,
-   "tris": 4262,
-   "bones": 17,
+   "tris": 4122,
+   "bones": 27,
    "file": "RATTATA.glb",
-   "bytes": 501064,
-   "status": "generated"
+   "bytes": 556480,
+   "status": "generated",
+   "plan": "quadruped_small",
+   "signature": [
+    "Tackle",
+    "TailWhip",
+    "QuickAttack",
+    "FocusEnergy",
+    "Toxic",
+    "BodySlam",
+    "WaterGun",
+    "Rage",
+    "Thunderbolt"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "EKANS": {
    "height_m": 2.007,
    "px_height": 42.41,
    "tris": 1994,
-   "bones": 17,
+   "bones": 16,
    "file": "EKANS.glb",
-   "bytes": 372224,
-   "status": "generated"
+   "bytes": 378376,
+   "status": "generated",
+   "plan": "serpent",
+   "signature": [
+    "Wrap",
+    "Leer",
+    "PoisonSting",
+    "Bite",
+    "Screech",
+    "Acid",
+    "Toxic",
+    "BodySlam",
+    "TakeDown"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "SANDSHREW": {
    "height_m": 0.61,
    "px_height": 48.09,
    "tris": 5322,
-   "bones": 17,
+   "bones": 21,
    "file": "SANDSHREW.glb",
-   "bytes": 540664,
-   "status": "generated"
+   "bytes": 531740,
+   "status": "generated",
+   "plan": "biped_tail",
+   "signature": [
+    "SandAttack",
+    "PoisonSting",
+    "Swift",
+    "SwordsDance",
+    "Toxic",
+    "BodySlam",
+    "TakeDown",
+    "Rage",
+    "Dig"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "NIDOQUEEN": {
    "height_m": 1.295,
    "px_height": 53.42,
    "tris": 4941,
-   "bones": 17,
+   "bones": 22,
    "file": "NIDOQUEEN.glb",
-   "bytes": 512628,
-   "status": "generated"
+   "bytes": 562016,
+   "status": "generated",
+   "plan": "biped_tail",
+   "signature": [
+    "Tackle",
+    "Scratch",
+    "TailWhip",
+    "BodySlam",
+    "PoisonSting",
+    "Toxic",
+    "HornDrill",
+    "Bubblebeam",
+    "PayDay"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "CLEFAIRY": {
    "height_m": 0.61,
    "px_height": 52.86,
    "tris": 1862,
-   "bones": 17,
+   "bones": 23,
    "file": "CLEFAIRY.glb",
-   "bytes": 376796,
-   "status": "generated"
+   "bytes": 397336,
+   "status": "generated",
+   "plan": "biped_tail",
+   "signature": [
+    "Pound",
+    "Growl",
+    "SingSong",
+    "Doubleslap",
+    "Minimize",
+    "Metronome",
+    "LightScreen",
+    "Toxic",
+    "BodySlam"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "JIGGLYPUFF": {
    "height_m": 0.508,
    "px_height": 45.79,
-   "tris": 4100,
-   "bones": 17,
+   "tris": 3760,
+   "bones": 10,
    "file": "JIGGLYPUFF.glb",
-   "bytes": 480704,
-   "status": "generated"
+   "bytes": 389252,
+   "status": "generated",
+   "plan": "blob",
+   "signature": [
+    "SingSong",
+    "Pound",
+    "Disable",
+    "DefenseCurl",
+    "Doubleslap",
+    "RestUp",
+    "BodySlam",
+    "DoubleEdge",
+    "MegaKick"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "ODDISH": {
    "height_m": 0.508,
    "px_height": 45.13,
    "tris": 3662,
-   "bones": 17,
+   "bones": 24,
    "file": "ODDISH.glb",
-   "bytes": 455956,
-   "status": "generated"
+   "bytes": 597992,
+   "status": "generated",
+   "plan": "plant",
+   "signature": [
+    "Absorb",
+    "Acid",
+    "PetalDance",
+    "SwordsDance",
+    "TakeDown",
+    "Rage",
+    "Mimic",
+    "DoubleTeam",
+    "Reflect"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "PARASECT": {
    "height_m": 0.991,
    "px_height": 49.58,
    "tris": 4978,
-   "bones": 17,
+   "bones": 29,
    "file": "PARASECT.glb",
-   "bytes": 533056,
-   "status": "generated"
+   "bytes": 664788,
+   "status": "generated",
+   "plan": "multileg",
+   "signature": [
+    "LeechLife",
+    "Growth",
+    "BodySlam",
+    "TakeDown",
+    "HyperBeam",
+    "Rage",
+    "Dig",
+    "Mimic",
+    "DoubleTeam"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "DUGTRIO": {
    "height_m": 0.711,
    "px_height": 40.96,
    "tris": 4332,
-   "bones": 17,
+   "bones": 14,
    "file": "DUGTRIO.glb",
-   "bytes": 507620,
-   "status": "generated"
+   "bytes": 402300,
+   "status": "generated",
+   "plan": "blob",
+   "signature": [
+    "Scratch",
+    "Growl",
+    "Dig",
+    "SandAttack",
+    "Toxic",
+    "HyperBeam",
+    "Rage",
+    "Mimic",
+    "DoubleTeam"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "GOLDUCK": {
    "height_m": 1.702,
    "px_height": 52.9,
    "tris": 4922,
-   "bones": 17,
+   "bones": 24,
    "file": "GOLDUCK.glb",
-   "bytes": 560332,
-   "status": "generated"
+   "bytes": 627116,
+   "status": "generated",
+   "plan": "biped_humanoid",
+   "signature": [
+    "Scratch",
+    "TailWhip",
+    "Disable",
+    "Confusion",
+    "FurySwipes",
+    "Toxic",
+    "BodySlam",
+    "TakeDown",
+    "WaterGun"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "ARCANINE": {
    "height_m": 1.905,
    "px_height": 54.19,
-   "tris": 6056,
-   "bones": 17,
+   "tris": 5896,
+   "bones": 34,
    "file": "ARCANINE.glb",
-   "bytes": 606956,
-   "status": "generated"
+   "bytes": 761944,
+   "status": "generated",
+   "plan": "quadruped",
+   "signature": [
+    "RoarCall",
+    "Ember",
+    "TakeDown",
+    "Toxic",
+    "BodySlam",
+    "HyperBeam",
+    "Rage",
+    "Dig",
+    "Teleport"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "ABRA": {
    "height_m": 0.889,
    "px_height": 49.91,
    "tris": 4732,
-   "bones": 17,
+   "bones": 32,
    "file": "ABRA.glb",
-   "bytes": 480192,
-   "status": "generated"
+   "bytes": 662440,
+   "status": "generated",
+   "plan": "biped_humanoid",
+   "signature": [
+    "Teleport",
+    "Disable",
+    "Psybeam",
+    "Recover",
+    "Reflect",
+    "MegaPunch",
+    "Toxic",
+    "BodySlam",
+    "TakeDown"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "MACHOKE": {
    "height_m": 1.499,
    "px_height": 54.61,
    "tris": 5526,
-   "bones": 17,
+   "bones": 21,
    "file": "MACHOKE.glb",
-   "bytes": 525600,
-   "status": "generated"
+   "bytes": 551848,
+   "status": "generated",
+   "plan": "biped_humanoid",
+   "signature": [
+    "LowKick",
+    "Leer",
+    "FocusEnergy",
+    "SeismicToss",
+    "Submission",
+    "Toxic",
+    "Counter",
+    "Dig",
+    "Mimic"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "VICTREEBEL": {
    "height_m": 1.423,
    "px_height": 57.41,
    "tris": 3668,
-   "bones": 17,
+   "bones": 15,
    "file": "VICTREEBEL.glb",
-   "bytes": 460976,
-   "status": "generated"
+   "bytes": 422952,
+   "status": "generated",
+   "plan": "plant",
+   "signature": [
+    "Acid",
+    "RazorLeaf",
+    "Wrap",
+    "SwordsDance",
+    "BodySlam",
+    "TakeDown",
+    "Rage",
+    "MegaDrain",
+    "Mimic"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "GRAVELER": {
    "height_m": 0.87,
@@ -1006,35 +2698,107 @@
    "tris": 4992,
    "bones": 17,
    "file": "GRAVELER.glb",
-   "bytes": 532904,
-   "status": "generated"
+   "bytes": 486772,
+   "status": "generated",
+   "plan": "rock",
+   "signature": [
+    "Tackle",
+    "DefenseCurl",
+    "Selfdestruct",
+    "MegaPunch",
+    "Toxic",
+    "Counter",
+    "Dig",
+    "Mimic",
+    "DoubleTeam"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "SLOWPOKE": {
    "height_m": 0.843,
    "px_height": 32.4,
    "tris": 3892,
-   "bones": 17,
+   "bones": 25,
    "file": "SLOWPOKE.glb",
-   "bytes": 457516,
-   "status": "generated"
+   "bytes": 615728,
+   "status": "generated",
+   "plan": "quadruped_small",
+   "signature": [
+    "Confusion",
+    "Disable",
+    "Headbutt",
+    "WaterGun",
+    "Amnesia",
+    "Withdraw",
+    "Toxic",
+    "BodySlam",
+    "TakeDown"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "FARFETCHD": {
    "height_m": 0.787,
    "px_height": 58.14,
    "tris": 5250,
-   "bones": 17,
+   "bones": 34,
    "file": "FARFETCHD.glb",
-   "bytes": 501512,
-   "status": "generated"
+   "bytes": 679284,
+   "status": "generated",
+   "plan": "bird",
+   "signature": [
+    "SandAttack",
+    "Leer",
+    "FuryAttack",
+    "SwordsDance",
+    "Agility",
+    "Slash",
+    "RazorWind",
+    "Whirlwind",
+    "Toxic"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "DEWGONG": {
    "height_m": 1.419,
    "px_height": 57.36,
    "tris": 4828,
-   "bones": 17,
+   "bones": 21,
    "file": "DEWGONG.glb",
-   "bytes": 483432,
-   "status": "generated"
+   "bytes": 563780,
+   "status": "generated",
+   "plan": "fish",
+   "signature": [
+    "Headbutt",
+    "Growl",
+    "AuroraBeam",
+    "RestUp",
+    "Toxic",
+    "BodySlam",
+    "PayDay",
+    "Rage",
+    "Mimic"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "CLOYSTER": {
    "height_m": 1.499,
@@ -1042,269 +2806,809 @@
    "tris": 4984,
    "bones": 17,
    "file": "CLOYSTER.glb",
-   "bytes": 502172,
-   "status": "generated"
+   "bytes": 505256,
+   "status": "generated",
+   "plan": "shell",
+   "signature": [
+    "Withdraw",
+    "Supersonic",
+    "Clamp",
+    "AuroraBeam",
+    "SpikeCannon",
+    "Toxic",
+    "TakeDown",
+    "Rage",
+    "Teleport"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "ONIX": {
    "height_m": 8.788,
    "px_height": 54.69,
    "tris": 5714,
-   "bones": 17,
+   "bones": 20,
    "file": "ONIX.glb",
-   "bytes": 581676,
-   "status": "generated"
+   "bytes": 670352,
+   "status": "generated",
+   "plan": "serpent",
+   "signature": [
+    "Tackle",
+    "Screech",
+    "Bind",
+    "Rage",
+    "Slam",
+    "Harden",
+    "Toxic",
+    "Dig",
+    "Mimic"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "KINGLER": {
    "height_m": 1.295,
    "px_height": 52.61,
    "tris": 10968,
-   "bones": 17,
+   "bones": 28,
    "file": "KINGLER.glb",
-   "bytes": 777196,
-   "status": "generated"
+   "bytes": 851244,
+   "status": "generated",
+   "plan": "multileg",
+   "signature": [
+    "Leer",
+    "Vicegrip",
+    "Guillotine",
+    "Stomp",
+    "Harden",
+    "SwordsDance",
+    "Toxic",
+    "TakeDown",
+    "Bubblebeam"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "EXEGGUTOR": {
    "height_m": 2.007,
    "px_height": 65.39,
    "tris": 13999,
-   "bones": 17,
+   "bones": 36,
    "file": "EXEGGUTOR.glb",
-   "bytes": 799704,
-   "status": "generated"
+   "bytes": 1131584,
+   "status": "generated",
+   "plan": "plant",
+   "signature": [
+    "Barrage",
+    "Hypnosis",
+    "Stomp",
+    "TakeDown",
+    "HyperBeam",
+    "Rage",
+    "MegaDrain",
+    "Psychic",
+    "Teleport"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "HITMONCHAN": {
    "height_m": 1.397,
    "px_height": 59.87,
-   "tris": 5726,
-   "bones": 17,
+   "tris": 5662,
+   "bones": 22,
    "file": "HITMONCHAN.glb",
-   "bytes": 530300,
-   "status": "generated"
+   "bytes": 527352,
+   "status": "generated",
+   "plan": "biped_humanoid",
+   "signature": [
+    "CometPunch",
+    "Agility",
+    "FirePunch",
+    "Counter",
+    "MegaKick",
+    "Toxic",
+    "BodySlam",
+    "Mimic",
+    "SkullBash"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "RHYHORN": {
    "height_m": 0.991,
    "px_height": 46.08,
    "tris": 10216,
-   "bones": 17,
+   "bones": 34,
    "file": "RHYHORN.glb",
-   "bytes": 776788,
-   "status": "generated"
+   "bytes": 1026176,
+   "status": "generated",
+   "plan": "quadruped",
+   "signature": [
+    "HornAttack",
+    "TailWhip",
+    "FuryAttack",
+    "Leer",
+    "TakeDown",
+    "Toxic",
+    "Rage",
+    "Thunderbolt",
+    "Dig"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "KANGASKHAN": {
    "height_m": 2.06,
    "px_height": 58.47,
    "tris": 6406,
-   "bones": 17,
+   "bones": 24,
    "file": "KANGASKHAN.glb",
-   "bytes": 582116,
-   "status": "generated"
+   "bytes": 657108,
+   "status": "generated",
+   "plan": "biped_tail",
+   "signature": [
+    "CometPunch",
+    "Rage",
+    "Bite",
+    "TailWhip",
+    "Leer",
+    "MegaKick",
+    "Toxic",
+    "BodySlam",
+    "TakeDown"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "SEAKING": {
    "height_m": 1.295,
    "px_height": 57.0,
    "tris": 9436,
-   "bones": 17,
+   "bones": 29,
    "file": "SEAKING.glb",
-   "bytes": 677164,
-   "status": "generated"
+   "bytes": 787968,
+   "status": "generated",
+   "plan": "fish",
+   "signature": [
+    "Peck",
+    "Supersonic",
+    "FuryAttack",
+    "Waterfall",
+    "Agility",
+    "Toxic",
+    "TakeDown",
+    "Bubblebeam",
+    "Rage"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "SCYTHER": {
    "height_m": 1.499,
    "px_height": 63.94,
-   "tris": 5416,
-   "bones": 17,
+   "tris": 5232,
+   "bones": 32,
    "file": "SCYTHER.glb",
-   "bytes": 533940,
-   "status": "generated"
+   "bytes": 624144,
+   "status": "generated",
+   "plan": "winged",
+   "signature": [
+    "QuickAttack",
+    "Leer",
+    "FocusEnergy",
+    "Toxic",
+    "TakeDown",
+    "HyperBeam",
+    "Rage",
+    "Mimic",
+    "SkullBash"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "PINSIR": {
    "height_m": 1.499,
    "px_height": 64.9,
    "tris": 4852,
-   "bones": 17,
+   "bones": 23,
    "file": "PINSIR.glb",
-   "bytes": 507648,
-   "status": "generated"
+   "bytes": 533820,
+   "status": "generated",
+   "plan": "biped_humanoid",
+   "signature": [
+    "Vicegrip",
+    "SeismicToss",
+    "Guillotine",
+    "FocusEnergy",
+    "Harden",
+    "TakeDown",
+    "HyperBeam",
+    "Rage",
+    "Mimic"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "LAPRAS": {
    "height_m": 2.49,
    "px_height": 61.91,
    "tris": 14000,
-   "bones": 17,
+   "bones": 26,
    "file": "LAPRAS.glb",
-   "bytes": 837376,
-   "status": "generated"
+   "bytes": 955196,
+   "status": "generated",
+   "plan": "fish",
+   "signature": [
+    "WaterGun",
+    "Growl",
+    "SingSong",
+    "Mist",
+    "BodySlam",
+    "Toxic",
+    "HornDrill",
+    "TakeDown",
+    "Rage"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "JOLTEON": {
    "height_m": 0.787,
    "px_height": 54.98,
    "tris": 4825,
-   "bones": 17,
+   "bones": 27,
    "file": "JOLTEON.glb",
-   "bytes": 464872,
-   "status": "generated"
+   "bytes": 499932,
+   "status": "generated",
+   "plan": "quadruped",
+   "signature": [
+    "Tackle",
+    "SandAttack",
+    "QuickAttack",
+    "Thundershock",
+    "TailWhip",
+    "DoubleKick",
+    "PinMissile",
+    "Toxic",
+    "BodySlam"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "OMASTAR": {
    "height_m": 0.991,
    "px_height": 60.21,
    "tris": 5304,
-   "bones": 17,
+   "bones": 25,
    "file": "OMASTAR.glb",
-   "bytes": 500360,
-   "status": "generated"
+   "bytes": 568216,
+   "status": "generated",
+   "plan": "shell",
+   "signature": [
+    "WaterGun",
+    "Withdraw",
+    "HornAttack",
+    "Leer",
+    "SpikeCannon",
+    "HydroPump",
+    "Toxic",
+    "BodySlam",
+    "TakeDown"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "SNORLAX": {
    "height_m": 2.108,
    "px_height": 60.35,
    "tris": 800,
-   "bones": 17,
+   "bones": 24,
    "file": "SNORLAX.glb",
-   "bytes": 319668,
-   "status": "generated"
+   "bytes": 420908,
+   "status": "generated",
+   "plan": "biped_tail",
+   "signature": [
+    "Headbutt",
+    "Amnesia",
+    "RestUp",
+    "BodySlam",
+    "Harden",
+    "DoubleEdge",
+    "MegaPunch",
+    "Toxic",
+    "WaterGun"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "DRATINI": {
    "height_m": 1.803,
    "px_height": 54.73,
    "tris": 2994,
-   "bones": 17,
+   "bones": 11,
    "file": "DRATINI.glb",
-   "bytes": 412448,
-   "status": "generated"
+   "bytes": 328752,
+   "status": "generated",
+   "plan": "serpent",
+   "signature": [
+    "Wrap",
+    "Leer",
+    "ThunderWave",
+    "Agility",
+    "Slam",
+    "HyperBeam",
+    "Toxic",
+    "TakeDown",
+    "Rage"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "MEW": {
    "height_m": 0.406,
    "px_height": 54.19,
-   "tris": 4582,
-   "bones": 17,
+   "tris": 4462,
+   "bones": 23,
    "file": "MEW.glb",
-   "bytes": 486148,
-   "status": "generated"
+   "bytes": 517204,
+   "status": "generated",
+   "plan": "floating",
+   "signature": [
+    "Pound",
+    "Transform",
+    "Psychic",
+    "RazorWind",
+    "SwordsDance",
+    "Whirlwind",
+    "MegaKick",
+    "Toxic",
+    "HornDrill"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "CHARMANDER": {
    "height_m": 0.61,
    "px_height": 48.17,
    "tris": 4680,
-   "bones": 17,
+   "bones": 24,
    "file": "CHARMANDER.glb",
-   "bytes": 498440,
-   "status": "generated"
+   "bytes": 536664,
+   "status": "generated",
+   "plan": "biped_tail",
+   "signature": [
+    "Scratch",
+    "Growl",
+    "Rage",
+    "Flamethrower",
+    "FireSpin",
+    "SwordsDance",
+    "MegaKick",
+    "Toxic",
+    "BodySlam"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "WARTORTLE": {
    "height_m": 0.991,
    "px_height": 59.93,
-   "tris": 5032,
-   "bones": 17,
+   "tris": 4952,
+   "bones": 28,
    "file": "WARTORTLE.glb",
-   "bytes": 512412,
-   "status": "generated"
+   "bytes": 656196,
+   "status": "generated",
+   "plan": "shell",
+   "signature": [
+    "Tackle",
+    "TailWhip",
+    "Bite",
+    "Withdraw",
+    "SkullBash",
+    "HydroPump",
+    "MegaPunch",
+    "Toxic",
+    "BodySlam"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "BUTTERFREE": {
    "height_m": 1.092,
    "px_height": 52.32,
    "tris": 3932,
-   "bones": 17,
+   "bones": 28,
    "file": "BUTTERFREE.glb",
-   "bytes": 457696,
-   "status": "generated"
+   "bytes": 567184,
+   "status": "generated",
+   "plan": "winged",
+   "signature": [
+    "Confusion",
+    "Poisonpowder",
+    "Supersonic",
+    "Whirlwind",
+    "Psybeam",
+    "RazorWind",
+    "TakeDown",
+    "Rage",
+    "MegaDrain"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "PIDGEY": {
    "height_m": 0.305,
    "px_height": 49.87,
    "tris": 5222,
-   "bones": 17,
+   "bones": 26,
    "file": "PIDGEY.glb",
-   "bytes": 562212,
-   "status": "generated"
+   "bytes": 625416,
+   "status": "generated",
+   "plan": "bird",
+   "signature": [
+    "Gust",
+    "SandAttack",
+    "QuickAttack",
+    "Whirlwind",
+    "MirrorMove",
+    "Toxic",
+    "TakeDown",
+    "Rage",
+    "Reflect"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "RATICATE": {
    "height_m": 0.711,
    "px_height": 46.97,
    "tris": 5379,
-   "bones": 17,
+   "bones": 32,
    "file": "RATICATE.glb",
-   "bytes": 554672,
-   "status": "generated"
+   "bytes": 658052,
+   "status": "generated",
+   "plan": "quadruped_small",
+   "signature": [
+    "Tackle",
+    "TailWhip",
+    "QuickAttack",
+    "FocusEnergy",
+    "Toxic",
+    "BodySlam",
+    "WaterGun",
+    "Rage",
+    "Thunderbolt"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "ARBOK": {
    "height_m": 3.505,
    "px_height": 57.55,
    "tris": 3418,
-   "bones": 17,
+   "bones": 11,
    "file": "ARBOK.glb",
-   "bytes": 442196,
-   "status": "generated"
+   "bytes": 355112,
+   "status": "generated",
+   "plan": "serpent",
+   "signature": [
+    "Wrap",
+    "Leer",
+    "PoisonSting",
+    "Bite",
+    "Screech",
+    "Acid",
+    "Toxic",
+    "TakeDown",
+    "Rage"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "SANDSLASH": {
    "height_m": 0.991,
    "px_height": 51.57,
    "tris": 5468,
-   "bones": 17,
+   "bones": 29,
    "file": "SANDSLASH.glb",
-   "bytes": 552416,
-   "status": "generated"
+   "bytes": 631400,
+   "status": "generated",
+   "plan": "biped_tail",
+   "signature": [
+    "SandAttack",
+    "PoisonSting",
+    "Swift",
+    "SwordsDance",
+    "Toxic",
+    "BodySlam",
+    "TakeDown",
+    "HyperBeam",
+    "Rage"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "NIDORAN_M": {
    "height_m": 0.508,
    "px_height": 39.18,
-   "tris": 4568,
-   "bones": 17,
+   "tris": 4492,
+   "bones": 29,
    "file": "NIDORAN_M.glb",
-   "bytes": 487008,
-   "status": "generated"
+   "bytes": 588628,
+   "status": "generated",
+   "plan": "quadruped_small",
+   "signature": [
+    "Leer",
+    "Tackle",
+    "HornAttack",
+    "PoisonSting",
+    "FocusEnergy",
+    "DoubleKick",
+    "BodySlam",
+    "Blizzard",
+    "Rage"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "CLEFABLE": {
    "height_m": 1.295,
    "px_height": 58.38,
    "tris": 4681,
-   "bones": 17,
+   "bones": 27,
    "file": "CLEFABLE.glb",
-   "bytes": 499700,
-   "status": "generated"
+   "bytes": 640032,
+   "status": "generated",
+   "plan": "biped_tail",
+   "signature": [
+    "SingSong",
+    "Doubleslap",
+    "Minimize",
+    "Metronome",
+    "MegaPunch",
+    "Toxic",
+    "BodySlam",
+    "TakeDown",
+    "WaterGun"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "WIGGLYTUFF": {
    "height_m": 0.991,
    "px_height": 59.68,
    "tris": 4316,
-   "bones": 17,
+   "bones": 14,
    "file": "WIGGLYTUFF.glb",
-   "bytes": 466584,
-   "status": "generated"
+   "bytes": 418116,
+   "status": "generated",
+   "plan": "blob",
+   "signature": [
+    "SingSong",
+    "Disable",
+    "DefenseCurl",
+    "Doubleslap",
+    "MegaPunch",
+    "MegaKick",
+    "Toxic",
+    "BodySlam",
+    "TakeDown"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "GLOOM": {
    "height_m": 0.787,
    "px_height": 38.52,
    "tris": 4884,
-   "bones": 17,
+   "bones": 20,
    "file": "GLOOM.glb",
-   "bytes": 507088,
-   "status": "generated"
+   "bytes": 561436,
+   "status": "generated",
+   "plan": "plant",
+   "signature": [
+    "Absorb",
+    "Acid",
+    "PetalDance",
+    "SwordsDance",
+    "TakeDown",
+    "Rage",
+    "Mimic",
+    "DoubleTeam",
+    "Reflect"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "VENONAT": {
    "height_m": 0.991,
    "px_height": 41.28,
    "tris": 4812,
-   "bones": 17,
+   "bones": 22,
    "file": "VENONAT.glb",
-   "bytes": 497236,
-   "status": "generated"
+   "bytes": 532748,
+   "status": "generated",
+   "plan": "multileg",
+   "signature": [
+    "Disable",
+    "LeechLife",
+    "Psybeam",
+    "Psychic",
+    "Rage",
+    "Mimic",
+    "DoubleTeam",
+    "Reflect",
+    "RestUp"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "MEOWTH": {
    "height_m": 0.406,
    "px_height": 46.33,
-   "tris": 5652,
-   "bones": 17,
+   "tris": 5460,
+   "bones": 29,
    "file": "MEOWTH.glb",
-   "bytes": 559424,
-   "status": "generated"
+   "bytes": 661116,
+   "status": "generated",
+   "plan": "biped_tail",
+   "signature": [
+    "Scratch",
+    "Growl",
+    "Bite",
+    "PayDay",
+    "Screech",
+    "FurySwipes",
+    "Toxic",
+    "BodySlam",
+    "WaterGun"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "MANKEY": {
    "height_m": 0.508,
    "px_height": 43.67,
    "tris": 4334,
-   "bones": 17,
+   "bones": 21,
    "file": "MANKEY.glb",
-   "bytes": 493344,
-   "status": "generated"
+   "bytes": 485732,
+   "status": "generated",
+   "plan": "biped_humanoid",
+   "signature": [
+    "Scratch",
+    "Leer",
+    "FurySwipes",
+    "SeismicToss",
+    "Thrash",
+    "Toxic",
+    "TakeDown",
+    "PayDay",
+    "Thunderbolt"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "POLIWAG": {
    "height_m": 0.61,
@@ -1312,215 +3616,647 @@
    "tris": 1248,
    "bones": 17,
    "file": "POLIWAG.glb",
-   "bytes": 346076,
-   "status": "generated"
+   "bytes": 330896,
+   "status": "generated",
+   "plan": "fish",
+   "signature": [
+    "Bubble",
+    "Hypnosis",
+    "Doubleslap",
+    "BodySlam",
+    "Amnesia",
+    "Toxic",
+    "Rage",
+    "Psychic",
+    "Mimic"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "KADABRA": {
    "height_m": 1.295,
    "px_height": 58.46,
-   "tris": 5812,
-   "bones": 17,
+   "tris": 5692,
+   "bones": 28,
    "file": "KADABRA.glb",
-   "bytes": 558040,
-   "status": "generated"
+   "bytes": 684396,
+   "status": "generated",
+   "plan": "biped_humanoid",
+   "signature": [
+    "Teleport",
+    "Confusion",
+    "Disable",
+    "Psybeam",
+    "Recover",
+    "MegaPunch",
+    "Toxic",
+    "BodySlam",
+    "TakeDown"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "MACHAMP": {
    "height_m": 1.6,
    "px_height": 60.37,
    "tris": 5751,
-   "bones": 17,
+   "bones": 26,
    "file": "MACHAMP.glb",
-   "bytes": 560252,
-   "status": "generated"
+   "bytes": 641904,
+   "status": "generated",
+   "plan": "biped_humanoid",
+   "signature": [
+    "LowKick",
+    "Leer",
+    "FocusEnergy",
+    "SeismicToss",
+    "Submission",
+    "Toxic",
+    "HyperBeam",
+    "Counter",
+    "Dig"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "TENTACOOL": {
    "height_m": 0.889,
    "px_height": 42.34,
    "tris": 4418,
-   "bones": 17,
+   "bones": 14,
    "file": "TENTACOOL.glb",
-   "bytes": 479568,
-   "status": "generated"
+   "bytes": 469396,
+   "status": "generated",
+   "plan": "multileg",
+   "signature": [
+    "Supersonic",
+    "Wrap",
+    "PoisonSting",
+    "WaterGun",
+    "Barrier",
+    "SwordsDance",
+    "Toxic",
+    "Rage",
+    "MegaDrain"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "GOLEM": {
    "height_m": 1.397,
    "px_height": 50.13,
    "tris": 5077,
-   "bones": 17,
+   "bones": 25,
    "file": "GOLEM.glb",
-   "bytes": 554180,
-   "status": "generated"
+   "bytes": 649584,
+   "status": "generated",
+   "plan": "rock",
+   "signature": [
+    "DefenseCurl",
+    "Selfdestruct",
+    "Earthquake",
+    "MegaPunch",
+    "MegaKick",
+    "Toxic",
+    "HyperBeam",
+    "Counter",
+    "Dig"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "SLOWBRO": {
    "height_m": 1.6,
    "px_height": 49.54,
    "tris": 5248,
-   "bones": 17,
+   "bones": 23,
    "file": "SLOWBRO.glb",
-   "bytes": 530744,
-   "status": "generated"
+   "bytes": 634300,
+   "status": "generated",
+   "plan": "shell",
+   "signature": [
+    "Confusion",
+    "Disable",
+    "Headbutt",
+    "WaterGun",
+    "Withdraw",
+    "Amnesia",
+    "MegaPunch",
+    "MegaKick",
+    "Toxic"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "DODUO": {
    "height_m": 1.397,
    "px_height": 55.83,
    "tris": 5170,
-   "bones": 17,
+   "bones": 24,
    "file": "DODUO.glb",
-   "bytes": 509048,
-   "status": "generated"
+   "bytes": 538068,
+   "status": "generated",
+   "plan": "bird",
+   "signature": [
+    "Growl",
+    "FuryAttack",
+    "Rage",
+    "Agility",
+    "Whirlwind",
+    "Toxic",
+    "BodySlam",
+    "TakeDown",
+    "Mimic"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "GRIMER": {
    "height_m": 0.889,
    "px_height": 33.18,
    "tris": 4424,
-   "bones": 17,
+   "bones": 18,
    "file": "GRIMER.glb",
-   "bytes": 461276,
-   "status": "generated"
+   "bytes": 448140,
+   "status": "generated",
+   "plan": "blob",
+   "signature": [
+    "Pound",
+    "Disable",
+    "PoisonGas",
+    "Minimize",
+    "Sludge",
+    "Screech",
+    "BodySlam",
+    "Rage",
+    "MegaDrain"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "GASTLY": {
    "height_m": 1.295,
    "px_height": 49.43,
-   "tris": 14000,
-   "bones": 17,
+   "tris": 7531,
+   "bones": 12,
    "file": "GASTLY.glb",
-   "bytes": 745572,
-   "status": "generated"
+   "bytes": 454256,
+   "status": "generated",
+   "plan": "floating",
+   "signature": [
+    "ConfuseRay",
+    "NightShade",
+    "DreamEater",
+    "Rage",
+    "Thunderbolt",
+    "Mimic",
+    "DoubleTeam",
+    "Selfdestruct",
+    "RestUp"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "DROWZEE": {
    "height_m": 0.991,
    "px_height": 50.9,
    "tris": 9440,
-   "bones": 17,
+   "bones": 22,
    "file": "DROWZEE.glb",
-   "bytes": 662984,
-   "status": "generated"
+   "bytes": 732012,
+   "status": "generated",
+   "plan": "biped_humanoid",
+   "signature": [
+    "Pound",
+    "Hypnosis",
+    "Disable",
+    "Headbutt",
+    "PoisonGas",
+    "Meditate",
+    "Toxic",
+    "BodySlam",
+    "TakeDown"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "VOLTORB": {
    "height_m": 0.508,
    "px_height": 26.98,
    "tris": 5168,
-   "bones": 17,
+   "bones": 8,
    "file": "VOLTORB.glb",
-   "bytes": 462136,
-   "status": "generated"
+   "bytes": 298732,
+   "status": "generated",
+   "plan": "sphere",
+   "signature": [
+    "Tackle",
+    "Screech",
+    "Sonicboom",
+    "Selfdestruct",
+    "LightScreen",
+    "Swift",
+    "Toxic",
+    "Rage",
+    "Mimic"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "CUBONE": {
    "height_m": 0.406,
    "px_height": 54.39,
    "tris": 4934,
-   "bones": 17,
+   "bones": 28,
    "file": "CUBONE.glb",
-   "bytes": 483408,
-   "status": "generated"
+   "bytes": 588700,
+   "status": "generated",
+   "plan": "biped_tail",
+   "signature": [
+    "Growl",
+    "FocusEnergy",
+    "Thrash",
+    "Bonemerang",
+    "MegaKick",
+    "Toxic",
+    "TakeDown",
+    "Bubblebeam",
+    "WaterGun"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "LICKITUNG": {
    "height_m": 1.194,
    "px_height": 46.37,
    "tris": 10204,
-   "bones": 17,
+   "bones": 25,
    "file": "LICKITUNG.glb",
-   "bytes": 763976,
-   "status": "generated"
+   "bytes": 838112,
+   "status": "generated",
+   "plan": "biped_tail",
+   "signature": [
+    "Wrap",
+    "Supersonic",
+    "Stomp",
+    "Disable",
+    "DefenseCurl",
+    "SwordsDance",
+    "MegaKick",
+    "Toxic",
+    "TakeDown"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "RHYDON": {
    "height_m": 1.905,
    "px_height": 56.61,
    "tris": 5104,
-   "bones": 17,
+   "bones": 22,
    "file": "RHYDON.glb",
-   "bytes": 532104,
-   "status": "generated"
+   "bytes": 553516,
+   "status": "generated",
+   "plan": "biped_tail",
+   "signature": [
+    "HornAttack",
+    "TailWhip",
+    "FuryAttack",
+    "Leer",
+    "TakeDown",
+    "MegaPunch",
+    "Toxic",
+    "Bubblebeam",
+    "WaterGun"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "HORSEA": {
    "height_m": 0.406,
    "px_height": 49.15,
    "tris": 7556,
-   "bones": 17,
+   "bones": 23,
    "file": "HORSEA.glb",
-   "bytes": 584356,
-   "status": "generated"
+   "bytes": 670388,
+   "status": "generated",
+   "plan": "fish",
+   "signature": [
+    "Bubble",
+    "Leer",
+    "Agility",
+    "Toxic",
+    "TakeDown",
+    "Rage",
+    "Mimic",
+    "SkullBash",
+    "RestUp"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "STARYU": {
    "height_m": 0.787,
    "px_height": 48.43,
    "tris": 2684,
-   "bones": 17,
+   "bones": 13,
    "file": "STARYU.glb",
-   "bytes": 413136,
-   "status": "generated"
+   "bytes": 381884,
+   "status": "generated",
+   "plan": "radial",
+   "signature": [
+    "WaterGun",
+    "Harden",
+    "Recover",
+    "Swift",
+    "LightScreen",
+    "Toxic",
+    "Rage",
+    "Thunderbolt",
+    "Psychic"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "JYNX": {
    "height_m": 1.397,
    "px_height": 58.89,
    "tris": 10856,
-   "bones": 17,
+   "bones": 27,
    "file": "JYNX.glb",
-   "bytes": 741160,
-   "status": "generated"
+   "bytes": 826820,
+   "status": "generated",
+   "plan": "biped_humanoid",
+   "signature": [
+    "Pound",
+    "LovelyKiss",
+    "Lick",
+    "Doubleslap",
+    "BodySlam",
+    "Thrash",
+    "Blizzard",
+    "Toxic",
+    "TakeDown"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "TAUROS": {
    "height_m": 1.397,
    "px_height": 52.13,
    "tris": 1972,
-   "bones": 17,
+   "bones": 33,
    "file": "TAUROS.glb",
-   "bytes": 368904,
-   "status": "generated"
+   "bytes": 514420,
+   "status": "generated",
+   "plan": "quadruped",
+   "signature": [
+    "Tackle",
+    "Stomp",
+    "TailWhip",
+    "Leer",
+    "Rage",
+    "Toxic",
+    "HornDrill",
+    "Blizzard",
+    "Thunderbolt"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "DITTO": {
    "height_m": 0.305,
    "px_height": 28.59,
    "tris": 3072,
-   "bones": 17,
+   "bones": 8,
    "file": "DITTO.glb",
-   "bytes": 787864,
-   "status": "generated"
+   "bytes": 630064,
+   "status": "generated",
+   "plan": "blob",
+   "signature": [
+    "Transform",
+    "Tackle",
+    "Slam",
+    "Growl",
+    "Harden",
+    "QuickAttack",
+    "Meditate",
+    "Rage",
+    "Screech"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "FLAREON": {
    "height_m": 0.889,
    "px_height": 53.94,
    "tris": 6056,
-   "bones": 17,
+   "bones": 34,
    "file": "FLAREON.glb",
-   "bytes": 551408,
-   "status": "generated"
+   "bytes": 780816,
+   "status": "generated",
+   "plan": "quadruped",
+   "signature": [
+    "Tackle",
+    "QuickAttack",
+    "TailWhip",
+    "Bite",
+    "Leer",
+    "FireSpin",
+    "Rage",
+    "Flamethrower",
+    "Toxic"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "KABUTO": {
    "height_m": 0.508,
    "px_height": 25.51,
    "tris": 6108,
-   "bones": 17,
+   "bones": 18,
    "file": "KABUTO.glb",
-   "bytes": 506496,
-   "status": "generated"
+   "bytes": 500744,
+   "status": "generated",
+   "plan": "multileg",
+   "signature": [
+    "Scratch",
+    "Harden",
+    "Absorb",
+    "Leer",
+    "HydroPump",
+    "Toxic",
+    "BodySlam",
+    "TakeDown",
+    "WaterGun"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "ARTICUNO": {
    "height_m": 1.702,
    "px_height": 65.68,
    "tris": 6248,
-   "bones": 17,
+   "bones": 25,
    "file": "ARTICUNO.glb",
-   "bytes": 586724,
-   "status": "generated"
+   "bytes": 676808,
+   "status": "generated",
+   "plan": "bird",
+   "signature": [
+    "Blizzard",
+    "Agility",
+    "Mist",
+    "RazorWind",
+    "Whirlwind",
+    "Toxic",
+    "TakeDown",
+    "Rage",
+    "Mimic"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "DRAGONAIR": {
    "height_m": 3.988,
    "px_height": 63.82,
    "tris": 3777,
-   "bones": 17,
+   "bones": 14,
    "file": "DRAGONAIR.glb",
-   "bytes": 454944,
-   "status": "generated"
+   "bytes": 430892,
+   "status": "generated",
+   "plan": "serpent",
+   "signature": [
+    "Wrap",
+    "Leer",
+    "ThunderWave",
+    "Agility",
+    "Slam",
+    "HyperBeam",
+    "Toxic",
+    "HornDrill",
+    "TakeDown"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   },
   "MISSINGNO": {
    "height_m": 1.6,
    "px_height": 56.0,
    "tris": 396,
-   "bones": 17,
+   "bones": 12,
    "file": "MISSINGNO.glb",
-   "bytes": 317712,
-   "status": "generated"
+   "bytes": 209160,
+   "status": "generated",
+   "plan": "blob",
+   "signature": [
+    "Tackle",
+    "Slam",
+    "Growl",
+    "Harden",
+    "QuickAttack",
+    "Meditate",
+    "Rage",
+    "Screech",
+    "Bite"
+   ],
+   "clips": 30,
+   "idle_variants": [
+    "IdleLook",
+    "IdleStretch",
+    "IdleFidget"
+   ]
   }
  },
  "animations": [
@@ -1552,6 +4288,11 @@
   "Taunt",
   "Hover",
   "Talk"
+ ],
+ "idle_variants": [
+  "IdleLook",
+  "IdleStretch",
+  "IdleFidget"
  ],
  "source": "Pokemon-3D-api/assets models/opt/regular (MIT), rigged + animated by gen_rigged_pokemon.py"
 }

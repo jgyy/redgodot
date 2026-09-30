@@ -199,6 +199,11 @@ func _setup_object(key: String) -> void:
 		_model.add_child(m2)
 	face(facing)
 
+## Raise a ground object (ball, Pokedex ...) onto the surface of the furniture it stands on.
+func lift_object(y: float) -> void:
+	if _model:
+		_model.position.y = y
+
 func _load_mon(species: String, px_height: float) -> Node3D:
 	# the battle agent's PokemonActor: cel-shaded species model with Idle/Walk clips
 	var m := PokemonActor.new()
@@ -572,7 +577,9 @@ func _update_gait(dt: float) -> void:
 			# the clip runs as fast as the feet travel: one cycle per _gait_cells of ground, whatever its length
 			_anim.speed_scale = maxf(0.0, _clip_len * v / _gait_cells)
 		elif _gesture == "":
-			if _anim.has_animation("Idle") and _anim.current_animation != "Idle":
+			# a follower's idle-variant clip (look around, stretch ...) plays out before it settles back into Idle
+			var variant := is_mon and _anim.current_animation.begins_with("Idle") and _anim.is_playing()
+			if _anim.has_animation("Idle") and _anim.current_animation != "Idle" and not variant:
 				_anim.play("Idle", BLEND_IDLE)
 			_anim.speed_scale = 1.0
 	# a puff of dust on every foot-fall while running or biking, a faint one when walking

@@ -3,7 +3,9 @@ extends Node
 ## A presses (Input.action_press), like upstream's tools/drive.js:
 ##   RED's room -> downstairs -> out the door -> north edge of Pallet (Oak stops you) -> Oak's lab ->
 ##   pick a starter -> walk to the exit (rival battle).
-## Run: godot4 --headless --path godot -- --scene=ow_playtest [--starter=CHARMANDER]
+## Run: godot4 --headless --path godot -- --scene=ow_playtest [--starter=CHARMANDER] [--version=RED|BLUE|YELLOW]
+## YELLOW has no starter choice: the one POKe BALL on the table is the rival's EEVEE and Oak gives PIKACHU, which then
+## walks behind the player (the run checks the follower and the rival's EEVEE fight).
 ## Prints [playtest] lines and exits 0 when every milestone was reached, 1 otherwise.
 
 var log_lines: Array = []
@@ -14,6 +16,7 @@ var _t0 := 0
 func run(starter: String) -> void:
 	_t0 = Time.get_ticks_msec()
 	GameState.start_new_adventure()
+	_note("version", GameState.version)
 	SceneRouter.goto_overworld()
 	await _frames(10)
 	_ow = get_tree().root.find_child("Overworld", true, false)
@@ -37,13 +40,14 @@ func run(starter: String) -> void:
 	await _advance_until(func() -> bool: return _ow.current_map() == "OaksLab" and not _story_busy(), 3600)
 	_note("lab", str(_ow.actor_cell("PLAYER")))
 	# 4. pick the starter's ball on the table
-	var ball := {"CHARMANDER": Vector2i(6, 3), "SQUIRTLE": Vector2i(7, 3), "BULBASAUR": Vector2i(8, 3)}.get(starter, Vector2i(6, 3)) as Vector2i
+	var ball := {"CHARMANDER": Vector2i(6, 3), "SQUIRTLE": Vector2i(7, 3), "BULBASAUR": Vector2i(8, 3), "PIKACHU": Vector2i(7, 3)}.get(starter, Vector2i(6, 3)) as Vector2i
 	await _advance_until(func() -> bool: return not _story_busy(), 1200)
 	await _walk_to(ball + Vector2i(0, 1))
 	await _press_dir("up", 8)
 	await _press_action("confirm", 4)
 	await _advance_until(func() -> bool: return not _story_busy() and not GameState.party.is_empty(), 3600)
 	_note("party", str(GameState.party.map(func(m: GameState.PartyMon) -> String: return m.species_id)))
+
 	# 5. head for the exit: the rival challenges you on the way out
 	await _advance_until(func() -> bool: return not _story_busy(), 1800)
 	await _walk_to(Vector2i(5, 6))
@@ -52,8 +56,62 @@ func run(starter: String) -> void:
 	await _advance_until(func() -> bool: return milestones.has("battle") and not SceneRouter.in_battle() and not _story_busy(), 7200)
 	if _ow.current_map() == "OaksLab" and _ow.visible:
 		_note("after_battle", "%s %s party=%s" % [_ow.current_map(), str(_ow.actor_cell("PLAYER")), str(GameState.party.map(func(m: GameState.PartyMon) -> String: return "%s L%d %d/%d" % [m.species_id, m.level, m.hp, m.max_hp]))])
+	if GameState.is_yellow() and _ow.current_map() == "OaksLab":
+		# a couple of steps so PIKACHU shows up trailing the player, then read what the overworld reports
+		await _walk_to(Vector2i(5, 8))
+		await _walk_to(Vector2i(5, 9))
+		await _frames(40)
+		_note("follower", "%s visible=%s" % [_ow.get("_follower_species"), str(_ow.follower.visible)])
 	var ok := milestones.has("lab") and not GameState.party.is_empty() and milestones.has("battle") and milestones.has("after_battle")
+	if GameState.is_yellow():
+		# PIKACHU is the buddy and walks behind you; the rival fought with EEVEE and picked its evolution
+		ok = ok and GameState.party[0].species_id == "PIKACHU" and GameState.party[0].buddy and str(milestones.get("follower", "")).ends_with("visible=true")
+		ok = ok and str(milestones.get("battle", "")).contains("RIVAL1") and ["FLAREON", "VAPOREON"].has(GameState.rival_eevee)
+	elif starter != "":
+		ok = ok and GameState.party[0].species_id == starter
 	_done("OK" if ok else "INCOMPLETE")
+
+## Drives the real title screen with key presses: A opens the menu, NEW GAME, then the version list; ends once Prof. Oak's
+## speech has started with that version. Run: godot4 --headless --path godot -- --scene=title_playtest --version=BLUE
+func run_title(want: String) -> void:
+	_t0 = Time.get_ticks_msec()
+	GameState.pending_version = "RED"   # so the choice has to come from the menu
+	GameState.version = "RED"
+	# a plain run opens with the intro movie: skip it (any key; the first press only "turns the sound on") until the title shows
+	var waited := 0
+	while _title_scene() == null and waited < 3600:
+		await _press_action("confirm", 2)
+		await _frames(20)
+		waited += 25
+	_note("title", str(_title_scene() != null))
+	await _frames(70)
+	await _press_action("confirm", 3)
+	await _frames(12)
+	if GameState.has_save():
+		await _press_action("move_down", 2)   # CONTINUE is first when a save exists
+	await _press_action("confirm", 3)   # NEW GAME
+	await _frames(12)
+	_note("menu", "version list open")
+	for i in GameData.VERSIONS.find(want):
+		await _press_action("move_down", 2)
+	await _press_action("confirm", 3)
+	var n := 0
+	while n < 600 and get_tree().root.find_child("Intro", true, false) == null:
+		await _frames(1)
+		n += 1
+	var speech := get_tree().root.find_child("Intro", true, false)
+	_note("oak_speech", str(speech != null))
+	var ok := speech != null and GameState.version == want and GameData.active_version == want
+	if ok and speech.has_method("_intro_mon"):
+		ok = speech.call("_intro_mon") == ("PIKACHU" if want == "YELLOW" else "NIDORINO")
+	_done("OK" if ok else "INCOMPLETE")
+
+func _title_scene() -> Node:
+	for n in get_tree().root.find_children("*", "Node3D", true, false):
+		var sc: Variant = n.get_script()
+		if sc != null and str((sc as Script).resource_path).ends_with("TitleScene.gd"):
+			return n
+	return null
 
 func _story_busy() -> bool:
 	var st := get_node_or_null("/root/Story")

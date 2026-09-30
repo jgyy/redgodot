@@ -73,6 +73,11 @@ func _init(opts: Dictionary) -> void:
 			break
 	trainer_items = (o.get("trainer_items", []) as Array).duplicate()
 	safari = o.get("safari", false)
+	if wild and not e.party.is_empty() and e.party[0].species_id == "MISSINGNO":
+		# the MISSINGNO. item glitch: meeting it turns the 6th item stack into 128 + n
+		var keys := GameState.bag.keys()
+		if keys.size() >= 6:
+			GameState.bag[keys[5]] = int(GameState.bag[keys[5]]) + 128
 	if o.has("seed"):
 		rng.seed = int(o["seed"])
 	else:
@@ -188,6 +193,8 @@ func _add_participant(m: GameState.PartyMon) -> void:
 # ------------------------------------------------------------------ main loop
 func run(the_ui: Object) -> String:
 	ui = the_ui
+	if not wild and LEADERS.has(str(trainer.get("cls", ""))):
+		PikachuBuddy.event(PikachuBuddy.GYM_LEADER)   # YELLOW: challenging a gym leader (or the league) pleases PIKACHU
 	await ui.intro(self)
 	_add_participant(mon(p))
 	while true:
@@ -608,6 +615,9 @@ func execute_move(side: BattleSide, md: Dictionary) -> void:
 	if tm == 0.0 and eff != "SPECIAL_DAMAGE" and eff != "SUPER_FANG":
 		await ui.msg("It doesn't affect " + tname + "!")
 		v["thrash"] = {}
+		if eff == "JUMP_KICK":   # Gen 1: a JUMP KICK that can't connect (immune target) still costs the user 1 HP
+			await ui.msg(nm + " kept going and crashed!")
+			await apply_damage(side, 1)
 		if eff == "EXPLODE":
 			a.hp = 0
 			await ui.sync_hp(side)
@@ -1166,6 +1176,7 @@ func check_faints() -> bool:
 		await ui.faint(p)
 		await ui.msg(pm.display_name() + " fainted!")
 		participants.erase(pm)
+		PikachuBuddy.event(PikachuBuddy.FAINTED_VS_STRONGER if mon(e).level - pm.level >= 30 else PikachuBuddy.FAINTED, pm)
 	if not any:
 		return false
 	if p.fainted:
@@ -1268,6 +1279,7 @@ func give_exp() -> void:
 				m.level += 1
 				m.recalc_keep_hp()
 				m.leveled_in_battle = true
+				PikachuBuddy.event(PikachuBuddy.LEVEL_UP, m)   # YELLOW: PIKACHU's friendship
 				if active:
 					await ui.refresh()
 				await ui.msg(m.display_name() + " grew to level " + str(m.level) + "!")
@@ -1435,6 +1447,7 @@ func apply_to_mon(id: String, m: GameState.PartyMon) -> bool:
 		var before := m.hp
 		if heals:
 			m.hp = mini(m.max_hp, m.hp + int(HEAL[id]))
+			PikachuBuddy.event(PikachuBuddy.HP_RESTORE, m)
 		if cures:
 			m.status = ""
 			m.sleep = 0
@@ -1597,6 +1610,19 @@ static func make_trainer_party(cls: String, n: int) -> Array:
 		var m := GameState.PartyMon.new(str(lv_sp[1]), int(lv_sp[0]), {"atk": 9, "def": 8, "spd": 8, "spc": 8})
 		m.ot = cls
 		party.append(m)
+	if not GameData.special_moves.is_empty():
+		# YELLOW: data/trainers/special_moves.asm hands individual trainers custom movesets ([mon, slot, MOVE] triples)
+		for tr in (GameData.special_moves.get(cls, {}) as Dictionary).get(str(n), []):
+			var mi: int = int(tr[0]) - 1
+			if mi >= 0 and mi < party.size():
+				var sm: GameState.PartyMon = party[mi]
+				var slot: int = int(tr[1]) - 1
+				if slot < sm.moves.size():
+					if not sm.moves.has(tr[2]):
+						sm.replace_move(slot, tr[2])
+				else:
+					sm.add_move(tr[2])
+		return party
 	var lone: String = LONE_MOVES.get(cls, "")
 	if lone != "" and not party.is_empty():
 		var lm: GameState.PartyMon = party[party.size() - 1]

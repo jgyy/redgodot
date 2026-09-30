@@ -1,4 +1,4 @@
-"""Geometry kit for the chibi character generator (pure numpy, no bpy).
+"""Mesh-part kit for the character generator (pure numpy, no bpy): Part, loft / lathe / solid-surface builders, weights, baked AO.
 
 Everything is a `Part`: an indexed triangle mesh + per-vertex attributes:
   * g      gradient parameter 0..1 that the part's texture cell maps along its V axis
@@ -78,7 +78,9 @@ class Part:
         if bone is not None:
             self.w = {bone: np.ones(n)}
         self.tag = tag
-        self.ao_gain = 1.0          # 0 disables baked AO for this part (decals)
+        self.ao_gain = 0.8          # 0 disables baked AO for this part (decals)
+        self.ao_const = None        # fixed AO value for this part (skips the bake), e.g. eyelids hidden in the socket
+        self.N = None               # optional precomputed smooth normals (shared with neighbouring parts so seams stay invisible)
 
     # -- transforms
     def transform(self, M=None, t=None):
@@ -92,6 +94,8 @@ class Part:
         p = Part(name or self.name, self.V.copy(), self.F.copy(), self.cell, self.g.copy(),
                  None if self.uv is None else self.uv.copy(), {k: v.copy() for k, v in self.w.items()}, tag=self.tag)
         p.ao_gain = self.ao_gain
+        p.N = None if self.N is None else self.N.copy()
+        p.ao_const = self.ao_const
         return p
 
     def mirror_x(self, name=None):
@@ -347,7 +351,13 @@ def loft(path, radii, seg=14, cell='skin', name='loft', ref=(1.0, 0.0, 0.0), cap
     if g is not None:
         gfun = g
         gv = np.asarray(gfun(Vv), float) if callable(gfun) else np.asarray(gfun, float)
-    p, _ = _finish(name, Vv, Ff, cell, gv)
+    p, _ = _finish(name, Vv, Ff, cell, gv, orient=False)
+    # face the winding away from the path (orient_outward's centre-of-mass test gets thin curved tubes near the skull wrong)
+    c = p.V[p.F].mean(1)
+    j = np.linalg.norm(c[:, None, :] - path[None, :, :], axis=2).argmin(1)
+    fn = np.cross(p.V[p.F[:, 1]] - p.V[p.F[:, 0]], p.V[p.F[:, 2]] - p.V[p.F[:, 0]])
+    if ((fn * (c - path[j])).sum(1) > 0).mean() < 0.5:
+        p.F = p.F[:, ::-1].copy()
     return p
 
 
@@ -587,11 +597,16 @@ def finalize_weights(part, bone_index, max_inf=4, prune=0.02):
 
 
 # ----------------------------------------------------------------------------- baked AO
-def bake_ao(V, F, normals, samples=20, max_dist=2.6, seed=3, bias=0.03, skip_mask=None):
+def bake_ao(V, F, normals, samples=20, max_dist=2.6, seed=3, bias=0.03, skip_mask=None, extra=None):
     """Hemisphere AO per vertex using mathutils BVH (bpy)."""
     from mathutils import Vector
     from mathutils.bvhtree import BVHTree
-    tree = BVHTree.FromPolygons([tuple(map(float, v)) for v in V], [tuple(int(i) for i in f) for f in F])
+    if extra is not None:                       # occluders that are not part of this mesh (e.g. the other half of a modular character)
+        Va = np.vstack([V, extra[0]])
+        Fa = np.vstack([F, extra[1] + len(V)])
+    else:
+        Va, Fa = V, F
+    tree = BVHTree.FromPolygons([tuple(map(float, v)) for v in Va], [tuple(int(i) for i in f) for f in Fa])
     rng = np.random.default_rng(seed)
     # cosine-weighted hemisphere samples in tangent space
     u1 = (np.arange(samples) + rng.random(samples)) / samples

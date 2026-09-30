@@ -9,6 +9,8 @@ extends PxScreen
 var sel := 0
 var top := 0
 var page_species := ""
+var area_species := ""     # POKeDEX > AREA: the species whose habitats are listed
+var area_top := 0
 var _view: PxView3D
 var _page_view: PxView3D
 
@@ -21,11 +23,23 @@ func _ready() -> void:
 
 func _on_open() -> void:
 	page_species = ""
+	area_species = ""
 
 func species_at(n: int) -> String:
 	return GameData.dex_order[n] if n > 0 and n < GameData.dex_order.size() and GameData.dex_order[n] != null else ""
 
 func _input_event(e: InputEvent) -> bool:
+	if area_species != "":
+		var n := GameData.habitats(area_species).size()
+		if pressed(e, "move_down", true):
+			area_top = mini(maxi(0, n - 8), area_top + 1)
+		elif pressed(e, "move_up", true):
+			area_top = maxi(0, area_top - 1)
+		elif pressed(e, "confirm") or pressed(e, "cancel"):
+			area_species = ""
+		else:
+			return false
+		return true
 	if page_species != "":
 		if pressed(e, "confirm") or pressed(e, "cancel"):
 			page_species = ""
@@ -45,7 +59,7 @@ func _input_event(e: InputEvent) -> bool:
 	elif pressed(e, "confirm"):
 		var sp := species_at(sel + 1)
 		if GameState.seen_species.has(sp):
-			page_species = sp
+			_species_menu(sp)
 		return true
 	else:
 		return false
@@ -55,7 +69,42 @@ func _input_event(e: InputEvent) -> bool:
 		top = sel - 7
 	return true
 
+## DATA / CRY / AREA / QUIT, like the cartridge's POKeDEX menu.
+func _species_menu(sp: String) -> void:
+	var r := await choose(["DATA", "CRY", "AREA", "QUIT"], {"x": 226, "y": 8, "w": 88})
+	match r:
+		0:
+			page_species = sp
+		1:
+			Audio.cry(sp)
+		2:
+			area_species = sp
+			area_top = 0
+
+func _draw_area(sp: String) -> void:
+	Px.menu_bg(self, Color("#e8e0c8"), Color("#dcd2b8"), t)
+	Px.frame(self, 4, 4, 312, 172, "red")
+	var d := GameData.get_species(sp)
+	Px.text(self, "%s's AREA" % str(d.get("name", sp)), 16, 12)
+	var places: Array = GameData.habitats(sp)
+	if places.is_empty():
+		Px.text(self, "AREA UNKNOWN", 16, 48)
+		Px.small(self, "(%s VERSION: not found in the wild)" % GameState.version, 16, 68, Px.INK)
+		return
+	for i in 8:
+		if area_top + i >= places.size():
+			break
+		Px.text(self, str(places[area_top + i]), 24, 34 + i * 16)
+	if area_top > 0:
+		Px.text(self, "▲", 296, 30, Px.RED, Color(0, 0, 0, 0))
+	if area_top + 8 < places.size():
+		Px.text(self, "▼", 296, 156, Px.RED, Color(0, 0, 0, 0))
+	Px.small(self, "%s VERSION" % GameState.version, 200, 164, GameState.version_color(GameState.version).darkened(0.2))
+
 func _draw() -> void:
+	if area_species != "":
+		_draw_area(area_species)
+		return
 	if page_species != "":
 		_draw_page(page_species)
 		return
